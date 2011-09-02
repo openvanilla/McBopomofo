@@ -33,7 +33,7 @@ Mac OS X 10.6 以上版本
 
 Q: 哪裡可以取得原始碼？
 
-> github
+> 請到 [github](https://github.com/mjhsieh/McBopomofo) 取得。
 
 Q: 為什麼只支援 Mac？
 
@@ -41,15 +41,15 @@ Q: 為什麼只支援 Mac？
 
 Q: 資料是從哪邊來的？
     
-> 請參考這張清單
+> 請參考[這張清單](textpool.html)
 
 Q: 要如何增加詞彙？
 
-> (undefined)
+> 目前此功能關閉維修中。
 
 Q: 要如何提升資料品質？
 
-> (undefined)
+> 請用 twitter 留言給 @McBopomofo
 
 Q: 選字的原理是什麼？
 
