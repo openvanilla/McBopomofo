@@ -1,0 +1,3 @@
+CFBundleName = "McBopomofo";
+CFBundleDisplayName = "McBopomofo";
+"org.openvanilla.inputmethod.McBopomofo.Bopomofo" = "Bopomofo (Phonetics)";

@@ -1,0 +1,3 @@
+CFBundleName = "小麥注音";
+CFBundleDisplayName = "小麥注音";
+"org.openvanilla.inputmethod.McBopomofo.Bopomofo" = "注音（自動選字）";

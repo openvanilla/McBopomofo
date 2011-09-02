@@ -1,0 +1,26 @@
+/* No comment provided by engineer. */
+"About McBopomofo…" = "關於小麥注音…";
+
+/* No comment provided by engineer. */
+"Clear Learning Dictionary (%ju Items)" = "清除學習辭典 (%ju 個項目)";
+
+/* No comment provided by engineer. */
+"Dump Learning Data to Console" = "將學習辭典內容輸出到 Console 上";
+
+/* No comment provided by engineer. */
+"Enable Selection Learning" = "使用自動學習功能";
+
+/* No comment provided by engineer. */
+"McBopomofo Preferences" = "小麥注音偏好設定";
+
+/* No comment provided by engineer. */
+"Check Later" = "晚點再通知我";
+
+/* No comment provided by engineer. */
+"New Version Available" = "New Version Available";
+
+/* No comment provided by engineer. */
+"Visit Website" = "開啟網站";
+
+/* No comment provided by engineer. */
+"You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?" = "目前的輸入法版本是 %1$@ 版 (%2$@)，目前最新版本已經到第 %3$@ 版 (%4$@)。\n\n是否要前往輸入法網站，下載最新版本？";

@@ -1,0 +1,251 @@
+
+1-4w.list
+1-4w.occ
+BPMFBase.txt
+BPMFMappings.txt
+BPMFPunctuations.txt
+Makefile
+PhraseFreq.txt
+README
+heterophony1.list
+heterophony2.list
+textpool.utf8
+bin/
+	BIG5toUTF8.pl
+	buildFreq.bash
+	filter.bash
+	build4wlist.bash
+	cook.rb
+	randomShuffle.bash
+
+----- Following was the readme file of original project,      -----
+----- now mjhsieh is consolidating it into Data folder.       -----
+
+Comments:
+    Basically only pseudo codes have any slightly chance to be in the reports
+    in any form. Thus following notes are just a place for hold my thoughts
+    together.
+
+Phrases source:
+    The answer to how do we get a list of phrases can be very vague. We need to
+    figure out a way to describe our methods. The purpose of this is of course
+    partly for just in case chewing wants to chew us.
+
+  Method One:
+    get the list externally and recalibrate the frequency
+
+    $ cat tsi.src | bin/BIG5toUTF8.pl > tsi.src.utf-8
+    $ grep -v -e '^#' -e '񻦱' -e 'ťť' tsi.src.utf-8 \
+      | awk '{print $1}' | sort > libtabe.tmp
+    $ cat libtabe.tmp big5.list Chang_CLSW6_2005.list \
+      | grep -v -e 'ˇ' -e 'ˊ' -e 'ˋ' -e '˙' -e '(' -e '（' -e '/' -e '#' \
+        -e '[0-9]' \
+      | sort | uniq | gawk 'length($1)<5' > lettuce.list
+    $ echo "big5.list only has two more new chars comparing to libtabe"
+    $ rm libtabe.tmp
+
+  Method Two:
+    use following pseudo code
+
+    wordcount(){
+       echo -n "$1	"
+       cat $(all files in the data folder) \
+           | filter with exclusion list \
+           | split the line with $1 \
+           | print out how many piece of the line got split by this \
+	   | sum the (piece - 1)
+    }
+    for a in $(all words); do
+       wordcount $a
+       for b in $(all words); do
+          wordcount $a$b
+          for $c in $(all words); do
+             wordcount $a$b$c
+             for $d in $(all words); do
+                wordcount $a$b$c$d
+             done
+          done
+       done
+    done
+
+    This nested loop practically becomes:
+       ( for $a in $(all words); do
+           wordcount $a
+         done ) | filter out zero occurrence > one_word.list
+       ( for $a in $(one_word list); do
+             for $b in $(one_word list); do 
+                 wordcount $a$b
+             done
+         done ) | filter out zero occurrence > two_word.list     
+       ( for $ab in $(two_word list); do
+             for $c in $(one_word list); do
+                 wordcount $ab$c
+             done
+         done ) | filter out zero occurrence > three_word.list
+       ( for $abc in $(three_word list); do
+             for $d in $(one_word list); do
+                 wordcount $abc$d
+             done
+         done ) | filter out zero occurrence > four_word.list
+    Also the text pool can be flattened by this:
+       ( find data -type f | xargs cat ) | ./BIG5toUTF8.pl \
+       | sed -e 's/[a-z,A-Z,0-9,<,>,:,/,=,\",_,\.,\?,\;,&,#,-,%]/ /g; \
+                 s/-/ /g;s/\[//g;s/]//g;s/\!//g;s/    / /g;s/ /\n/g'  \
+       | grep -v '^$' > flattened.datafile
+    The wordcount jobs in the loop can also be unlooped into a joblist file
+    so that they can be run in parallel environment. Here is the script to
+    submit Open PBS jobs:
+       foreach PSn (`seq 1 500`)
+          qsub -v "PSn=$PSn,nPS=10000" w2_gen.pbs
+       end
+    Here is the PBS script:
+       #PBS -S /bin/bash
+       #PBS -N "sequence"
+       #PBS -r n
+       #PBS -j oe
+       #PBS -l nodes=1:p4:ppn=1
+       . bash/wordcount.bash
+       
+       if [ -z "$nPS" ]; then
+          export nPS=1
+          export PSn=1
+       fi
+       if [ -z "$PSn" ]; then
+          export PSn=1
+       fi
+       
+       cd $PBS_O_WORKDIR   
+       mkdir -p /tmp/mjgrep; rsync -ax --delete datafile /tmp/mjgrep/
+       
+       export SEDRANGE=$(cat joblist | awk -v nPS=$nPS -v PSn=$PSn  \
+               'function ceiling(x){return ((x > int(x)) ? int(x)+1 : int(x))} \
+                END{print (PSn-1)*ceiling(NR/nPS)+1","PSn*ceiling(NR/nPS)"p"}' )
+       
+       myTEMP=$(mktemp)
+       sed -n $SEDRANGE joblist > $myTEMP
+       ( source $myTEMP )> ab.txt.$PSn
+       rm -rf /tmp/mjgrep $myTEMP
+
+Data Sources:
+    IRC text pool
+        Logs from public IRC channels #bsdchat, #osxchat, #elixus, and #bioinfo
+        on IRC networks of IRCNet and FreeNode, from 2002 to 2010. This text set
+        was later obsolete due to privacy concern. There are some suggestions to
+        recollect some of the sentences with approvals from the authors. (Phrase
+        frequencies version 0, 1, and 2 are based on this pool.)
+        ( New IRC text pool ) (disabled)
+        IRC log of public channel licensed by the authors. (mjhsieh so far)
+        - replace all alphabet/numerical/punctuation symbols with a space
+        - replace all white space with a line break
+        - randomly shuffle the lines in the files, can be shuffled with
+          following flatterned data files.
+    Blog text pool
+    News text pool (snapshot)
+    PTT boards snapshots thru RSS
+    Journal
+        PDFtoText and filtered by filter.bash:
+    Processing method:
+        All RSS feeds are processed through http://mrss.dokoda.jp and grabbed
+        the all text links.
+           # filter.bash
+           perl -p -e 's/\r//g;s/∼//g' \
+            | gsed -e 's/[\!-ÿ]/ /g' \
+            | gsed -e 's/[	,　,è,ø]/ /g' \
+            | gsed -e 's/[【,】,（,）,＜,＞,〔,〕,～,《,》,「,」,“,”]/ /g' \
+            | gsed -e 's/[┐,\—,┌,﹝,﹞,『,』,〈,〉,↓]/ /g' \
+            | gsed -e 's/[～,‧,。,，,！,、,：,；,＠,＃,＄,％,︿,＆,＊,’]/ /g' \
+            | gsed -e 's/[？,▼,★,→,–,…,◎,※,＼,／,​,◄,►,．,←,↩,－]/ /g' \
+            | gsed -e 's/^ *//g;s/ *$//g' \
+            | gsed -e 's/リーダーで見るために変換しています//g' \
+            | gsed -e 's/まるごと//g' \
+            | grep -v -e '^$' -e '^ *$'
+
+All the IRC logs are converted from mixed big5/utf-8 text to pure utf-8 text
+with this PERL subroutine:
+   use strict;
+   use warnings;
+   use Encode qw(decode FB_CROAK);
+   binmode(STDIN,  ":raw")  || die "can't binmode STDIN";
+   binmode(STDOUT, ":utf8") || die "can't binmode STDOUT";
+   while (my $line = <STDIN>) {
+       eval { $line = decode("UTF-8", $line, FB_CROAK()) };
+       if ($@) { 
+           $line = decode("big5-hkscs", $line, 0); # silent even if error
+       }
+       $line =~ s/\R\z/\n/;  # fix raw mode reads
+       print STDOUT $line;    
+   }
+   close(STDIN)  || die "can't close STDIN: $!";
+   close(STDOUT) || die "can't close STDOUT: $!";
+   exit 0;
+
+The occurrence of a single phrase is counted with this BASH subroutine:
+   phrase_count(){
+   if [ $# -lt 2 ]; then
+      echo "u r doin it wron!"
+      echo "Usage: $0 <phrase with double quote> <file to count>"
+      exit 1
+   fi
+   cat ${@:2} | grep -v '^$' \
+   	| awk -F "$1" '{print NF-1}' ${@:2} \
+   	| awk 'BEGIN{s=0} \
+   		    {s+=$1} \
+   		 END{print s}'
+   }
+
+The frequencies are done with simple awk scripts:
+
+   awk '{printf("%s %.8f\n",$1,log($2/43763573)/log(10))}' \
+	corpusirc.sorted.txt > mjhsieh-phrase-freq.txt
+   awk 'length($1)<4{printf("%s %.8f\n",$1,log($2/43198279)/log(10))}' \
+	corpusirc.sorted.txt > mjhsieh-char-freq.txt
+
+   (updated)
+   % awk -v TOTAL=$(awk '{s+=$2}END{print s}' 1-4w.occ) \
+         '{printf("%s %.8f\n",$1,log($2/TOTAL)/log(10))}' 1-4w.occ \
+     | sed -e 's/inf$/7.0/' > phrase-freqv000.txt
+
+Mapping BPMF with libtabe (tsi.src)
+
+   % cat tsi.src.[2-4]w | gawk '{printf "%s",$1; \
+       for (i=1;i<=length($1);i++) {printf " %s",$(i+2)}; printf "\n"}' \
+     | awk 'NF>1' > BPMFMappings.txt.new
+   % cat tsi.src.[2-4]w | gawk '{printf "%s",$1; \
+       for (i=1;i<=length($1);i++) {printf " %s",$(i+2+length($1))}; \
+          printf "\n"}' \
+     | awk 'NF>1' >> BPMFMappings.txt.new
+   $ (for myph in $(cat tsi.src.[2-4]w \
+                    | gawk '{printf "%s",$1; \
+                             for (i=1;i<=length($1);i++) { \
+                                 printf " %s",$(i+2)}; \
+                                 printf "\n" \
+                              }' | awk 'NF==1'); do \
+          awk -v query="$myph" '$1==query' BPMFMappings.txt; \
+       done) > tmp
+   % cat tmp >> BPMFMappings.txt.new
+   % sed -i -e 's/ *$//;s/1/ /g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g;s/5/˙/g' \
+     BPMFMappings.txt.new
+   (disabled) % grep -e '].*].*]' BPMFMappings.txt.new > multi3
+   (disabled) % vi multi3
+   (disabled) # manually expand the multi3 into multi1
+   % vi BPMFMappings.txt.new
+  #  manually fixed
+  #     1. [] [] [] three expressions in a line
+  #     2. [xx,xx,xx] three elements in a expression 
+  #     3. make it into a one-expression per line with only two elements
+  #        in an expression if there is an expression.
+   % grep -e '].*]' BPMFMappings.txt.new > multi2
+   % grep -e ']' BPMFMappings.txt.new | grep -v '].*]' > multi1
+   % gsed -e 's/\[//;s/,\S*] //' multi2 >> multi1
+   % gsed -e 's/ \[\S*,/ /;s/]//' multi2 >> multi1
+  #  For some reason, Mac OS X sort doesn't really sort unicode properly
+   % gsed -e 's/\[//;s/,\S*]//' multi1 > multi
+   % gsed -e 's/ \[\S*,/ /;s/]//' multi1 >> multi
+   % grep -v ']' BPMFMappings.txt.new > multi0
+   % cat multi0 multi > BPMFMappings.txt
+
+   $ find RawTextPool -type f | xargs cat | ./filter.bash > textpool.utf8
+   $ cat Data/BPMFMappings.txt Data/BPMFBase.txt | awk '{print $1}' | sort > list
+   $ awk '$NF=="big5"' Data/BPMFBase.txt > tmp
+   $ awk '{print $1}' tmp Data/BPMFMappings.txt | uniq > 1-4w.list
+
