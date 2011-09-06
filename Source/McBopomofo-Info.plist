@@ -7,9 +7,9 @@
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
 	<string>PreferencesWindowController</string>
 	<key>UpdateInfoEndpoint</key>
-	<string>http://localhost/~lukhnos/test.plist</string>
+	<string>http://mcbopomofo.openvanilla.org/updates/Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>http://openvanilla.org</string>
+	<string>http://mcbopomofo.openvanilla.org/updates/</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
