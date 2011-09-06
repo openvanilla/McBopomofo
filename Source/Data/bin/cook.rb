@@ -7,6 +7,7 @@ if ARGV.size < 4
 end
 
 UNK_LOG_FREQ = -99.0
+H_DEFLT_FREQ = -6.8
 
 bpmf_chars = {}
 bpmf_phrases = {}
@@ -104,14 +105,22 @@ while line = p.gets
               if bpmf_phon1[key].to_s == r
                  o.puts("%s %s %s" % [key, r, value])
               elsif bpmf_phon2[key].to_s == r
-                 o.puts("%s %s %f" % [key, r, value.to_f-0.28768207245178])
+                 if value.to_f-0.28768207245178 > H_DEFLT_FREQ
+                    o.puts("%s %s %f" % [key, r, value.to_f-0.28768207245178])
+                 else
+                    o.puts("%s %s %f" % [key, r, H_DEFLT_FREQ])
+                 end
                  # l(3/4) = -0.28768207245178 / 頻率打七五折之意
               elsif bpmf_phon3[key].to_s == r
-                 o.puts("%s %s %f" % [key, r, value.to_f-0.28768207245178*2])
+                 if value.to_f-0.28768207245178*2 > H_DEFLT_FREQ
+                    o.puts("%s %s %f" % [key, r, value.to_f-0.28768207245178*2])
+                 else
+                    o.puts("%s %s %f" % [key, r, H_DEFLT_FREQ])
+                 end
                  # l(3/4*3/4) = -0.28768207245178*2
               else
-                 o.puts("%s %s %f" % [key, r, UNK_LOG_FREQ])
-                 # 如果是破音字, set it to unknown.
+                 o.puts("%s %s %f" % [key, r, H_DEFLT_FREQ])
+                 # 如果是破音字, set it to default.
                  #$stdout.puts("%s\|%s\|" % [bpmf_phon1[key], r])
               end
            end

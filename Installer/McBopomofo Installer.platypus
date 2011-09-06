@@ -10,9 +10,9 @@
 	<string>Mengjuei Hsieh</string>
 	<key>BundledFiles</key>
 	<array>
-		<string>/opt/lettuce/Source/build/Release/McBopomofo.app</string>
-		<string>/opt/lettuce/Installer/CocoaDialog.app</string>
-		<string>/opt/lettuce/Installer/pic_normal.png</string>
+		<string>/opt/McBopomofo_repo/Source/build/Release/McBopomofo.app</string>
+		<string>/opt/McBopomofo_repo/Installer/CocoaDialog.app</string>
+		<string>/opt/McBopomofo_repo/Installer/pic_normal.png</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-4.4</string>
@@ -27296,7 +27296,7 @@
 	<key>Role</key>
 	<string>Viewer</string>
 	<key>ScriptPath</key>
-	<string>/opt/lettuce/Installer/Script.bash</string>
+	<string>/opt/McBopomofo_repo/Installer/Script.bash</string>
 	<key>Secure</key>
 	<false/>
 	<key>ShowInDock</key>
