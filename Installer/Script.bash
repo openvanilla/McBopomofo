@@ -2,7 +2,7 @@
 
 # The following files are bundled:
 #
-# 'Lettuce.app'
+# 'McBopomofo.app'
 # 'CocoaDialog.app'
 # 'pic_normal.png'
 #
@@ -22,8 +22,8 @@ if [ $rv == "No" ]; then
    exit 0
 fi
 
-if [ $(/bin/ps xww|/usr/bin/awk '/Lettuce/{bm=1}END{print bm}')"blah" != "blah1" ]; then
-   killall -9 Lettuce
+if [ $(/bin/ps xww|/usr/bin/awk '/McBopomofo/{bm=1}END{print bm}')"blah" != "blah1" ]; then
+   killall -9 McBopomofo
    echo PROGRESS:25
 fi
 if [ ! -e $HOME/Library/Input\ Methods ]; then
@@ -32,8 +32,8 @@ if [ ! -e $HOME/Library/Input\ Methods ]; then
 else
    echo PROGRESS:50
 fi
-cp -R Lettuce.app $HOME/Library/Input\ Methods/
+cp -R McBopomofo.app $HOME/Library/Input\ Methods/
 echo PROGRESS:75
-$HOME/Library/Input\ Methods/Lettuce.app/Contents/MacOS/Lettuce install
+$HOME/Library/Input\ Methods/McBopomofo.app/Contents/MacOS/McBopomofo install
 echo PROGRESS:100
 $CD bubble --debug --title "Thank you!" --text "McBoPoMoPo has been installed." --icon-file pic_normal.png
