@@ -1,1 +1,1 @@
-Lettuce Project
+McBopomofo Project

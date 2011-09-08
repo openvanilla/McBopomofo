@@ -2,7 +2,7 @@
 
 0.9 搶先體驗版
 
-下載連結 
+[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.zip)
 
 ## 特色
 
@@ -23,7 +23,7 @@ Mac OS X 10.6 以上版本
 
 本專案採用 MIT License 釋出，使用者可自由使用、散播本軟體，惟散播時必須保持軟體完整、不得修改版權文字。
 
-小麥注音的輸入法引擎是 Gramambular，這是一套在 2010 年開發釋出的 open source 中文斷字引擎。斷字跟選字的原理相近，我們利用這個特性，加上網路上公開可使用的語料與讀音資料，整理成小麥注音的資料庫。
+小麥注音的輸入法引擎是 [Gramambular](https://github.com/lukhnos/formosana)，這是一套在 2010 年開發釋出的 open source 中文斷字引擎。斷字跟選字的原理相近，我們利用這個特性，加上網路上公開可使用的語料與讀音資料，整理成小麥注音的資料庫。
 
 ## 卸載方式
 
@@ -43,14 +43,10 @@ Q: 資料是從哪邊來的？
     
 > 請參考[這張清單](textpool.html)
 
-Q: 要如何增加詞彙？
-
-> 目前此功能關閉維修中。
-
 Q: 要如何提升資料品質？
 
-> 請用 twitter 留言給 @McBopomofo
+> 請用 twitter 留言給 @[McBopomofo](https://twitter.com/McBopomofo)
 
 Q: 選字的原理是什麼？
 
-> 簡化過的 Hidden Markov Model + Viterbi algorithm。請參考 Formosana 原始碼。
+> 簡化過的 Hidden Markov Model + Viterbi algorithm。請參考 [Formosana 原始碼](https://github.com/lukhnos/formosana)。
