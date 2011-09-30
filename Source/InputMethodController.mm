@@ -860,7 +860,7 @@ public:
 @end
 
 
-void LTLoadLanugageModel()
+void LTLoadLanguageModel()
 {
     // load the language model; the performance of this function can be greatly improved
     // with better loading/parsing methods

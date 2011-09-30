@@ -61,4 +61,4 @@
 @end
 
 // the shared language model object
-extern "C" void LTLoadLanugageModel();
+extern "C" void LTLoadLanguageModel();

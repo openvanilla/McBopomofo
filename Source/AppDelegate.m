@@ -35,7 +35,7 @@
 #import "AppDelegate.h"
 #import "UpdateNotificationController.h"
 
-void LTLoadLanugageModel();
+void LTLoadLanguageModel();
 
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
 static NSString *kUpdateInfoEndpointKey = @"UpdateInfoEndpoint";
@@ -55,7 +55,7 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
-    LTLoadLanugageModel();
+    LTLoadLanguageModel();
     
     [self checkForUpdate];
 }
