@@ -436,6 +436,15 @@ public:
     
     bool composeReading = false;
     
+    // caps lock processing : if caps locked, temporarily disabled bopomofo.
+	if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask){
+		if ([_composingBuffer length]) [self commitComposition:client];
+		if ([NSEvent modifierFlags] & NSShiftKeyMask) return NO;
+		NSString *popedText = [inputText lowercaseString];
+		[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+		return YES;
+	}
+    
     // see if it's valid BPMF reading
     if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
@@ -667,12 +676,12 @@ public:
     // still nothing, then we update the composing buffer (some app has
     // strange behavior if we don't do this, "thinking" the key is not
     // actually consumed)
-    if ([_composingBuffer length]) {    
+    if ([_composingBuffer length]) {
         [self beep];
         [self updateClientComposingBuffer:client];
         return YES;
     }
-    
+
     return NO;
 }
 
