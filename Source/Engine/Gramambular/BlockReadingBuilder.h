@@ -60,7 +60,7 @@ namespace Formosa {
             
             static const string Join(vector<string>::const_iterator begin, vector<string>::const_iterator end, const string& separator);
             
-            static const size_t MaximumBuildSpanLength = 4;
+            static const size_t MaximumBuildSpanLength = 5;
             
             size_t m_cursorIndex;
             vector<string> m_readings;
