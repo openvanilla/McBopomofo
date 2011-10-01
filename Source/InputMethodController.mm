@@ -527,7 +527,8 @@ public:
                 return NO;
             }
             
-            [self beep];
+            //[self beep];
+            //如果要按 ESC 的時候都已經知道要取消些啥，不必beep
         }
         else {
             _bpmfReadingBuffer->clear();
