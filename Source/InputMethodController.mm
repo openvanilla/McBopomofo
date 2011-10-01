@@ -161,6 +161,7 @@ public:
 
     // If Option key is pressed, show the learning-related menu
     
+    #if DEBUG
     if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
     
         BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
@@ -185,6 +186,7 @@ public:
             [menu addItem:dumpMenuItem];
         }
     }
+    #endif //DEBUG
 	
 	NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
 	[menu addItem:aboutMenuItem];
