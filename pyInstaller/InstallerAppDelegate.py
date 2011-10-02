@@ -91,10 +91,12 @@ class InstallerAppDelegate(NSObject):
 		try:
 			call([os.path.join(McBopomofoPath, "Contents/MacOS/McBopomofo"), "install"])
 		except:
-			NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""), "", NSLocalizedString("OK", ""), None, None)
+			NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""), 
+				NSLocalizedString("Failed to activate McBopomofo", ""), 
+				NSLocalizedString("OK", ""), None, None)
 			NSApp.terminate_(self)
 		NSRunAlertPanel(NSLocalizedString("Done!", ""),
-			NSLocalizedString("OpenVanilla McBopomofo has been installed on your Mac.", ""),
+			NSLocalizedString("McBopomofo has been installed on your Mac.", ""),
 			NSLocalizedString("OK", ""), None, None)
 		NSApp.terminate_(self)
 
@@ -103,9 +105,7 @@ class InstallerAppDelegate(NSObject):
 		NSApp.terminate_(self)
 		
 	def applicationDidFinishLaunching_(self, sender):
+		NSApp.activateIgnoringOtherApps_(True)
 		self.checkOSVerion()
 		self.showLicenseWindow()
-		pass
-		
-		
 		
