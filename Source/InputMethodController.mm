@@ -426,8 +426,8 @@ public:
 	BOOL userVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
 	NSInteger leftKey = userVerticalMode ? 125 : 124;
 	NSInteger rightKey = userVerticalMode ? 126 : 123;
-	NSInteger downKey = userVerticalMode ? 123 : 126;
-//	NSInteger upKey = userVerticalMode ? 124 : 125;	
+	NSInteger downKey = userVerticalMode ? 123 : 125;
+//	NSInteger upKey = userVerticalMode ? 124 : 126;
 	
     // get the unicode character code
 	UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;    
