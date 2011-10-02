@@ -508,7 +508,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "pwd\nls -l\ncp -R $BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME \"$HOME/Library/Input Methods/\"\n\"$HOME/Library/Input Methods/$EXECUTABLE_FOLDER_PATH/$EXECUTABLE_NAME\" install";
+			shellScript = "killall McBopomofo\npwd\nls -l\ncp -R $BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME \"$HOME/Library/Input Methods/\"\n\"$HOME/Library/Input Methods/$EXECUTABLE_FOLDER_PATH/$EXECUTABLE_NAME\" install";
 		};
 /* End PBXShellScriptBuildPhase section */
 

@@ -419,23 +419,59 @@ public:
     NSBeep();
 }
 
+- (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
+{
+	// candidate
+	[LTSharedCandidates setDismissesAutomatically:YES];
+	
+	// wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
+#define LTUIntObj(x)    ([NSNumber numberWithInteger:x])        
+	[LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
+#undef LTUIntObj
+	
+	// set the candidate panel style
+	BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
+	
+	if (useVerticalMode) {
+		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+	}
+	else if (useHorizontalCandidateList) {
+		[LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
+	}
+	else {
+		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+	}
+	
+	// set the attributes for the candidate panel (which uses NSAttributedString)
+	NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];        
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];		
+	[LTSharedCandidates setAttributes:attributes];
+	
+	[LTSharedCandidates updateCandidates];
+	[LTSharedCandidates show:useVerticalMode ? kIMKLocateCandidatesLeftHint : kIMKLocateCandidatesBelowHint];
+	
+	// update the composing text, set the client
+	[self updateClientComposingBuffer:client];
+	_currentCandidateClient = client;
+}
+
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
 	NSRect textFrame = NSZeroRect;
 	NSDictionary *attributes = nil;
-	BOOL userVerticalMode = NO;
+	BOOL useVerticalMode = NO;
 	@try {
 		attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
-		userVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
+		useVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
 	}
 	@catch (NSException *e) {
 		// An exception may raise while using Twitter.app's search filed.
 	}
 	
-	NSInteger leftKey = userVerticalMode ? 125 : 124;
-	NSInteger rightKey = userVerticalMode ? 126 : 123;
-	NSInteger downKey = userVerticalMode ? 123 : 125;
-//	NSInteger upKey = userVerticalMode ? 124 : 126;
+	NSInteger leftKey = useVerticalMode ? 125 : 124;
+	NSInteger rightKey = useVerticalMode ? 126 : 123;
+	NSInteger downKey = useVerticalMode ? 123 : 125;
+//	NSInteger upKey = useVerticalMode ? 124 : 126;
 	
     // get the unicode character code
 	UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;    
@@ -536,39 +572,7 @@ public:
 					
 			}
 		}
-		
-		// candidate
-        [LTSharedCandidates setDismissesAutomatically:YES];
-        
-        // wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
-        #define LTUIntObj(x)    ([NSNumber numberWithInteger:x])        
-        [LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
-        #undef LTUIntObj
-
-        // set the candidate panel style
-        BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
-
-        if (userVerticalMode) {
-            [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
-		}
-		else if (useHorizontalCandidateList) {
-            [LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
-        }
-        else {
-            [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
-        }
-        
-        // set the attributes for the candidate panel (which uses NSAttributedString)
-        NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];        
-		NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];		
-		[LTSharedCandidates setAttributes:attributes];
-
-        [LTSharedCandidates updateCandidates];
-        [LTSharedCandidates show:kIMKLocateCandidatesBelowHint];
-        
-        // update the composing text, set the client
-        [self updateClientComposingBuffer:client];
-        _currentCandidateClient = client;
+		[self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         return YES;
     }
     
@@ -667,6 +671,21 @@ public:
         return YES;
     }
 
+	if ((char)charCode == '`') {
+		if (LTLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
+			if (_bpmfReadingBuffer->isEmpty()) {
+				_builder->insertReadingAtCursor(string("_punctuation_list"));
+				[self popOverflowComposingTextAndWalk:client];
+				[self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+			}
+			else { // If there is still unfinished bpmf reading, ignore the punctuation
+				[self beep];
+			}
+			[self updateClientComposingBuffer:client];
+			return YES;
+		}
+	}
+	
 	string layout = string("Standard_");;
 	NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
     switch (keyboardLayout) {
