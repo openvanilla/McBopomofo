@@ -452,7 +452,7 @@ public:
 	}
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    if (![_composingBuffer length] && _bpmfReadingBuffer->isEmpty() && ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask))) {
+    if (![_composingBuffer length] && _bpmfReadingBuffer->isEmpty() && ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask) || (flags & NSNumericPadKeyMask))) {
         return NO;
     }        
     
