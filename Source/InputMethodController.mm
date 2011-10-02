@@ -471,7 +471,7 @@ public:
 	NSInteger leftKey = useVerticalMode ? 125 : 124;
 	NSInteger rightKey = useVerticalMode ? 126 : 123;
 	NSInteger downKey = useVerticalMode ? 123 : 125;
-//	NSInteger upKey = useVerticalMode ? 124 : 126;
+	NSInteger upKey = useVerticalMode ? 124 : 126;
 	
     // get the unicode character code
 	UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;    
@@ -636,7 +636,15 @@ public:
         
         [self updateClientComposingBuffer:client];
         return YES;
-    }    
+    }
+
+	if (keyCode == upKey || keyCode == downKey) {
+        if (!_bpmfReadingBuffer->isEmpty()) {            
+            [self beep];
+        }
+        [self updateClientComposingBuffer:client];
+        return YES;		
+	}
     
     // Backspace
     if (charCode == 8) {
