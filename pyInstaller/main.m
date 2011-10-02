@@ -1,5 +1,3 @@
-// AUTHOR: Weizhong Yang (wzyang@kkbox.com.tw)
-
 #import <Python/Python.h>
 #import <Cocoa/Cocoa.h>
 
