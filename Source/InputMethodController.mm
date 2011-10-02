@@ -421,6 +421,14 @@ public:
 
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
+	NSRect textFrame = NSZeroRect;
+	NSDictionary *attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
+	BOOL userVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
+	NSInteger leftKey = userVerticalMode ? 125 : 124;
+	NSInteger rightKey = userVerticalMode ? 126 : 123;
+	NSInteger downKey = userVerticalMode ? 123 : 126;
+//	NSInteger upKey = userVerticalMode ? 124 : 125;	
+	
     // get the unicode character code
 	UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;    
     
@@ -503,7 +511,7 @@ public:
     }
 
     // keyCode 125 = Down, charCode 32 = Space
-    if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == 125 || charCode == 32)) {
+    if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == downKey || charCode == 32)) {
 		if (charCode == 32) {
 			if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
 				if (_builder->cursorIndex() >= _builder->length()) {
@@ -531,7 +539,11 @@ public:
 
         // set the candidate panel style
         BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
-        if (useHorizontalCandidateList) {
+
+        if (userVerticalMode) {
+            [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+		}
+		else if (useHorizontalCandidateList) {
             [LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
         }
         else {
@@ -571,7 +583,7 @@ public:
     }
     
     // The Right key, note we use keyCode here
-    if (keyCode == 123) {
+    if (keyCode == rightKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {            
             [self beep];
         }
@@ -593,7 +605,7 @@ public:
     }
     
     // The Left key, note we use keyCode here
-    if (keyCode == 124) {
+    if (keyCode == leftKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {            
             [self beep];
         }
