@@ -224,7 +224,6 @@
 		6A8515A8137277C80066B1BD = {
 			isa = PBXGroup;
 			children = (
-				6ACF37E813A7C159008798F2 /* QuartzCore.framework */,
 				6A43430813727B230094187C /* Data */,
 				6ABE4FE2137285F900981680 /* Engine */,
 				6A43430713727B1B0094187C /* Lettuce */,
@@ -247,6 +246,7 @@
 		6A8515B8137277DB0066B1BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6ACF37E813A7C159008798F2 /* QuartzCore.framework */,
 				6ADF4DB713727BEC00A7C57B /* Carbon.framework */,
 				6A8515B9137277DB0066B1BD /* Cocoa.framework */,
 				6ADF4DB513727BD200A7C57B /* InputMethodKit.framework */,

@@ -69,6 +69,7 @@ static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"Sele
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
+static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 
 // a global object for saving the "learned" user candidate selections
 NSMutableDictionary *TLCandidateLearningDictionary = nil;
@@ -251,7 +252,10 @@ public:
     if (textSize != previousTextSize) {
         [[NSUserDefaults standardUserDefaults] setInteger:textSize forKey:kCandidateListTextSizeKey];
     }
-    
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:kChooseCandidateUsingSpaceKey]) {
+		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:kChooseCandidateUsingSpaceKey];
+	}
+	
     [(AppDelegate *)[NSApp delegate] checkForUpdate];
 }
 
@@ -500,7 +504,24 @@ public:
 
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == 125 || charCode == 32)) {
-        // candidate
+		if (charCode == 32) {
+			if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
+				if (_builder->cursorIndex() >= _builder->length()) {
+					[_composingBuffer appendString:@" "];
+					[self commitComposition:client];
+					_bpmfReadingBuffer->clear();					
+				}
+				else if (LTLanguageModel.hasUnigramsForKey(" ")) {
+					_builder->insertReadingAtCursor(" ");
+					[self popOverflowComposingTextAndWalk:client];
+					[self updateClientComposingBuffer:client];
+				}
+				return YES;
+					
+			}
+		}
+		
+		// candidate
         [LTSharedCandidates setDismissesAutomatically:YES];
         
         // wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
@@ -528,7 +549,7 @@ public:
         // update the composing text, set the client
         [self updateClientComposingBuffer:client];
         _currentCandidateClient = client;
-        return YES;        
+        return YES;
     }
     
     // Esc
@@ -898,6 +919,7 @@ void LTLoadLanguageModel()
         }
     }
     ifs.close();
+	LTLanguageModel.add(" ", " ", 0.0);
     
     // initialize the singleton learning dictionary
     // putting singleton in @synchronized is the standard way in Objective-C
