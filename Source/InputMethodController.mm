@@ -422,8 +422,16 @@ public:
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
 	NSRect textFrame = NSZeroRect;
-	NSDictionary *attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
-	BOOL userVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
+	NSDictionary *attributes = nil;
+	BOOL userVerticalMode = NO;
+	@try {
+		attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
+		userVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
+	}
+	@catch (NSException *e) {
+		// An exception may raise while using Twitter.app's search filed.
+	}
+	
 	NSInteger leftKey = userVerticalMode ? 125 : 124;
 	NSInteger rightKey = userVerticalMode ? 126 : 123;
 	NSInteger downKey = userVerticalMode ? 123 : 125;
