@@ -15,6 +15,7 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		D48D001D143868DA0050BDFF /* McBopomofo.app in Copy Files to Resource Folder */ = {isa = PBXBuildFile; fileRef = D48D0016143868A90050BDFF /* McBopomofo.app */; };
+		D48D00DF1438932E0050BDFF /* Lettuce.icns in Resources */ = {isa = PBXBuildFile; fileRef = D48D00DE1438932E0050BDFF /* Lettuce.icns */; };
 		D4CA5DAD14040B3300B58ED3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA5DAC14040B3300B58ED3 /* QTKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -71,6 +72,8 @@
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Installer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Installer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D48D000F143868A90050BDFF /* Lettuce.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Lettuce.xcodeproj; path = ../Source/Lettuce.xcodeproj; sourceTree = SOURCE_ROOT; };
+		D48D00DC143892E80050BDFF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		D48D00DE1438932E0050BDFF /* Lettuce.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = Lettuce.icns; path = ../Source/Images/Lettuce.icns; sourceTree = SOURCE_ROOT; };
 		D4CA5DAC14040B3300B58ED3 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -150,6 +153,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D48D00DE1438932E0050BDFF /* Lettuce.icns */,
 				77C8C1F70C07829500965286 /* MainMenu.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -212,6 +216,7 @@
 				Japanese,
 				French,
 				German,
+				"zh-Hant",
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* xcPROJECTNAMEASXMLxc */;
 			projectDirPath = "";
@@ -254,6 +259,7 @@
 				77631A3F0C0748CF005415CB /* main.py in Resources */,
 				7790198F0C07548A00326F66 /* InstallerAppDelegate.py in Resources */,
 				77C8C1F90C07829500965286 /* MainMenu.xib in Resources */,
+				D48D00DF1438932E0050BDFF /* Lettuce.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,6 +289,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
+				D48D00DC143892E80050BDFF /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";

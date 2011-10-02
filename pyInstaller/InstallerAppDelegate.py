@@ -2,22 +2,55 @@ from Foundation import *
 from AppKit import *
 import os, shutil, platform
 
+MIT_LICENSE = """Copyright (C) 2011 by OpenVanilla.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+"""
+
 class InstallerAppDelegate(NSObject):
 
 	window = objc.IBOutlet()
 	licenseView = objc.IBOutlet()
 	licenseTextView = objc.IBOutlet()
+	messageLabel = objc.IBOutlet()
 	agreeButton = objc.IBOutlet()
 	cancelButton = objc.IBOutlet()
+	
+	def awakeFromNib(self):
+		self.window.setDelegate_(self)
+		self.window.setTitle_(NSLocalizedString("OpenVanilla McBopomofo", ""))
+		self.agreeButton.setTitle_(NSLocalizedString("Agree", ""))
+		self.cancelButton.setTitle_(NSLocalizedString("Cancel", ""))
+		self.messageLabel.setStringValue_(NSLocalizedString("Do you agree with the license?", ""))
+		self.licenseTextView.textStorage().mutableString().setString_(MIT_LICENSE)
+		
+	def windowWillClose_(self, notification):
+		NSApp.terminate_(self)
 
 	def checkOSVerion(self):
 		mac_version = platform.mac_ver()[0].split(".")
 		if int(mac_version[1]) < 6:
-			NSRunAlertPanel("McBoPoMoFo requires on Mac OS X 10.6 or later verion.", "", "OK", None, None)
+			NSRunAlertPanel(NSLocalizedString("McBopomofo requires on Mac OS X 10.6 or later verion.", ""),
+				NSLocalizedString("Unable to install McBopomofo on your Mac.",""), 
+				NSLocalizedString("OK", ""), None, None)
 			NSApp.terminate_(self)
 	
 	def showLicenseWindow(self):
-		self.licenseTextView.textStorage().mutableString().setString_("License")
 		windowFrame = self.window.frame()
 		windowFrame.size = self.licenseView.frame().size
 		windowFrame.size.height += 20.0
@@ -43,20 +76,26 @@ class InstallerAppDelegate(NSObject):
 			try:
 				shutil.rmtree(McBopomofoPath)
 			except:
-				NSRunAlertPanel("Failed to remove existing application!", "", "OK", None, None)
+				NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""),
+					NSLocalizedString("Failed to remove existing installation.", ""),
+					NSLocalizedString("OK", ""), None, None)
 		try:
 			shutil.copytree(packagePath, McBopomofoPath)
 		except:
-			NSRunAlertPanel("Failed to copy application!", "", "OK", None, None)
+			NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""),
+				NSLocalizedString("Failed to copy application.", ""),
+				NSLocalizedString("OK", ""), None, None)
 			NSApp.terminate_(self)
 
 		print McBopomofoPath
 		try:
 			call([os.path.join(McBopomofoPath, "Contents/MacOS/McBopomofo"), "install"])
 		except:
-			NSRunAlertPanel("Failed to install McBopomofo!", "", "OK", None, None)
+			NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""), "", NSLocalizedString("OK", ""), None, None)
 			NSApp.terminate_(self)
-		NSRunAlertPanel("Done!", "", "OK", None, None)
+		NSRunAlertPanel(NSLocalizedString("Done!", ""),
+			NSLocalizedString("OpenVanilla McBopomofo has been installed on your Mac.", ""),
+			NSLocalizedString("OK", ""), None, None)
 		NSApp.terminate_(self)
 
 	@objc.IBAction
