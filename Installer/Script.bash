@@ -6,6 +6,20 @@
 # 'CocoaDialog.app'
 # 'pic_normal.png'
 #
+osx_version=`/usr/bin/sw_vers -productVersion | awk '{print $1}'`
+case "$osx_version" in
+    *10\.6*)
+        osx_supported='yes' ;;
+    *10\.7*)
+        osx_supported='yes' ;;
+    *) 
+        osx_supported='no' ;;
+esac
+
+if [ $osx_supported == "no" ]; then
+   $CD bubble --debug --title "Sorry!" --text "McBoPoMoPo is only compatible with Mac OS X 10.6 and 10.7." --icon-file pic_normal.png
+   exit 0
+fi
 
 myLicense="Copyright (c) 2011, the Openvanilla Project
 
