@@ -5,7 +5,7 @@
 	<key>UpdateInfoEndpoint</key>
 	<string>http://mcbopomofo.openvanilla.org/updates/Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>http://mcbopomofo.openvanilla.org/updates/</string>
+	<string>https://github.com/mjhsieh/McBopomofo/downloads</string>
 	<key>CFBundleVersion</key>
 	<string>2</string>
 	<key>CFBundleShortVersionString</key>
