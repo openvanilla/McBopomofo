@@ -15,11 +15,13 @@ clean:
 
 release:
 	@killall -9 McBopomofo; sleep 2
-	xcodebuild -target Lettuce -configuration Release
+	xcodebuild -target Lettuce -configuration Release \
+	-arch i386 -arch x86_64
 
 debug:
 	@killall -9 McBopomofo; sleep 2
-	xcodebuild -target Lettuce -configuration Debug
+	xcodebuild -target Lettuce -configuration Debug \
+	-arch i386 -arch x86_64
 
 install: release
 
