@@ -580,7 +580,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{335, 516}, {494, 234}}</string>
 				<int key="NSWTFlags">872415232</int>
-				<string key="NSWindowTitle">OpenVanilla McBopomofo</string>
+				<string key="NSWindowTitle">McBopomofo</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>

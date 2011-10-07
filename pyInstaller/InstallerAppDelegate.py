@@ -33,7 +33,7 @@ class InstallerAppDelegate(NSObject):
 	
 	def awakeFromNib(self):
 		self.window.setDelegate_(self)
-		self.window.setTitle_(NSLocalizedString("OpenVanilla McBopomofo", ""))
+		self.window.setTitle_(NSLocalizedString("McBopomofo", ""))
 		self.agreeButton.setTitle_(NSLocalizedString("Agree", ""))
 		self.cancelButton.setTitle_(NSLocalizedString("Cancel", ""))
 		self.messageLabel.setStringValue_(NSLocalizedString("Do you agree with the license?", ""))
