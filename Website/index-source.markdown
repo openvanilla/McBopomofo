@@ -1,8 +1,8 @@
 # OpenVanilla McBopomofo 小麥注音輸入法
 
-0.9 搶先體驗版
+0.9.1 搶先體驗版
 
-[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.zip)
+[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.1.zip)
 
 ## 特色
 
@@ -13,7 +13,7 @@
 
 ## 安裝方式
 
-安裝只需要把 zip 壓縮檔解壓縮然後執行安裝程式即可。
+安裝只需要把 zip 壓縮檔解壓縮然後執行安裝程式即可。如果原來已經有安裝小麥注音，安裝程式會直接覆蓋原有的輸入法。
 
 ## 系統需求
 
