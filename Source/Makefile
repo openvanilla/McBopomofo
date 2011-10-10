@@ -24,6 +24,7 @@ debug:
 	-arch i386 -arch x86_64
 
 install: release
+	$(HOME)/Library/Input\ Methods/McBopomofo install
 
 #cd ../LettucePhrases
 #awk -v TOTAL=$(awk '{s+=$2}END{print s}' 1-4w.occ ) \
