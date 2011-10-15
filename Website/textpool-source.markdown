@@ -1,3 +1,8 @@
+# 小麥注音詞條資料來源
+
+1. [libtabe](http://sourceforge.net/projects/libtabe/) (BSD Licensed)
+2. mjhsieh's editorial contribution
+
 # 小麥注音詞頻資料來源
 
 ## 新聞語料
