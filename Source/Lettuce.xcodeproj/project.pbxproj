@@ -37,6 +37,7 @@
 		6ADF4DB813727BED00A7C57B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADF4DB713727BEC00A7C57B /* Carbon.framework */; };
 		6ADF4DC413727F1B00A7C57B /* Lettuce.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6ADF4DC213727F1B00A7C57B /* Lettuce.icns */; };
 		D4192895137AD26200EB16F7 /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = D4192894137AD26200EB16F7 /* preferences.xib */; };
+		D4F44E77144B4ED4002DEFFB /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D4F44E76144B4ED4002DEFFB /* Credits.rtf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -150,6 +151,7 @@
 		6ADF4DB713727BEC00A7C57B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
 		6ADF4DC213727F1B00A7C57B /* Lettuce.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Lettuce.icns; sourceTree = "<group>"; };
 		D4192892137AD25E00EB16F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/preferences.xib; sourceTree = "<group>"; };
+		D4F44E76144B4ED4002DEFFB /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +211,7 @@
 		6A43430913727B2A0094187C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D4F44E76144B4ED4002DEFFB /* Credits.rtf */,
 				6ADF4DC113727F1B00A7C57B /* Images */,
 				6A43430313727AC80094187C /* InfoPlist.strings */,
 				6ADF4DB313727B8400A7C57B /* McBopomofo-Info.plist */,
@@ -406,6 +409,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A8515D1137277DB0066B1BD /* Build configuration list for PBXNativeTarget "Lettuce" */;
 			buildPhases = (
+				D4052493144B4644006FC753 /* Generate Credits.rtf */,
 				6A8515B1137277DB0066B1BD /* Sources */,
 				6A8515B2137277DB0066B1BD /* Frameworks */,
 				6A8515B3137277DB0066B1BD /* Resources */,
@@ -481,6 +485,7 @@
 				6A3B3A3113A1D44E006A6BA9 /* Bopomofo.tiff in Resources */,
 				6ABEDAF313F74D9C00A0825A /* Localizable.strings in Resources */,
 				6A89E66A13F7647D00DDBF09 /* UpdateNotificationController.xib in Resources */,
+				D4F44E77144B4ED4002DEFFB /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,6 +514,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "killall McBopomofo\npwd\nls -l\ncp -R $BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME \"$HOME/Library/Input Methods/\"\n\"$HOME/Library/Input Methods/$EXECUTABLE_FOLDER_PATH/$EXECUTABLE_NAME\" install";
+		};
+		D4052493144B4644006FC753 /* Generate Credits.rtf */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Credits.rtf";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "Tools/genRTF.py $SOURCE_ROOT";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -648,7 +668,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = McBopomofo;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64 ppc";
 				WRAPPER_EXTENSION = app;
 			};
@@ -673,7 +693,7 @@
 				INFOPLIST_FILE = "McBopomofo-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = McBopomofo;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64 ppc";
 				WRAPPER_EXTENSION = app;
 			};
