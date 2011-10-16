@@ -235,6 +235,9 @@ public:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:kKeyboardLayoutPreferenceKey];
     }
+	if (keyboardLayout < 4) {
+		[client overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+	}
 
     // set the size
     NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];                
