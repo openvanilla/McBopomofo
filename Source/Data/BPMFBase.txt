@@ -5713,7 +5713,6 @@
 耍 ㄕㄨㄚˇ shua3 gj83 big5
 摔 ㄕㄨㄞ shuai gj9 big5
 衰 ㄕㄨㄞ shuai gj9 big5
-縗 ㄕㄨㄞ shuai gj9 big5
 孈 ㄕㄨㄞ shuai gj9 big5
 甩 ㄕㄨㄞˇ shuai3 gj93 big5
 率 ㄕㄨㄞˋ shuai4 gj94 big5
@@ -6109,6 +6108,7 @@
 鏙 ㄘㄨㄟ cui hjo big5
 榱 ㄘㄨㄟ cui hjo big5
 衰 ㄘㄨㄟ cui hjo big5
+縗 ㄘㄨㄟ cui hjo big5
 璀 ㄘㄨㄟˇ cui3 hjo3 big5
 趡 ㄘㄨㄟˇ cui3 hjo3 big5
 漼 ㄘㄨㄟˇ cui3 hjo3 big5
