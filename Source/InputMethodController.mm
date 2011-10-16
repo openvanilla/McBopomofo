@@ -521,7 +521,7 @@ public:
     composeReading |= (!_bpmfReadingBuffer->isEmpty() && (charCode == 32 || charCode == 13));
     if (composeReading) {
         // combine the reading
-        string reading = _bpmfReadingBuffer->composedString();
+        string reading = _bpmfReadingBuffer->syllable().composedString();
         
         // see if we have a unigram for this
         if (!LTLanguageModel.hasUnigramsForKey(reading)) {
