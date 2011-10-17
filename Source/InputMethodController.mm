@@ -498,7 +498,7 @@ public:
     bool composeReading = false;
     
     // caps lock processing : if caps locked, temporarily disabled bopomofo.
-	if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask){
+	if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask || [NSEvent modifierFlags] & NSNumericPadKeyMask){
 		if ([_composingBuffer length]) [self commitComposition:client];
 		if ([NSEvent modifierFlags] & NSShiftKeyMask) return NO;
 		NSString *popedText = [inputText lowercaseString];
