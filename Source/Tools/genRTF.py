@@ -2,6 +2,7 @@
 
 import sys, os
 os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.7"
+os.environ["PYTHONPATH"] = "/System/Library/Frameworks/Python.framework/Versions/2.6/Extras/lib/python/"
 
 import subprocess, getopt
 from Foundation import *
