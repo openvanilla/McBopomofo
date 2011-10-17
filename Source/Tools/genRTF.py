@@ -32,7 +32,7 @@ def main(argv=None):
 		return
 
 	path = os.path.abspath(path)
-	cmd = "/usr/local/git/bin/git log --format='%h' -1"
+	cmd = "/usr/bin/git log --format='%h' -1"
 	try:
 		p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		lines = ""
