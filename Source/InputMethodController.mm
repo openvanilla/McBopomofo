@@ -498,12 +498,20 @@ public:
     bool composeReading = false;
     
     // caps lock processing : if caps locked, temporarily disabled bopomofo.
-	if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask || [NSEvent modifierFlags] & NSNumericPadKeyMask){
+	if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask){
 		if ([_composingBuffer length]) [self commitComposition:client];
 		if ([NSEvent modifierFlags] & NSShiftKeyMask) return NO;
 		NSString *popedText = [inputText lowercaseString];
 		[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 		return YES;
+	}
+	if ([NSEvent modifierFlags] & NSNumericPadKeyMask) {
+		if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && keyCode != 123 && charCode != 32 ) {
+			if ([_composingBuffer length]) [self commitComposition:client];
+			NSString *popedText = [inputText lowercaseString];
+			[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+			return YES;
+		}
 	}
     
     // see if it's valid BPMF reading
