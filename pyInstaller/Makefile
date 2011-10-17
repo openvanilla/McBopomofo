@@ -9,9 +9,7 @@ clean:
 	xcodebuild clean
 
 release:
-	xcodebuild -target Installer -configuration Release \
-	-arch i386 -arch x86_64
+	xcodebuild -target Installer -configuration Release
 
 debug:
-	xcodebuild -target Installer -configuration Debug \
-	-arch i386 -arch x86_64
+	xcodebuild -target Installer -configuration Debug
