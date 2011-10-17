@@ -57,8 +57,10 @@ int main(int argc, char *argv[])
         
         TISInputSourceRef inputSource = [OVInputSourceHelper inputSourceForInputSourceID:bundleID];
 
+        // if this IME name is not found in the list of available IMEs
         if (!inputSource) {
             NSLog(@"Registering input source %@ at %@.", bundleID, [bundleURL absoluteString]);
+            // then register
 			BOOL status = [OVInputSourceHelper registerInputSource:bundleURL];
             
             if (!status) {
@@ -68,6 +70,7 @@ int main(int argc, char *argv[])
             }
             
             inputSource = [OVInputSourceHelper inputSourceForInputSourceID:bundleID];
+            // if it still doesn't register successfully, bail.
             if (!inputSource) {
                 NSLog(@"Fatal error: Cannot find input source %@ after registration.", bundleID);
                 [pool drain];
@@ -75,11 +78,17 @@ int main(int argc, char *argv[])
             }
         }
         
+        // if it's not enabled, just enabled it
         if (inputSource && ![OVInputSourceHelper inputSourceEnabled:inputSource]) {							
             NSLog(@"Enabling input source %@ at %@.", bundleID, [bundleURL absoluteString]);
             BOOL status = [OVInputSourceHelper enableInputSource:inputSource];
             
             if (!status != noErr) {
+                NSLog(@"Fatal error: Cannot enable input source %@.", bundleID);
+                [pool drain];
+                return -1;
+            }
+            if (![OVInputSourceHelper inputSourceEnabled:inputSource]){
                 NSLog(@"Fatal error: Cannot enable input source %@.", bundleID);
                 [pool drain];
                 return -1;
