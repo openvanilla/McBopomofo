@@ -94,6 +94,7 @@ SimpleLM LTLanguageModel;
 
 - (void)_performDeferredSaveUserCandidatesDictionary;
 - (void)saveUserCandidatesDictionary;
+- (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
 @end
 
 // sort helper
@@ -195,14 +196,7 @@ public:
     return menu;
 }
 
-#pragma mark IMKStateSetting protocol methods
-
-- (void)showPreferences:(id)sender
-{
-    // show the preferences panel, and also make the IME app itself the focus
-    [super showPreferences:sender];
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-}
+#pragma mark - IMKStateSetting protocol methods
 
 - (void)activateServer:(id)client
 {
@@ -269,6 +263,8 @@ public:
     _currentDeferredClient = nil;    
     _currentCandidateClient = nil;
 }
+
+#pragma mark - IMKServerInput protocol methods
 
 - (void)commitComposition:(id)client 
 {    
@@ -420,42 +416,6 @@ public:
 {
     // use the system's default sound (configurable in System Preferences) to give a warning
     NSBeep();
-}
-
-- (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
-{
-	// candidate
-	[LTSharedCandidates setDismissesAutomatically:YES];
-	
-	// wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
-#define LTUIntObj(x)    ([NSNumber numberWithInteger:x])        
-	[LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
-#undef LTUIntObj
-	
-	// set the candidate panel style
-	BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
-	
-	if (useVerticalMode) {
-		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
-	}
-	else if (useHorizontalCandidateList) {
-		[LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
-	}
-	else {
-		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
-	}
-	
-	// set the attributes for the candidate panel (which uses NSAttributedString)
-	NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];        
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];		
-	[LTSharedCandidates setAttributes:attributes];
-	
-	[LTSharedCandidates updateCandidates];
-	[LTSharedCandidates show:useVerticalMode ? kIMKLocateCandidatesLeftHint : kIMKLocateCandidatesBelowHint];
-	
-	// update the composing text, set the client
-	[self updateClientComposingBuffer:client];
-	_currentCandidateClient = client;
 }
 
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -789,61 +749,6 @@ public:
         
     return results;
 }
-
-- (NSString *)neighborTrigramString
-{
-    // gather the "trigram" for user candidate selection learning
-    
-    NSMutableArray *termArray = [NSMutableArray array];
-    
-	size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-    
-    const Node* prev = 0;
-    const Node* current = 0;
-    const Node* next = 0;
-    
-    size_t wni = 0;
-    size_t wnc = _walkedNodes.size();
-    size_t accuSpanningLength = 0;
-    for (wni = 0; wni < wnc; wni++) {
-        NodeAnchor& anchor = _walkedNodes[wni];
-        if (!anchor.node) {
-            continue;
-        }
-        
-        accuSpanningLength += anchor.spanningLength;
-        if (accuSpanningLength >= cursorIndex) {            
-            prev = current;
-            current = anchor.node;
-            break;
-        }
-        
-        current = anchor.node;
-    }
-    
-    if (wni + 1 < wnc) {
-        next = _walkedNodes[wni + 1].node;
-    }
-
-    string term;
-    if (prev) {
-        term = prev->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-    
-    if (current) {
-        term = current->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-    
-    if (next) {
-        term = next->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    return [termArray componentsJoinedByString:@"-"];
-}
              
 - (void)candidateSelected:(NSAttributedString *)candidateString
 {
@@ -885,7 +790,7 @@ public:
     _currentCandidateClient = nil;
 }
 
-#pragma mark Private methods
+#pragma mark - Private methods
 
 - (size_t)actualCandidateCursorIndex
 {
@@ -908,6 +813,61 @@ public:
     return cursorIndex;
 }
 
+- (NSString *)neighborTrigramString
+{
+    // gather the "trigram" for user candidate selection learning
+    
+    NSMutableArray *termArray = [NSMutableArray array];
+    
+	size_t cursorIndex = [self actualCandidateCursorIndex];
+    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    
+    const Node* prev = 0;
+    const Node* current = 0;
+    const Node* next = 0;
+    
+    size_t wni = 0;
+    size_t wnc = _walkedNodes.size();
+    size_t accuSpanningLength = 0;
+    for (wni = 0; wni < wnc; wni++) {
+        NodeAnchor& anchor = _walkedNodes[wni];
+        if (!anchor.node) {
+            continue;
+        }
+        
+        accuSpanningLength += anchor.spanningLength;
+        if (accuSpanningLength >= cursorIndex) {            
+            prev = current;
+            current = anchor.node;
+            break;
+        }
+        
+        current = anchor.node;
+    }
+    
+    if (wni + 1 < wnc) {
+        next = _walkedNodes[wni + 1].node;
+    }
+	
+    string term;
+    if (prev) {
+        term = prev->currentKeyValue().key;
+        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
+    }
+    
+    if (current) {
+        term = current->currentKeyValue().key;
+        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
+    }
+    
+    if (next) {
+        term = next->currentKeyValue().key;
+        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
+    }
+	
+    return [termArray componentsJoinedByString:@"-"];
+}
+
 - (void)_performDeferredSaveUserCandidatesDictionary
 {
     BOOL __unused success = [TLCandidateLearningDictionary writeToFile:TLUserCandidatesDictionaryPath atomically:YES];
@@ -925,7 +885,50 @@ public:
     [self performSelector:@selector(_performDeferredSaveUserCandidatesDictionary) withObject:nil afterDelay:5.0];
 }
 
-#pragma Misc menu items
+- (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
+{
+	// candidate
+	[LTSharedCandidates setDismissesAutomatically:YES];
+	
+	// wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
+#define LTUIntObj(x)    ([NSNumber numberWithInteger:x])        
+	[LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
+#undef LTUIntObj
+	
+	// set the candidate panel style
+	BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
+	
+	if (useVerticalMode) {
+		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+	}
+	else if (useHorizontalCandidateList) {
+		[LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
+	}
+	else {
+		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+	}
+	
+	// set the attributes for the candidate panel (which uses NSAttributedString)
+	NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];        
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];		
+	[LTSharedCandidates setAttributes:attributes];
+	
+	[LTSharedCandidates updateCandidates];
+	[LTSharedCandidates show:useVerticalMode ? kIMKLocateCandidatesLeftHint : kIMKLocateCandidatesBelowHint];
+	
+	// update the composing text, set the client
+	[self updateClientComposingBuffer:client];
+	_currentCandidateClient = client;
+}
+
+#pragma mark - Misc menu items
+
+- (void)showPreferences:(id)sender
+{
+    // show the preferences panel, and also make the IME app itself the focus
+    [super showPreferences:sender];
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+}
 
 - (void)showAbout:(id)sender
 {
