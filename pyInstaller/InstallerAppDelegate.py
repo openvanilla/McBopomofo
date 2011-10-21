@@ -64,7 +64,7 @@ class InstallerAppDelegate(NSObject):
 	def agreeLicenseAction_(self, sender):
 		self.window.orderOut_(None)
 		from subprocess import call
-		call(["killall", "McBopomofo"])
+		call(["/usr/bin/killall", "McBopomofo"])
 		
 		inputMethodDir = os.path.expanduser("~/Library/Input Methods")
 		if os.path.exists(inputMethodDir) is False:
@@ -74,18 +74,19 @@ class InstallerAppDelegate(NSObject):
 		McBopomofoPath = os.path.join(inputMethodDir, "McBopomofo.app")
 		if os.path.exists(McBopomofoPath) is True:
 			try:
-				shutil.rmtree(McBopomofoPath)
+				call(["/bin/cp", "-R", packagePath, McBopomofoPath]) 
 			except:
 				NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""),
-					NSLocalizedString("Failed to remove existing installation.", ""),
+					NSLocalizedString("Failed to overwrite existing installation.", ""),
 					NSLocalizedString("OK", ""), None, None)
-		try:
-			shutil.copytree(packagePath, McBopomofoPath)
-		except:
-			NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""),
-				NSLocalizedString("Failed to copy application.", ""),
-				NSLocalizedString("OK", ""), None, None)
-			NSApp.terminate_(self)
+		else:
+			try:
+				shutil.copytree(packagePath, McBopomofoPath)
+			except:
+				NSRunAlertPanel(NSLocalizedString("Failed to install McBopomofo!", ""),
+					NSLocalizedString("Failed to copy application.", ""),
+					NSLocalizedString("OK", ""), None, None)
+				NSApp.terminate_(self)
 
 		print McBopomofoPath
 		try:
