@@ -2314,7 +2314,7 @@
 麼 ㄇㄚˊ ma2 a86 big5
 蟆 ㄇㄚˊ ma2 a86 big5
 犘 ㄇㄚˊ ma2 a86 big5
-尛 ㄇㄚˊ ma2 a86 utf8
+尛 ㄇㄚˊ ma2 a86 big5
 嘛 ㄇㄚ˙ ma5 a87 big5
 嗎 ㄇㄚ˙ ma5 a87 big5
 蟆 ㄇㄚ˙ ma5 a87 big5

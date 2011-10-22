@@ -54,7 +54,7 @@ while line = b.gets
   key = elements[0]
   value = elements[1]
   
-  if elements[4] == "big5"
+  #if elements[4] == "big5"
     if bpmf_chars[key]
       bpmf_chars[key] += [value]
     else
@@ -66,7 +66,7 @@ while line = b.gets
     else
       bpmf_phrases[key] = [value]
     end
-  end
+  #end
 end
 
 
