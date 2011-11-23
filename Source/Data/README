@@ -1,6 +1,6 @@
 
-1-4w.list
-1-4w.occ
+phrase.list
+phrase.occ
 BPMFBase.txt
 BPMFMappings.txt
 BPMFPunctuations.txt
@@ -201,8 +201,8 @@ The frequencies are done with simple awk scripts:
 	corpusirc.sorted.txt > mjhsieh-char-freq.txt
 
    (updated)
-   % awk -v TOTAL=$(awk '{s+=$2}END{print s}' 1-4w.occ) \
-         '{printf("%s %.8f\n",$1,log($2/TOTAL)/log(10))}' 1-4w.occ \
+   % awk -v TOTAL=$(awk '{s+=$2}END{print s}' phrase.occ) \
+         '{printf("%s %.8f\n",$1,log($2/TOTAL)/log(10))}' phrase.occ \
      | sed -e 's/inf$/7.0/' > phrase-freqv000.txt
 
 Mapping BPMF with libtabe (tsi.src)
@@ -247,5 +247,5 @@ Mapping BPMF with libtabe (tsi.src)
    $ find RawTextPool -type f | xargs cat | ./filter.bash > textpool.utf8
    $ cat Data/BPMFMappings.txt Data/BPMFBase.txt | awk '{print $1}' | sort > list
    $ awk '$NF=="big5"' Data/BPMFBase.txt > tmp
-   $ awk '{print $1}' tmp Data/BPMFMappings.txt | uniq > 1-4w.list
+   $ awk '{print $1}' tmp Data/BPMFMappings.txt | uniq > phrase.list
 
