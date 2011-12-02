@@ -457,18 +457,24 @@ public:
     
     bool composeReading = false;
     
-    // caps lock processing : if caps locked, temporarily disabled bopomofo.
-	if (charCode == 8) {
-       // Do nothing if backspace is pressed
+    // caps lock processing : if caps is locked, temporarily disabled bopomofo.
+
+	if (charCode == 8 || keyCode == upKey || keyCode == downKey ||
+        keyCode == leftKey || keyCode == rightKey ) {
+        // Do nothing if backspace is pressed
 	} else if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask){
+        // Now process all possible combination, we hope.
 		if ([_composingBuffer length]) [self commitComposition:client];
+        // First commit everything in the buffer.
 		if ([NSEvent modifierFlags] & NSShiftKeyMask) return NO;
+        // when shift is pressed, don't do further processing, since it outputs
+        // capital letter anyway.
 		NSString *popedText = [inputText lowercaseString];
 		[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 		return YES;
 	}
 	if ([NSEvent modifierFlags] & NSNumericPadKeyMask) {
-		if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && keyCode != 123 && charCode != 32 ) {
+		if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 ) {
 			if ([_composingBuffer length]) [self commitComposition:client];
 			NSString *popedText = [inputText lowercaseString];
 			[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
