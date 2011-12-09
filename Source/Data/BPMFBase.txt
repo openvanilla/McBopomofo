@@ -2627,6 +2627,7 @@
 鮸 ㄇㄧㄢˇ mian3 au03 big5
 面 ㄇㄧㄢˋ mian4 au04 big5
 麵 ㄇㄧㄢˋ mian4 au04 big5
+麪 ㄇㄧㄢˋ mian4 au04 big5
 棉 ㄇㄧㄢˊ mian2 au06 big5
 綿 ㄇㄧㄢˊ mian2 au06 big5
 眠 ㄇㄧㄢˊ mian2 au06 big5
