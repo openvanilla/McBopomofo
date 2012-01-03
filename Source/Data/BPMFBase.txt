@@ -241,6 +241,7 @@
 甏 ㄅㄤˋ bang4 1;4 big5
 塝 ㄅㄤˋ bang4 1;4 big5
 艕 ㄅㄤˋ bang4 1;4 big5
+蒡 ㄅㄤˋ bang4 1;4 big5
 玻 ㄅㄛ bo 1i big5
 撥 ㄅㄛ bo 1i big5
 剝 ㄅㄛ bo 1i big5
@@ -7635,7 +7636,6 @@
 膀 ㄆㄤˊ pang2 q;6 big5
 螃 ㄆㄤˊ pang2 q;6 big5
 徬 ㄆㄤˊ pang2 q;6 big5
-蒡 ㄆㄤˊ pang2 q;6 big5
 厖 ㄆㄤˊ pang2 q;6 big5
 尨 ㄆㄤˊ pang2 q;6 big5
 雱 ㄆㄤˊ pang2 q;6 big5
