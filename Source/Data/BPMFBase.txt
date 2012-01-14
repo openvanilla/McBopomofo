@@ -83,6 +83,7 @@
 萻 ㄢ an 0 big5
 韽 ㄢ an 0 big5
 垵 ㄢ an 0 big5
+鮟 ㄢ an 0 big5
 俺 ㄢˇ an3 03 big5
 唵 ㄢˇ an3 03 big5
 晻 ㄢˇ an3 03 big5
@@ -3830,6 +3831,7 @@
 鏮 ㄎㄤ kang d; big5
 漮 ㄎㄤ kang d; big5
 嫝 ㄎㄤ kang d; big5
+鱇 ㄎㄤ kang d; big5
 慷 ㄎㄤˇ kang3 d;3 big5
 亢 ㄎㄤˋ kang4 d;4 big5
 抗 ㄎㄤˋ kang4 d;4 big5
