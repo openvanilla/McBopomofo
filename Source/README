@@ -1,0 +1,125 @@
+.
+├── AppDelegate.h
+├── AppDelegate.m
+├── Data
+│   ├── BPMFBase.txt
+│   ├── BPMFMappings.txt
+│   ├── BPMFPunctuations.txt
+│   ├── Makefile
+│   ├── PhraseFreq.txt
+│   ├── README
+│   ├── bin
+│   │   ├── BIG5toUTF8.pl
+│   │   ├── build4wlist.bash
+│   │   ├── buildFreq.bash
+│   │   ├── cook.rb
+│   │   ├── countphrase.bash
+│   │   ├── filter.bash
+│   │   ├── randomShuffle.bash
+│   │   └── typocorrection.bash
+│   ├── heterophony1.list
+│   ├── heterophony2.list
+│   ├── heterophony3.list
+│   └── phrase.occ
+├── Engine
+│   ├── Gramambular
+│   │   ├── Bigram.h
+│   │   ├── BlockReadingBuilder.h
+│   │   ├── Gramambular.h
+│   │   ├── Grid.h
+│   │   ├── KeyValuePair.h
+│   │   ├── LanguageModel.h
+│   │   ├── Node.h
+│   │   ├── NodeAnchor.h
+│   │   ├── Span.h
+│   │   ├── Unigram.h
+│   │   └── Walker.h
+│   ├── Mandarin
+│   │   ├── Mandarin.cpp
+│   │   └── Mandarin.h
+│   ├── OpenVanilla
+│   │   ├── OVAroundFilter.h
+│   │   ├── OVBase.h
+│   │   ├── OVBenchmark.h
+│   │   ├── OVCINDataTable.h
+│   │   ├── OVCINDatabaseService.h
+│   │   ├── OVCINToSQLiteConvertor.h
+│   │   ├── OVCandidateService.h
+│   │   ├── OVDatabaseService.h
+│   │   ├── OVDateTimeHelper.h
+│   │   ├── OVEncodingService.h
+│   │   ├── OVEventHandlingContext.h
+│   │   ├── OVException.h
+│   │   ├── OVFileHelper.h
+│   │   ├── OVFrameworkInfo.h
+│   │   ├── OVInputMethod.h
+│   │   ├── OVKey.h
+│   │   ├── OVKeyPreprocessor.h
+│   │   ├── OVKeyValueMap.h
+│   │   ├── OVLoaderBase.h
+│   │   ├── OVLoaderService.h
+│   │   ├── OVLocalization.h
+│   │   ├── OVModule.h
+│   │   ├── OVModulePackage.h
+│   │   ├── OVOutputFilter.h
+│   │   ├── OVPathInfo.h
+│   │   ├── OVSQLiteDatabaseService.h
+│   │   ├── OVSQLiteWrapper.h
+│   │   ├── OVStringHelper.h
+│   │   ├── OVTextBuffer.h
+│   │   ├── OVUTF8Helper.h
+│   │   ├── OVWildcard.h
+│   │   └── OpenVanilla.h
+│   ├── SimpleLM.cpp
+│   └── SimpleLM.h
+├── English.lproj
+│   ├── InfoPlist.strings
+│   ├── Localizable.strings
+│   ├── MainMenu.xib
+│   └── preferences.xib
+├── IconMaker
+│   ├── AppIconRendererView.h
+│   ├── AppIconRendererView.m
+│   ├── IconMaker-Info.plist
+│   ├── IconMaker-Prefix.pch
+│   ├── IconMakerAppDelegate.h
+│   ├── IconMakerAppDelegate.m
+│   ├── ImageZoomInView.h
+│   ├── ImageZoomInView.m
+│   ├── TISIconRendererView.h
+│   ├── TISIconRendererView.m
+│   ├── en.lproj
+│   │   ├── Credits.rtf
+│   │   ├── InfoPlist.strings
+│   │   └── MainMenu.xib
+│   └── main.m
+├── Images
+│   ├── Bopomofo.tiff
+│   ├── BopomofoSelected.tiff
+│   ├── Lettuce.icns
+│   ├── favicon.ico
+│   ├── favicon.png
+│   └── favicon.tiff
+├── InputMethodController.h
+├── InputMethodController.mm
+├── Lettuce.xcodeproj
+│   └── project.pbxproj
+├── Makefile
+├── McBopomofo-Info.plist
+├── McBopomofo-Prefix.pch
+├── OVInputSourceHelper.h
+├── OVInputSourceHelper.m
+├── PreferencesWindowController.h
+├── PreferencesWindowController.m
+├── README
+├── Tools
+│   ├── genRTF.py
+│   └── tistool.m
+├── UpdateNotificationController.h
+├── UpdateNotificationController.m
+├── UpdateNotificationController.xib
+├── main.m
+└── zh-Hant.lproj
+    ├── InfoPlist.strings
+    ├── Localizable.strings
+    └── preferences.xib

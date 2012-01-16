@@ -1,25 +1,25 @@
-
-phrase.list
-phrase.occ
-BPMFBase.txt
-BPMFMappings.txt
-BPMFPunctuations.txt
-Makefile
-PhraseFreq.txt
-README
-heterophony1.list
-heterophony2.list
-textpool.utf8
-bin/
-	BIG5toUTF8.pl
-	buildFreq.bash
-	filter.bash
-	build4wlist.bash
-	cook.rb
-	randomShuffle.bash
+├── BPMFBase.txt		Bopomofo Table for chars
+├── BPMFMappings.txt		Bopomofo Table for 2-char words to 6-char words
+|                                  Originally simplified from tsi.src of libtabe
+|                                  (BSD Licensed) with my own and zonble's
+|                                  modification.
+├── BPMFPunctuations.txt	Punctuation table
+├── heterophony1.list		table for char heterophony, first order
+├── heterophony2.list		table for char heterophony, second order
+├── heterophony3.list		table for char heterophony, third order
+├── phrase.occ			table for appearance of a word in a text pool
+├── Makefile			for conveniences for developers
+└── bin
+    ├── cook.rb			The tool to build the data.txt for McBopomofo
+    ├── BIG5toUTF8.pl		A tool for text pool preparation
+    ├── build4wlist.bash	A tool for text pool preparation
+    ├── buildFreq.bash		The awk script for counting occurance
+    ├── countphrase.bash	some SGE script candidate to count occurance
+    ├── filter.bash		A tool for text pool preparation
+    ├── randomShuffle.bash	A tool to shuffle text pool
+    └── typocorrection.bash	A demo of common typo in the text pool
 
 ----- Following was the readme file of original project,      -----
------ now mjhsieh is consolidating it into Data folder.       -----
 
 Comments:
     Basically only pseudo codes have any slightly chance to be in the reports
