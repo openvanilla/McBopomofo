@@ -7670,6 +7670,7 @@
 岶 ㄆㄛˋ po4 qi4 big5
 烞 ㄆㄛˋ po4 qi4 big5
 蒪 ㄆㄛˋ po4 qi4 big5
+釙 ㄆㄛˋ po4 qi4 big5
 婆 ㄆㄛˊ po2 qi6 big5
 鄱 ㄆㄛˊ po2 qi6 big5
 皤 ㄆㄛˊ po2 qi6 big5
@@ -7714,7 +7715,6 @@
 蒱 ㄆㄨˊ pu2 qj6 big5
 襆 ㄆㄨˊ pu2 qj6 big5
 酺 ㄆㄨˊ pu2 qj6 big5
-釙 ㄆㄨˊ pu2 qj6 big5
 鏷 ㄆㄨˊ pu2 qj6 big5
 轐 ㄆㄨˊ pu2 qj6 big5
 纀 ㄆㄨˊ pu2 qj6 big5
@@ -13175,7 +13175,6 @@
 唎 ㄌㄧˋ li4 xu4 big5
 屴 ㄌㄧˋ li4 xu4 big5
 躒 ㄌㄧˋ li4 xu4 big5
-釙 ㄌㄧˋ li4 xu4 big5
 鬲 ㄌㄧˋ li4 xu4 big5
 皪 ㄌㄧˋ li4 xu4 big5
 秝 ㄌㄧˋ li4 xu4 big5
@@ -13855,6 +13854,7 @@
 瞂 ㄈㄚ fa z8 big5
 法 ㄈㄚˇ fa3 z83 big5
 髮 ㄈㄚˇ fa3 z83 big5
+鍅 ㄈㄚˇ fa3 z83 big5
 法 ㄈㄚˋ fa4 z84 big5
 琺 ㄈㄚˋ fa4 z84 big5
 乏 ㄈㄚˊ fa2 z86 big5
