@@ -1298,6 +1298,7 @@
 嵽 ㄉㄧˋ di4 2u4 big5
 珶 ㄉㄧˋ di4 2u4 big5
 甋 ㄉㄧˋ di4 2u4 big5
+坔 ㄉㄧˋ di4 2u4 big5
 的 ㄉㄧˊ di2 2u6 big5
 敵 ㄉㄧˊ di2 2u6 big5
 迪 ㄉㄧˊ di2 2u6 big5
@@ -9106,6 +9107,7 @@
 莮 ㄋㄢˊ nan2 s06 big5
 那 ㄋㄚˇ na3 s83 big5
 哪 ㄋㄚˇ na3 s83 big5
+雫 ㄋㄚˇ na3 s83 utf8
 那 ㄋㄚˋ na4 s84 big5
 納 ㄋㄚˋ na4 s84 big5
 吶 ㄋㄚˋ na4 s84 big5
@@ -12481,6 +12483,7 @@
 纜 ㄌㄢˋ lan4 x04 big5
 鑭 ㄌㄢˋ lan4 x04 big5
 爁 ㄌㄢˋ lan4 x04 big5
+坔 ㄌㄢˋ lan4 x04 big5
 壏 ㄌㄢˋ lan4 x04 big5
 蘭 ㄌㄢˊ lan2 x06 big5
 籃 ㄌㄢˊ lan2 x06 big5
