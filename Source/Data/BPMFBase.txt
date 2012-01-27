@@ -2044,6 +2044,7 @@
 鸅 ㄓㄜˊ zhe2 5k6 big5
 讘 ㄓㄜˊ zhe2 5k6 big5
 瓋 ㄓㄜˊ zhe2 5k6 big5
+喆 ㄓㄜˊ zhe2 5k6 big5
 著 ㄓㄜ˙ zhe5 5k7 big5
 遮 ㄓㄜ˙ zhe5 5k7 big5
 晢 ㄓㄜ˙ zhe5 5k7 big5
@@ -3725,6 +3726,7 @@
 黑 ㄏㄟ hei co big5
 嘿 ㄏㄟ hei co big5
 潶 ㄏㄟ hei co big5
+黒 ㄏㄟ hei co big5
 黑 ㄏㄟˇ hei3 co3 big5
 很 ㄏㄣˇ hen3 cp3 big5
 狠 ㄏㄣˇ hen3 cp3 big5
@@ -8612,6 +8614,7 @@
 襺 ㄐㄧㄢˇ jian3 ru03 big5
 暕 ㄐㄧㄢˇ jian3 ru03 big5
 瑐 ㄐㄧㄢˇ jian3 ru03 big5
+彅 ㄐㄧㄢˇ jian3 ru03 utf8
 見 ㄐㄧㄢˋ jian4 ru04 big5
 建 ㄐㄧㄢˋ jian4 ru04 big5
 健 ㄐㄧㄢˋ jian4 ru04 big5
