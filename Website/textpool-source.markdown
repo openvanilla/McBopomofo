@@ -15,6 +15,7 @@
 1. 立法院公報 (隨機選取)
 2. 台大圖書館藏政府出版電子檔案（隨機選取）
 3. 中研院提供之 Second International Chinese Word Segmentation Bakeoff 競賽資料。
+
 ## 新聞語料
 
 1. 雅虎奇摩新聞 RSS 數天份
