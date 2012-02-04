@@ -18,7 +18,7 @@ int main ( int argc, char** argv )
          //fputs ( line, stdout ); /* write the line */
          myCount+=match(line,myQuery);
       }
-      printf("%s    %d\n",myQuery,myCount);
+      printf("%s	%d\n",myQuery,myCount);
       fclose ( file );
    }
    else
