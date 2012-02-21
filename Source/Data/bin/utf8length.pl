@@ -11,7 +11,9 @@ binmode(STDOUT, ":utf8") || die "can't binmode STDOUT";
 
 while (my $line = <STDIN>) {
     chomp ($line);
-    print STDOUT $line," ", length $line,"\n";
+    my $myline=$line;
+    $myline =~ s/\t.*$//;
+    print STDOUT $line," ", length $myline,"\n";
 }
 
 close(STDIN)  || die "can't close STDIN: $!";
