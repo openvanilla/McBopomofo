@@ -459,8 +459,9 @@ public:
     
     // caps lock processing : if caps is locked, temporarily disabled bopomofo.
 
-	if (charCode == 8 || keyCode == upKey || keyCode == downKey ||
-        keyCode == leftKey || keyCode == rightKey ) {
+	if (charCode == 8      || charCode == 13     ||
+        keyCode == upKey   || keyCode == downKey || 
+        keyCode == leftKey || keyCode == rightKey) {
         // Do nothing if backspace is pressed
 	} else if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask){
         // Now process all possible combination, we hope.
