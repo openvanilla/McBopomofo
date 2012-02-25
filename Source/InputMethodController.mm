@@ -463,18 +463,18 @@ public:
         keyCode == upKey   || keyCode == downKey || 
         keyCode == leftKey || keyCode == rightKey) {
         // Do nothing if backspace is pressed
-	} else if ([NSEvent modifierFlags] & NSAlphaShiftKeyMask){
+	} else if (flags & NSAlphaShiftKeyMask){
         // Now process all possible combination, we hope.
 		if ([_composingBuffer length]) [self commitComposition:client];
         // First commit everything in the buffer.
-		if ([NSEvent modifierFlags] & NSShiftKeyMask) return NO;
+		if (flags & NSShiftKeyMask) return NO;
         // when shift is pressed, don't do further processing, since it outputs
         // capital letter anyway.
 		NSString *popedText = [inputText lowercaseString];
 		[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 		return YES;
 	}
-	if ([NSEvent modifierFlags] & NSNumericPadKeyMask) {
+	if (flags & NSNumericPadKeyMask) {
 		if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 ) {
 			if ([_composingBuffer length]) [self commitComposition:client];
 			NSString *popedText = [inputText lowercaseString];
