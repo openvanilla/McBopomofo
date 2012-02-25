@@ -5,7 +5,7 @@ data.txt: bin/cook.rb BPMFBase.txt BPMFMappings.txt PhraseFreq.txt \
 
 deploydata.txt: data.txt
 	mv data.txt ${HOME}/Library/Input\ Methods/McBopomofo.app/Contents/Resources/data.txt
-	killall -9 McBopomofo
+	killall -9 McBopomofo; sleep 2
 	${HOME}/Library/Input\ Methods/McBopomofo.app/Contents/MacOS/McBopomofo install
 
 PhraseFreq.txt: bin/buildFreq.bash phrase.occ
