@@ -1,4 +1,4 @@
-.PHONY: deploydata
+.PHONY: deploydata sort
 DATPATH=Contents/Resources/data.txt
 EXEPATH=Contents/MacOS/McBopomofo
 EXENAME=McBopomofo
