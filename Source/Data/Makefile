@@ -16,9 +16,10 @@ deploydata: data.txt
 	done
 	if [ "`sw_vers | awk -F '.' '/oductV/{print $$2}'`" == "5" ]; then \
 	    $${HOME}/Library/Input\ Methods/McBopomofo.app/$(EXEPATH) install; \
+	    echo extra install; \
 	    sleep 2; \
 	fi
-	$${HOME}/Library/Input\ Methods/McBopomofo.app/$(EXEPATH) install; \
+	$${HOME}/Library/Input\ Methods/McBopomofo.app/$(EXEPATH) install
 
 PhraseFreq.txt: bin/buildFreq.bash phrase.occ
 	bin/buildFreq.bash
