@@ -286,6 +286,7 @@ public:
     [_composingBuffer setString:@""];
 }
 
+// TODO: bug #28 is more likely to live in this method.
 - (void)updateClientComposingBuffer:(id)client
 {
     // "updating the composing buffer" means to request the client to "refresh" the text input buffer
@@ -520,6 +521,7 @@ public:
         if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
             NSString *trigram = [self neighborTrigramString];
             
+			// Lookup from the user dict to see if the trigram fit or not
             NSString *overrideCandidateString = [TLCandidateLearningDictionary objectForKey:trigram];
             if (overrideCandidateString) {
                 [self candidateSelected:(NSAttributedString *)overrideCandidateString];
@@ -537,6 +539,7 @@ public:
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == downKey || charCode == 32)) {
 		if (charCode == 32) {
+			// if the spacebar is NOT set to be a selection key
 			if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
 				if (_builder->cursorIndex() >= _builder->length()) {
 					[_composingBuffer appendString:@" "];
@@ -572,6 +575,8 @@ public:
 
         [self updateClientComposingBuffer:client];
         return YES;
+		//可能的行為包括 1. 取消組字, 把字吃掉 2. 取消 candidate 選擇, 恢復原來的
+		//3. 取消組字，現出注音
     }
     
     // The Right key, note we use keyCode here
@@ -1005,8 +1010,7 @@ void LTLoadLanguageModel()
     
     NSString *appSupportPath = [paths objectAtIndex:0];
     
-    // TODO: Change this
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"Lettuce"];
+    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
 
     BOOL isDir = NO;
     BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictPath isDirectory:&isDir];
