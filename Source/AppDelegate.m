@@ -56,7 +56,7 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
     LTLoadLanguageModel();
-    
+
     [self checkForUpdate];
 }
 
@@ -70,36 +70,36 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
     if ([(NSDate *)[NSDate date] compare:date] == NSOrderedAscending) {
         return;
     }
-    
+
     NSDate *nextUpdateDate = [NSDate dateWithTimeInterval:kNextCheckInterval sinceDate:[NSDate date]];
     [[NSUserDefaults standardUserDefaults] setObject:nextUpdateDate forKey:kNextUpdateCheckDateKey];
-    
+
     if (_updateCheckConnection) {
         [_updateCheckConnection release];
         _updateCheckConnection = nil;
     }
-    
+
     NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
     NSString *updateInfoURLString = [infoDict objectForKey:kUpdateInfoEndpointKey];
-    
+
     if (![updateInfoURLString length]) {
         return;
     }
-    
+
     NSURL *updateInfoURL = [NSURL URLWithString:updateInfoURLString];
     if (!updateInfoURL) {
         return;
     }
-    
+
     NSURLRequest *request = [NSURLRequest requestWithURL:updateInfoURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:kTimeoutInterval];
-    
+
     if (!request) {
         return;
     }
 #if DEBUG
     NSLog(@"about to request update url %@ ",updateInfoURL);
 #endif
-    
+
     _updateCheckConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     [_updateCheckConnection start];
 }
@@ -118,7 +118,7 @@ NSLog(@"error");
     if (!plist) {
         return;
     }
-    
+
     NSString *remoteVersion = [plist objectForKey:(id)kCFBundleVersionKey];
 #if DEBUG
     NSLog(@"the remoteversion is %@",remoteVersion);
@@ -126,10 +126,10 @@ NSLog(@"error");
     if (!remoteVersion) {
         return;
     }
-    
+
     // TODO: Validate info (e.g. bundle identifier)
     // TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
-    
+
     NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
     NSString *currentVersion = [infoDict objectForKey:(id)kCFBundleVersionKey];
     NSComparisonResult result  = [currentVersion compare:remoteVersion options:NSNumericSearch];
@@ -137,25 +137,25 @@ NSLog(@"error");
     if (result != NSOrderedAscending) {
         return;
     }
-    
-    
+
+
     NSString *siteInfoURLString = [plist objectForKey:kUpdateInfoSiteKey];
     if (!siteInfoURLString) {
         return;
     }
-    
+
     NSURL *siteInfoURL = [NSURL URLWithString:siteInfoURLString];
     if (!siteInfoURL) {
         return;
     }
-    
-    
+
+
     if (_updateNotificationController) {
         [_updateNotificationController release], _updateNotificationController = nil;
     }
-    
+
     _updateNotificationController = [[UpdateNotificationController alloc] initWithWindowNibName:@"UpdateNotificationController"];
-    
+
     _updateNotificationController.siteURL = siteInfoURL;
     _updateNotificationController.infoText = [NSString stringWithFormat:NSLocalizedString(@"You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?", @""),
                                               [infoDict objectForKey:@"CFBundleShortVersionString"],
@@ -163,7 +163,7 @@ NSLog(@"error");
                                               [plist objectForKey:@"CFBundleShortVersionString"],
                                               [plist objectForKey:(id)kCFBundleVersionKey],
                                               nil];
-    
+
     [_updateNotificationController showWindow:self];
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];    
 }

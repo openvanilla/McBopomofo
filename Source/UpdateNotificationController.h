@@ -39,7 +39,7 @@
     NSButton *_visitButton;
     NSButton *_laterButton;
     NSTextField *_infoTextField;
-    
+
     NSURL *_siteURL;
     NSString *_infoText;    
 }

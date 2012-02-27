@@ -9,7 +9,7 @@
 //
 // Based on the Syrup Project and the Formosana Library
 // by Lukhnos Liu (@lukhnos).
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -117,12 +117,12 @@ public:
     if (_builder) {
         delete _builder;
     }
-    
+
     [_composingBuffer release];
-    
+
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
-    
+
     [super dealloc];
 }
 
@@ -130,44 +130,44 @@ public:
 {
     // an instance is initialized whenever a text input client (a Mac app) requires
     // text input from an IME
-    
+
     self = [super initWithServer:server delegate:delegate client:client];
-	if (self) {
-	    // create the reading buffer
+    if (self) {
+        // create the reading buffer
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
-        
+
         // create the lattice builder
         _builder = new BlockReadingBuilder(&LTLanguageModel);
-        
+
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
-        
+
         // create the composing buffer
         _composingBuffer = [[NSMutableString alloc] init];
-        
+
         // populate the settings, by default, DISABLE user candidate learning
         if (![[NSUserDefaults standardUserDefaults] objectForKey:kDisableUserCandidateSelectionLearning]) {
             [[NSUserDefaults standardUserDefaults] setObject:(id)kCFBooleanTrue forKey:kDisableUserCandidateSelectionLearning];
         }
-	}
-	
-	return self;
+    }
+
+    return self;
 }
 
 - (NSMenu *)menu
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
-	NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Input Method Menu"] autorelease];
-	NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
-	[menu addItem:preferenceMenuItem];
+    NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Input Method Menu"] autorelease];
+    NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
+    [menu addItem:preferenceMenuItem];
 
     // If Option key is pressed, show the learning-related menu
-    
+
     #if DEBUG
     if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
-    
+
         BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
-        
+
         NSMenuItem *learnMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""] autorelease];
         if (learningEnabled) {
             [learnMenuItem setState:NSOnState];
@@ -175,7 +175,7 @@ public:
         else {
             [learnMenuItem setState:NSOffState];
         }
-        
+
         [menu addItem:learnMenuItem];
 
         if (learningEnabled) {
@@ -183,16 +183,16 @@ public:
             NSMenuItem *clearMenuItem = [[[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""] autorelease];
             [menu addItem:clearMenuItem];
 
-            
+
             NSMenuItem *dumpMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""] autorelease];
             [menu addItem:dumpMenuItem];
         }
     }
     #endif //DEBUG
-	
-	NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
-	[menu addItem:aboutMenuItem];
-    
+
+    NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
+    [menu addItem:aboutMenuItem];
+
     return menu;
 }
 
@@ -201,7 +201,7 @@ public:
 - (void)activateServer:(id)client
 {
     // reset the state
-    _currentDeferredClient = nil;    
+    _currentDeferredClient = nil;
     _currentCandidateClient = nil;
     _builder->clear();
     _walkedNodes.clear();
@@ -211,7 +211,7 @@ public:
     NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
     switch (keyboardLayout) {
         case 0:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());        
+            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             break;
         case 1:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETenLayout());
@@ -229,12 +229,12 @@ public:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:kKeyboardLayoutPreferenceKey];
     }
-	if (keyboardLayout < 4) {
-		[client overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-	}
+    if (keyboardLayout < 4) {
+        [client overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+    }
 
     // set the size
-    NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];                
+    NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
     NSInteger previousTextSize = textSize;
     if (textSize == 0) {
         textSize = kDefaultCandidateListTextSize;
@@ -245,14 +245,14 @@ public:
     else if (textSize > kMaxCandidateListTextSize) {
         textSize = kMaxCandidateListTextSize;
     }
-    
+
     if (textSize != previousTextSize) {
         [[NSUserDefaults standardUserDefaults] setInteger:textSize forKey:kCandidateListTextSizeKey];
     }
     if (![[NSUserDefaults standardUserDefaults] objectForKey:kChooseCandidateUsingSpaceKey]) {
-		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:kChooseCandidateUsingSpaceKey];
-	}
-	
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kChooseCandidateUsingSpaceKey];
+    }
+
     [(AppDelegate *)[NSApp delegate] checkForUpdate];
 }
 
@@ -260,14 +260,14 @@ public:
 {
     // commit any residue in the composing buffer
     [self commitComposition:client];
-    _currentDeferredClient = nil;    
+    _currentDeferredClient = nil;
     _currentCandidateClient = nil;
 }
 
 #pragma mark - IMKServerInput protocol methods
 
-- (void)commitComposition:(id)client 
-{    
+- (void)commitComposition:(id)client
+{
     // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
     // then we defer the update in the next runloop round -- so that the composing buffer is not
     // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
@@ -278,9 +278,9 @@ public:
         }
         return;
     }
-    
+
     // commit the text, clear the state
-    [client insertText:_composingBuffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];    
+    [client insertText:_composingBuffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
@@ -291,7 +291,7 @@ public:
 {
     // "updating the composing buffer" means to request the client to "refresh" the text input buffer
     // with our "composing text"
-    
+
     [_composingBuffer setString:@""];
     NSInteger composedStringCursorIndex = 0;
 
@@ -306,10 +306,10 @@ public:
             string nodeStr = (*wi).node->currentKeyValue().value;
             vector<string> codepoints = OVUTF8Helper::SplitStringByCodePoint(nodeStr);
             size_t codepointCount = codepoints.size();
-            
+
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [_composingBuffer appendString:valueString];
-            
+
             // this re-aligns the cursor index in the composed string
             // (the actual cursor on the screen) with the builder's logical
             // cursor (reading) cursor; each built node has a "spanning length"
@@ -328,7 +328,7 @@ public:
                 }
             }
         }
-    }    
+    }
 
     // now we gather all the info, we separate the composing buffer to two parts, head and tail,
     // and insert the reading text (the Mandarin syllable) in between them;
@@ -344,11 +344,11 @@ public:
     NSDictionary *attrDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               [NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
                               [NSNumber numberWithInt:0], NSMarkedClauseSegmentAttributeName, nil];
-	NSMutableAttributedString *attrString = [[[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict] autorelease];
-	
-	// the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-	// i.e. the client app needs to take care of where to put ths composing buffer
-	[client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    NSMutableAttributedString *attrString = [[[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict] autorelease];
+
+    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+    // i.e. the client app needs to take care of where to put ths composing buffer
+    [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 }
 
 - (void)walk
@@ -357,19 +357,19 @@ public:
     // of the best possible Mandarain characters given the input syllables,
     // using the Viterbi algorithm implemented in the Gramambular library
     Walker walker(&_builder->grid());
-    
-    // the reverse walk traces the trellis from the end   
+
+    // the reverse walk traces the trellis from the end
     _walkedNodes = walker.reverseWalk(_builder->grid().width());
-    
+
     // then we reverse the nodes so that we get the forward-walked nodes
     reverse(_walkedNodes.begin(), _walkedNodes.end());
 
-    // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile 
-    #if DEBUG    
+    // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
+    #if DEBUG
     string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
-    
+
     BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
     #endif
 }
@@ -383,10 +383,10 @@ public:
     // lose their influence over the whole MLE anyway -- so tht when
     // the user type along, the already composed text at front will
     // be popped out
-    
+
     NSInteger _composingBufferSize = [[NSUserDefaults standardUserDefaults] integerForKey:kComposingBufferSizePreferenceKey];
     NSInteger previousComposingBufferSize = _composingBufferSize;
-    
+
     if (_composingBufferSize == 0) {
         _composingBufferSize = kDefaultComposingBufferSize;
     }
@@ -396,20 +396,20 @@ public:
     else if (_composingBufferSize > kMaxComposingBufferSize) {
         _composingBufferSize = kMaxComposingBufferSize;
     }
-    
+
     if (_composingBufferSize != previousComposingBufferSize) {
         [[NSUserDefaults standardUserDefaults] setInteger:_composingBufferSize forKey:kComposingBufferSizePreferenceKey];
     }
-    
+
     if (_builder->grid().width() > (size_t)_composingBufferSize) {
         if (_walkedNodes.size() > 0) {
             NodeAnchor &anchor = _walkedNodes[0];
-            NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];            
+            NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
     }
-    
+
     [self walk];
 }
 
@@ -421,73 +421,73 @@ public:
 
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
-	NSRect textFrame = NSZeroRect;
-	NSDictionary *attributes = nil;
-	BOOL useVerticalMode = NO;
-	@try {
-		attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
-		useVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
-	}
-	@catch (NSException *e) {
-		// An exception may raise while using Twitter.app's search filed.
-	}
-	
-	NSInteger leftKey = useVerticalMode ? 125 : 124;
-	NSInteger rightKey = useVerticalMode ? 126 : 123;
-	NSInteger downKey = useVerticalMode ? 123 : 125;
-	NSInteger upKey = useVerticalMode ? 124 : 126;
-	
+    NSRect textFrame = NSZeroRect;
+    NSDictionary *attributes = nil;
+    BOOL useVerticalMode = NO;
+    @try {
+        attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
+        useVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
+    }
+    @catch (NSException *e) {
+        // An exception may raise while using Twitter.app's search filed.
+    }
+
+    NSInteger leftKey = useVerticalMode ? 125 : 124;
+    NSInteger rightKey = useVerticalMode ? 126 : 123;
+    NSInteger downKey = useVerticalMode ? 123 : 125;
+    NSInteger upKey = useVerticalMode ? 124 : 126;
+
     // get the unicode character code
-	UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;    
-    
+    UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
+
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"])
     {
         // special handling for com.apple.Terminal
         _currentDeferredClient = client;
     }
-    
+
     // if the inputText is empty, it's a function key combination, we ignore it
-	if (![inputText length]) {
-		return NO;
-	}
+    if (![inputText length]) {
+        return NO;
+    }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     if (![_composingBuffer length] && _bpmfReadingBuffer->isEmpty() && ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask) || (flags & NSAlternateKeyMask) || (flags & NSNumericPadKeyMask))) {
         return NO;
-    }        
-    
+    }
+
     bool composeReading = false;
-    
+
     // caps lock processing : if caps is locked, temporarily disabled bopomofo.
 
-	if (charCode == 8      || charCode == 13     ||
-        keyCode == upKey   || keyCode == downKey || 
+    if (charCode == 8      || charCode == 13     ||
+        keyCode == upKey   || keyCode == downKey ||
         keyCode == leftKey || keyCode == rightKey) {
         // Do nothing if backspace is pressed
-	} else if (flags & NSAlphaShiftKeyMask){
+    } else if (flags & NSAlphaShiftKeyMask){
         // Now process all possible combination, we hope.
-		if ([_composingBuffer length]) [self commitComposition:client];
+        if ([_composingBuffer length]) [self commitComposition:client];
         // First commit everything in the buffer.
-		if (flags & NSShiftKeyMask) return NO;
+        if (flags & NSShiftKeyMask) return NO;
         // when shift is pressed, don't do further processing, since it outputs
         // capital letter anyway.
-		NSString *popedText = [inputText lowercaseString];
-		[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-		return YES;
-	}
-	if (flags & NSNumericPadKeyMask) {
-		if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 ) {
-			if ([_composingBuffer length]) [self commitComposition:client];
-			NSString *popedText = [inputText lowercaseString];
-			[client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-			return YES;
-		}
-	}
-    
+        NSString *popedText = [inputText lowercaseString];
+        [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+        return YES;
+    }
+    if (flags & NSNumericPadKeyMask) {
+        if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 ) {
+            if ([_composingBuffer length]) [self commitComposition:client];
+            NSString *popedText = [inputText lowercaseString];
+            [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+            return YES;
+        }
+    }
+
     // see if it's valid BPMF reading
     if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
-        
+
         // if we have a tone marker, we have to insert the reading to the builder
         // in other words, if we don't have a tone marker, we just update the composing buffer
         composeReading = _bpmfReadingBuffer->hasToneMarker();
@@ -496,76 +496,76 @@ public:
             return YES;
         }
     }
-    
+
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
     composeReading |= (!_bpmfReadingBuffer->isEmpty() && (charCode == 32 || charCode == 13));
     if (composeReading) {
         // combine the reading
         string reading = _bpmfReadingBuffer->syllable().composedString();
-        
+
         // see if we have a unigram for this
         if (!LTLanguageModel.hasUnigramsForKey(reading)) {
             [self beep];
             [self updateClientComposingBuffer:client];
             return YES;
         }
-        
+
         // and insert it into the lattice
         _builder->insertReadingAtCursor(reading);
-        
+
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
-        
+
         // see if we need to override the selection if a learned one exists
         if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
             NSString *trigram = [self neighborTrigramString];
-            
-			// Lookup from the user dict to see if the trigram fit or not
+
+            // Lookup from the user dict to see if the trigram fit or not
             NSString *overrideCandidateString = [TLCandidateLearningDictionary objectForKey:trigram];
             if (overrideCandidateString) {
                 [self candidateSelected:(NSAttributedString *)overrideCandidateString];
             }
         }
-        
+
         // then update the text
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
-        
+
         // and tells the client that the key is consumed
-        return YES;        
+        return YES;
     }
 
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == downKey || charCode == 32)) {
-		if (charCode == 32) {
-			// if the spacebar is NOT set to be a selection key
-			if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
-				if (_builder->cursorIndex() >= _builder->length()) {
-					[_composingBuffer appendString:@" "];
-					[self commitComposition:client];
-					_bpmfReadingBuffer->clear();					
-				}
-				else if (LTLanguageModel.hasUnigramsForKey(" ")) {
-					_builder->insertReadingAtCursor(" ");
-					[self popOverflowComposingTextAndWalk:client];
-					[self updateClientComposingBuffer:client];
-				}
-				return YES;
-					
-			}
-		}
-		[self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        if (charCode == 32) {
+            // if the spacebar is NOT set to be a selection key
+            if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
+                if (_builder->cursorIndex() >= _builder->length()) {
+                    [_composingBuffer appendString:@" "];
+                    [self commitComposition:client];
+                    _bpmfReadingBuffer->clear();
+                }
+                else if (LTLanguageModel.hasUnigramsForKey(" ")) {
+                    _builder->insertReadingAtCursor(" ");
+                    [self popOverflowComposingTextAndWalk:client];
+                    [self updateClientComposingBuffer:client];
+                }
+                return YES;
+
+            }
+        }
+        [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         return YES;
     }
-    
+
     // Esc
-    if (charCode == 27) {        
+    if (charCode == 27) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
             }
-            
+
             //[self beep];
             //如果要按 ESC 的時候都已經知道要取消些啥，不必beep
         }
@@ -575,20 +575,20 @@ public:
 
         [self updateClientComposingBuffer:client];
         return YES;
-		//可能的行為包括 1. 取消組字, 把字吃掉 2. 取消 candidate 選擇, 恢復原來的
-		//3. 取消組字，現出注音
+        //可能的行為包括 1. 取消組字, 把字吃掉 2. 取消 candidate 選擇, 恢復原來的
+        //3. 取消組字，現出注音
     }
-    
+
     // The Right key, note we use keyCode here
     if (keyCode == rightKey) {
-        if (!_bpmfReadingBuffer->isEmpty()) {            
+        if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
         else {
             if (![_composingBuffer length]) {
                 return NO;
             }
-            
+
             if (_builder->cursorIndex() > 0) {
                 _builder->setCursorIndex(_builder->cursorIndex() - 1);
             }
@@ -596,21 +596,21 @@ public:
                 [self beep];
             }
         }
-        
+
         [self updateClientComposingBuffer:client];
         return YES;
     }
-    
+
     // The Left key, note we use keyCode here
     if (keyCode == leftKey) {
-        if (!_bpmfReadingBuffer->isEmpty()) {            
+        if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
         else {
             if (![_composingBuffer length]) {
                 return NO;
             }
-            
+
             if (_builder->cursorIndex() < [_composingBuffer length]) {
                 _builder->setCursorIndex(_builder->cursorIndex() + 1);
             }
@@ -618,29 +618,29 @@ public:
                 [self beep];
             }
         }
-        
+
         [self updateClientComposingBuffer:client];
         return YES;
     }
 
-	if (keyCode == upKey || keyCode == downKey) {
-        if (!_bpmfReadingBuffer->isEmpty()) {            
+    if (keyCode == upKey || keyCode == downKey) {
+        if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
         [self updateClientComposingBuffer:client];
-        return YES;		
-	}
-    
+        return YES;
+    }
+
     // Backspace
     if (charCode == 8) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
             }
-            
+
             if (_builder->cursorIndex()) {
                 _builder->deleteReadingBeforeCursor();
-                [self walk];                
+                [self walk];
             }
             else {
                 [self beep];
@@ -649,60 +649,60 @@ public:
         else {
             _bpmfReadingBuffer->backspace();
         }
-        
+
         [self updateClientComposingBuffer:client];
         return YES;
     }
-    
+
     // Enter
     if (charCode == 13) {
         if (![_composingBuffer length]) {
             return NO;
         }
-        
+
         [self commitComposition:client];
         return YES;
     }
 
-	if ((char)charCode == '`') {
-		if (LTLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
-			if (_bpmfReadingBuffer->isEmpty()) {
-				_builder->insertReadingAtCursor(string("_punctuation_list"));
-				[self popOverflowComposingTextAndWalk:client];
-				[self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-			}
-			else { // If there is still unfinished bpmf reading, ignore the punctuation
-				[self beep];
-			}
-			[self updateClientComposingBuffer:client];
-			return YES;
-		}
-	}
-	
-	string layout = string("Standard_");;
-	NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
+    if ((char)charCode == '`') {
+        if (LTLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
+            if (_bpmfReadingBuffer->isEmpty()) {
+                _builder->insertReadingAtCursor(string("_punctuation_list"));
+                [self popOverflowComposingTextAndWalk:client];
+                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+            }
+            else { // If there is still unfinished bpmf reading, ignore the punctuation
+                [self beep];
+            }
+            [self updateClientComposingBuffer:client];
+            return YES;
+        }
+    }
+
+    string layout = string("Standard_");;
+    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
     switch (keyboardLayout) {
         case 0:
-			layout = string("Standard_");
+            layout = string("Standard_");
             break;
         case 1:
-			layout = string("ETen_");
+            layout = string("ETen_");
             break;
         case 2:
-			layout = string("ETen26_");
+            layout = string("ETen26_");
             break;
         case 3:
-			layout = string("Hsu_");
+            layout = string("Hsu_");
             break;
         case 4:
-			layout = string("HanyuPinyin_");
+            layout = string("HanyuPinyin_");
             break;
         default:
-			break;
+            break;
     }
-	
-	string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
-	if (LTLanguageModel.hasUnigramsForKey(customPunctuation)) {
+
+    string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
+    if (LTLanguageModel.hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
             _builder->insertReadingAtCursor(customPunctuation);
             [self popOverflowComposingTextAndWalk:client];
@@ -713,7 +713,7 @@ public:
         [self updateClientComposingBuffer:client];
         return YES;
     }
-	
+
     // if nothing is matched, see if it's a punctuation key
     string punctuation = string("_punctuation_") + string(1, (char)charCode);
     if (LTLanguageModel.hasUnigramsForKey(punctuation)) {
@@ -743,11 +743,11 @@ public:
 - (NSArray*)candidates:(id)client
 {
     // returns the candidate
-    
+
     NSMutableArray *results = [NSMutableArray array];
     size_t cursorIndex = [self actualCandidateCursorIndex];
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-    
+
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
 
@@ -758,23 +758,23 @@ public:
             [results addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
         }
     }
-        
+
     return results;
 }
-             
+
 - (void)candidateSelected:(NSAttributedString *)candidateString
 {
     // candidate selected, override the node with selection
-    
+
     string selectedValue;
-    
+
     if ([candidateString isKindOfClass:[NSString class]]) {
         selectedValue = [(NSString *)candidateString UTF8String];
     }
     else {
         selectedValue = [[candidateString string] UTF8String];
     }
-    
+
     if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
         NSString *trigram = [self neighborTrigramString];
         NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
@@ -782,9 +782,9 @@ public:
         [self saveUserCandidatesDictionary];
     }
 
-	size_t cursorIndex = [self actualCandidateCursorIndex];    
+    size_t cursorIndex = [self actualCandidateCursorIndex];
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-    
+
     for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         const vector<KeyValuePair>& candidates = (*ni).node->candidates();
 
@@ -796,7 +796,7 @@ public:
             }
         }
     }
-        
+
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
     _currentCandidateClient = nil;
@@ -807,37 +807,37 @@ public:
 - (size_t)actualCandidateCursorIndex
 {
     size_t cursorIndex = _builder->cursorIndex();
-    
+
     BOOL candidatePhraseLocatedAfterCursor = [[NSUserDefaults standardUserDefaults] boolForKey:kSelectPhraseAfterCursorAsCandidatePreferenceKey];
-    
+
     if (candidatePhraseLocatedAfterCursor) {
         // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
         if (cursorIndex < _builder->length()) {
             ++cursorIndex;
-        }        
+        }
     }
     else {
         if (!cursorIndex) {
             ++cursorIndex;
-        }        
+        }
     }
-    
+
     return cursorIndex;
 }
 
 - (NSString *)neighborTrigramString
 {
     // gather the "trigram" for user candidate selection learning
-    
+
     NSMutableArray *termArray = [NSMutableArray array];
-    
-	size_t cursorIndex = [self actualCandidateCursorIndex];
+
+    size_t cursorIndex = [self actualCandidateCursorIndex];
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-    
+
     const Node* prev = 0;
     const Node* current = 0;
     const Node* next = 0;
-    
+
     size_t wni = 0;
     size_t wnc = _walkedNodes.size();
     size_t accuSpanningLength = 0;
@@ -846,37 +846,37 @@ public:
         if (!anchor.node) {
             continue;
         }
-        
+
         accuSpanningLength += anchor.spanningLength;
-        if (accuSpanningLength >= cursorIndex) {            
+        if (accuSpanningLength >= cursorIndex) {
             prev = current;
             current = anchor.node;
             break;
         }
-        
+
         current = anchor.node;
     }
-    
+
     if (wni + 1 < wnc) {
         next = _walkedNodes[wni + 1].node;
     }
-	
+
     string term;
     if (prev) {
         term = prev->currentKeyValue().key;
         [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
     }
-    
+
     if (current) {
         term = current->currentKeyValue().key;
         [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
     }
-    
+
     if (next) {
         term = next->currentKeyValue().key;
         [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
     }
-	
+
     return [termArray componentsJoinedByString:@"-"];
 }
 
@@ -890,47 +890,47 @@ public:
     if (!TLUserCandidatesDictionaryPath) {
         return;
     }
-    
+
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_performDeferredSaveUserCandidatesDictionary) object:nil];
-    
+
     // TODO: Const-ize the delay
     [self performSelector:@selector(_performDeferredSaveUserCandidatesDictionary) withObject:nil afterDelay:5.0];
 }
 
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
 {
-	// candidate
-	[LTSharedCandidates setDismissesAutomatically:YES];
-	
-	// wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
-#define LTUIntObj(x)    ([NSNumber numberWithInteger:x])        
-	[LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
+    // candidate
+    [LTSharedCandidates setDismissesAutomatically:YES];
+
+    // wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
+#define LTUIntObj(x)    ([NSNumber numberWithInteger:x])
+    [LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
 #undef LTUIntObj
-	
-	// set the candidate panel style
-	BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
-	
-	if (useVerticalMode) {
-		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
-	}
-	else if (useHorizontalCandidateList) {
-		[LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
-	}
-	else {
-		[LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
-	}
-	
-	// set the attributes for the candidate panel (which uses NSAttributedString)
-	NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];        
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];		
-	[LTSharedCandidates setAttributes:attributes];
-	
-	[LTSharedCandidates updateCandidates];
-	[LTSharedCandidates show:useVerticalMode ? kIMKLocateCandidatesLeftHint : kIMKLocateCandidatesBelowHint];
-	
-	// update the composing text, set the client
-	[self updateClientComposingBuffer:client];
-	_currentCandidateClient = client;
+
+    // set the candidate panel style
+    BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
+
+    if (useVerticalMode) {
+        [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+    }
+    else if (useHorizontalCandidateList) {
+        [LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
+    }
+    else {
+        [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+    }
+
+    // set the attributes for the candidate panel (which uses NSAttributedString)
+    NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];
+    [LTSharedCandidates setAttributes:attributes];
+
+    [LTSharedCandidates updateCandidates];
+    [LTSharedCandidates show:useVerticalMode ? kIMKLocateCandidatesLeftHint : kIMKLocateCandidatesBelowHint];
+
+    // update the composing text, set the client
+    [self updateClientComposingBuffer:client];
+    _currentCandidateClient = client;
 }
 
 #pragma mark - Misc menu items
@@ -951,7 +951,7 @@ public:
 - (void)toggleLearning:(id)sender
 {
     BOOL toggle = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
-    
+
     [[NSUserDefaults standardUserDefaults] setBool:toggle forKey:kDisableUserCandidateSelectionLearning];
 }
 
@@ -972,49 +972,49 @@ void LTLoadLanguageModel()
 {
     // load the language model; the performance of this function can be greatly improved
     // with better loading/parsing methods
-    
+
     NSDate *__unused startTime = [NSDate date];
 
     NSString *dataPath = [[NSBundle bundleForClass:[LettuceInputMethodController class]] pathForResource:@"data" ofType:@"txt"];
-    
+
     ifstream ifs;
     ifs.open([dataPath UTF8String]);
     while (ifs.good()) {
         string line;
         getline(ifs, line);
-        
+
         if (!line.size() || (line.size() && line[0] == '#')) {
             continue;
         }
-        
+
         vector<string> p = OVStringHelper::SplitBySpacesOrTabs(line);
-        
+
         if (p.size() == 3) {
             LTLanguageModel.add(p[1], p[0], atof(p[2].c_str()));
         }
     }
     ifs.close();
-	LTLanguageModel.add(" ", " ", 0.0);
-    
+    LTLanguageModel.add(" ", " ", 0.0);
+
     // initialize the singleton learning dictionary
     // putting singleton in @synchronized is the standard way in Objective-C
     // to avoid race condition
     TLCandidateLearningDictionary = [[NSMutableDictionary alloc] init];
-        
+
     // the first instance is also responsible for loading the dictionary
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
     if (![paths count]) {
         NSLog(@"Fatal error: cannot find Applicaiton Support directory.");
         return;
     }
-    
+
     NSString *appSupportPath = [paths objectAtIndex:0];
-    
+
     NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
 
     BOOL isDir = NO;
     BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictPath isDirectory:&isDir];
-    
+
     if (exists) {
         if (!isDir) {
             NSLog(@"Fatal error: Path '%@' is not a directory", userDictPath);
@@ -1029,7 +1029,7 @@ void LTLoadLanguageModel()
             return;
         }
     }
-    
+
     // TODO: Change this
     NSString *userDictFile = [userDictPath stringByAppendingPathComponent:@"UserCandidatesCache.plist"];
     TLUserCandidatesDictionaryPath = [userDictFile retain];
@@ -1040,14 +1040,14 @@ void LTLoadLanguageModel()
         if (!data) {
             return;
         }
-        
+
         NSString *errorStr = nil;
         NSPropertyListFormat format = 0;
         id plist = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&errorStr];
         if (plist && [plist isKindOfClass:[NSDictionary class]]) {
             [TLCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
             NSLog(@"User dictionary read, item count: %ju", (uintmax_t)[TLCandidateLearningDictionary count]);
-        }        
+        }
     }
-    
+
 }

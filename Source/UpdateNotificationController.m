@@ -47,7 +47,7 @@
     if (self) {
         _infoText = @"Version info here";
     }
-    
+
     return self;
 }
 
@@ -64,14 +64,14 @@
     [_visitButton setTitle:NSLocalizedString(@"Visit Website", @"")];
     [_laterButton setTitle:NSLocalizedString(@"Check Later", @"")];
     [_infoTextField setStringValue:_infoText];
-    
+
     [[self window] makeFirstResponder:_visitButton];
 }
 
 - (void)windowDidLoad
 {
     [super windowDidLoad];
-    
+
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
 
