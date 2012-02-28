@@ -5886,6 +5886,7 @@
 妽 ㄕㄣ shen gp big5
 峷 ㄕㄣ shen gp big5
 眒 ㄕㄣ shen gp big5
+鯓 ㄕㄣ shen gp big5
 沈 ㄕㄣˇ shen3 gp3 big5
 審 ㄕㄣˇ shen3 gp3 big5
 嬸 ㄕㄣˇ shen3 gp3 big5
@@ -9351,7 +9352,6 @@
 輗 ㄋㄧˊ ni2 su6 big5
 郳 ㄋㄧˊ ni2 su6 big5
 麑 ㄋㄧˊ ni2 su6 big5
-鯓 ㄋㄧˊ ni2 su6 big5
 鯢 ㄋㄧˊ ni2 su6 big5
 齯 ㄋㄧˊ ni2 su6 big5
 臡 ㄋㄧˊ ni2 su6 big5
