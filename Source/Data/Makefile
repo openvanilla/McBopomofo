@@ -1,4 +1,4 @@
-.PHONY: deploydata sort
+.PHONY: deploydata sort clean
 DATPATH=Contents/Resources/data.txt
 EXEPATH=Contents/MacOS/McBopomofo
 EXENAME=McBopomofo
@@ -28,10 +28,8 @@ phrase.list: bin/build4wlist.bash BPMFBase.txt BPMFMappings.txt textpool.utf8
 	bin/build4wlist.bash
 
 sort: 
-	env LANG=C sort -k1 phrase.occ > tmp
-	mv tmp phrase.occ
-	env LANG=C sort -sk1 BPMFMappings.txt > tmp
-	mv tmp BPMFMappings.txt
+	env LANG=C sort -k1 phrase.occ > tmp; mv tmp phrase.occ
+	env LANG=C sort -sk1 BPMFMappings.txt > tmp; mv tmp BPMFMappings.txt
 
 clean:
 	rm -f data.txt
