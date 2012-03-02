@@ -164,6 +164,7 @@ public:
     // If Option key is pressed, show the learning-related menu
 
     #if DEBUG
+    //I think the following line is 10.6+ specific
     if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
 
         BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
