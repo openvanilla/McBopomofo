@@ -31,5 +31,9 @@ sort:
 	env LANG=C sort -k1 phrase.occ > tmp; mv tmp phrase.occ
 	env LANG=C sort -sk1 BPMFMappings.txt > tmp; mv tmp BPMFMappings.txt
 
+check:
+	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
+	@awk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | awk '/一/'
+
 clean:
 	rm -f data.txt
