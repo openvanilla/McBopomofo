@@ -34,6 +34,12 @@ sort:
 check:
 	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
 	@awk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | awk '/一/'
+	awk '{print $$1}' BPMFMappings.txt | uniq|wc -l
+	awk 'length($$1)>3{print $$1}' phrase.occ |wc -l
+
+tidy:
+	sed -i '' -e 's/ //g' phrase.occ
+	sed -i '' -e 's/  / /g;s/ $$//g' BPMFMappings.txt
 
 clean:
 	rm -f data.txt
