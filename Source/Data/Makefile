@@ -28,8 +28,8 @@ phrase.list: bin/build4wlist.bash BPMFBase.txt BPMFMappings.txt textpool.utf8
 	bin/build4wlist.bash
 
 sort: 
-	env LANG=C sort -k1 phrase.occ > tmp; mv tmp phrase.occ
-	env LANG=C sort -sk1 BPMFMappings.txt > tmp; mv tmp BPMFMappings.txt
+	env LANG=C sort -k1 phrase.occ | uniq> tmp; mv tmp phrase.occ
+	env LANG=C sort -sk1 BPMFMappings.txt | uniq > tmp; mv tmp BPMFMappings.txt
 
 check:
 	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
