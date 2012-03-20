@@ -12,4 +12,6 @@ if [ "${TEXTPOOL}_test" == "_test" ]; then
 fi
 if [ -f "$TEXTPOOL" ]; then
    $myPATH/C_count.occ.exe $TEXTPOOL $1
+else
+   echo "File \"${TEXTPOOL}\" not found."
 fi
