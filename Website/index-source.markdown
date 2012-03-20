@@ -1,8 +1,8 @@
 # OpenVanilla McBopomofo 小麥注音輸入法
 
-0.9.2 搶先體驗版
+0.9.3 搶先體驗版
 
-[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.2.zip)
+[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.3.zip)
 
 ## 特色
 
@@ -32,22 +32,26 @@ Mac OS X 10.6 以上版本
 
 ## 常見問題 (FAQ)
 
-Q: 哪裡可以取得原始碼？
+Q: 要怎麼輸入符號？
 
-> 請到 [github](https://github.com/mjhsieh/McBopomofo) 取得。
-
-Q: 為什麼只支援 Mac？
-
-> 因為開發者都是 Mac user。另一方面，這個輸入法的引擎是跨平台的，我們樂見有人移植到其他平台上。:-)
-
-Q: 資料是從哪邊來的？
-    
-> 請參考[這張清單](textpool.html)
+> 目前按下 '`' 按鈕之後，會有一個簡單的符號表。至於說相關的文件說明，我們因工作繁忙之故只能說抱歉了。
 
 Q: 要如何提升資料品質？
 
 > 請用 twitter 留言給 @[McBopomofo](https://twitter.com/McBopomofo)
 
+Q: 為什麼只支援 Mac？
+
+> 因為開發者都是 Mac user。另一方面，這個輸入法的引擎是跨平台的，我們樂見有人移植到其他平台上。:-)
+
+Q: 哪裡可以取得原始碼？
+
+> 請到 [github](https://github.com/mjhsieh/McBopomofo) 取得。
+
 Q: 選字的原理是什麼？
 
 > 簡化過的 Hidden Markov Model + Viterbi algorithm。請參考 [Formosana 原始碼](https://github.com/lukhnos/formosana)。
+
+Q: 資料是從哪邊來的？
+    
+> 請參考[這張清單](textpool.html)
