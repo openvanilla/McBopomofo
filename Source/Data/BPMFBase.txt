@@ -5913,6 +5913,7 @@
 鋠 ㄕㄣˋ shen4 gp4 big5
 神 ㄕㄣˊ shen2 gp6 big5
 甚 ㄕㄣˊ shen2 gp6 big5
+什 ㄕㄣˊ shen2 gp6 big5
 疵 ㄘ ci h big5
 庛 ㄘ ci h big5
 雌 ㄘ ci h big5
