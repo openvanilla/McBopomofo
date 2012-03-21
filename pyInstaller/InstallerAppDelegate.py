@@ -64,7 +64,7 @@ class InstallerAppDelegate(NSObject):
     def agreeLicenseAction_(self, sender):
         self.window.orderOut_(None)
         from subprocess import call
-        call(["/usr/bin/killall", "McBopomofo"])
+        call(["/usr/bin/killall", "-9", "McBopomofo"])
 
         inputMethodDir = os.path.expanduser("~/Library/Input Methods")
         if os.path.exists(inputMethodDir) is False:
