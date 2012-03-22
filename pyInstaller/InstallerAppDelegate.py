@@ -72,14 +72,20 @@ class InstallerAppDelegate(NSObject):
 
         packagePath = NSBundle.mainBundle().pathForResource_ofType_("McBopomofo", "app")
         McBopomofoPath = os.path.join(inputMethodDir, "McBopomofo.app")
+
         WrongPath = os.path.join(McBopomofoPath, "McBopomofo.app")
         if os.path.exists(WrongPath) is True:
             try:
                 shutil.rmtree(WrongPath)
             except:
                 """do nothing"""
-                
+
         if os.path.exists(McBopomofoPath) is True:
+            if os.path.isfile(McBopomofoPath) is True:
+                try:
+                    call(["/bin/rm","-f",McBopomofoPath])
+                except:
+                    """do nothing"""
             try:
                 call(["/bin/cp", "-R", packagePath, inputMethodDir]) 
             except:
@@ -95,7 +101,6 @@ class InstallerAppDelegate(NSObject):
                     NSLocalizedString("OK", ""), None, None)
                 NSApp.terminate_(self)
 
-        print McBopomofoPath
         try:
             call([os.path.join(McBopomofoPath, "Contents/MacOS/McBopomofo"), "install"])
         except:
