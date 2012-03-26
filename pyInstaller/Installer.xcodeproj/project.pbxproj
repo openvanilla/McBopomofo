@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		71EF7ABE15202B070040AE62 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 71EF7AC015202B070040AE62 /* Localizable.strings */; };
 		77631A270C06C501005415CB /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77631A260C06C501005415CB /* Python.framework */; };
 		77631A3F0C0748CF005415CB /* main.py in Resources */ = {isa = PBXBuildFile; fileRef = 77631A3E0C0748CF005415CB /* main.py */; };
 		7790198F0C07548A00326F66 /* InstallerAppDelegate.py in Resources */ = {isa = PBXBuildFile; fileRef = 7790198E0C07548A00326F66 /* InstallerAppDelegate.py */; };
@@ -63,6 +64,8 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* Installer_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Installer_Prefix.pch; sourceTree = "<group>"; };
+		71EF7ABF15202B070040AE62 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		71EF7AC115202B1B0040AE62 /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		77631A260C06C501005415CB /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		77631A3E0C0748CF005415CB /* main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = main.py; sourceTree = "<group>"; };
 		7790198E0C07548A00326F66 /* InstallerAppDelegate.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = InstallerAppDelegate.py; sourceTree = "<group>"; };
@@ -151,6 +154,7 @@
 				77C8C1F70C07829500965286 /* MainMenu.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				71EF7AC015202B070040AE62 /* Localizable.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -257,6 +261,7 @@
 				7790198F0C07548A00326F66 /* InstallerAppDelegate.py in Resources */,
 				77C8C1F90C07829500965286 /* MainMenu.xib in Resources */,
 				D48D00DF1438932E0050BDFF /* Lettuce.icns in Resources */,
+				71EF7ABE15202B070040AE62 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +294,15 @@
 				D48D00DC143892E80050BDFF /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		71EF7AC015202B070040AE62 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				71EF7ABF15202B070040AE62 /* English */,
+				71EF7AC115202B1B0040AE62 /* zh-Hant */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		77C8C1F70C07829500965286 /* MainMenu.xib */ = {
