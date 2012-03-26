@@ -42,10 +42,10 @@ class InstallerAppDelegate(NSObject):
     def windowWillClose_(self, notification):
         NSApp.terminate_(self)
 
-    def checkOSVerion(self):
+    def checkOSVersion(self):
         mac_version = platform.mac_ver()[0].split(".")
         if int(mac_version[1]) < 6:
-            NSRunAlertPanel(NSLocalizedString("McBopomofo requires on Mac OS X 10.6 or later verion.", ""),
+            NSRunAlertPanel(NSLocalizedString("McBopomofo requires on Mac OS X 10.6 or later version.", ""),
                 NSLocalizedString("Unable to install McBopomofo on your Mac.",""), 
                 NSLocalizedString("OK", ""), None, None)
             NSApp.terminate_(self)
@@ -119,6 +119,6 @@ class InstallerAppDelegate(NSObject):
 
     def applicationDidFinishLaunching_(self, sender):
         NSApp.activateIgnoringOtherApps_(True)
-        self.checkOSVerion()
+        self.checkOSVersion()
         self.showLicenseWindow()
 
