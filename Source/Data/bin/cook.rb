@@ -94,6 +94,7 @@ while line = p.gets
   readings = bpmf_phrases[key]
   phrases[key] = true
   if readings
+     # 一個字目前還是 3 (unicode)
      if key.length > 3
         readings.each do |r|
            o.puts("%s %s %s" % [key, r, value])
@@ -121,6 +122,8 @@ while line = p.gets
               else
                  o.puts("%s %s %f" % [key, r, H_DEFLT_FREQ])
                  # 如果是破音字, set it to default.
+                 # 很罕用的注音建議不要列入 heterophony?.list，這樣的話
+                 # 就可以直接進來這個 condition
                  #$stdout.puts("%s\|%s\|" % [bpmf_phon1[key], r])
               end
            end
