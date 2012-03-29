@@ -192,6 +192,13 @@
         NSRect buttonRect = [_nextPageButton frame];
         CGFloat spacing = 0.0;
         
+        if (newSize.height < 40.0) {
+            buttonRect.size.height = floor(newSize.height / 2);
+        }
+        else {
+            buttonRect.size.height = 20.0;
+        }
+        
         if (newSize.height >= 60.0) {
             spacing = ceil(newSize.height * 0.1);
         }

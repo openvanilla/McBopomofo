@@ -52,6 +52,8 @@
 - (BOOL)highlightNextCandidate;
 - (BOOL)highlightPreviousCandidate;
 
+- (void)setWindowTopLeftPoint:(NSPoint)topLeftPoint bottomOutOfScreenAdjustmentHeight:(CGFloat)height;
+
 - (NSUInteger)candidateIndexAtKeyLabelIndex:(NSUInteger)index;
 
 @property (assign, weak, nonatomic) id<VTCandidateControllerDelegate> delegate;

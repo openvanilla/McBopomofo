@@ -29,6 +29,10 @@
 #import "VTVerticalKeyLabelStripView.h"
 #import "VTVerticalCandidateTableView.h"
 
+// use these instead of MIN/MAX macro to keep compilers happy with pedantic warnings on
+NS_INLINE CGFloat min(CGFloat a, CGFloat b) { return a < b ? a : b; }
+NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
+
 static const CGFloat kCandidateTextPadding = 24.0;
 static const CGFloat kCandidateTextLeftMargin = 8.0;
 
@@ -108,7 +112,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
 - (void)reloadData
 {
-    _maxCandidateAttrStringWidth = ceil(MAX([_candidateFont pointSize], [_CJKCandidateFont pointSize])) * 2.0 + kCandidateTextPadding;
+    _maxCandidateAttrStringWidth = ceil(max([_candidateFont pointSize], [_CJKCandidateFont pointSize])) * 2.0 + kCandidateTextPadding;
 
     [_tableView reloadData];
     [self layoutCandidateView];
@@ -168,7 +172,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     
     if (selectedRow != -1 && itemCount > 0 && itemCount > labelCount) {
         if (newIndex > selectedRow && (newIndex - selectedRow) > 1) {
-            lastVisibleRow = MIN(newIndex + labelCount - 1, itemCount - 1);            
+            lastVisibleRow = min(newIndex + labelCount - 1, itemCount - 1);            
         }
         
         // no need to handle the backward case: (newIndex < selectedRow && selectedRow - newIndex > 1)
@@ -274,7 +278,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
             return NO;
         }
         
-        newIndex = MIN(newIndex + labelCount, itemCount - 1);
+        newIndex = min(newIndex + labelCount, itemCount - 1);
     }
     else {
         if (newIndex == 0) {
@@ -329,9 +333,9 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         return;
     }
     
-    CGFloat candidateFontSize = ceil(MAX([_candidateFont pointSize], [_CJKCandidateFont pointSize]));
+    CGFloat candidateFontSize = ceil(max([_candidateFont pointSize], [_CJKCandidateFont pointSize]));
     CGFloat keyLabelFontSize = ceil([_keyLabelFont pointSize]);
-    CGFloat fontSize = MAX(candidateFontSize, keyLabelFontSize);
+    CGFloat fontSize = max(candidateFontSize, keyLabelFontSize);
     
     NSControlSize controlSize = (fontSize > 36.0) ? NSRegularControlSize : NSSmallControlSize;
     
@@ -362,23 +366,8 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     _keyLabelStripView.keyLabels = [_keyLabels subarrayWithRange:NSMakeRange(0, keyLabelCount)];
     _keyLabelStripView.labelOffsetY = (keyLabelFontSize >= candidateFontSize) ? 0.0 : floor((candidateFontSize - keyLabelFontSize) / 2.0);
     
-    CGFloat rowHeight = fontSize;
-    
-    if (fontSize <= 16.0) {
-        rowHeight += 4.0;
-    }
-    else if (fontSize <= 24.0) {
-        rowHeight += 8.0;
-    }
-    else if (fontSize <= 64.0) {
-        rowHeight += 16.0;
-    }
-    else {
-        rowHeight += 24.0;
-    }
-    
+    CGFloat rowHeight = ceil(fontSize * 1.20);
     [_tableView setRowHeight:rowHeight];
-    
     
     CGFloat rowSpacing = [_tableView intercellSpacing].height;    
     CGFloat stripWidth = ceil(keyLabelFontSize * 1.20);
@@ -387,7 +376,6 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     CGFloat windowHeight = keyLabelCount * (rowHeight + rowSpacing);
     
     NSRect frameRect = [[self window] frame];
-    frameRect = [[self window] frame];
     NSPoint topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height);
     
     frameRect.size = NSMakeSize(windowWidth, windowHeight);
