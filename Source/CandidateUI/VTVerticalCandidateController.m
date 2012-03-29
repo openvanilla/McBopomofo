@@ -63,7 +63,8 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     if (self) {
         _candidateTextParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [_candidateTextParagraphStyle setFirstLineHeadIndent:kCandidateTextLeftMargin];
-
+        [_candidateTextParagraphStyle setLineBreakMode:NSLineBreakByClipping];
+        
         contentRect.origin = NSMakePoint(0.0, 0.0);
         
         NSRect stripRect = contentRect;
