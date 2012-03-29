@@ -51,6 +51,7 @@ using namespace OpenVanilla;
 
 // default, min and max candidate list text size
 static const NSInteger kDefaultCandidateListTextSize = 14;
+static const NSInteger kMinKeyLabelSize = 10;
 static const NSInteger kMinCandidateListTextSize = 12;
 static const NSInteger kMaxCandidateListTextSize = 128;
 
@@ -1016,7 +1017,12 @@ public:
     // set the attributes for the candidate panel (which uses NSAttributedString)
     NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
     
-    LTCurrentCandidateController.keyLabelFont = [NSFont systemFontOfSize:(textSize < 20) ? textSize : 19 + (textSize / 4)];
+    NSInteger keyLabelSize = textSize / 2;
+    if (keyLabelSize < kMinKeyLabelSize) {
+        keyLabelSize = kMinKeyLabelSize;
+    }
+    
+    LTCurrentCandidateController.keyLabelFont = [NSFont systemFontOfSize:keyLabelSize];
     LTCurrentCandidateController.candidateFont = [NSFont systemFontOfSize:textSize];
     LTCurrentCandidateController.CJKCandidateFont = [NSFont systemFontOfSize:textSize];    
     LTCurrentCandidateController.keyLabels = [NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
@@ -1037,7 +1043,8 @@ public:
     }
     
     [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
-    LTCurrentCandidateController.windowTopLeftPoint = NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0);
+
+    [LTCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
     LTCurrentCandidateController.visible = YES;
 }
 
