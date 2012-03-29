@@ -27,6 +27,10 @@
 
 #import "VTHorizontalCandidateView.h"
 
+// use these instead of MIN/MAX macro to keep compilers happy with pedantic warnings on
+NS_INLINE CGFloat min(CGFloat a, CGFloat b) { return a < b ? a : b; }
+NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
+
 @implementation VTHorizontalCandidateView
 
 @synthesize highlightedIndex = _highlightedIndex;
@@ -46,7 +50,7 @@
 
 - (void)setKeyLabels:(NSArray *)labels displayedCandidates:(NSArray *)candidates
 {
-    NSUInteger count = MIN([labels count], [candidates count]);
+    NSUInteger count = min([labels count], [candidates count]);
     id tmp;
     
     tmp = _keyLabels;
@@ -66,7 +70,7 @@
         // TODO: Handle CJK text drawing
         NSRect candidateRect = [[_displayedCandidates objectAtIndex:index] boundingRectWithSize:baseSize options:NSStringDrawingUsesLineFragmentOrigin attributes:_candidateAttrDict];
         
-        CGFloat width = MAX(labelRect.size.width, candidateRect.size.width) + _cellPadding;
+        CGFloat width = max(labelRect.size.width, candidateRect.size.width) + _cellPadding;
         [newWidths addObject:[NSNumber numberWithDouble:width]];
     }
     
@@ -107,50 +111,12 @@
 
 
     CGFloat labelFontSize = [labelFont pointSize];
-    CGFloat candidateFontSize = MAX([candidateFont pointSize], [candidateFontCJK pointSize]);
-    CGFloat biggestSize = MAX(labelFontSize, candidateFontSize);
+    CGFloat candidateFontSize = max([candidateFont pointSize], [candidateFontCJK pointSize]);
+    CGFloat biggestSize = max(labelFontSize, candidateFontSize);
     
-    _keyLabelHeight = labelFontSize;
-    _candidateTextHeight = candidateFontSize;
-    
-    if (labelFontSize <= 16.0) {
-        _keyLabelHeight += 4.0;
-    }
-    else if (labelFontSize <= 24.0) {
-        _keyLabelHeight += 8.0;
-    }
-    else if (labelFontSize <= 64.0) {
-        _keyLabelHeight += 16.0;
-    }
-    else {
-        _keyLabelHeight += 24.0;
-    }
-
-    if (candidateFontSize <= 16.0) {
-        _candidateTextHeight += 4.0;
-    }
-    else if (candidateFontSize <= 24.0) {
-        _candidateTextHeight += 8.0;
-    }
-    else if (candidateFontSize <= 64.0) {
-        _candidateTextHeight += 16.0;
-    }
-    else {
-        _candidateTextHeight += 24.0;
-    }
-
-    if (biggestSize <= 16.0) {
-        _cellPadding = 8.0;
-    }
-    else if (biggestSize <= 24.0) {
-        _cellPadding = 16.0;
-    }
-    else if (biggestSize <= 64.0) {
-        _cellPadding = 24.0;
-    }
-    else {
-        _cellPadding = 32.0;
-    }
+    _keyLabelHeight = ceil(labelFontSize * 1.20);
+    _candidateTextHeight = ceil(candidateFontSize * 1.20);
+    _cellPadding = ceil(biggestSize / 2.0);
 }
 
 

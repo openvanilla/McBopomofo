@@ -82,6 +82,52 @@
     return NO;
 }
 
+- (void)setWindowTopLeftPoint:(NSPoint)topLeftPoint bottomOutOfScreenAdjustmentHeight:(CGFloat)height
+{
+    NSPoint adjustedPoint = topLeftPoint;
+    CGFloat adjustedHeight = height;
+    
+    // first, locate the screen the point is in
+    NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
+    
+    for (NSScreen *screen in [NSScreen screens]) {
+        NSRect frame = [screen visibleFrame];
+        if (topLeftPoint.x >= NSMinX(frame) && topLeftPoint.x <= NSMaxX(frame)) {
+            screenFrame = frame;
+            break;
+        }
+    }
+    
+    // make sure we don't have any erratic value
+    if (adjustedHeight > screenFrame.size.height / 2.0) {
+        adjustedHeight = 0.0;
+    }
+    
+    NSSize windowSize = [[self window] frame].size;
+    
+    // bottom beneath the screen?
+    if (adjustedPoint.y - windowSize.height < NSMinY(screenFrame)) {
+        adjustedPoint.y = topLeftPoint.y + adjustedHeight + windowSize.height;
+    }
+    
+    // top over the screen?
+    if (adjustedPoint.y >= NSMaxY(screenFrame)) {
+        adjustedPoint.y = NSMaxY(screenFrame) - 1.0;
+    }
+    
+    // right
+    if (adjustedPoint.x + windowSize.width >= NSMaxX(screenFrame)) {
+        adjustedPoint.x = NSMaxX(screenFrame) - windowSize.width;
+    }
+    
+    // left
+    if (adjustedPoint.x < NSMinX(screenFrame)) {
+        adjustedPoint.x = NSMinX(screenFrame);
+    }
+    
+    [[self window] setFrameTopLeftPoint:adjustedPoint];
+}
+
 - (NSUInteger)candidateIndexAtKeyLabelIndex:(NSUInteger)index
 {
     return NSUIntegerMax;
@@ -108,9 +154,9 @@
     return NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height);
 }
 
-- (void)setWindowTopLeftPoint:(NSPoint)windowTopLeftPoint
+- (void)setWindowTopLeftPoint:(NSPoint)topLeftPoint
 {
-    [[self window] setFrameTopLeftPoint:windowTopLeftPoint];
+    [self setWindowTopLeftPoint:topLeftPoint bottomOutOfScreenAdjustmentHeight:0.0];
 }
 
 - (NSUInteger)selectedCandidateIndex
