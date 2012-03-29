@@ -33,7 +33,7 @@
 @synthesize keyLabels = _keyLabels;
 @synthesize keyLabelFont = _keyLabelFont;
 @synthesize candidateFont = _candidateFont;
-@synthesize CJKCandidateFont = CJKCandidateFont;
+@synthesize CJKCandidateFont = _CJKCandidateFont;
 
 - (void)dealloc
 {
