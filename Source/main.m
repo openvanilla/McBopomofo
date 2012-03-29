@@ -36,7 +36,6 @@
 #import "OVInputSourceHelper.h"
 
 static NSString *const kConnectionName = @"McBopomofo_1_Connection";
-IMKCandidates *LTSharedCandidates = nil;
 
 int main(int argc, char *argv[])
 {
@@ -116,14 +115,6 @@ int main(int argc, char *argv[])
     IMKServer *server = [[IMKServer alloc] initWithName:kConnectionName bundleIdentifier:[[NSBundle mainBundle] bundleIdentifier]];
     if (!server) {
         NSLog(@"Fatal error: Cannot initialize input method server with connection %@.", kConnectionName);
-        [pool drain];
-        return -1;
-    }
-
-    LTSharedCandidates = [[IMKCandidates alloc] initWithServer:server panelType:kIMKSingleColumnScrollingCandidatePanel];
-    if (!LTSharedCandidates) {
-        NSLog(@"Fatal error: Cannot initialize shared candidate panel with connection %@.", kConnectionName);
-        [server release];
         [pool drain];
         return -1;
     }

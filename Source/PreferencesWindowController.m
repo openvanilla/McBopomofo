@@ -43,15 +43,15 @@
 //        return;
 //    }
 
-    NSMenu *menu = [_fontSizePopUpButton menu];
-    NSArray *menuItems = [menu itemArray];
-
-    for (NSMenuItem *item in menuItems) {
-        NSUInteger tag = [item tag];
-
-        if (tag != 14 && tag != 24) {
-            [menu removeItem:item];
-        }
-    }
+//    NSMenu *menu = [_fontSizePopUpButton menu];
+//    NSArray *menuItems = [menu itemArray];
+//
+//    for (NSMenuItem *item in menuItems) {
+//        NSUInteger tag = [item tag];
+//
+//        if (tag != 14 && tag != 24) {
+//            [menu removeItem:item];
+//        }
+//    }
 }
 @end

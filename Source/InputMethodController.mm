@@ -40,6 +40,8 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
+#import "VTHorizontalCandidateController.h"
+#import "VTVerticalCandidateController.h"
 
 // C++ namespace usages
 using namespace std;
@@ -75,20 +77,24 @@ static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpa
 NSMutableDictionary *TLCandidateLearningDictionary = nil;
 NSString *TLUserCandidatesDictionaryPath = nil;
 
+VTCandidateController *LTCurrentCandidateController = nil;
+
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
 // specified path everytime the grid is walked
 #if DEBUG
 static NSString *const kGraphVizOutputfile = @"/tmp/lettuce-visualization.dot";
 #endif
 
-// IMK candidate panel object, created in main()
-extern IMKCandidates *LTSharedCandidates;
-
 // shared language model object that stores our phrase-term probability database
 SimpleLM LTLanguageModel;
 
 // private methods
-@interface LettuceInputMethodController ()
+@interface LettuceInputMethodController () <VTCandidateControllerDelegate>
++ (VTHorizontalCandidateController *)horizontalCandidateController;
++ (VTVerticalCandidateController *)verticalCandidateController;
+
+- (void)collectCandidates;
+
 - (size_t)actualCandidateCursorIndex;
 - (NSString *)neighborTrigramString;
 
@@ -120,6 +126,8 @@ public:
 
     [_composingBuffer release];
 
+    [_candidates release];
+    
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
 
@@ -133,6 +141,8 @@ public:
 
     self = [super initWithServer:server delegate:delegate client:client];
     if (self) {
+        _candidates = [[NSMutableArray alloc] init];
+        
         // create the reading buffer
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
@@ -263,6 +273,10 @@ public:
     [self commitComposition:client];
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
+    
+    LTCurrentCandidateController.delegate = nil;
+    LTCurrentCandidateController.visible = NO;
+    [_candidates removeAllObjects];
 }
 
 #pragma mark - IMKServerInput protocol methods
@@ -285,6 +299,8 @@ public:
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
+    LTCurrentCandidateController.visible = NO;
+    [_candidates removeAllObjects];
 }
 
 // TODO: bug #28 is more likely to live in this method.
@@ -350,6 +366,8 @@ public:
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    
+    _latestReadingCursor = cursorIndex;
 }
 
 - (void)walk
@@ -477,7 +495,7 @@ public:
         return YES;
     }
     if (flags & NSNumericPadKeyMask) {
-        if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 ) {
+        if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 && isprint(charCode)) {
             if ([_composingBuffer length]) [self commitComposition:client];
             NSString *popedText = [inputText lowercaseString];
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
@@ -485,6 +503,106 @@ public:
         }
     }
 
+    if ([_candidates count]) {
+        if (charCode == 27) {
+            LTCurrentCandidateController.visible = NO;
+            [_candidates removeAllObjects];
+            return YES;
+        }
+        else if (charCode == 13 || keyCode == 127) {
+            [self candidateController:LTCurrentCandidateController didSelectCandidateAtIndex:LTCurrentCandidateController.selectedCandidateIndex];
+            return YES;
+        }
+        else if (charCode == 32 || keyCode == 121) {
+            BOOL updated = [LTCurrentCandidateController showNextPage];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+        else if (keyCode == 116) {
+            BOOL updated = [LTCurrentCandidateController showPreviousPage];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;            
+        }
+        else if (keyCode == 123) {
+            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [LTCurrentCandidateController highlightPreviousCandidate];
+                if (!updated) {
+                    [self beep];
+                }
+                return YES;
+            }
+            else {
+                [self beep];
+                return YES;
+            }
+        }
+        else if (keyCode == 124) {
+            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [LTCurrentCandidateController highlightNextCandidate];
+                if (!updated) {
+                    [self beep];
+                }
+                return YES;
+            }
+            else {
+                [self beep];
+                return YES;
+            }
+        }
+        else if (keyCode == 126) {
+            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [LTCurrentCandidateController showPreviousPage];
+                if (!updated) {
+                    [self beep];
+                }
+                return YES;
+            }
+            else {
+                BOOL updated = [LTCurrentCandidateController highlightPreviousCandidate];
+                if (!updated) {
+                    [self beep];
+                }
+                return YES;
+            }
+        }
+        else if (keyCode == 125) {
+            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [LTCurrentCandidateController showNextPage];
+                if (!updated) {
+                    [self beep];
+                }
+                return YES;
+            }
+            else {
+                BOOL updated = [LTCurrentCandidateController highlightNextCandidate];
+                if (!updated) {
+                    [self beep];
+                }
+                return YES;
+            }
+        }
+        else {
+            
+            NSInteger index = [LTCurrentCandidateController.keyLabels indexOfObject:inputText];
+            if (index != NSNotFound) {
+                NSUInteger candidateIndex = [LTCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
+                if (candidateIndex != NSUIntegerMax) {
+                    [self candidateController:LTCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
+                    return YES;
+                }
+            }
+            
+            [self beep];            
+            return YES;
+        }
+
+    }
+    
+    
     // see if it's valid BPMF reading
     if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
@@ -741,69 +859,51 @@ public:
     return NO;
 }
 
-- (NSArray*)candidates:(id)client
+#pragma mark - Private methods
+
++ (VTHorizontalCandidateController *)horizontalCandidateController
+{
+    static VTHorizontalCandidateController *instance = nil;
+    @synchronized(self) {
+        if (!instance) {
+            instance = [[VTHorizontalCandidateController alloc] init];
+        }
+    }
+    
+    return instance;
+}
+
++ (VTVerticalCandidateController *)verticalCandidateController
+{
+    static VTVerticalCandidateController *instance = nil;
+    @synchronized(self) {
+        if (!instance) {
+            instance = [[VTVerticalCandidateController alloc] init];
+        }
+    }
+    
+    return instance;    
+}
+
+- (void)collectCandidates
 {
     // returns the candidate
-
-    NSMutableArray *results = [NSMutableArray array];
+    [_candidates removeAllObjects];
+    
     size_t cursorIndex = [self actualCandidateCursorIndex];
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
+    
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
-
+    
     // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
     for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         const vector<KeyValuePair>& candidates = (*ni).node->candidates();
         for (vector<KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
-            [results addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
+            [_candidates addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
         }
     }
-
-    return results;
 }
-
-- (void)candidateSelected:(NSAttributedString *)candidateString
-{
-    // candidate selected, override the node with selection
-
-    string selectedValue;
-
-    if ([candidateString isKindOfClass:[NSString class]]) {
-        selectedValue = [(NSString *)candidateString UTF8String];
-    }
-    else {
-        selectedValue = [[candidateString string] UTF8String];
-    }
-
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
-        NSString *trigram = [self neighborTrigramString];
-        NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
-        [TLCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
-        [self saveUserCandidatesDictionary];
-    }
-
-    size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const vector<KeyValuePair>& candidates = (*ni).node->candidates();
-
-        for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-            if (candidates[i].value == selectedValue) {
-                // found our node
-                const_cast<Node*>((*ni).node)->selectCandidateAtIndex(i);
-                break;
-            }
-        }
-    }
-
-    [self walk];
-    [self updateClientComposingBuffer:_currentCandidateClient];
-    _currentCandidateClient = nil;
-}
-
-#pragma mark - Private methods
 
 - (size_t)actualCandidateCursorIndex
 {
@@ -900,38 +1000,45 @@ public:
 
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
 {
-    // candidate
-    [LTSharedCandidates setDismissesAutomatically:YES];
-
-    // wrap NSNumber; we only allow number keys 1-9 as selection keys in this project
-#define LTUIntObj(x)    ([NSNumber numberWithInteger:x])
-    [LTSharedCandidates setSelectionKeys:[NSArray arrayWithObjects:LTUIntObj(18), LTUIntObj(19), LTUIntObj(20), LTUIntObj(21), LTUIntObj(23), LTUIntObj(22), LTUIntObj(26), LTUIntObj(28), LTUIntObj(25), nil]];
-#undef LTUIntObj
-
     // set the candidate panel style
     BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
 
     if (useVerticalMode) {
-        [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+        LTCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
     }
     else if (useHorizontalCandidateList) {
-        [LTSharedCandidates setPanelType:kIMKSingleRowSteppingCandidatePanel];
+        LTCurrentCandidateController = [LettuceInputMethodController horizontalCandidateController];
     }
     else {
-        [LTSharedCandidates setPanelType:kIMKSingleColumnScrollingCandidatePanel];
+        LTCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
     NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
-    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys: [NSFont systemFontOfSize:textSize], NSFontAttributeName, nil];
-    [LTSharedCandidates setAttributes:attributes];
-
-    [LTSharedCandidates updateCandidates];
-    [LTSharedCandidates show:useVerticalMode ? kIMKLocateCandidatesLeftHint : kIMKLocateCandidatesBelowHint];
+    
+    LTCurrentCandidateController.keyLabelFont = [NSFont systemFontOfSize:(textSize < 20) ? textSize : 19 + (textSize / 4)];
+    LTCurrentCandidateController.candidateFont = [NSFont systemFontOfSize:textSize];
+    LTCurrentCandidateController.CJKCandidateFont = [NSFont systemFontOfSize:textSize];    
+    LTCurrentCandidateController.keyLabels = [NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    [self collectCandidates];
+    
+    LTCurrentCandidateController.delegate = self;
+    [LTCurrentCandidateController reloadData];
 
     // update the composing text, set the client
     [self updateClientComposingBuffer:client];
     _currentCandidateClient = client;
+
+    NSRect lineHeightRect;    
+    
+    NSInteger cursor = _latestReadingCursor;
+    if (cursor == [_composingBuffer length] && cursor != 0) {
+        cursor--;
+    }
+    
+    [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+    LTCurrentCandidateController.windowTopLeftPoint = NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0);
+    LTCurrentCandidateController.visible = YES;
 }
 
 #pragma mark - Misc menu items
@@ -966,6 +1073,52 @@ public:
 {
     NSLog(@"%@", TLCandidateLearningDictionary);
 }
+
+- (NSUInteger)candidateCountForController:(VTCandidateController *)controller
+{
+    return [_candidates count];
+}
+
+- (NSString *)candidateController:(VTCandidateController *)controller candidateAtIndex:(NSUInteger)index
+{
+    return [_candidates objectAtIndex:index];
+}
+
+- (void)candidateController:(VTCandidateController *)controller didSelectCandidateAtIndex:(NSUInteger)index
+{
+    LTCurrentCandidateController.visible = NO;
+    
+    // candidate selected, override the node with selection
+    string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
+    
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
+        NSString *trigram = [self neighborTrigramString];
+        NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
+        [TLCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
+        [self saveUserCandidatesDictionary];
+    }
+    
+    size_t cursorIndex = [self actualCandidateCursorIndex];
+    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    
+    for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        const vector<KeyValuePair>& candidates = (*ni).node->candidates();
+        
+        for (size_t i = 0, c = candidates.size(); i < c; ++i) {
+            if (candidates[i].value == selectedValue) {
+                // found our node
+                const_cast<Node*>((*ni).node)->selectCandidateAtIndex(i);
+                break;
+            }
+        }
+    }
+    
+    [_candidates removeAllObjects];
+    
+    [self walk];
+    [self updateClientComposingBuffer:_currentCandidateClient];
+}
+
 @end
 
 

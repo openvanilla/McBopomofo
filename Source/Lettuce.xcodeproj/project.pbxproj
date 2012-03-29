@@ -23,6 +23,12 @@
 		6A89E66A13F7647D00DDBF09 /* UpdateNotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A89E66913F7647D00DDBF09 /* UpdateNotificationController.xib */; };
 		6ABE50131372864300981680 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ABE50111372864300981680 /* Mandarin.cpp */; };
 		6ABEDAF313F74D9C00A0825A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ABEDAF513F74D9C00A0825A /* Localizable.strings */; };
+		6AC45E16152413D600C5E259 /* VTCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AC45E0B152413D600C5E259 /* VTCandidateController.m */; };
+		6AC45E17152413D600C5E259 /* VTHorizontalCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AC45E0D152413D600C5E259 /* VTHorizontalCandidateController.m */; };
+		6AC45E18152413D600C5E259 /* VTHorizontalCandidateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AC45E0F152413D600C5E259 /* VTHorizontalCandidateView.m */; };
+		6AC45E19152413D600C5E259 /* VTVerticalCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AC45E11152413D600C5E259 /* VTVerticalCandidateController.m */; };
+		6AC45E1A152413D600C5E259 /* VTVerticalCandidateTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AC45E13152413D600C5E259 /* VTVerticalCandidateTableView.m */; };
+		6AC45E1B152413D600C5E259 /* VTVerticalKeyLabelStripView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AC45E15152413D600C5E259 /* VTVerticalKeyLabelStripView.m */; };
 		6ACF37C413A7BE68008798F2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A8515B9137277DB0066B1BD /* Cocoa.framework */; };
 		6ACF37CE13A7BE68008798F2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF37CC13A7BE68008798F2 /* InfoPlist.strings */; };
 		6ACF37D113A7BE68008798F2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACF37D013A7BE68008798F2 /* main.m */; };
@@ -126,6 +132,18 @@
 		6ABEDAF013F74D2F00A0825A /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		6ABEDAF413F74D9C00A0825A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ABEDAF613F74DA300A0825A /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		6AC45E0A152413D600C5E259 /* VTCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTCandidateController.h; sourceTree = "<group>"; };
+		6AC45E0B152413D600C5E259 /* VTCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTCandidateController.m; sourceTree = "<group>"; };
+		6AC45E0C152413D600C5E259 /* VTHorizontalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateController.h; sourceTree = "<group>"; };
+		6AC45E0D152413D600C5E259 /* VTHorizontalCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTHorizontalCandidateController.m; sourceTree = "<group>"; };
+		6AC45E0E152413D600C5E259 /* VTHorizontalCandidateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateView.h; sourceTree = "<group>"; };
+		6AC45E0F152413D600C5E259 /* VTHorizontalCandidateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTHorizontalCandidateView.m; sourceTree = "<group>"; };
+		6AC45E10152413D600C5E259 /* VTVerticalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTVerticalCandidateController.h; sourceTree = "<group>"; };
+		6AC45E11152413D600C5E259 /* VTVerticalCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalCandidateController.m; sourceTree = "<group>"; };
+		6AC45E12152413D600C5E259 /* VTVerticalCandidateTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTVerticalCandidateTableView.h; sourceTree = "<group>"; };
+		6AC45E13152413D600C5E259 /* VTVerticalCandidateTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalCandidateTableView.m; sourceTree = "<group>"; };
+		6AC45E14152413D600C5E259 /* VTVerticalKeyLabelStripView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTVerticalKeyLabelStripView.h; sourceTree = "<group>"; };
+		6AC45E15152413D600C5E259 /* VTVerticalKeyLabelStripView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalKeyLabelStripView.m; sourceTree = "<group>"; };
 		6ACF37C213A7BE68008798F2 /* IconMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACF37C613A7BE68008798F2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6ACF37C713A7BE68008798F2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -227,6 +245,7 @@
 		6A8515A8137277C80066B1BD = {
 			isa = PBXGroup;
 			children = (
+				6AC45E09152413D600C5E259 /* CandidateUI */,
 				6A43430813727B230094187C /* Data */,
 				6ABE4FE2137285F900981680 /* Engine */,
 				6A43430713727B1B0094187C /* Lettuce */,
@@ -334,6 +353,25 @@
 				6ABE50121372864300981680 /* Mandarin.h */,
 			);
 			path = Mandarin;
+			sourceTree = "<group>";
+		};
+		6AC45E09152413D600C5E259 /* CandidateUI */ = {
+			isa = PBXGroup;
+			children = (
+				6AC45E0A152413D600C5E259 /* VTCandidateController.h */,
+				6AC45E0B152413D600C5E259 /* VTCandidateController.m */,
+				6AC45E0C152413D600C5E259 /* VTHorizontalCandidateController.h */,
+				6AC45E0D152413D600C5E259 /* VTHorizontalCandidateController.m */,
+				6AC45E0E152413D600C5E259 /* VTHorizontalCandidateView.h */,
+				6AC45E0F152413D600C5E259 /* VTHorizontalCandidateView.m */,
+				6AC45E10152413D600C5E259 /* VTVerticalCandidateController.h */,
+				6AC45E11152413D600C5E259 /* VTVerticalCandidateController.m */,
+				6AC45E12152413D600C5E259 /* VTVerticalCandidateTableView.h */,
+				6AC45E13152413D600C5E259 /* VTVerticalCandidateTableView.m */,
+				6AC45E14152413D600C5E259 /* VTVerticalKeyLabelStripView.h */,
+				6AC45E15152413D600C5E259 /* VTVerticalKeyLabelStripView.m */,
+			);
+			path = CandidateUI;
 			sourceTree = "<group>";
 		};
 		6ACF37C513A7BE68008798F2 /* Other Frameworks */ = {
@@ -545,6 +583,12 @@
 				6A7157FF13728A5000E39343 /* SimpleLM.cpp in Sources */,
 				6A42C5E113A5584F0080A121 /* PreferencesWindowController.m in Sources */,
 				6A89E66713F7637200DDBF09 /* UpdateNotificationController.m in Sources */,
+				6AC45E16152413D600C5E259 /* VTCandidateController.m in Sources */,
+				6AC45E17152413D600C5E259 /* VTHorizontalCandidateController.m in Sources */,
+				6AC45E18152413D600C5E259 /* VTHorizontalCandidateView.m in Sources */,
+				6AC45E19152413D600C5E259 /* VTVerticalCandidateController.m in Sources */,
+				6AC45E1A152413D600C5E259 /* VTVerticalCandidateTableView.m in Sources */,
+				6AC45E1B152413D600C5E259 /* VTVerticalKeyLabelStripView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -668,7 +712,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = McBopomofo;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 				VALID_ARCHS = "i386 x86_64 ppc";
 				WRAPPER_EXTENSION = app;
 			};
@@ -693,7 +737,7 @@
 				INFOPLIST_FILE = "McBopomofo-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = McBopomofo;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 				VALID_ARCHS = "i386 x86_64 ppc";
 				WRAPPER_EXTENSION = app;
 			};
