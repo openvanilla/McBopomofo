@@ -42,7 +42,6 @@
     NSArray *_keyLabels;
     NSFont *_keyLabelFont;
     NSFont *_candidateFont;
-    NSFont *_CJKCandidateFont;
 }
 
 - (void)reloadData;
@@ -65,5 +64,4 @@
 @property (copy, nonatomic) NSArray *keyLabels;
 @property (copy, nonatomic) NSFont *keyLabelFont;
 @property (copy, nonatomic) NSFont *candidateFont;
-@property (copy, nonatomic) NSFont *CJKCandidateFont;
 @end

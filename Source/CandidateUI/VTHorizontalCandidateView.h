@@ -37,7 +37,6 @@
     CGFloat _cellPadding;
     NSDictionary *_keyLabelAttrDict;
     NSDictionary *_candidateAttrDict;
-    NSDictionary *_CJKCandidateAttrDict;
     NSArray *_elementWidths;
     NSUInteger _highlightedIndex;
     NSUInteger _trackingHighlightedIndex;
@@ -46,7 +45,7 @@
 }
 
 - (void)setKeyLabels:(NSArray *)labels displayedCandidates:(NSArray *)candidates;
-- (void)setKeyLabelFont:(NSFont *)labelFont candidateFont:(NSFont *)candidateFont CJKCandidateFont:(NSFont *)candidateFontCJK;
+- (void)setKeyLabelFont:(NSFont *)labelFont candidateFont:(NSFont *)candidateFont;
 
 @property (readonly, nonatomic) NSSize sizeForView;
 @property (assign, nonatomic) NSUInteger highlightedIndex;

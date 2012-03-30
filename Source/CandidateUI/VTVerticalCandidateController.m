@@ -112,7 +112,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
 - (void)reloadData
 {
-    _maxCandidateAttrStringWidth = ceil(max([_candidateFont pointSize], [_CJKCandidateFont pointSize])) * 2.0 + kCandidateTextPadding;
+    _maxCandidateAttrStringWidth = ceil([_candidateFont pointSize] * 2.0 + kCandidateTextPadding);
 
     [_tableView reloadData];
     [self layoutCandidateView];
@@ -199,9 +199,9 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 {
     NSString *candidate = [_delegate candidateController:self candidateAtIndex:row];
     
-    // TODO: Handle CJK font fallback
     NSAttributedString *attrString = [[[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]] autorelease];    
     
+    // we do more work than what this method is expected; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
     
     // expand the window width if text overflows
     NSRect boundingRect = [attrString boundingRectWithSize:NSMakeSize(10240.0, 10240.0) options:NSStringDrawingUsesLineFragmentOrigin];
@@ -235,6 +235,11 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
             [_keyLabelStripView setNeedsDisplay:YES];            
         }
     }
+
+    // fix a subtle on 10.7 that, since we force the scroller to appear, scrolling sometimes shows a temporarily "broken" scroll bar (but quickly disappears)
+    if ([_scrollView hasVerticalScroller]) {
+        [[_scrollView verticalScroller] setNeedsDisplay];
+    }
     
     return attrString;
 }
@@ -247,7 +252,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         NSInteger firstVisibleRow = [_tableView rowAtPoint:[_scrollView documentVisibleRect].origin];
         _keyLabelStripView.highlightedIndex = selectedRow - firstVisibleRow;
         [_keyLabelStripView setNeedsDisplay:YES];
-    }
+    }    
 }
 
 - (void)rowDoubleClicked:(id)sender
@@ -333,7 +338,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         return;
     }
     
-    CGFloat candidateFontSize = ceil(max([_candidateFont pointSize], [_CJKCandidateFont pointSize]));
+    CGFloat candidateFontSize = ceil([_candidateFont pointSize]);
     CGFloat keyLabelFontSize = ceil([_keyLabelFont pointSize]);
     CGFloat fontSize = max(candidateFontSize, keyLabelFontSize);
     

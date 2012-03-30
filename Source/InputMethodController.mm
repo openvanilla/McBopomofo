@@ -1024,7 +1024,6 @@ public:
     
     LTCurrentCandidateController.keyLabelFont = [NSFont systemFontOfSize:keyLabelSize];
     LTCurrentCandidateController.candidateFont = [NSFont systemFontOfSize:textSize];
-    LTCurrentCandidateController.CJKCandidateFont = [NSFont systemFontOfSize:textSize];    
     LTCurrentCandidateController.keyLabels = [NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
     [self collectCandidates];
     

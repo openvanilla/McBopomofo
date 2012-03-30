@@ -33,14 +33,12 @@
 @synthesize keyLabels = _keyLabels;
 @synthesize keyLabelFont = _keyLabelFont;
 @synthesize candidateFont = _candidateFont;
-@synthesize CJKCandidateFont = _CJKCandidateFont;
 
 - (void)dealloc
 {
     [_keyLabels release];
     [_keyLabelFont release];
     [_candidateFont release];
-    [_CJKCandidateFont release];
     [super dealloc];
 }
 
@@ -52,7 +50,6 @@
         _keyLabels = [[NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil] retain];
         _keyLabelFont = [[NSFont systemFontOfSize:14.0] retain];
         _candidateFont = [[NSFont systemFontOfSize:18.0] retain];
-        _CJKCandidateFont = [_candidateFont retain];
     }
     
     return self;
