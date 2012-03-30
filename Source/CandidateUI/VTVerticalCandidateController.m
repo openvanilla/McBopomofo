@@ -197,8 +197,14 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    NSString *candidate = [_delegate candidateController:self candidateAtIndex:row];
-    
+    NSString *candidate = @"";
+
+    // rendering can occur when the delegate is already gone or data goes stale; in that case we ignore it    
+
+    if (row < [_delegate candidateCountForController:self]) {
+        candidate = [_delegate candidateController:self candidateAtIndex:row];
+    }
+
     NSAttributedString *attrString = [[[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]] autorelease];    
     
     // we do more work than what this method is expected; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
