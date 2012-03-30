@@ -366,7 +366,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     _keyLabelStripView.keyLabels = [_keyLabels subarrayWithRange:NSMakeRange(0, keyLabelCount)];
     _keyLabelStripView.labelOffsetY = (keyLabelFontSize >= candidateFontSize) ? 0.0 : floor((candidateFontSize - keyLabelFontSize) / 2.0);
     
-    CGFloat rowHeight = ceil(fontSize * 1.20);
+    CGFloat rowHeight = ceil(fontSize * 1.25);
     [_tableView setRowHeight:rowHeight];
     
     CGFloat rowSpacing = [_tableView intercellSpacing].height;    
