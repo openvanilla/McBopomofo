@@ -43,7 +43,6 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
     [_displayedCandidates release];
     [_keyLabelAttrDict release];
     [_candidateAttrDict release];
-    [_CJKCandidateAttrDict release];
     [_elementWidths release];
     [super dealloc];
 }
@@ -67,7 +66,6 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
     for (NSUInteger index = 0; index < count; index++) {
         NSRect labelRect = [[_keyLabels objectAtIndex:index] boundingRectWithSize:baseSize options:NSStringDrawingUsesLineFragmentOrigin attributes:_keyLabelAttrDict];
         
-        // TODO: Handle CJK text drawing
         NSRect candidateRect = [[_displayedCandidates objectAtIndex:index] boundingRectWithSize:baseSize options:NSStringDrawingUsesLineFragmentOrigin attributes:_candidateAttrDict];
         
         CGFloat width = max(labelRect.size.width, candidateRect.size.width) + _cellPadding;
@@ -79,7 +77,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
     [tmp release];
 }
 
-- (void)setKeyLabelFont:(NSFont *)labelFont candidateFont:(NSFont *)candidateFont CJKCandidateFont:(NSFont *)candidateFontCJK
+- (void)setKeyLabelFont:(NSFont *)labelFont candidateFont:(NSFont *)candidateFont
 {
     NSMutableParagraphStyle *paraStyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     [paraStyle setAlignment:NSCenterTextAlignment];
@@ -101,17 +99,8 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
                            nil] retain];
     [tmp release];
     
-    tmp = _CJKCandidateAttrDict;
-    _CJKCandidateAttrDict = [[NSDictionary dictionaryWithObjectsAndKeys:
-                              candidateFontCJK, NSFontAttributeName,
-                              paraStyle, NSParagraphStyleAttributeName,
-                              [NSColor textColor], NSForegroundColorAttributeName,
-                              nil] retain];
-    [tmp release];
-
-
     CGFloat labelFontSize = [labelFont pointSize];
-    CGFloat candidateFontSize = max([candidateFont pointSize], [candidateFontCJK pointSize]);
+    CGFloat candidateFontSize = [candidateFont pointSize];
     CGFloat biggestSize = max(labelFontSize, candidateFontSize);
     
     _keyLabelHeight = ceil(labelFontSize * 1.20);

@@ -172,7 +172,7 @@
 
 - (void)layoutCandidateView
 {
-    [_candidateView setKeyLabelFont:_keyLabelFont candidateFont:_candidateFont CJKCandidateFont:_CJKCandidateFont];
+    [_candidateView setKeyLabelFont:_keyLabelFont candidateFont:_candidateFont];
     
     NSMutableArray *candidates = [NSMutableArray array];
     NSUInteger count = [_delegate candidateCountForController:self];

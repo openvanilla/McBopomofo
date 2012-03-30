@@ -84,6 +84,10 @@
         NSRect textRect = NSMakeRect(0.0, index * cellHeight + _labelOffsetY, bounds.size.width, cellHeight - _labelOffsetY);
         NSRect cellRect = NSMakeRect(0.0, index * cellHeight, bounds.size.width, cellHeight - 1);
         
+        // fill in the last cell
+        if (index + 1 >= count) {
+            cellRect.size.height += 1.0;
+        }
         
         if (index == _highlightedIndex) {
             [darkGray setFill];
