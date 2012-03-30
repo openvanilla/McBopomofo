@@ -207,7 +207,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
     NSAttributedString *attrString = [[[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]] autorelease];    
     
-    // we do more work than what this method is expected; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
+    // we do more work than what this method is expected to; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
     
     // expand the window width if text overflows
     NSRect boundingRect = [attrString boundingRectWithSize:NSMakeSize(10240.0, 10240.0) options:NSStringDrawingUsesLineFragmentOrigin];
