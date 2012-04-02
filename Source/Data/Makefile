@@ -44,6 +44,8 @@ tidy:
 	sed -i '' -e 's/ //g' phrase.occ
 	sed -i '' -e 's/  / /g;s/ $$//g' BPMFMappings.txt
 	sed -i '' -e 's/｜/ㄧ/g;s/　/ /g' BPMFMappings.txt
+	sed -i '' -e 's/ [:0-9:]*$$//g' BPMFMappings.txt
+	sed -i '' -e 's/1/˙/g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g' BPMFMappings.txt
 
 clean:
 	rm -f data.txt
