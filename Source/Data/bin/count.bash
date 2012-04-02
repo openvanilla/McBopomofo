@@ -1,4 +1,5 @@
 #!/bin/bash
+# Whom to blame: Mengjuei Hsieh
 if [ $# -ne 1 ]; then
    echo "Usage: $0 <phrase string without space>"
    exit 0
@@ -15,3 +16,5 @@ if [ -f "$TEXTPOOL" ]; then
 else
    echo "File \"${TEXTPOOL}\" not found."
 fi
+exit 0
+# TODO: use uniq to count occurance seems to be a viable way
