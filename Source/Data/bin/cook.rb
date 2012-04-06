@@ -73,6 +73,7 @@ end
 m = File.open(ARGV[1])
 while line = m.gets
   line.chomp!
+  # we should put something here to ignore pound# sign in the mapping
   elements = line.split(/\s+/)
   key = elements.shift
   value = elements.join("-")
