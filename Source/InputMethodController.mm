@@ -1034,14 +1034,20 @@ public:
     [self updateClientComposingBuffer:client];
     _currentCandidateClient = client;
 
-    NSRect lineHeightRect;    
+    NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);    
     
     NSInteger cursor = _latestReadingCursor;
     if (cursor == [_composingBuffer length] && cursor != 0) {
         cursor--;
     }
     
-    [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+    // some apps (e.g. Twitter for Mac's search bar) handle this call incorrectly, hence the try-catch
+    @try {
+        [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception);
+    }
 
     [LTCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
     LTCurrentCandidateController.visible = YES;
