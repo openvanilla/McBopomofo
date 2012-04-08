@@ -76,7 +76,7 @@ static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpa
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"kCandidateTextFontName";
-static NSString *const kCandidateKeyLabelFontName = @"kCandidateTextFontName";
+static NSString *const kCandidateKeyLabelFontName = @"kCandidateKeyLabelFontName";
 static NSString *const kCandidateKeys = @"CandidateKeys";
 
 // a global object for saving the "learned" user candidate selections
