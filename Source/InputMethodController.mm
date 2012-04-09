@@ -74,6 +74,11 @@ static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 
+// advanced (usually optional) settings
+static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
+static NSString *const kCandidateKeyLabelFontName = @"CandidateKeyLabelFontName";
+static NSString *const kCandidateKeys = @"CandidateKeys";
+
 // a global object for saving the "learned" user candidate selections
 NSMutableDictionary *TLCandidateLearningDictionary = nil;
 NSString *TLUserCandidatesDictionaryPath = nil;
@@ -212,6 +217,8 @@ public:
 
 - (void)activateServer:(id)client
 {
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     // reset the state
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
@@ -588,7 +595,15 @@ public:
         }
         else {
             
-            NSInteger index = [LTCurrentCandidateController.keyLabels indexOfObject:inputText];
+            NSInteger index = NSNotFound;
+            for (NSUInteger j = 0, c = [LTCurrentCandidateController.keyLabels count]; j < c; j++) {
+                if ([inputText compare:[LTCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+                    index = j;
+                    break;
+                }
+            }
+            
+            [LTCurrentCandidateController.keyLabels indexOfObject:inputText];
             if (index != NSNotFound) {
                 NSUInteger candidateIndex = [LTCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
                 if (candidateIndex != NSUIntegerMax) {
@@ -1022,9 +1037,23 @@ public:
         keyLabelSize = kMinKeyLabelSize;
     }
     
-    LTCurrentCandidateController.keyLabelFont = [NSFont systemFontOfSize:keyLabelSize];
-    LTCurrentCandidateController.candidateFont = [NSFont systemFontOfSize:textSize];
-    LTCurrentCandidateController.keyLabels = [NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    NSString *ctFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateTextFontName];
+    NSString *klFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeyLabelFontName];
+    NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
+    
+    LTCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
+    LTCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
+    
+    NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    
+    if ([ckeys length] > 1) {
+        [keyLabels removeAllObjects];
+        for (NSUInteger i = 0, c = [ckeys length]; i < c; i++) {
+            [keyLabels addObject:[ckeys substringWithRange:NSMakeRange(i, 1)]];
+        }
+    }
+    
+    LTCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
     
     LTCurrentCandidateController.delegate = self;
