@@ -866,7 +866,7 @@ public:
     // still nothing, then we update the composing buffer (some app has
     // strange behavior if we don't do this, "thinking" the key is not
     // actually consumed)
-    if ([_composingBuffer length]) {
+    if ([_composingBuffer length] || !_bpmfReadingBuffer->isEmpty()) {
         [self beep];
         [self updateClientComposingBuffer:client];
         return YES;
