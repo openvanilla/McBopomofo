@@ -2208,6 +2208,7 @@
 皚 ㄞˊ ai2 96 big5
 騃 ㄞˊ ai2 96 big5
 敳 ㄞˊ ai2 96 big5
+癌 ㄞˊ ai2 96 big5
 骯 ㄤ ang ; big5
 腌 ㄤ ang ; big5
 ㄤ ㄤ ang ; big5
