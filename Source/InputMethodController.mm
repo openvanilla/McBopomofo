@@ -605,6 +605,27 @@ enum {
                 return YES;
             }
         }
+        else if (keyCode == kHomeKeyCode) {
+            if (LTCurrentCandidateController.selectedCandidateIndex == 0) {
+                [self beep];
+                
+            }
+            else {
+                LTCurrentCandidateController.selectedCandidateIndex = 0;
+            }
+            
+            return YES;
+        }
+        else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
+            if (LTCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
+                [self beep];
+            }
+            else {
+                LTCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
+            }
+
+            return YES;            
+        }
         else {
             
             NSInteger index = NSNotFound;
