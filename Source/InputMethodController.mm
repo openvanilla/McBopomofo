@@ -118,6 +118,9 @@ SimpleLM gLanguageModel;
 - (void)_performDeferredSaveUserCandidatesDictionary;
 - (void)saveUserCandidatesDictionary;
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
+
+- (void)beep;
+- (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode;
 @end
 
 // sort helper
@@ -457,29 +460,160 @@ public:
     NSBeep();
 }
 
+- (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
+{
+    if (charCode == 27) {
+        gCurrentCandidateController.visible = NO;
+        [_candidates removeAllObjects];
+        return YES;
+    }
+    else if (charCode == 13 || keyCode == 127) {
+        [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
+        return YES;
+    }
+    else if (charCode == 32 || keyCode == kPageDownKeyCode) {
+        BOOL updated = [gCurrentCandidateController showNextPage];
+        if (!updated) {
+            [self beep];
+        }
+        return YES;
+    }
+    else if (keyCode == kPageUpKeyCode) {
+        BOOL updated = [gCurrentCandidateController showPreviousPage];
+        if (!updated) {
+            [self beep];
+        }
+        return YES;            
+    }
+    else if (keyCode == kLeftKeyCode) {
+        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+            BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+        else {
+            [self beep];
+            return YES;
+        }
+    }
+    else if (keyCode == kRightKeyCode) {
+        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+            BOOL updated = [gCurrentCandidateController highlightNextCandidate];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+        else {
+            [self beep];
+            return YES;
+        }
+    }
+    else if (keyCode == kUpKeyCode) {
+        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+            BOOL updated = [gCurrentCandidateController showPreviousPage];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+        else {
+            BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+    }
+    else if (keyCode == kDownKeyCode) {
+        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+            BOOL updated = [gCurrentCandidateController showNextPage];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+        else {
+            BOOL updated = [gCurrentCandidateController highlightNextCandidate];
+            if (!updated) {
+                [self beep];
+            }
+            return YES;
+        }
+    }
+    else if (keyCode == kHomeKeyCode) {
+        if (gCurrentCandidateController.selectedCandidateIndex == 0) {
+            [self beep];
+            
+        }
+        else {
+            gCurrentCandidateController.selectedCandidateIndex = 0;
+        }
+        
+        return YES;
+    }
+    else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
+        if (gCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
+            [self beep];
+        }
+        else {
+            gCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
+        }
+        
+        return YES;            
+    }
+    else {
+        
+        NSInteger index = NSNotFound;
+        for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
+            if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+                index = j;
+                break;
+            }
+        }
+        
+        [gCurrentCandidateController.keyLabels indexOfObject:inputText];
+        if (index != NSNotFound) {
+            NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
+            if (candidateIndex != NSUIntegerMax) {
+                [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
+                return YES;
+            }
+        }
+        
+        [self beep];            
+        return YES;
+    }    
+}
+
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
     NSRect textFrame = NSZeroRect;
     NSDictionary *attributes = nil;
+
+    bool composeReading = false;
     BOOL useVerticalMode = NO;
+    
     @try {
         attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
         useVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
     }
     @catch (NSException *e) {
-        // An exception may raise while using Twitter.app's search filed.
+        // exception may raise while using Twitter.app's search filed.
     }
 
     NSInteger cursorForwardKey = useVerticalMode ? kDownKeyCode : kRightKeyCode;
     NSInteger cursorBackwardKey = useVerticalMode ? kUpKeyCode : kLeftKeyCode;
     NSInteger extraChooseCandidateKey = useVerticalMode ? kLeftKeyCode : kDownKeyCode;
     NSInteger absorbedArrowKey = useVerticalMode ? kRightKeyCode : kUpKeyCode;
+    NSInteger verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : 0;
 
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
 
-    if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"])
-    {
+    if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         // special handling for com.apple.Terminal
         _currentDeferredClient = client;
     }
@@ -494,160 +628,43 @@ public:
         return NO;
     }
 
-    bool composeReading = false;
 
-    // caps lock processing : if caps is locked, temporarily disabled bopomofo.
-
-    if (charCode == 8      || charCode == 13     ||
-        keyCode == absorbedArrowKey   || keyCode == extraChooseCandidateKey ||
-        keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
-        // Do nothing if backspace is pressed
-    } else if (flags & NSAlphaShiftKeyMask){
-        // Now process all possible combination, we hope.
-        if ([_composingBuffer length]) [self commitComposition:client];
-        // First commit everything in the buffer.
-        if (flags & NSShiftKeyMask) return NO;
-        // when shift is pressed, don't do further processing, since it outputs
-        // capital letter anyway.
+    // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
+    if (charCode == 8 || charCode == 13 || keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey || keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
+        // do nothing if backspace is pressed -- we ignore the key
+    }
+    else if (flags & NSAlphaShiftKeyMask) {
+        // process all possible combination, we hope.
+        if ([_composingBuffer length]) {
+            [self commitComposition:client];
+        }
+        
+        // first commit everything in the buffer.
+        if (flags & NSShiftKeyMask) {
+            return NO;
+        }
+        
+        // when shift is pressed, don't do further processing, since it outputs capital letter anyway.
         NSString *popedText = [inputText lowercaseString];
         [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         return YES;
     }
+    
     if (flags & NSNumericPadKeyMask) {
         if (keyCode != kLeftKeyCode && keyCode != kRightKeyCode && keyCode != kDownKeyCode && keyCode != kUpKeyCode && charCode != 32 && isprint(charCode)) {
-            if ([_composingBuffer length]) [self commitComposition:client];
+            if ([_composingBuffer length]) {
+                [self commitComposition:client];
+            }
+            
             NSString *popedText = [inputText lowercaseString];
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             return YES;
         }
     }
 
+    // if we have candidate, it means we need to pass the event to the candidate handler
     if ([_candidates count]) {
-        if (charCode == 27) {
-            gCurrentCandidateController.visible = NO;
-            [_candidates removeAllObjects];
-            return YES;
-        }
-        else if (charCode == 13 || keyCode == 127) {
-            [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
-            return YES;
-        }
-        else if (charCode == 32 || keyCode == kPageDownKeyCode) {
-            BOOL updated = [gCurrentCandidateController showNextPage];
-            if (!updated) {
-                [self beep];
-            }
-            return YES;
-        }
-        else if (keyCode == kPageUpKeyCode) {
-            BOOL updated = [gCurrentCandidateController showPreviousPage];
-            if (!updated) {
-                [self beep];
-            }
-            return YES;            
-        }
-        else if (keyCode == kLeftKeyCode) {
-            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
-                if (!updated) {
-                    [self beep];
-                }
-                return YES;
-            }
-            else {
-                [self beep];
-                return YES;
-            }
-        }
-        else if (keyCode == kRightKeyCode) {
-            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [gCurrentCandidateController highlightNextCandidate];
-                if (!updated) {
-                    [self beep];
-                }
-                return YES;
-            }
-            else {
-                [self beep];
-                return YES;
-            }
-        }
-        else if (keyCode == kUpKeyCode) {
-            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [gCurrentCandidateController showPreviousPage];
-                if (!updated) {
-                    [self beep];
-                }
-                return YES;
-            }
-            else {
-                BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
-                if (!updated) {
-                    [self beep];
-                }
-                return YES;
-            }
-        }
-        else if (keyCode == kDownKeyCode) {
-            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [gCurrentCandidateController showNextPage];
-                if (!updated) {
-                    [self beep];
-                }
-                return YES;
-            }
-            else {
-                BOOL updated = [gCurrentCandidateController highlightNextCandidate];
-                if (!updated) {
-                    [self beep];
-                }
-                return YES;
-            }
-        }
-        else if (keyCode == kHomeKeyCode) {
-            if (gCurrentCandidateController.selectedCandidateIndex == 0) {
-                [self beep];
-                
-            }
-            else {
-                gCurrentCandidateController.selectedCandidateIndex = 0;
-            }
-            
-            return YES;
-        }
-        else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
-            if (gCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
-                [self beep];
-            }
-            else {
-                gCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
-            }
-
-            return YES;            
-        }
-        else {
-            
-            NSInteger index = NSNotFound;
-            for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
-                if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
-                    index = j;
-                    break;
-                }
-            }
-            
-            [gCurrentCandidateController.keyLabels indexOfObject:inputText];
-            if (index != NSNotFound) {
-                NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
-                if (candidateIndex != NSUIntegerMax) {
-                    [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
-                    return YES;
-                }
-            }
-            
-            [self beep];            
-            return YES;
-        }
-
+        return [self handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode];
     }
     
     
@@ -704,7 +721,7 @@ public:
     }
 
     // keyCode 125 = Down, charCode 32 = Space
-    if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == extraChooseCandidateKey || charCode == 32)) {
+    if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == extraChooseCandidateKey || charCode == 32 || (useVerticalMode && (keyCode == verticalModeOnlyChooseCandidateKey)))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
@@ -728,13 +745,14 @@ public:
 
     // Esc
     if (charCode == 27) {
+        // if reading is not empty, we cancel the reading; Apple's built-in Zhuyin (and the erstwhile Hanin) has a default option that Esc "cancels" the current composed character and revert it to Bopomofo reading, in odds with the expectation of users from other platforms
+        
         if (_bpmfReadingBuffer->isEmpty()) {
+            // no nee to beep since the event is deliberately triggered by user
+            
             if (![_composingBuffer length]) {
                 return NO;
             }
-
-            //[self beep];
-            //如果要按 ESC 的時候都已經知道要取消些啥，不必beep
         }
         else {
             _bpmfReadingBuffer->clear();
@@ -742,11 +760,9 @@ public:
 
         [self updateClientComposingBuffer:client];
         return YES;
-        //可能的行為包括 1. 取消組字, 把字吃掉 2. 取消 candidate 選擇, 恢復原來的
-        //3. 取消組字，現出注音
     }
 
-    // The Right key, note we use keyCode here
+    // handle cursor backward
     if (keyCode == cursorBackwardKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
@@ -768,7 +784,7 @@ public:
         return YES;
     }
 
-    // The Left key, note we use keyCode here
+    // handle cursor forward
     if (keyCode == cursorForwardKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
@@ -831,6 +847,7 @@ public:
         return YES;
     }
 
+    // punctuation list
     if ((char)charCode == '`') {
         if (gLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
             if (_bpmfReadingBuffer->isEmpty()) {
@@ -1110,7 +1127,13 @@ public:
         NSLog(@"%@", exception);
     }
 
-    [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
+    if (useVerticalMode) {
+        [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
+    }
+    else {
+        [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
+    }
+    
     gCurrentCandidateController.visible = YES;
 }
 
