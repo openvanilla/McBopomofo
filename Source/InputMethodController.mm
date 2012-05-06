@@ -446,6 +446,18 @@ public:
     NSBeep();
 }
 
+enum {
+    kUpKeyCode = 126,
+    kDownKeyCode = 125,
+    kLeftKeyCode = 123,
+    kRightKeyCode = 124,
+    kPageUpKeyCode = 116,
+    kPageDownKeyCode = 121,
+    kHomeKeyCode = 115,
+    kEndKeyCode = 119
+};
+
+
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
     NSRect textFrame = NSZeroRect;
@@ -459,10 +471,10 @@ public:
         // An exception may raise while using Twitter.app's search filed.
     }
 
-    NSInteger leftKey = useVerticalMode ? 125 : 124;
-    NSInteger rightKey = useVerticalMode ? 126 : 123;
-    NSInteger downKey = useVerticalMode ? 123 : 125;
-    NSInteger upKey = useVerticalMode ? 124 : 126;
+    NSInteger cursorForwardKey = useVerticalMode ? kDownKeyCode : kRightKeyCode;
+    NSInteger cursorBackwardKey = useVerticalMode ? kUpKeyCode : kLeftKeyCode;
+    NSInteger extraChooseCandidateKey = useVerticalMode ? kLeftKeyCode : kDownKeyCode;
+    NSInteger absorbedArrowKey = useVerticalMode ? kRightKeyCode : kUpKeyCode;
 
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
@@ -488,8 +500,8 @@ public:
     // caps lock processing : if caps is locked, temporarily disabled bopomofo.
 
     if (charCode == 8      || charCode == 13     ||
-        keyCode == upKey   || keyCode == downKey ||
-        keyCode == leftKey || keyCode == rightKey) {
+        keyCode == absorbedArrowKey   || keyCode == extraChooseCandidateKey ||
+        keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
         // Do nothing if backspace is pressed
     } else if (flags & NSAlphaShiftKeyMask){
         // Now process all possible combination, we hope.
@@ -503,7 +515,7 @@ public:
         return YES;
     }
     if (flags & NSNumericPadKeyMask) {
-        if (keyCode != 123 && keyCode != 124 && keyCode != 125 && keyCode != 126 && charCode != 32 && isprint(charCode)) {
+        if (keyCode != kLeftKeyCode && keyCode != kRightKeyCode && keyCode != kDownKeyCode && keyCode != kUpKeyCode && charCode != 32 && isprint(charCode)) {
             if ([_composingBuffer length]) [self commitComposition:client];
             NSString *popedText = [inputText lowercaseString];
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
@@ -521,21 +533,21 @@ public:
             [self candidateController:LTCurrentCandidateController didSelectCandidateAtIndex:LTCurrentCandidateController.selectedCandidateIndex];
             return YES;
         }
-        else if (charCode == 32 || keyCode == 121) {
+        else if (charCode == 32 || keyCode == kPageDownKeyCode) {
             BOOL updated = [LTCurrentCandidateController showNextPage];
             if (!updated) {
                 [self beep];
             }
             return YES;
         }
-        else if (keyCode == 116) {
+        else if (keyCode == kPageUpKeyCode) {
             BOOL updated = [LTCurrentCandidateController showPreviousPage];
             if (!updated) {
                 [self beep];
             }
             return YES;            
         }
-        else if (keyCode == 123) {
+        else if (keyCode == kLeftKeyCode) {
             if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
                 BOOL updated = [LTCurrentCandidateController highlightPreviousCandidate];
                 if (!updated) {
@@ -548,7 +560,7 @@ public:
                 return YES;
             }
         }
-        else if (keyCode == 124) {
+        else if (keyCode == kRightKeyCode) {
             if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
                 BOOL updated = [LTCurrentCandidateController highlightNextCandidate];
                 if (!updated) {
@@ -561,7 +573,7 @@ public:
                 return YES;
             }
         }
-        else if (keyCode == 126) {
+        else if (keyCode == kUpKeyCode) {
             if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
                 BOOL updated = [LTCurrentCandidateController showPreviousPage];
                 if (!updated) {
@@ -577,7 +589,7 @@ public:
                 return YES;
             }
         }
-        else if (keyCode == 125) {
+        else if (keyCode == kDownKeyCode) {
             if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
                 BOOL updated = [LTCurrentCandidateController showNextPage];
                 if (!updated) {
@@ -672,7 +684,7 @@ public:
     }
 
     // keyCode 125 = Down, charCode 32 = Space
-    if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == downKey || charCode == 32)) {
+    if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == extraChooseCandidateKey || charCode == 32)) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
@@ -715,7 +727,7 @@ public:
     }
 
     // The Right key, note we use keyCode here
-    if (keyCode == rightKey) {
+    if (keyCode == cursorBackwardKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -737,7 +749,7 @@ public:
     }
 
     // The Left key, note we use keyCode here
-    if (keyCode == leftKey) {
+    if (keyCode == cursorForwardKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -758,7 +770,7 @@ public:
         return YES;
     }
 
-    if (keyCode == upKey || keyCode == downKey) {
+    if (keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
