@@ -79,6 +79,18 @@ static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
 static NSString *const kCandidateKeyLabelFontName = @"CandidateKeyLabelFontName";
 static NSString *const kCandidateKeys = @"CandidateKeys";
 
+// key code enums
+enum {
+    kUpKeyCode = 126,
+    kDownKeyCode = 125,
+    kLeftKeyCode = 123,
+    kRightKeyCode = 124,
+    kPageUpKeyCode = 116,
+    kPageDownKeyCode = 121,
+    kHomeKeyCode = 115,
+    kEndKeyCode = 119
+};
+
 // a global object for saving the "learned" user candidate selections
 NSMutableDictionary *gCandidateLearningDictionary = nil;
 NSString *gUserCandidatesDictionaryPath = nil;
@@ -444,18 +456,6 @@ public:
     // use the system's default sound (configurable in System Preferences) to give a warning
     NSBeep();
 }
-
-enum {
-    kUpKeyCode = 126,
-    kDownKeyCode = 125,
-    kLeftKeyCode = 123,
-    kRightKeyCode = 124,
-    kPageUpKeyCode = 116,
-    kPageDownKeyCode = 121,
-    kHomeKeyCode = 115,
-    kEndKeyCode = 119
-};
-
 
 - (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
