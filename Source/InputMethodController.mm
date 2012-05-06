@@ -80,10 +80,9 @@ static NSString *const kCandidateKeyLabelFontName = @"CandidateKeyLabelFontName"
 static NSString *const kCandidateKeys = @"CandidateKeys";
 
 // a global object for saving the "learned" user candidate selections
-NSMutableDictionary *TLCandidateLearningDictionary = nil;
-NSString *TLUserCandidatesDictionaryPath = nil;
-
-VTCandidateController *LTCurrentCandidateController = nil;
+NSMutableDictionary *gCandidateLearningDictionary = nil;
+NSString *gUserCandidatesDictionaryPath = nil;
+VTCandidateController *gCurrentCandidateController = nil;
 
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
 // specified path everytime the grid is walked
@@ -92,7 +91,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/lettuce-visualization.dot";
 #endif
 
 // shared language model object that stores our phrase-term probability database
-SimpleLM LTLanguageModel;
+SimpleLM gLanguageModel;
 
 // private methods
 @interface LettuceInputMethodController () <VTCandidateControllerDelegate>
@@ -153,7 +152,7 @@ public:
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _builder = new BlockReadingBuilder(&LTLanguageModel);
+        _builder = new BlockReadingBuilder(&gLanguageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -196,7 +195,7 @@ public:
         [menu addItem:learnMenuItem];
 
         if (learningEnabled) {
-            NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[TLCandidateLearningDictionary count]];
+            NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[gCandidateLearningDictionary count]];
             NSMenuItem *clearMenuItem = [[[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""] autorelease];
             [menu addItem:clearMenuItem];
 
@@ -282,8 +281,8 @@ public:
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
     
-    LTCurrentCandidateController.delegate = nil;
-    LTCurrentCandidateController.visible = NO;
+    gCurrentCandidateController.delegate = nil;
+    gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
 }
 
@@ -307,7 +306,7 @@ public:
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
-    LTCurrentCandidateController.visible = NO;
+    gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
 }
 
@@ -525,31 +524,31 @@ enum {
 
     if ([_candidates count]) {
         if (charCode == 27) {
-            LTCurrentCandidateController.visible = NO;
+            gCurrentCandidateController.visible = NO;
             [_candidates removeAllObjects];
             return YES;
         }
         else if (charCode == 13 || keyCode == 127) {
-            [self candidateController:LTCurrentCandidateController didSelectCandidateAtIndex:LTCurrentCandidateController.selectedCandidateIndex];
+            [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
             return YES;
         }
         else if (charCode == 32 || keyCode == kPageDownKeyCode) {
-            BOOL updated = [LTCurrentCandidateController showNextPage];
+            BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
                 [self beep];
             }
             return YES;
         }
         else if (keyCode == kPageUpKeyCode) {
-            BOOL updated = [LTCurrentCandidateController showPreviousPage];
+            BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
                 [self beep];
             }
             return YES;            
         }
         else if (keyCode == kLeftKeyCode) {
-            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [LTCurrentCandidateController highlightPreviousCandidate];
+            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
                 if (!updated) {
                     [self beep];
                 }
@@ -561,8 +560,8 @@ enum {
             }
         }
         else if (keyCode == kRightKeyCode) {
-            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [LTCurrentCandidateController highlightNextCandidate];
+            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [gCurrentCandidateController highlightNextCandidate];
                 if (!updated) {
                     [self beep];
                 }
@@ -574,15 +573,15 @@ enum {
             }
         }
         else if (keyCode == kUpKeyCode) {
-            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [LTCurrentCandidateController showPreviousPage];
+            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [gCurrentCandidateController showPreviousPage];
                 if (!updated) {
                     [self beep];
                 }
                 return YES;
             }
             else {
-                BOOL updated = [LTCurrentCandidateController highlightPreviousCandidate];
+                BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
                 if (!updated) {
                     [self beep];
                 }
@@ -590,15 +589,15 @@ enum {
             }
         }
         else if (keyCode == kDownKeyCode) {
-            if ([LTCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                BOOL updated = [LTCurrentCandidateController showNextPage];
+            if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+                BOOL updated = [gCurrentCandidateController showNextPage];
                 if (!updated) {
                     [self beep];
                 }
                 return YES;
             }
             else {
-                BOOL updated = [LTCurrentCandidateController highlightNextCandidate];
+                BOOL updated = [gCurrentCandidateController highlightNextCandidate];
                 if (!updated) {
                     [self beep];
                 }
@@ -606,22 +605,22 @@ enum {
             }
         }
         else if (keyCode == kHomeKeyCode) {
-            if (LTCurrentCandidateController.selectedCandidateIndex == 0) {
+            if (gCurrentCandidateController.selectedCandidateIndex == 0) {
                 [self beep];
                 
             }
             else {
-                LTCurrentCandidateController.selectedCandidateIndex = 0;
+                gCurrentCandidateController.selectedCandidateIndex = 0;
             }
             
             return YES;
         }
         else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
-            if (LTCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
+            if (gCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
                 [self beep];
             }
             else {
-                LTCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
+                gCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
             }
 
             return YES;            
@@ -629,18 +628,18 @@ enum {
         else {
             
             NSInteger index = NSNotFound;
-            for (NSUInteger j = 0, c = [LTCurrentCandidateController.keyLabels count]; j < c; j++) {
-                if ([inputText compare:[LTCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+            for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
+                if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
                     index = j;
                     break;
                 }
             }
             
-            [LTCurrentCandidateController.keyLabels indexOfObject:inputText];
+            [gCurrentCandidateController.keyLabels indexOfObject:inputText];
             if (index != NSNotFound) {
-                NSUInteger candidateIndex = [LTCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
+                NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
                 if (candidateIndex != NSUIntegerMax) {
-                    [self candidateController:LTCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
+                    [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
                     return YES;
                 }
             }
@@ -673,7 +672,7 @@ enum {
         string reading = _bpmfReadingBuffer->syllable().composedString();
 
         // see if we have a unigram for this
-        if (!LTLanguageModel.hasUnigramsForKey(reading)) {
+        if (!gLanguageModel.hasUnigramsForKey(reading)) {
             [self beep];
             [self updateClientComposingBuffer:client];
             return YES;
@@ -690,7 +689,7 @@ enum {
             NSString *trigram = [self neighborTrigramString];
 
             // Lookup from the user dict to see if the trigram fit or not
-            NSString *overrideCandidateString = [TLCandidateLearningDictionary objectForKey:trigram];
+            NSString *overrideCandidateString = [gCandidateLearningDictionary objectForKey:trigram];
             if (overrideCandidateString) {
                 [self candidateSelected:(NSAttributedString *)overrideCandidateString];
             }
@@ -714,7 +713,7 @@ enum {
                     [self commitComposition:client];
                     _bpmfReadingBuffer->clear();
                 }
-                else if (LTLanguageModel.hasUnigramsForKey(" ")) {
+                else if (gLanguageModel.hasUnigramsForKey(" ")) {
                     _builder->insertReadingAtCursor(" ");
                     [self popOverflowComposingTextAndWalk:client];
                     [self updateClientComposingBuffer:client];
@@ -833,7 +832,7 @@ enum {
     }
 
     if ((char)charCode == '`') {
-        if (LTLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
+        if (gLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
             if (_bpmfReadingBuffer->isEmpty()) {
                 _builder->insertReadingAtCursor(string("_punctuation_list"));
                 [self popOverflowComposingTextAndWalk:client];
@@ -870,7 +869,7 @@ enum {
     }
 
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
-    if (LTLanguageModel.hasUnigramsForKey(customPunctuation)) {
+    if (gLanguageModel.hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
             _builder->insertReadingAtCursor(customPunctuation);
             [self popOverflowComposingTextAndWalk:client];
@@ -884,7 +883,7 @@ enum {
 
     // if nothing is matched, see if it's a punctuation key
     string punctuation = string("_punctuation_") + string(1, (char)charCode);
-    if (LTLanguageModel.hasUnigramsForKey(punctuation)) {
+    if (gLanguageModel.hasUnigramsForKey(punctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
             _builder->insertReadingAtCursor(punctuation);
             [self popOverflowComposingTextAndWalk:client];
@@ -1032,12 +1031,12 @@ enum {
 
 - (void)_performDeferredSaveUserCandidatesDictionary
 {
-    BOOL __unused success = [TLCandidateLearningDictionary writeToFile:TLUserCandidatesDictionaryPath atomically:YES];
+    BOOL __unused success = [gCandidateLearningDictionary writeToFile:gUserCandidatesDictionaryPath atomically:YES];
 }
 
 - (void)saveUserCandidatesDictionary
 {
-    if (!TLUserCandidatesDictionaryPath) {
+    if (!gUserCandidatesDictionaryPath) {
         return;
     }
 
@@ -1053,13 +1052,13 @@ enum {
     BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
 
     if (useVerticalMode) {
-        LTCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
+        gCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
     }
     else if (useHorizontalCandidateList) {
-        LTCurrentCandidateController = [LettuceInputMethodController horizontalCandidateController];
+        gCurrentCandidateController = [LettuceInputMethodController horizontalCandidateController];
     }
     else {
-        LTCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
+        gCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -1074,8 +1073,8 @@ enum {
     NSString *klFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeyLabelFontName];
     NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
     
-    LTCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
-    LTCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
+    gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
+    gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
     
     NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
     
@@ -1086,11 +1085,11 @@ enum {
         }
     }
     
-    LTCurrentCandidateController.keyLabels = keyLabels;
+    gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
     
-    LTCurrentCandidateController.delegate = self;
-    [LTCurrentCandidateController reloadData];
+    gCurrentCandidateController.delegate = self;
+    [gCurrentCandidateController reloadData];
 
     // update the composing text, set the client
     [self updateClientComposingBuffer:client];
@@ -1111,8 +1110,8 @@ enum {
         NSLog(@"%@", exception);
     }
 
-    [LTCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
-    LTCurrentCandidateController.visible = YES;
+    [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
+    gCurrentCandidateController.visible = YES;
 }
 
 #pragma mark - Misc menu items
@@ -1139,13 +1138,13 @@ enum {
 
 - (void)clearLearningDictionary:(id)sender
 {
-    [TLCandidateLearningDictionary removeAllObjects];
+    [gCandidateLearningDictionary removeAllObjects];
     [self _performDeferredSaveUserCandidatesDictionary];
 }
 
 - (void)dumpLearningDictionary:(id)sender
 {
-    NSLog(@"%@", TLCandidateLearningDictionary);
+    NSLog(@"%@", gCandidateLearningDictionary);
 }
 
 - (NSUInteger)candidateCountForController:(VTCandidateController *)controller
@@ -1160,7 +1159,7 @@ enum {
 
 - (void)candidateController:(VTCandidateController *)controller didSelectCandidateAtIndex:(NSUInteger)index
 {
-    LTCurrentCandidateController.visible = NO;
+    gCurrentCandidateController.visible = NO;
     
     // candidate selected, override the node with selection
     string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
@@ -1168,7 +1167,7 @@ enum {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
         NSString *trigram = [self neighborTrigramString];
         NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
-        [TLCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
+        [gCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
         [self saveUserCandidatesDictionary];
     }
     
@@ -1218,16 +1217,16 @@ void LTLoadLanguageModel()
         vector<string> p = OVStringHelper::SplitBySpacesOrTabs(line);
 
         if (p.size() == 3) {
-            LTLanguageModel.add(p[1], p[0], atof(p[2].c_str()));
+            gLanguageModel.add(p[1], p[0], atof(p[2].c_str()));
         }
     }
     ifs.close();
-    LTLanguageModel.add(" ", " ", 0.0);
+    gLanguageModel.add(" ", " ", 0.0);
 
     // initialize the singleton learning dictionary
     // putting singleton in @synchronized is the standard way in Objective-C
     // to avoid race condition
-    TLCandidateLearningDictionary = [[NSMutableDictionary alloc] init];
+    gCandidateLearningDictionary = [[NSMutableDictionary alloc] init];
 
     // the first instance is also responsible for loading the dictionary
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
@@ -1260,7 +1259,7 @@ void LTLoadLanguageModel()
 
     // TODO: Change this
     NSString *userDictFile = [userDictPath stringByAppendingPathComponent:@"UserCandidatesCache.plist"];
-    TLUserCandidatesDictionaryPath = [userDictFile retain];
+    gUserCandidatesDictionaryPath = [userDictFile retain];
 
     exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictFile isDirectory:&isDir];
     if (exists && !isDir) {
@@ -1273,8 +1272,8 @@ void LTLoadLanguageModel()
         NSPropertyListFormat format = 0;
         id plist = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&errorStr];
         if (plist && [plist isKindOfClass:[NSDictionary class]]) {
-            [TLCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
-            NSLog(@"User dictionary read, item count: %ju", (uintmax_t)[TLCandidateLearningDictionary count]);
+            [gCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
+            NSLog(@"User dictionary read, item count: %ju", (uintmax_t)[gCandidateLearningDictionary count]);
         }
     }
 
