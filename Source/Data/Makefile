@@ -40,6 +40,7 @@ sort:
 	@mv tmp heterophony3.list
 
 check:
+	@rm -f tmp1 tmp2
 	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
 	@awk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | awk '/一/'
 	awk '{print $$1}' BPMFMappings.txt | uniq|wc -l
