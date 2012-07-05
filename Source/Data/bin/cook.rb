@@ -15,7 +15,6 @@ phrases = {}
 bpmf_phon1 = {}
 bpmf_phon2 = {}
 bpmf_phon3 = {}
-phrases_blacklist ={}
 
 # Reading-in a list of heterophonic words and
 # its most frequent pronunciation
@@ -99,26 +98,28 @@ while line = m.gets
   #$stdout.puts("%s %d" % [key, key.length])
 end
 
-blacklist = File.open("blacklist.txt")
-while line = blacklist.gets
-  if line.match(/^#/)
-    next
-  end
-  line.chomp!
-  elements = line.split(/\s+/)
-  key = elements.shift
-  if key.length < 4
-    next
-  end
-  value = elements.join("-")
-  if phrases_blacklist[key]
-    phrases_blacklist[key] += [value]
-    o.puts("%s %s %s" % [key, value, UNK_LOG_FREQ*3])
-  else
-    phrases_blacklist[key] = [value]
-    o.puts("%s %s %s" % [key, value, UNK_LOG_FREQ*3])
-  end
-end
+#phrases_blacklist ={}
+#blacklist = File.open("blacklist.txt")
+#while line = blacklist.gets
+#  if line.match(/^#/)
+#    next
+#  end
+#  line.chomp!
+#  elements = line.split(/\s+/)
+#  key = elements.shift
+#  if key.length < 4
+#    next
+#  end
+#  value = elements.join("-")
+#  BL_LOG_FREQ = UNK_LOG_FREQ * Integer (key.length / 3 + 1) 
+#  if phrases_blacklist[key]
+#    phrases_blacklist[key] += [value]
+#    o.puts("%s %s %d" % [key, value, BL_LOG_FREQ])
+#  else
+#    phrases_blacklist[key] = [value]
+#    o.puts("%s %s %d" % [key, value, BL_LOG_FREQ])
+#  end
+#end
 
 p = File.open(ARGV[0])
 while line = p.gets
@@ -128,10 +129,10 @@ while line = p.gets
   line.chomp!
   elements = line.split(/\s+/)
   key = elements.shift
-  if phrases_blacklist[key]
-    #$stdout.puts("%s %s" % [key, $stdout.puts("%s %s" % [key, phrases_blacklist[key]])])
-    next
-  end
+  #if phrases_blacklist[key]
+  #  #$stdout.puts("%s %s" % [key, $stdout.puts("%s %s" % [key, phrases_blacklist[key]])])
+  #  next
+  #end
   value = elements.shift
   readings = bpmf_phrases[key]
   phrases[key] = true
