@@ -15,11 +15,15 @@ phrases = {}
 bpmf_phon1 = {}
 bpmf_phon2 = {}
 bpmf_phon3 = {}
+phrases_blacklist ={}
 
 # Reading-in a list of heterophonic words and
 # its most frequent pronunciation
 h1 = File.open("heterophony1.list")
 while line = h1.gets
+  if line.match(/^#/)
+    next
+  end
   line.chomp!
   elements = line.split(/\s+/)
   key = elements[0]
@@ -28,6 +32,9 @@ while line = h1.gets
 end
 h2 = File.open("heterophony2.list")
 while line = h2.gets
+  if line.match(/^#/)
+    next
+  end
   line.chomp!
   elements = line.split(/\s+/)
   key = elements[0]
@@ -36,6 +43,9 @@ while line = h2.gets
 end
 h3 = File.open("heterophony3.list")
 while line = h3.gets
+  if line.match(/^#/)
+    next
+  end
   line.chomp!
   elements = line.split(/\s+/)
   key = elements[0]
@@ -47,6 +57,9 @@ o = File.open(ARGV[3], "w")
 
 b = File.open(ARGV[2])
 while line = b.gets
+  if line.match(/^#/)
+    next
+  end
   line.chomp!
   elements = line.split(/\s+/)
   
@@ -69,15 +82,15 @@ while line = b.gets
   #end
 end
 
-
 m = File.open(ARGV[1])
 while line = m.gets
+  if line.match(/^#/)
+    next
+  end
   line.chomp!
-  # we should put something here to ignore pound# sign in the mapping
   elements = line.split(/\s+/)
   key = elements.shift
   value = elements.join("-")
-  #bpmf_phrases[key] = value
   if bpmf_phrases[key]
     bpmf_phrases[key] += [value]
   else
@@ -86,16 +99,44 @@ while line = m.gets
   #$stdout.puts("%s %d" % [key, key.length])
 end
 
-p = File.open(ARGV[0])
-while line = p.gets
+blacklist = File.open("blacklist.txt")
+while line = blacklist.gets
+  if line.match(/^#/)
+    next
+  end
   line.chomp!
   elements = line.split(/\s+/)
   key = elements.shift
+  if key.length < 4
+    next
+  end
+  value = elements.join("-")
+  if phrases_blacklist[key]
+    phrases_blacklist[key] += [value]
+    o.puts("%s %s %s" % [key, value, UNK_LOG_FREQ*3])
+  else
+    phrases_blacklist[key] = [value]
+    o.puts("%s %s %s" % [key, value, UNK_LOG_FREQ*3])
+  end
+end
+
+p = File.open(ARGV[0])
+while line = p.gets
+  if line.match(/^#/)
+    next
+  end
+  line.chomp!
+  elements = line.split(/\s+/)
+  key = elements.shift
+  if phrases_blacklist[key]
+    #$stdout.puts("%s %s" % [key, $stdout.puts("%s %s" % [key, phrases_blacklist[key]])])
+    next
+  end
   value = elements.shift
   readings = bpmf_phrases[key]
   phrases[key] = true
   if readings
-     # 一個字目前還是 3 (unicode)
+     # 一個字的長度目前還是 3 (unicode? or just CJK pages use length==3?)
      if key.length > 3
         readings.each do |r|
            o.puts("%s %s %s" % [key, r, value])
