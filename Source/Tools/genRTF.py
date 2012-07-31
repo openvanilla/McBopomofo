@@ -1,7 +1,15 @@
 #!/usr/bin/env python
-
 import sys, os
-os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.7"
+import platform
+myversion, _, _ = platform.mac_ver()
+myversion = float('.'.join(myversion.split('.')[:2]))
+
+if myversion == 10.8:
+    os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.8"
+    print myversion
+else:
+    os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.7"
+
 os.environ["PYTHONPATH"] = "/System/Library/Frameworks/Python.framework/Versions/2.6/Extras/lib/python/"
 
 import subprocess, getopt
