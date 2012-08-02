@@ -79,7 +79,7 @@
 		6A42C5E013A5584F0080A121 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		6A43430213727AC80094187C /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A43430513727AD50094187C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		6A6BE33415CA25790075467A /* Install McBopomofo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Install McBopomofo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A6BE33415CA25790075467A /* InstallMcBopomofo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstallMcBopomofo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A6BE33915CA257A0075467A /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Installer-Info.plist"; sourceTree = "<group>"; };
 		6A6BE33B15CA257A0075467A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A6BE33D15CA257A0075467A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -324,7 +324,7 @@
 			children = (
 				6A8515B5137277DB0066B1BD /* McBopomofo.app */,
 				6ACF37C213A7BE68008798F2 /* IconMaker.app */,
-				6A6BE33415CA25790075467A /* Install McBopomofo.app */,
+				6A6BE33415CA25790075467A /* InstallMcBopomofo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -507,9 +507,9 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
-		6A6BE33315CA25790075467A /* Install McBopomofo */ = {
+		6A6BE33315CA25790075467A /* InstallMcBopomofo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6A6BE34B15CA257A0075467A /* Build configuration list for PBXNativeTarget "Install McBopomofo" */;
+			buildConfigurationList = 6A6BE34B15CA257A0075467A /* Build configuration list for PBXNativeTarget "InstallMcBopomofo" */;
 			buildPhases = (
 				6A6BE33015CA25790075467A /* Sources */,
 				6A6BE33115CA25790075467A /* Frameworks */,
@@ -520,9 +520,9 @@
 			dependencies = (
 				6AB7EFAC15CA2D78006D2F21 /* PBXTargetDependency */,
 			);
-			name = "Install McBopomofo";
+			name = InstallMcBopomofo;
 			productName = Installer;
-			productReference = 6A6BE33415CA25790075467A /* Install McBopomofo.app */;
+			productReference = 6A6BE33415CA25790075467A /* InstallMcBopomofo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		6A8515B4137277DB0066B1BD /* Lettuce */ = {
@@ -587,7 +587,7 @@
 				6A8515B4137277DB0066B1BD /* Lettuce */,
 				6ADF4DBA13727D1000A7C57B /* Data */,
 				6ACF37C113A7BE68008798F2 /* IconMaker */,
-				6A6BE33315CA25790075467A /* Install McBopomofo */,
+				6A6BE33315CA25790075467A /* InstallMcBopomofo */,
 			);
 		};
 /* End PBXProject section */
@@ -1049,7 +1049,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6A6BE34B15CA257A0075467A /* Build configuration list for PBXNativeTarget "Install McBopomofo" */ = {
+		6A6BE34B15CA257A0075467A /* Build configuration list for PBXNativeTarget "InstallMcBopomofo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6A6BE34915CA257A0075467A /* Debug */,
