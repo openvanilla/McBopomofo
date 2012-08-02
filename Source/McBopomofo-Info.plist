@@ -23,11 +23,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.3</string>
+	<string>0.9.4</string>
 	<key>CFBundleSignature</key>
 	<string>LTCE</string>
 	<key>CFBundleVersion</key>
-	<string>250</string>
+	<string>361</string>
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
@@ -74,7 +74,7 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>10.5</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2011 The McBopomofo Project</string>
+	<string>Copyright © 2011-2012 The OpenVanilla Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
