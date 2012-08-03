@@ -2178,6 +2178,7 @@
 哎 ㄞ ai 9 big5
 ㄞ ㄞ ai 9 big5
 誒 ㄞ ai 9 big5
+欸 ㄞ ai 9 big5
 矮 ㄞˇ ai3 93 big5
 藹 ㄞˇ ai3 93 big5
 靄 ㄞˇ ai3 93 big5
@@ -7515,6 +7516,7 @@
 幓 ㄙㄣ sen np big5
 篸 ㄙㄣ sen np big5
 ㄟ ㄟ ei o big5
+欸 ㄟˋ ei4 o4 big5
 恩 ㄣ en p big5
 嗯 ㄣ en p big5
 ㄣ ㄣ en p big5
