@@ -1,0 +1,27 @@
+/* No comment provided by engineer. */
+"%@ (for version %@)" = "%1$@ (%2$@ 版)";
+
+/* No comment provided by engineer. */
+"Agree and Upgrade" = "同意並升級";
+
+/* No comment provided by engineer. */
+"Cancel" = "取消";
+
+/* No comment provided by engineer. */
+"Cannot activate the input method." = "無法啟用輸入法。";
+
+/* No comment provided by engineer. */
+"Cannot copy the file to the destination." = "無法將輸入法拷貝至目的地。";
+
+/* No comment provided by engineer. */
+"Install Failed" = "安裝失敗";
+
+/* No comment provided by engineer. */
+"Installation Successful" = "安裝成功";
+
+/* No comment provided by engineer. */
+"OK" = "好";
+
+/* No comment provided by engineer. */
+"McBopomofo is ready to use." = "小麥注音輸入法安裝成功";
+
