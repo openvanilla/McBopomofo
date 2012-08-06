@@ -16,6 +16,8 @@ bpmf_phon3 = {}
 if __name__=='__main__':
     if len(sys.argv) < 5:
         sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base output')
+    # Reading-in a list of heterophonic words and
+    # its most frequent pronunciation
     handle=open('heterophony1.list',"r")
     while True:
         line = handle.readline()
@@ -79,6 +81,7 @@ if __name__=='__main__':
             bpmf_phrases[mykey].append(myvalue)
     handle.close()
     handle=open(sys.argv[1],"r")
+    fout=open(sys.argv[4],"w")
     while True:
         line = handle.readline()
         if not line: break
@@ -93,41 +96,48 @@ if __name__=='__main__':
             #剛好一個中文字字的長度目前還是 3 (標點、聲調好像都是2)       
             if len(mykey) > 3:
                 for r in readings:
-                    print "%s %s %s" % ( mykey, r, myvalue )
+                    fout.write("%s %s %s\n" % ( mykey, r, myvalue ))
                     pass
                 continue
             else:
+                # lookup the table from canonical list
                 for r in readings:
                     if not mykey in bpmf_phon1:
-                        print "%s %s %s" % ( mykey, r, myvalue )
+                        fout.write("%s %s %s\n" % ( mykey, r, myvalue ))
                         continue
                     elif str(bpmf_phon1[mykey]) == r:
-                        print "%s %s %s" % ( mykey, r, myvalue )
+                        fout.write("%s %s %s\n" % ( mykey, r, myvalue ))
                         continue
                     elif not mykey in bpmf_phon2:
-                        print "%s %s %f" % ( mykey, r, H_DEFLT_FREQ )
+                        fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))
                         continue
                     elif str(bpmf_phon2[mykey]) == r:
+                        # l(3/4) = -0.28768207245178 / 頻率打七五折之意
                         if float(myvalue)-0.28768207245178 > H_DEFLT_FREQ:
-                            print "%s %s %f" % ( mykey, r, float(myvalue)-0.28768207245178 )
+                            fout.write("%s %s %f\n" % ( mykey, r, float(myvalue)-0.28768207245178 ))
                             continue
                         else:
-                            print "%s %s %f" % ( mykey, r, H_DEFLT_FREQ )
+                            fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))
                             continue
                     elif not mykey in bpmf_phon3:
-                        print "%s %s %f" % ( mykey, r, H_DEFLT_FREQ )
+                        fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))
                         continue
                     elif str(bpmf_phon3[mykey]) == r:
+                        # l(3/4*3/4) = -0.28768207245178*2
                         if float(myvalue)-0.28768207245178*2 > H_DEFLT_FREQ:
-                            print "%s %s %f" % ( mykey, r, float(myvalue)-0.28768207245178*2 )
+                            fout.write("%s %s %f\n" % ( mykey, r, float(myvalue)-0.28768207245178*2 ))
                             continue
                         else:
-                            print "%s %s %f" % ( mykey, r, H_DEFLT_FREQ )
+                            fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))
                             continue
-                    print "%s %s %f" % ( mykey, r, H_DEFLT_FREQ )
+                    fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))
+                    # 如果是破音字, set it to default.
+                    # 很罕用的注音建議不要列入 heterophony?.list，這樣的話
+                    # 就可以直接進來這個 condition
     handle.close()
     for k in bpmf_chars:
         if not k in phrases:
             for v in bpmf_chars[k]:
-                print "%s %s %f" % (k, v, UNK_LOG_FREQ)
+                fout.write("%s %s %f\n" % (k, v, UNK_LOG_FREQ))
                 pass
+    fout.close()
