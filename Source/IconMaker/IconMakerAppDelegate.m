@@ -71,8 +71,12 @@
     faviconRenderView.selected = YES;
     [faviconRenderView setNeedsDisplay:YES];
     
-    [self makeIconForObject:@"TISIconRendererView" size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo.tiff"];
-    [self makeIconForObject:selectedTISIconRendererView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoSelected.tiff"];
+//    [self makeIconForObject:@"TISIconRendererView" size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo.tiff"];
+//    [self makeIconForObject:selectedTISIconRendererView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoSelected.tiff"];
+    [self makeIconForObject:@"BopomofoIconRenderView" size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo.tiff"];
+    [self makeIconForObject:@"BopomofoIconRenderView" size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo@2x.tiff"];
+    [self makeIconForObject:@"BopomofoIconRenderView" size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoSelected.tiff"];
+
     [self makeIconForObject:faviconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoFavicon.tiff"];
 
     
