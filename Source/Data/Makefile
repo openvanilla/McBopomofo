@@ -3,9 +3,9 @@ DATPATH=Contents/Resources/data.txt
 EXEPATH=Contents/MacOS/McBopomofo
 EXENAME=McBopomofo
 
-data.txt: bin/cook.rb BPMFBase.txt BPMFMappings.txt PhraseFreq.txt \
+data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt PhraseFreq.txt \
           heterophony1.list heterophony2.list phrase.occ
-	bin/cook.rb PhraseFreq.txt BPMFMappings.txt BPMFBase.txt $@
+	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt $@
 	cat BPMFPunctuations.txt >> $@
 
 deploydata: data.txt

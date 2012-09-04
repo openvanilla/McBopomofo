@@ -11,35 +11,66 @@ phrases = {}
 bpmf_phon1 = {}
 bpmf_phon2 = {}
 bpmf_phon3 = {}
-
+bpmf_hetero = {}
 
 if __name__=='__main__':
     if len(sys.argv) < 5:
         sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base output')
+    # Read a list of heterophonic singulars and its estimated frequency
+    # not active yet
+    #try:
+    #    handle=open('heterophony.list',"r")
+    #except IOError as e:
+    #    print("({})".format(e))
+    #while True:
+    #    line = handle.readline()
+    #    if not line: break
+    #    if line[0] == '#': break
+    #    elements = line.rstrip().split()
+    #    myword = elements[0]
+    #    myvalue = {elements[1], elements[2]}
+    #    if myword in bpmf_hetero:
+    #        bpmf_hetero[myword].append(myvalue)
+    #    else:
+    #        bpmf_hetero[myword] = []
+    #        bpmf_hetero[myword].append(myvalue)
+    #handle.close()
     # Reading-in a list of heterophonic words and
     # its most frequent pronunciation
-    handle=open('heterophony1.list',"r")
+    try:
+        handle=open('heterophony1.list',"r")
+    except IOError as e:
+        print("({})".format(e))
     while True:
         line = handle.readline()
         if not line: break
         if line[0] == '#': break
         elements = line.rstrip().split()
+        #if elements[0] in bpmf_hetero: break
         bpmf_phon1[elements[0]] = elements[1]
     handle.close()
-    handle=open('heterophony2.list',"r")
+    try:
+        handle=open('heterophony2.list',"r")
+    except IOError as e:
+        print("({})".format(e))
     while True:
         line = handle.readline()
         if not line: break
         if line[0] == '#': break
         elements = line.rstrip().split()
+        #if elements[0] in bpmf_hetero: break
         bpmf_phon2[elements[0]] = elements[1]
     handle.close()
-    handle=open('heterophony3.list',"r")
+    try:
+        handle=open('heterophony3.list',"r")
+    except IOError as e:
+        print("({})".format(e))
     while True:
         line = handle.readline()
         if not line: break
         if line[0] == '#': break
         elements = line.rstrip().split()
+        #if elements[0] in bpmf_hetero: break
         bpmf_phon3[elements[0]] = elements[1]
     handle.close()
     #bpmfbase
@@ -64,6 +95,7 @@ if __name__=='__main__':
             bpmf_phrases[mykey] = []
             bpmf_phrases[mykey].append(myvalue)
     handle.close()
+    #bpmf-mappings
     handle=open(sys.argv[2],"r")
     while True:
         line = handle.readline()
@@ -80,6 +112,7 @@ if __name__=='__main__':
             bpmf_phrases[mykey] = []
             bpmf_phrases[mykey].append(myvalue)
     handle.close()
+    #phrase-freqs
     handle=open(sys.argv[1],"r")
     fout=open(sys.argv[4],"w")
     while True:
