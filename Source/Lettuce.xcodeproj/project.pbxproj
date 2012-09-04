@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6A3B3A3013A1D44E006A6BA9 /* BopomofoSelected.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A3B3A2E13A1D44E006A6BA9 /* BopomofoSelected.tiff */; };
 		6A3B3A3113A1D44E006A6BA9 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A3B3A2F13A1D44E006A6BA9 /* Bopomofo.tiff */; };
 		6A42C5E113A5584F0080A121 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A42C5E013A5584F0080A121 /* PreferencesWindowController.m */; };
 		6A43430113727AC80094187C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A43430313727AC80094187C /* InfoPlist.strings */; };
 		6A43430413727AD50094187C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A43430613727AD50094187C /* MainMenu.xib */; };
+		6A46824515F5E5BC00F8E159 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A46824415F5E5BC00F8E159 /* Bopomofo@2x.tiff */; };
 		6A6BE33615CA257A0075467A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A8515B9137277DB0066B1BD /* Cocoa.framework */; };
 		6A6BE33C15CA257A0075467A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A6BE33A15CA257A0075467A /* InfoPlist.strings */; };
 		6A6BE33E15CA257A0075467A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6BE33D15CA257A0075467A /* main.m */; };
@@ -28,6 +28,7 @@
 		6A8515F213727A470066B1BD /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A8515F113727A470066B1BD /* data.txt */; };
 		6A89E66713F7637200DDBF09 /* UpdateNotificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A89E66613F7637200DDBF09 /* UpdateNotificationController.m */; };
 		6A89E66A13F7647D00DDBF09 /* UpdateNotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A89E66913F7647D00DDBF09 /* UpdateNotificationController.xib */; };
+		6AA2092015F5D9B100DEC420 /* BopomofoIconRenderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA2091F15F5D9B100DEC420 /* BopomofoIconRenderView.m */; };
 		6AB7EFA915CA2D6B006D2F21 /* Lettuce.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6ADF4DC213727F1B00A7C57B /* Lettuce.icns */; };
 		6AB7EFAD15CA2DB9006D2F21 /* McBopomofo.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A8515B5137277DB0066B1BD /* McBopomofo.app */; };
 		6ABE50131372864300981680 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ABE50111372864300981680 /* Mandarin.cpp */; };
@@ -73,12 +74,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6A3B3A2E13A1D44E006A6BA9 /* BopomofoSelected.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = BopomofoSelected.tiff; sourceTree = "<group>"; };
 		6A3B3A2F13A1D44E006A6BA9 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A42C5DF13A5584F0080A121 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
 		6A42C5E013A5584F0080A121 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		6A43430213727AC80094187C /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A43430513727AD50094187C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		6A46824415F5E5BC00F8E159 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
 		6A6BE33415CA25790075467A /* InstallMcBopomofo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstallMcBopomofo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A6BE33915CA257A0075467A /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Installer-Info.plist"; sourceTree = "<group>"; };
 		6A6BE33B15CA257A0075467A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -113,6 +114,8 @@
 		6A89E66513F7637200DDBF09 /* UpdateNotificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateNotificationController.h; sourceTree = "<group>"; };
 		6A89E66613F7637200DDBF09 /* UpdateNotificationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateNotificationController.m; sourceTree = "<group>"; };
 		6A89E66913F7647D00DDBF09 /* UpdateNotificationController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UpdateNotificationController.xib; sourceTree = "<group>"; };
+		6AA2091E15F5D9B100DEC420 /* BopomofoIconRenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BopomofoIconRenderView.h; sourceTree = "<group>"; };
+		6AA2091F15F5D9B100DEC420 /* BopomofoIconRenderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BopomofoIconRenderView.m; sourceTree = "<group>"; };
 		6ABE4FE4137285F900981680 /* OpenVanilla.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenVanilla.h; sourceTree = "<group>"; };
 		6ABE4FE5137285F900981680 /* OVAroundFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVAroundFilter.h; sourceTree = "<group>"; };
 		6ABE4FE6137285F900981680 /* OVBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVBase.h; sourceTree = "<group>"; };
@@ -453,6 +456,8 @@
 			children = (
 				6ACF37DF13A7BED0008798F2 /* AppIconRendererView.h */,
 				6ACF37E013A7BED0008798F2 /* AppIconRendererView.m */,
+				6AA2091E15F5D9B100DEC420 /* BopomofoIconRenderView.h */,
+				6AA2091F15F5D9B100DEC420 /* BopomofoIconRenderView.m */,
 				6ACF37E113A7BED0008798F2 /* TISIconRendererView.h */,
 				6ACF37E213A7BED0008798F2 /* TISIconRendererView.m */,
 				6ACF37E313A7BED0008798F2 /* ImageZoomInView.h */,
@@ -480,7 +485,7 @@
 		6ADF4DC113727F1B00A7C57B /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				6A3B3A2E13A1D44E006A6BA9 /* BopomofoSelected.tiff */,
+				6A46824415F5E5BC00F8E159 /* Bopomofo@2x.tiff */,
 				6A3B3A2F13A1D44E006A6BA9 /* Bopomofo.tiff */,
 				6ADF4DC213727F1B00A7C57B /* Lettuce.icns */,
 			);
@@ -615,11 +620,11 @@
 				6A43430413727AD50094187C /* MainMenu.xib in Resources */,
 				6ADF4DC413727F1B00A7C57B /* Lettuce.icns in Resources */,
 				D4192895137AD26200EB16F7 /* preferences.xib in Resources */,
-				6A3B3A3013A1D44E006A6BA9 /* BopomofoSelected.tiff in Resources */,
 				6A3B3A3113A1D44E006A6BA9 /* Bopomofo.tiff in Resources */,
 				6ABEDAF313F74D9C00A0825A /* Localizable.strings in Resources */,
 				6A89E66A13F7647D00DDBF09 /* UpdateNotificationController.xib in Resources */,
 				D4F44E77144B4ED4002DEFFB /* Credits.rtf in Resources */,
+				6A46824515F5E5BC00F8E159 /* Bopomofo@2x.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -706,6 +711,7 @@
 				6ACF37E513A7BED0008798F2 /* AppIconRendererView.m in Sources */,
 				6ACF37E613A7BED0008798F2 /* TISIconRendererView.m in Sources */,
 				6ACF37E713A7BED0008798F2 /* ImageZoomInView.m in Sources */,
+				6AA2092015F5D9B100DEC420 /* BopomofoIconRenderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
