@@ -35,7 +35,7 @@
 			<key>org.openvanilla.inputmethod.McBopomofo.Bopomofo</key>
 			<dict>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>BopomofoSelected.tiff</string>
+				<string>Bopomofo.tiff</string>
 				<key>tsInputModeDefaultStateKey</key>
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
