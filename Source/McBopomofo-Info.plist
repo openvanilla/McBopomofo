@@ -47,10 +47,32 @@
 				<key>tsInputModeScriptKey</key>
 				<string>smUnicodeScript</string>
 			</dict>
+			<key>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</key>
+			<dict>
+				<key>tsInputModeAlternateMenuIconFileKey</key>
+				<string>PlainBopomofo.tiff</string>
+				<key>tsInputModeDefaultStateKey</key>
+				<true/>
+				<key>tsInputModeIsVisibleKey</key>
+				<true/>
+				<key>tsInputModeKeyEquivalentKey</key>
+				<string>H</string>
+				<key>tsInputModeKeyEquivalentModifiersKey</key>
+				<integer>4608</integer>
+				<key>tsInputModeMenuIconFileKey</key>
+				<string>PlainBopomofo.tiff</string>
+				<key>tsInputModePaletteIconFileKey</key>
+				<string>PlainBopomofo.tiff</string>
+				<key>tsInputModePrimaryInScriptKey</key>
+				<true/>
+				<key>tsInputModeScriptKey</key>
+				<string>smUnicodeScript</string>
+			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
 			<string>org.openvanilla.inputmethod.McBopomofo.Bopomofo</string>
+			<string>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</string>
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>

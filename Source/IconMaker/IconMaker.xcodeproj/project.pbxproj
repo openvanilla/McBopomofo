@@ -21,9 +21,6 @@
 /* Begin PBXFileReference section */
 		6AA67F9915FC429D00B5A308 /* IconMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AA67F9D15FC429D00B5A308 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		6AA67FA015FC429D00B5A308 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		6AA67FA115FC429D00B5A308 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		6AA67FA215FC429D00B5A308 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6AA67FBF15FC430F00B5A308 /* AppIconRendererView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppIconRendererView.h; sourceTree = "<group>"; };
 		6AA67FC015FC430F00B5A308 /* AppIconRendererView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppIconRendererView.m; sourceTree = "<group>"; };
 		6AA67FC115FC430F00B5A308 /* BopomofoIconRenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BopomofoIconRenderView.h; sourceTree = "<group>"; };
@@ -57,14 +54,10 @@
 		6AA67F8E15FC429D00B5A308 = {
 			isa = PBXGroup;
 			children = (
-				6AA67FE115FC43BC00B5A308 /* Quartz.framework */,
 				6AA67FBF15FC430F00B5A308 /* AppIconRendererView.h */,
 				6AA67FC015FC430F00B5A308 /* AppIconRendererView.m */,
 				6AA67FC115FC430F00B5A308 /* BopomofoIconRenderView.h */,
 				6AA67FC215FC430F00B5A308 /* BopomofoIconRenderView.m */,
-				6AA67FC315FC430F00B5A308 /* en.lproj */,
-				6AA67FCA15FC430F00B5A308 /* IconMaker-Info.plist */,
-				6AA67FCB15FC430F00B5A308 /* IconMaker-Prefix.pch */,
 				6AA67FCC15FC430F00B5A308 /* IconMakerAppDelegate.h */,
 				6AA67FCD15FC430F00B5A308 /* IconMakerAppDelegate.m */,
 				6AA67FCE15FC430F00B5A308 /* ImageZoomInView.h */,
@@ -72,6 +65,7 @@
 				6AA67FD015FC430F00B5A308 /* main.m */,
 				6AA67FD115FC430F00B5A308 /* TISIconRendererView.h */,
 				6AA67FD215FC430F00B5A308 /* TISIconRendererView.m */,
+				6AE210AF15FC6388003659FE /* Resources */,
 				6AA67F9C15FC429D00B5A308 /* Frameworks */,
 				6AA67F9A15FC429D00B5A308 /* Products */,
 			);
@@ -89,27 +83,19 @@
 			isa = PBXGroup;
 			children = (
 				6AA67F9D15FC429D00B5A308 /* Cocoa.framework */,
-				6AA67F9F15FC429D00B5A308 /* Other Frameworks */,
+				6AA67FE115FC43BC00B5A308 /* Quartz.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		6AA67F9F15FC429D00B5A308 /* Other Frameworks */ = {
+		6AE210AF15FC6388003659FE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6AA67FA015FC429D00B5A308 /* AppKit.framework */,
-				6AA67FA115FC429D00B5A308 /* CoreData.framework */,
-				6AA67FA215FC429D00B5A308 /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
-			sourceTree = "<group>";
-		};
-		6AA67FC315FC430F00B5A308 /* en.lproj */ = {
-			isa = PBXGroup;
-			children = (
+				6AA67FCA15FC430F00B5A308 /* IconMaker-Info.plist */,
+				6AA67FCB15FC430F00B5A308 /* IconMaker-Prefix.pch */,
 				6AA67FC815FC430F00B5A308 /* MainMenu.xib */,
 			);
-			path = en.lproj;
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -192,6 +178,7 @@
 				6AA67FC915FC430F00B5A308 /* en */,
 			);
 			name = MainMenu.xib;
+			path = en.lproj;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
