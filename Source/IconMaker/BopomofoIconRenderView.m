@@ -100,20 +100,13 @@
 
         if (!([self bounds].size.width > 16.0)) {
             [[NSColor colorWithDeviceWhite:0.6 alpha:1.0] setFill];
-            [[NSColor colorWithDeviceWhite:0.6 alpha:1.0] setStroke];
         }
-        
-        [[NSColor colorWithDeviceWhite:0.65 alpha:1.0] setFill];
-        [[NSColor colorWithDeviceWhite:0.65 alpha:1.0] setStroke];
+        else {
+            [[NSColor colorWithDeviceWhite:0.65 alpha:1.0] setFill];
+        }
+
         [backgroundPath fill];
-
-        boundsRect.size.width -= 1.0;
-        boundsRect.size.height -= 1.0;
-        boundsRect.origin.x += 0.5;
-        boundsRect.origin.y += 0.5;
-        backgroundPath = [NSBezierPath bezierPathWithRoundedRect:boundsRect xRadius:2.0 yRadius:2.0];
-        [backgroundPath stroke];
-
+        
         [attrDict setObject:[NSColor colorWithDeviceWhite:1.0 alpha:1.0] forKey:NSForegroundColorAttributeName];
         [attrString setAttributes:attrDict range:NSMakeRange(0, [text length])];
         [attrString drawAtPoint:textOrigin];
