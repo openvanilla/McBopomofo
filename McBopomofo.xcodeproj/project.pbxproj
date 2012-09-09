@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6A0361DC15FC22A800B33246 /* McBopomofo.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF509415FC10820068DE97 /* McBopomofo.icns */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
@@ -34,6 +33,8 @@
 		6A38BC1D15FC11C700A8A51F /* UpdateNotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BC1F15FC11C700A8A51F /* UpdateNotificationController.xib */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
 		6A38BC2A15FC161000A8A51F /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2915FC161000A8A51F /* Carbon.framework */; };
+		6A719D0415FC5FD200C8B8E3 /* McBopomofo.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */; };
+		6A719D0515FC5FD200C8B8E3 /* McBopomofo.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */; };
 		6AA67FEB15FC5B0D00B5A308 /* BopomofoTextMenu.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */; };
 		6AA67FEC15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */; };
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
@@ -44,7 +45,6 @@
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA41FF15FC1D9000935EF6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41F415FC1D9000935EF6 /* main.m */; };
 		6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */; };
-		6ACF509515FC10820068DE97 /* McBopomofo.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF509415FC10820068DE97 /* McBopomofo.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +185,7 @@
 		6A38BC2015FC11CE00A8A51F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6A38BC2915FC161000A8A51F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
+		6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = McBopomofo.iconset; sourceTree = "<group>"; };
 		6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = BopomofoTextMenu.tiff; sourceTree = "<group>"; };
 		6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "BopomofoTextMenu@2x.tiff"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -201,7 +202,6 @@
 		6ACA41F615FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/License.rtf"; sourceTree = "<group>"; };
 		6ACA41F715FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6ACA41F815FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
-		6ACF509415FC10820068DE97 /* McBopomofo.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = McBopomofo.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -307,7 +307,7 @@
 				6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */,
 				6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */,
 				6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */,
-				6ACF509415FC10820068DE97 /* McBopomofo.icns */,
+				6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */,
 			);
 			name = Images;
 			path = Source/Images;
@@ -561,7 +561,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A38BC1D15FC11C700A8A51F /* UpdateNotificationController.xib in Resources */,
-				6ACF509515FC10820068DE97 /* McBopomofo.icns in Resources */,
 				6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */,
 				6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */,
 				6A0D4F5215FC0EE100ABF4B3 /* MainMenu.xib in Resources */,
@@ -572,6 +571,7 @@
 				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
 				6AA67FEB15FC5B0D00B5A308 /* BopomofoTextMenu.tiff in Resources */,
 				6AA67FEC15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff in Resources */,
+				6A719D0415FC5FD200C8B8E3 /* McBopomofo.iconset in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,12 +579,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6A0361DC15FC22A800B33246 /* McBopomofo.icns in Resources */,
 				6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */,
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
 				6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */,
 				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
 				6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */,
+				6A719D0515FC5FD200C8B8E3 /* McBopomofo.iconset in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
