@@ -549,8 +549,8 @@
 			projectRoot = "";
 			targets = (
 				6A0D4EA115FC0D2D00ABF4B3 /* McBopomofo */,
-				6A38BC2115FC12FD00A8A51F /* Data */,
 				6ACA41CA15FC1D7500935EF6 /* McBopomofoInstaller */,
+				6A38BC2115FC12FD00A8A51F /* Data */,
 			);
 		};
 /* End PBXProject section */
