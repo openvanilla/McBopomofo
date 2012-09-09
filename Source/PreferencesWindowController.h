@@ -36,8 +36,10 @@
 @interface PreferencesWindowController : NSWindowController
 {
 @private
-    IBOutlet NSPopUpButton *_fontSizePopUpButton;
+    NSPopUpButton *_fontSizePopUpButton;
+    NSPopUpButton *_basisKeyboardLayoutButton;
 }
-
+- (IBAction)updateBasisKeyboardLayoutAction:(id)sender;
 @property (assign, nonatomic) IBOutlet NSPopUpButton *fontSizePopUpButton;
+@property (assign, nonatomic) IBOutlet NSPopUpButton *basisKeyboardLayoutButton;
 @end

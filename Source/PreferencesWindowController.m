@@ -32,26 +32,70 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 #import "PreferencesWindowController.h"
+#import <Carbon/Carbon.h>
+
+static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
 
 @implementation PreferencesWindowController
 @synthesize fontSizePopUpButton = _fontSizePopUpButton;
+@synthesize basisKeyboardLayoutButton = _basisKeyboardLayoutButton;
 
 - (void)awakeFromNib
 {
-    // this is a way to find if we're on OS X 10.7
-//    if (![[NSApplication sharedApplication] respondsToSelector:@selector(disableRelaunchOnLogin)]) {
-//        return;
-//    }
+    CFArrayRef list = TISCreateInputSourceList(NULL, true);
+    NSMenuItem *usKeyboardLayoutItem = nil;
+    NSMenuItem *chosenItem = nil;
 
-//    NSMenu *menu = [_fontSizePopUpButton menu];
-//    NSArray *menuItems = [menu itemArray];
-//
-//    for (NSMenuItem *item in menuItems) {
-//        NSUInteger tag = [item tag];
-//
-//        if (tag != 14 && tag != 24) {
-//            [menu removeItem:item];
-//        }
-//    }
+    [[self.basisKeyboardLayoutButton menu] removeAllItems];
+
+    NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+
+    for (int i = 0; i < CFArrayGetCount(list); i++) {
+        TISInputSourceRef source = (TISInputSourceRef)CFArrayGetValueAtIndex(list, i);
+
+        CFStringRef category = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory);
+        if (CFStringCompare(category, kTISCategoryKeyboardInputSource, 0) != kCFCompareEqualTo) {
+            continue;
+        }
+
+        CFBooleanRef asciiCapable = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsASCIICapable);
+        if (!CFBooleanGetValue(asciiCapable)) {
+            continue;
+        }
+
+        CFStringRef sourceType = TISGetInputSourceProperty(source, kTISPropertyInputSourceType);
+        if (CFStringCompare(sourceType, kTISTypeKeyboardLayout, 0) != kCFCompareEqualTo) {
+            continue;
+        }
+
+        NSString *sourceID = (NSString *)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+        NSString *localizedName = (NSString *)TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
+
+        NSMenuItem *item = [[[NSMenuItem alloc] init] autorelease];
+        [item setTitle:localizedName];
+        [item setRepresentedObject:sourceID];
+
+        if ([sourceID isEqualToString:@"com.apple.keylayout.US"]) {
+            usKeyboardLayoutItem = item;
+        }
+
+        // false if nil
+        if ([basisKeyboardLayoutID isEqualToString:sourceID]) {
+            chosenItem = item;
+        }
+
+        [[self.basisKeyboardLayoutButton menu] addItem:item];
+    }
+
+    [self.basisKeyboardLayoutButton selectItem:(chosenItem ? chosenItem : usKeyboardLayoutItem)];
+    CFRelease(list);
+}
+
+- (IBAction)updateBasisKeyboardLayoutAction:(id)sender
+{
+    NSString *sourceID = [[self.basisKeyboardLayoutButton selectedItem] representedObject];
+    if (sourceID) {
+        [[NSUserDefaults standardUserDefaults] setObject:sourceID forKey:kBasisKeyboardLayoutPreferenceKey];
+    }
 }
 @end

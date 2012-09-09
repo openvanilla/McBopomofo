@@ -34,6 +34,7 @@
 
 #import "AppDelegate.h"
 #import "UpdateNotificationController.h"
+#import "PreferencesWindowController.h"
 
 void LTLoadLanguageModel();
 
@@ -58,6 +59,11 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
     LTLoadLanguageModel();
 
     [self checkForUpdate];
+
+    if (0) {
+        PreferencesWindowController *controller = [[PreferencesWindowController alloc] initWithWindowNibName:@"preferences"];
+        [[controller window] orderFront:nil];
+    }
 }
 
 - (void)checkForUpdate
