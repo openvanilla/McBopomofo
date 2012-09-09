@@ -50,7 +50,7 @@ using namespace Formosa::Gramambular;
 using namespace OpenVanilla;
 
 // default, min and max candidate list text size
-static const NSInteger kDefaultCandidateListTextSize = 14;
+static const NSInteger kDefaultCandidateListTextSize = 16;
 static const NSInteger kMinKeyLabelSize = 10;
 static const NSInteger kMinCandidateListTextSize = 12;
 static const NSInteger kMaxCandidateListTextSize = 128;
@@ -67,6 +67,7 @@ static const NSInteger kMaxComposingBufferSize = 20;
 // user defaults (app perferences) key names; in this project we use
 // NSUserDefaults throughout and do not wrap them in another config object
 static NSString *const kKeyboardLayoutPreferenceKey = @"KeyboardLayout";
+static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
 static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
 static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
@@ -313,7 +314,12 @@ public:
         _inputMode = kBopomofoModeIdentifier;
     }
 
-    [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+    NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+    if (!basisKeyboardLayoutID) {
+        basisKeyboardLayoutID = @"com.apple.keylayout.US";
+    }
+
+    [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
 
     if (!_bpmfReadingBuffer->isEmpty()) {
         _bpmfReadingBuffer->clear();
