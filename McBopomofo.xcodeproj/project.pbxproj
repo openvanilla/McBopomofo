@@ -34,6 +34,8 @@
 		6A38BC1D15FC11C700A8A51F /* UpdateNotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BC1F15FC11C700A8A51F /* UpdateNotificationController.xib */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
 		6A38BC2A15FC161000A8A51F /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2915FC161000A8A51F /* Carbon.framework */; };
+		6AA67FEB15FC5B0D00B5A308 /* BopomofoTextMenu.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */; };
+		6AA67FEC15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */; };
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41E915FC1D9000935EF6 /* AppDelegate.m */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
@@ -69,7 +71,6 @@
 		6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/AppDelegate.h; sourceTree = "<group>"; };
 		6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/AppDelegate.m; sourceTree = "<group>"; };
-		6A0D4EC515FC0D6400ABF4B3 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = Source/Credits.rtf; sourceTree = "<group>"; };
 		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputMethodController.h; path = Source/InputMethodController.h; sourceTree = "<group>"; };
 		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = InputMethodController.mm; path = Source/InputMethodController.mm; sourceTree = "<group>"; };
 		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Source/main.m; sourceTree = "<group>"; };
@@ -184,6 +185,8 @@
 		6A38BC2015FC11CE00A8A51F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6A38BC2915FC161000A8A51F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
+		6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = BopomofoTextMenu.tiff; sourceTree = "<group>"; };
+		6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "BopomofoTextMenu@2x.tiff"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -300,9 +303,11 @@
 		6A0D4EEE15FC0DA600ABF4B3 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				6ACF509415FC10820068DE97 /* McBopomofo.icns */,
 				6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */,
 				6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */,
+				6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */,
+				6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */,
+				6ACF509415FC10820068DE97 /* McBopomofo.icns */,
 			);
 			name = Images;
 			path = Source/Images;
@@ -391,7 +396,6 @@
 			isa = PBXGroup;
 			children = (
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
-				6A0D4EC515FC0D6400ABF4B3 /* Credits.rtf */,
 				6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */,
 				6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */,
 				6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */,
@@ -566,6 +570,8 @@
 				6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */,
 				6A0D4F5915FC0EF900ABF4B3 /* MainMenu.xib in Resources */,
 				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
+				6AA67FEB15FC5B0D00B5A308 /* BopomofoTextMenu.tiff in Resources */,
+				6AA67FEC15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
