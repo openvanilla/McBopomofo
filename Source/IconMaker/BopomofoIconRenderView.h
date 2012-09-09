@@ -9,5 +9,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface BopomofoIconRenderView : NSView
-
+@property (assign, nonatomic) BOOL textMenuIcon;
+@property (assign, nonatomic) BOOL plainBopomofoIcon;
 @end
