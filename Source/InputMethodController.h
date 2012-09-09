@@ -61,6 +61,9 @@
     
     // currently available candidates
     NSMutableArray *_candidates;
+
+    // current input mode
+    NSString *_inputMode;
 }
 @end
 

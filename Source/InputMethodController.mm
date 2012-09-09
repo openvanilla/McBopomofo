@@ -79,6 +79,10 @@ static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
 static NSString *const kCandidateKeyLabelFontName = @"CandidateKeyLabelFontName";
 static NSString *const kCandidateKeys = @"CandidateKeys";
 
+// input modes
+static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
+static NSString *const kPlainBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
+
 // key code enums
 enum {
     kUpKeyCode = 126,
@@ -179,6 +183,8 @@ public:
         if (![[NSUserDefaults standardUserDefaults] objectForKey:kDisableUserCandidateSelectionLearning]) {
             [[NSUserDefaults standardUserDefaults] setObject:(id)kCFBooleanTrue forKey:kDisableUserCandidateSelectionLearning];
         }
+
+        _inputMode = kBopomofoModeIdentifier;
     }
 
     return self;
@@ -262,9 +268,6 @@ public:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:kKeyboardLayoutPreferenceKey];
     }
-    if (keyboardLayout < 4) {
-        [client overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-    }
 
     // set the size
     NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
@@ -299,6 +302,27 @@ public:
     gCurrentCandidateController.delegate = nil;
     gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
+}
+
+- (void)setValue:(id)value forTag:(long)tag client:(id)sender
+{
+    if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
+        _inputMode = kPlainBopomofoModeIdentifier;
+    }
+    else {
+        _inputMode = kBopomofoModeIdentifier;
+    }
+
+    [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        _bpmfReadingBuffer->clear();
+        [self updateClientComposingBuffer:sender];
+    }
+
+    if ([_composingBuffer length] > 0) {
+        [self commitComposition:sender];
+    }
 }
 
 #pragma mark - IMKServerInput protocol methods
@@ -462,9 +486,25 @@ public:
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
 {
+    if (_inputMode == kPlainBopomofoModeIdentifier) {
+        if (charCode == '<') {
+            keyCode = kPageUpKeyCode;
+        }
+        else if (charCode == '>') {
+            keyCode = kPageDownKeyCode;
+        }
+    }
+
     if (charCode == 27) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
+
+        if (_inputMode == kPlainBopomofoModeIdentifier) {
+            _builder->clear();
+            _walkedNodes.clear();
+            [_composingBuffer setString:@""];
+        }
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (charCode == 13 || keyCode == 127) {
@@ -564,8 +604,7 @@ public:
         
         return YES;            
     }
-    else {
-        
+    else {        
         NSInteger index = NSNotFound;
         for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
             if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
@@ -580,6 +619,16 @@ public:
             if (candidateIndex != NSUIntegerMax) {
                 [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
                 return YES;
+            }
+        }
+
+        if (_inputMode == kPlainBopomofoModeIdentifier) {
+            if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
+                NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
+                if (candidateIndex != NSUIntegerMax) {
+                    [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
+                    return [self inputText:inputText key:keyCode modifiers:0 client:_currentCandidateClient];
+                }
             }
         }
         
@@ -715,6 +764,10 @@ public:
         // then update the text
         _bpmfReadingBuffer->clear();
         [self updateClientComposingBuffer:client];
+
+        if (_inputMode == kPlainBopomofoModeIdentifier) {
+            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        }
 
         // and tells the client that the key is consumed
         return YES;
@@ -895,6 +948,11 @@ public:
             [self beep];
         }
         [self updateClientComposingBuffer:client];
+
+        if (_inputMode == kPlainBopomofoModeIdentifier) {
+            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        }
+
         return YES;
     }
 
@@ -909,6 +967,17 @@ public:
             [self beep];
         }
         [self updateClientComposingBuffer:client];
+
+        if (_inputMode == kPlainBopomofoModeIdentifier) {
+            [self collectCandidates];
+            if ([_candidates count] == 1) {
+                [self commitComposition:client];
+            }
+            else {
+                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+            }
+        }
+
         return YES;
     }
 
@@ -1104,6 +1173,11 @@ public:
     
     gCurrentCandidateController.keyLabels = keyLabels;
     [self collectCandidates];
+
+    if (_inputMode == kPlainBopomofoModeIdentifier && [_candidates count] == 1) {
+        [self commitComposition:client];
+        return;
+    }
     
     gCurrentCandidateController.delegate = self;
     [gCurrentCandidateController reloadData];
@@ -1213,6 +1287,11 @@ public:
     
     [self walk];
     [self updateClientComposingBuffer:_currentCandidateClient];
+
+    if (_inputMode == kPlainBopomofoModeIdentifier) {
+        [self commitComposition:_currentCandidateClient];
+        return;
+    }
 }
 
 @end
