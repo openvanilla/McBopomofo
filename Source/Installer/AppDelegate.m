@@ -103,6 +103,12 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
         [NSApp terminate:self];        
     }
 
+    // alno need to restart SystemUIServer to reflect icon changes if the replaced version <= 0.9.4
+    if (_currentVersion && [_currentVersion compare:@"0.9.4"] != NSOrderedDescending) {
+        NSTask *restartSystemUIServerTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/killall" arguments:[NSArray arrayWithObjects: @"-9", @"SystemUIServer", nil]];
+        [restartSystemUIServerTask waitUntilExit];
+    }
+
     NSRunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
     [NSApp terminate:self];
 }
