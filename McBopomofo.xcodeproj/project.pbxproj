@@ -187,6 +187,7 @@
 		6A38BC2015FC11CE00A8A51F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6A38BC2915FC161000A8A51F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
+		6A62F73615FD1DE400B95579 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = McBopomofo.iconset; sourceTree = "<group>"; };
 		6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = BopomofoTextMenu.tiff; sourceTree = "<group>"; };
 		6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "BopomofoTextMenu@2x.tiff"; sourceTree = "<group>"; };
@@ -601,7 +602,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		6AE306DD15FC18BB00C264C8 /* Run Script (Install Input Method When Under Debug Configuration) */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -684,6 +685,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				6A0D4F4D15FC0EE100ABF4B3 /* en */,
+				6A62F73615FD1DE400B95579 /* zh-Hant */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
