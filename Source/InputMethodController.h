@@ -37,7 +37,7 @@
 #import "Mandarin.h"
 #import "Gramambular.h"
 
-@interface LettuceInputMethodController : IMKInputController
+@interface McBopomofoInputMethodController : IMKInputController
 {
 @private    
     // the reading buffer that takes user input

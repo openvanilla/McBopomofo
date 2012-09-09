@@ -35,9 +35,6 @@
 #import "IconMakerAppDelegate.h"
 
 @implementation IconMakerAppDelegate
-@synthesize selectedTISIconRendererView;
-@synthesize faviconRenderView;
-@synthesize window;
 
 - (void)makeIconForObject:(id)object size:(NSSize)size filename:(NSString *)name
 {
@@ -48,6 +45,7 @@
     NSView *view = nil;
     if ([object isKindOfClass:[NSView class]]) {
         view = object;
+        [view setFrame:NSMakeRect(0.0, 0.0, size.width, size.height)];
     }
     else if ([object isKindOfClass:[NSString class]]) {
         view = [[[NSClassFromString(object) alloc] initWithFrame:rect] autorelease];
@@ -64,27 +62,50 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
-    selectedTISIconRendererView.selected = YES;
-    [selectedTISIconRendererView setNeedsDisplay:YES];
+    self.selectedTISIconRendererView.selected = YES;
+    [self.selectedTISIconRendererView setNeedsDisplay:YES];
 
-    faviconRenderView.favicon = YES;
-    faviconRenderView.selected = YES;
-    [faviconRenderView setNeedsDisplay:YES];
-    
-    [self makeIconForObject:@"TISIconRendererView" size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo.tiff"];
-    [self makeIconForObject:selectedTISIconRendererView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoSelected.tiff"];
-    [self makeIconForObject:faviconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoFavicon.tiff"];
+    self.faviconRenderView.favicon = YES;
+    self.faviconRenderView.selected = YES;
+    NSRect oldFrame = [self.faviconRenderView frame];
+    [self makeIconForObject:self.faviconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoFavicon.tiff"];
+    [self.faviconRenderView setFrame:oldFrame];
+    [self.faviconRenderView setNeedsDisplay:YES];
 
-    
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo-32.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(57, 57) filename:@"/tmp/Bopomofo-57.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(64, 64) filename:@"/tmp/Bopomofo-64.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(72, 72) filename:@"/tmp/Bopomofo-72.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(128, 128) filename:@"/tmp/Bopomofo-128.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(144, 144) filename:@"/tmp/Bopomofo-144.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/Bopomofo-256.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/Bopomofo-512.tiff"];    
-    
+    self.bopomofoIconRenderView.textMenuIcon = NO;
+    self.bopomofoIconRenderView.plainBopomofoIcon = NO;
+    self.bopomofoIconRenderView2x.textMenuIcon = NO;
+    self.bopomofoIconRenderView2x.plainBopomofoIcon = NO;
+    [self.bopomofoIconRenderView setNeedsDisplay:YES];
+    [self.bopomofoIconRenderView2x setNeedsDisplay:YES];
+
+    BopomofoIconRenderView *iconRenderView = [[[BopomofoIconRenderView alloc] init] autorelease];
+    iconRenderView.textMenuIcon = NO;
+    iconRenderView.plainBopomofoIcon = NO;
+    [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo@2x.tiff"];
+
+    iconRenderView.textMenuIcon = NO;
+    iconRenderView.plainBopomofoIcon = YES;
+    [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/PlainBopomofo.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/PlainBopomofo@2x.tiff"];
+
+    iconRenderView.plainBopomofoIcon = NO;
+    iconRenderView.textMenuIcon = YES;
+    [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoTextMenu.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/BopomofoTextMenu@2x.tiff"];
+     
+    [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo_16x16.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo_16x16@2x.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo_32x32.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(64, 64) filename:@"/tmp/Bopomofo_32x32@2x.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(128, 128) filename:@"/tmp/Bopomofo_128x128.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/Bopomofo_128x128@2x.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/Bopomofo_256x256.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/Bopomofo_256x256@2x.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/Bopomofo_512x512.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(1024, 1024) filename:@"/tmp/Bopomofo_512x512@2x.tiff"];
+
     NSRunAlertPanel(@"Icons Generated", @"TIFF files are placed in /tmp", @"Dismiss", nil, nil);    
 }
 
