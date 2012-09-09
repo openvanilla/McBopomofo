@@ -1,4 +1,5 @@
 /* Localized versions of Info.plist keys */
 
 CFBundleName = "安裝小麥注音";
-NSHumanReadableCopyright = "Copyright © 2011-2012 The OpenVanilla Project.\nAll rights reserved.";
+NSHumanReadableCopyright = "Copyright © 2011-2012 Mengjuei Hsieh et al.\nAll Rights Reserved.";
+
