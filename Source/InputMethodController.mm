@@ -99,14 +99,14 @@ VTCandidateController *gCurrentCandidateController = nil;
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
 // specified path everytime the grid is walked
 #if DEBUG
-static NSString *const kGraphVizOutputfile = @"/tmp/lettuce-visualization.dot";
+static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot";
 #endif
 
 // shared language model object that stores our phrase-term probability database
 SimpleLM gLanguageModel;
 
 // private methods
-@interface LettuceInputMethodController () <VTCandidateControllerDelegate>
+@interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
 + (VTHorizontalCandidateController *)horizontalCandidateController;
 + (VTVerticalCandidateController *)verticalCandidateController;
 
@@ -132,7 +132,7 @@ public:
     }
 };
 
-@implementation LettuceInputMethodController
+@implementation McBopomofoInputMethodController
 - (void)dealloc
 {
     // clean up everything
@@ -1069,13 +1069,13 @@ public:
     BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
 
     if (useVerticalMode) {
-        gCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
+        gCurrentCandidateController = [McBopomofoInputMethodController verticalCandidateController];
     }
     else if (useHorizontalCandidateList) {
-        gCurrentCandidateController = [LettuceInputMethodController horizontalCandidateController];
+        gCurrentCandidateController = [McBopomofoInputMethodController horizontalCandidateController];
     }
     else {
-        gCurrentCandidateController = [LettuceInputMethodController verticalCandidateController];
+        gCurrentCandidateController = [McBopomofoInputMethodController verticalCandidateController];
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -1225,7 +1225,7 @@ void LTLoadLanguageModel()
 
     NSDate *__unused startTime = [NSDate date];
 
-    NSString *dataPath = [[NSBundle bundleForClass:[LettuceInputMethodController class]] pathForResource:@"data" ofType:@"txt"];
+    NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:@"data" ofType:@"txt"];
 
     ifstream ifs;
     ifs.open([dataPath UTF8String]);

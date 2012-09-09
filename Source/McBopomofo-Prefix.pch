@@ -1,5 +1,5 @@
 //
-// Prefix header for all source files of the 'Lettuce' target in the 'Lettuce' project
+// Prefix header for all source files of the 'McBopomofo' target in the 'McBopomofo' project
 //
 
 #ifdef __OBJC__
