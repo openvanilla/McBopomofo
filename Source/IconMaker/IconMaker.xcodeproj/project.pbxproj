@@ -1,0 +1,295 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6AA67F9E15FC429D00B5A308 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AA67F9D15FC429D00B5A308 /* Cocoa.framework */; };
+		6AA67FD315FC430F00B5A308 /* AppIconRendererView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA67FC015FC430F00B5A308 /* AppIconRendererView.m */; };
+		6AA67FD415FC430F00B5A308 /* BopomofoIconRenderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA67FC215FC430F00B5A308 /* BopomofoIconRenderView.m */; };
+		6AA67FD715FC430F00B5A308 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AA67FC815FC430F00B5A308 /* MainMenu.xib */; };
+		6AA67FD915FC430F00B5A308 /* IconMakerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA67FCD15FC430F00B5A308 /* IconMakerAppDelegate.m */; };
+		6AA67FDA15FC430F00B5A308 /* ImageZoomInView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA67FCF15FC430F00B5A308 /* ImageZoomInView.m */; };
+		6AA67FDB15FC430F00B5A308 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA67FD015FC430F00B5A308 /* main.m */; };
+		6AA67FDC15FC430F00B5A308 /* TISIconRendererView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AA67FD215FC430F00B5A308 /* TISIconRendererView.m */; };
+		6AA67FE215FC43BC00B5A308 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AA67FE115FC43BC00B5A308 /* Quartz.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6AA67F9915FC429D00B5A308 /* IconMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AA67F9D15FC429D00B5A308 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		6AA67FA015FC429D00B5A308 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		6AA67FA115FC429D00B5A308 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		6AA67FA215FC429D00B5A308 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		6AA67FBF15FC430F00B5A308 /* AppIconRendererView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppIconRendererView.h; sourceTree = "<group>"; };
+		6AA67FC015FC430F00B5A308 /* AppIconRendererView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppIconRendererView.m; sourceTree = "<group>"; };
+		6AA67FC115FC430F00B5A308 /* BopomofoIconRenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BopomofoIconRenderView.h; sourceTree = "<group>"; };
+		6AA67FC215FC430F00B5A308 /* BopomofoIconRenderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BopomofoIconRenderView.m; sourceTree = "<group>"; };
+		6AA67FC915FC430F00B5A308 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = MainMenu.xib; sourceTree = "<group>"; };
+		6AA67FCA15FC430F00B5A308 /* IconMaker-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IconMaker-Info.plist"; sourceTree = "<group>"; };
+		6AA67FCB15FC430F00B5A308 /* IconMaker-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IconMaker-Prefix.pch"; sourceTree = "<group>"; };
+		6AA67FCC15FC430F00B5A308 /* IconMakerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IconMakerAppDelegate.h; sourceTree = "<group>"; };
+		6AA67FCD15FC430F00B5A308 /* IconMakerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IconMakerAppDelegate.m; sourceTree = "<group>"; };
+		6AA67FCE15FC430F00B5A308 /* ImageZoomInView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageZoomInView.h; sourceTree = "<group>"; };
+		6AA67FCF15FC430F00B5A308 /* ImageZoomInView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageZoomInView.m; sourceTree = "<group>"; };
+		6AA67FD015FC430F00B5A308 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6AA67FD115FC430F00B5A308 /* TISIconRendererView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TISIconRendererView.h; sourceTree = "<group>"; };
+		6AA67FD215FC430F00B5A308 /* TISIconRendererView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TISIconRendererView.m; sourceTree = "<group>"; };
+		6AA67FE115FC43BC00B5A308 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6AA67F9615FC429D00B5A308 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AA67FE215FC43BC00B5A308 /* Quartz.framework in Frameworks */,
+				6AA67F9E15FC429D00B5A308 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6AA67F8E15FC429D00B5A308 = {
+			isa = PBXGroup;
+			children = (
+				6AA67FE115FC43BC00B5A308 /* Quartz.framework */,
+				6AA67FBF15FC430F00B5A308 /* AppIconRendererView.h */,
+				6AA67FC015FC430F00B5A308 /* AppIconRendererView.m */,
+				6AA67FC115FC430F00B5A308 /* BopomofoIconRenderView.h */,
+				6AA67FC215FC430F00B5A308 /* BopomofoIconRenderView.m */,
+				6AA67FC315FC430F00B5A308 /* en.lproj */,
+				6AA67FCA15FC430F00B5A308 /* IconMaker-Info.plist */,
+				6AA67FCB15FC430F00B5A308 /* IconMaker-Prefix.pch */,
+				6AA67FCC15FC430F00B5A308 /* IconMakerAppDelegate.h */,
+				6AA67FCD15FC430F00B5A308 /* IconMakerAppDelegate.m */,
+				6AA67FCE15FC430F00B5A308 /* ImageZoomInView.h */,
+				6AA67FCF15FC430F00B5A308 /* ImageZoomInView.m */,
+				6AA67FD015FC430F00B5A308 /* main.m */,
+				6AA67FD115FC430F00B5A308 /* TISIconRendererView.h */,
+				6AA67FD215FC430F00B5A308 /* TISIconRendererView.m */,
+				6AA67F9C15FC429D00B5A308 /* Frameworks */,
+				6AA67F9A15FC429D00B5A308 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6AA67F9A15FC429D00B5A308 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6AA67F9915FC429D00B5A308 /* IconMaker.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6AA67F9C15FC429D00B5A308 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6AA67F9D15FC429D00B5A308 /* Cocoa.framework */,
+				6AA67F9F15FC429D00B5A308 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6AA67F9F15FC429D00B5A308 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6AA67FA015FC429D00B5A308 /* AppKit.framework */,
+				6AA67FA115FC429D00B5A308 /* CoreData.framework */,
+				6AA67FA215FC429D00B5A308 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		6AA67FC315FC430F00B5A308 /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				6AA67FC815FC430F00B5A308 /* MainMenu.xib */,
+			);
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6AA67F9815FC429D00B5A308 /* IconMaker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6AA67FB715FC429D00B5A308 /* Build configuration list for PBXNativeTarget "IconMaker" */;
+			buildPhases = (
+				6AA67F9515FC429D00B5A308 /* Sources */,
+				6AA67F9615FC429D00B5A308 /* Frameworks */,
+				6AA67F9715FC429D00B5A308 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IconMaker;
+			productName = IconMaker;
+			productReference = 6AA67F9915FC429D00B5A308 /* IconMaker.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6AA67F9015FC429D00B5A308 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = OpenVanilla;
+			};
+			buildConfigurationList = 6AA67F9315FC429D00B5A308 /* Build configuration list for PBXProject "IconMaker" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 6AA67F8E15FC429D00B5A308;
+			productRefGroup = 6AA67F9A15FC429D00B5A308 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6AA67F9815FC429D00B5A308 /* IconMaker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6AA67F9715FC429D00B5A308 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AA67FD715FC430F00B5A308 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6AA67F9515FC429D00B5A308 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AA67FD315FC430F00B5A308 /* AppIconRendererView.m in Sources */,
+				6AA67FD415FC430F00B5A308 /* BopomofoIconRenderView.m in Sources */,
+				6AA67FD915FC430F00B5A308 /* IconMakerAppDelegate.m in Sources */,
+				6AA67FDA15FC430F00B5A308 /* ImageZoomInView.m in Sources */,
+				6AA67FDB15FC430F00B5A308 /* main.m in Sources */,
+				6AA67FDC15FC430F00B5A308 /* TISIconRendererView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		6AA67FC815FC430F00B5A308 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6AA67FC915FC430F00B5A308 /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6AA67FB515FC429D00B5A308 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6AA67FB615FC429D00B5A308 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6AA67FB815FC429D00B5A308 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IconMaker-Prefix.pch";
+				INFOPLIST_FILE = "IconMaker-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		6AA67FB915FC429D00B5A308 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IconMaker-Prefix.pch";
+				INFOPLIST_FILE = "IconMaker-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6AA67F9315FC429D00B5A308 /* Build configuration list for PBXProject "IconMaker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AA67FB515FC429D00B5A308 /* Debug */,
+				6AA67FB615FC429D00B5A308 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6AA67FB715FC429D00B5A308 /* Build configuration list for PBXNativeTarget "IconMaker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AA67FB815FC429D00B5A308 /* Debug */,
+				6AA67FB915FC429D00B5A308 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6AA67F9015FC429D00B5A308 /* Project object */;
+}

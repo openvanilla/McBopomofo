@@ -97,7 +97,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-
     NSString *mainNibName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSMainNibFile"];
     if (!mainNibName) {
         NSLog(@"Fatal error: NSMainNibFile key not defined in Info.plist.");

@@ -4,12 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>LSHasLocalizedDisplayName</key>
-	<true/>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>Lettuce</string>
+	<string>McBopomofo.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -19,15 +17,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.4</string>
-	<key>CFBundleVersion</key>
-	<string>363</string>
+	<string>0.9.4.1</string>
 	<key>CFBundleSignature</key>
-	<string>????</string>
+	<string>MBIN</string>
+	<key>CFBundleVersion</key>
+	<string>371</string>
+	<key>LSHasLocalizedDisplayName</key>
+	<true/>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2011-2012 The OpenVanilla Project. All rights reserved.</string>
+	<string>Copyright © 2011-2012 Mengjuei Hsieh et al.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

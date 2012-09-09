@@ -34,13 +34,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "TISIconRendererView.h"
+#import "BopomofoIconRenderView.h"
 
-@interface IconMakerAppDelegate : NSObject <NSApplicationDelegate> {
-@private
-    NSWindow *window;
-}
-
+@interface IconMakerAppDelegate : NSObject <NSApplicationDelegate>
 @property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet TISIconRendererView *selectedTISIconRendererView;
 @property (assign) IBOutlet TISIconRendererView *faviconRenderView;
+@property (assign) IBOutlet BopomofoIconRenderView *bopomofoIconRenderView;
+@property (assign) IBOutlet BopomofoIconRenderView *bopomofoIconRenderView2x;
 @end
