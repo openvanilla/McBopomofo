@@ -1043,7 +1043,7 @@ public:
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
     
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
-    sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
+    stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
     
     // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
     for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
