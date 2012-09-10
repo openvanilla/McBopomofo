@@ -45,6 +45,7 @@
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA41FF15FC1D9000935EF6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41F415FC1D9000935EF6 /* main.m */; };
 		6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */; };
+		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
 		6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */; };
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
 /* End PBXBuildFile section */
@@ -205,6 +206,7 @@
 		6ACA41F615FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/License.rtf"; sourceTree = "<group>"; };
 		6ACA41F715FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6ACA41F815FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
+		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlainBopomofo.tiff; sourceTree = "<group>"; };
 		6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "PlainBopomofo@2x.tiff"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -425,6 +427,7 @@
 				6A38BBF415FC117A00A8A51F /* BPMFMappings.txt */,
 				6A38BBF515FC117A00A8A51F /* BPMFPunctuations.txt */,
 				6A38BBF615FC117A00A8A51F /* data.txt */,
+				6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */,
 				6A38BBF715FC117A00A8A51F /* heterophony1.list */,
 				6A38BBF815FC117A00A8A51F /* heterophony2.list */,
 				6A38BBF915FC117A00A8A51F /* heterophony3.list */,
@@ -581,6 +584,7 @@
 				6A719D0415FC5FD200C8B8E3 /* McBopomofo.iconset in Resources */,
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
+				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

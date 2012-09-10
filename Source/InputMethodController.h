@@ -36,13 +36,17 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "Mandarin.h"
 #import "Gramambular.h"
+#import "SimpleLM.h"
 
 @interface McBopomofoInputMethodController : IMKInputController
 {
-@private    
+@private
     // the reading buffer that takes user input
     Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
 
+    // language model
+    Formosa::Gramambular::SimpleLM *_languageModel;
+    
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;
 
