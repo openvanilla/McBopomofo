@@ -90,7 +90,7 @@ namespace Formosa {
             , m_selectedUnigramIndex(0)
             , m_score(0.0)
         {
-            sort(m_unigrams.begin(), m_unigrams.end(), Unigram::ScoreCompare);
+            stable_sort(m_unigrams.begin(), m_unigrams.end(), Unigram::ScoreCompare);
             
             if (m_unigrams.size()) {
                 m_score = m_unigrams[0].score;
