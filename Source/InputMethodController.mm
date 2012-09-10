@@ -36,7 +36,6 @@
 #import <fstream>
 #import <iostream>
 #import <set>
-#import "SimpleLM.h"
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
@@ -109,6 +108,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 // shared language model object that stores our phrase-term probability database
 SimpleLM gLanguageModel;
+SimpleLM gLanguageModelPlainBopomofo;
 
 // private methods
 @interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
@@ -172,7 +172,8 @@ public:
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _builder = new BlockReadingBuilder(&gLanguageModel);
+        _languageModel = &gLanguageModel;
+        _builder = new BlockReadingBuilder(_languageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -309,9 +310,11 @@ public:
 {
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
         _inputMode = kPlainBopomofoModeIdentifier;
+        _languageModel = &gLanguageModelPlainBopomofo;
     }
     else {
         _inputMode = kBopomofoModeIdentifier;
+        _languageModel = &gLanguageModel;
     }
 
     NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
@@ -328,6 +331,12 @@ public:
 
     if ([_composingBuffer length] > 0) {
         [self commitComposition:sender];
+    }
+    
+    if (_builder) {
+        delete _builder;
+        _builder = new BlockReadingBuilder(_languageModel);
+        _builder->setJoinSeparator("-");        
     }
 }
 
@@ -744,7 +753,7 @@ public:
         string reading = _bpmfReadingBuffer->syllable().composedString();
 
         // see if we have a unigram for this
-        if (!gLanguageModel.hasUnigramsForKey(reading)) {
+        if (!_languageModel->hasUnigramsForKey(reading)) {
             [self beep];
             [self updateClientComposingBuffer:client];
             return YES;
@@ -789,7 +798,7 @@ public:
                     [self commitComposition:client];
                     _bpmfReadingBuffer->clear();
                 }
-                else if (gLanguageModel.hasUnigramsForKey(" ")) {
+                else if (_languageModel->hasUnigramsForKey(" ")) {
                     _builder->insertReadingAtCursor(" ");
                     [self popOverflowComposingTextAndWalk:client];
                     [self updateClientComposingBuffer:client];
@@ -908,7 +917,7 @@ public:
 
     // punctuation list
     if ((char)charCode == '`') {
-        if (gLanguageModel.hasUnigramsForKey(string("_punctuation_list"))) {
+        if (_languageModel->hasUnigramsForKey(string("_punctuation_list"))) {
             if (_bpmfReadingBuffer->isEmpty()) {
                 _builder->insertReadingAtCursor(string("_punctuation_list"));
                 [self popOverflowComposingTextAndWalk:client];
@@ -945,7 +954,7 @@ public:
     }
 
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
-    if (gLanguageModel.hasUnigramsForKey(customPunctuation)) {
+    if (_languageModel->hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
             _builder->insertReadingAtCursor(customPunctuation);
             [self popOverflowComposingTextAndWalk:client];
@@ -964,7 +973,7 @@ public:
 
     // if nothing is matched, see if it's a punctuation key
     string punctuation = string("_punctuation_") + string(1, (char)charCode);
-    if (gLanguageModel.hasUnigramsForKey(punctuation)) {
+    if (_languageModel->hasUnigramsForKey(punctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
             _builder->insertReadingAtCursor(punctuation);
             [self popOverflowComposingTextAndWalk:client];
@@ -1302,34 +1311,42 @@ public:
 
 @end
 
-
-void LTLoadLanguageModel()
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, SimpleLM &lm)
 {
     // load the language model; the performance of this function can be greatly improved
     // with better loading/parsing methods
-
     NSDate *__unused startTime = [NSDate date];
-
-    NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:@"data" ofType:@"txt"];
-
+    
+    NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
+    
     ifstream ifs;
     ifs.open([dataPath UTF8String]);
     while (ifs.good()) {
         string line;
         getline(ifs, line);
-
+        
         if (!line.size() || (line.size() && line[0] == '#')) {
             continue;
         }
-
+        
         vector<string> p = OVStringHelper::SplitBySpacesOrTabs(line);
-
+        
         if (p.size() == 3) {
-            gLanguageModel.add(p[1], p[0], atof(p[2].c_str()));
+            lm.add(p[1], p[0], atof(p[2].c_str()));
         }
     }
     ifs.close();
-    gLanguageModel.add(" ", " ", 0.0);
+    
+    // insert an empty entry for BOS/EOS markers
+    lm.add(" ", " ", 0.0);
+}
+
+
+void LTLoadLanguageModel()
+{
+    LTLoadLanguageModelFile(@"data", gLanguageModel);
+    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    
 
     // initialize the singleton learning dictionary
     // putting singleton in @synchronized is the standard way in Objective-C
@@ -1344,7 +1361,6 @@ void LTLoadLanguageModel()
     }
 
     NSString *appSupportPath = [paths objectAtIndex:0];
-
     NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
 
     BOOL isDir = NO;
