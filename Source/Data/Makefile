@@ -3,6 +3,11 @@ DATPATH=Contents/Resources/data.txt
 EXEPATH=Contents/MacOS/McBopomofo
 EXENAME=McBopomofo
 
+all: data.txt data-plain-bpmf.txt
+
+data-plain-bpmf.txt: bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt
+	bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
+
 data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt PhraseFreq.txt \
           heterophony1.list heterophony2.list phrase.occ
 	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt $@
@@ -53,4 +58,4 @@ tidy:
 	@sed -i '' -e 's/1/˙/g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g' BPMFMappings.txt
 
 clean:
-	rm -f data.txt
+	rm -f data.txt data-plain-bpmf.txt
