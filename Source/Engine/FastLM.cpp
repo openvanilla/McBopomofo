@@ -71,7 +71,7 @@ bool FastLM::open(const char *path)
 		return false;
 	}
 
-    // we have 5 states
+    // we have 4 states, plus end and error
     // 0
     //  end -> end
     //  lf -> forward, go to 0
