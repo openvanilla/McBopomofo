@@ -964,8 +964,14 @@ public:
         }
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
-            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
+            [self collectCandidates];
+            if ([_candidates count] == 1) {
+                [self commitComposition:client];
+            }
+            else {
+                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+            }
         }
 
         return YES;
@@ -983,7 +989,7 @@ public:
         }
         [self updateClientComposingBuffer:client];
 
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
+        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
             [self collectCandidates];
             if ([_candidates count] == 1) {
                 [self commitComposition:client];
