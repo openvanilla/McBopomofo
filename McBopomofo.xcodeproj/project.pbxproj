@@ -611,7 +611,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		6AE306DD15FC18BB00C264C8 /* Run Script (Install Input Method When Under Debug Configuration) */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -619,7 +619,7 @@
 			name = "Run Script (Install Input Method When Under Debug Configuration)";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "FROM=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\nPREVIOUS=\"$HOME/Library/Input Methods/$FULL_PRODUCT_NAME\"\nTO=\"$HOME/Library/Input Methods/\"\nEXE=\"$HOME/Library/Input Methods/$EXECUTABLE_FOLDER_PATH/$EXECUTABLE_NAME\"\n\nif [ $CONFIGURATION = \"Debug\" ]\nthen\n    echo Stopping $PRODUCT_NAME\n    killall \"$PRODUCT_NAME\"\n\n    echo Removing the installed version at $PREVIOUS\n    rm -rf \"$PREVIOUS\"\n\n    echo Copying built product from $FROM to $TO\n    cp -R \"$FROM\" \"$TO\"\n\n    echo Invoking $EXE to activate $PRODUCT_NAME\n    \"$EXE\" install\n\n    echo Restarting SystemUIServer to reflect icon changes\n    killall SystemUIServer\nfi\n";
 		};
