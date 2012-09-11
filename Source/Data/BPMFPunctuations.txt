@@ -60,8 +60,8 @@
 ． _punctuation_ETen_> 0.0
 ‘ _punctuation_ETen_` 0.0
 ’ _punctuation_ETen_' 0.0
-： _punctuation_ETen_:  0.0
-； _punctuation_ETen_:  0.0
+： _punctuation_ETen_: 0.0
+； _punctuation_ETen_: 0.0
 ， _punctuation_ETen26_, 0.0
 。 _punctuation_ETen26_. 0.0
 ． _punctuation_ETen26_. 0.0
@@ -71,7 +71,7 @@
 ； _punctuation_ETen26_; 0.0
 、 _punctuation_ETen26_' 0.0
 ” _punctuation_ETen26_" 0.0
-， _punctuation_Hsu_,  0.0
+， _punctuation_Hsu_, 0.0
 。 _punctuation_Hsu_. 0.0
 ． _punctuation_Hsu_. 0.0
 〈 _punctuation_Hsu_< 0.0
