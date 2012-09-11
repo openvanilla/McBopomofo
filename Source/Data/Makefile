@@ -8,8 +8,8 @@ all: data.txt data-plain-bpmf.txt
 data-plain-bpmf.txt: bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt
 	bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
 
-data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt PhraseFreq.txt \
-          heterophony1.list heterophony2.list phrase.occ
+data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
+		  PhraseFreq.txt heterophony1.list heterophony2.list phrase.occ
 	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt $@
 	cat BPMFPunctuations.txt >> $@
 
