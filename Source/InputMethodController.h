@@ -36,7 +36,6 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "Mandarin.h"
 #import "Gramambular.h"
-#import "SimpleLM.h"
 #import "FastLM.h"
 
 @interface McBopomofoInputMethodController : IMKInputController

@@ -24,7 +24,6 @@
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
-		6A0D4F4615FC0EB100ABF4B3 /* SimpleLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4315FC0EB100ABF4B3 /* SimpleLM.cpp */; };
 		6A0D4F5215FC0EE100ABF4B3 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */; };
 		6A0D4F5315FC0EE100ABF4B3 /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */; };
 		6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */; };
@@ -147,8 +146,6 @@
 		6A0D4F4015FC0EB100ABF4B3 /* OVTextBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVTextBuffer.h; sourceTree = "<group>"; };
 		6A0D4F4115FC0EB100ABF4B3 /* OVUTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVUTF8Helper.h; sourceTree = "<group>"; };
 		6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVWildcard.h; sourceTree = "<group>"; };
-		6A0D4F4315FC0EB100ABF4B3 /* SimpleLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleLM.cpp; sourceTree = "<group>"; };
-		6A0D4F4415FC0EB100ABF4B3 /* SimpleLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleLM.h; sourceTree = "<group>"; };
 		6A0D4F4915FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A0D4F4B15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6A0D4F4D15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Source/en.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -331,8 +328,6 @@
 				6A0D4F1315FC0EB100ABF4B3 /* Gramambular */,
 				6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */,
 				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
-				6A0D4F4315FC0EB100ABF4B3 /* SimpleLM.cpp */,
-				6A0D4F4415FC0EB100ABF4B3 /* SimpleLM.h */,
 				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
 				6A0421A715FEF3F50061ED63 /* FastLM.h */,
 			);
@@ -643,7 +638,6 @@
 				6A0D4F0215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m in Sources */,
 				6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
-				6A0D4F4615FC0EB100ABF4B3 /* SimpleLM.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
