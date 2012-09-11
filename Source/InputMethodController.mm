@@ -107,8 +107,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 #endif
 
 // shared language model object that stores our phrase-term probability database
-SimpleLM gLanguageModel;
-SimpleLM gLanguageModelPlainBopomofo;
+FastLM gLanguageModel;
+FastLM gLanguageModelPlainBopomofo;
 
 // private methods
 @interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
@@ -1317,34 +1317,13 @@ public:
 
 @end
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, SimpleLM &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
 {
-    // load the language model; the performance of this function can be greatly improved
-    // with better loading/parsing methods
-    NSDate *__unused startTime = [NSDate date];
-    
     NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
-    
-    ifstream ifs;
-    ifs.open([dataPath UTF8String]);
-    while (ifs.good()) {
-        string line;
-        getline(ifs, line);
-        
-        if (!line.size() || (line.size() && line[0] == '#')) {
-            continue;
-        }
-        
-        vector<string> p = OVStringHelper::SplitBySpacesOrTabs(line);
-        
-        if (p.size() == 3) {
-            lm.add(p[1], p[0], atof(p[2].c_str()));
-        }
+    bool result = lm.open([dataPath UTF8String]);
+    if (!result) {
+        NSLog(@"Failed opening language model: %@", dataPath);
     }
-    ifs.close();
-    
-    // insert an empty entry for BOS/EOS markers
-    lm.add(" ", " ", 0.0);
 }
 
 
