@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
@@ -68,6 +69,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6A0421A615FEF3F50061ED63 /* FastLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FastLM.cpp; sourceTree = "<group>"; };
+		6A0421A715FEF3F50061ED63 /* FastLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastLM.h; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -330,6 +333,8 @@
 				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
 				6A0D4F4315FC0EB100ABF4B3 /* SimpleLM.cpp */,
 				6A0D4F4415FC0EB100ABF4B3 /* SimpleLM.h */,
+				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
+				6A0421A715FEF3F50061ED63 /* FastLM.h */,
 			);
 			name = Engine;
 			path = Source/Engine;
@@ -639,6 +644,7 @@
 				6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6A0D4F4615FC0EB100ABF4B3 /* SimpleLM.cpp in Sources */,
+				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

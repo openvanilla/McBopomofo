@@ -37,6 +37,7 @@
 #import "Mandarin.h"
 #import "Gramambular.h"
 #import "SimpleLM.h"
+#import "FastLM.h"
 
 @interface McBopomofoInputMethodController : IMKInputController
 {
@@ -45,7 +46,7 @@
     Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
 
     // language model
-    Formosa::Gramambular::SimpleLM *_languageModel;
+    Formosa::Gramambular::FastLM *_languageModel;
     
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;

@@ -52,7 +52,7 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
     [[self window] orderFront:self];
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 
-    NSAttributedString *attrStr = [[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL];
+    NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL] autorelease];
 
     [[self.textView textStorage] setAttributedString:attrStr];
     
