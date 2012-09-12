@@ -28,7 +28,7 @@
 		6A0D4F5315FC0EE100ABF4B3 /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */; };
 		6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */; };
 		6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */; };
-		6A0D4F5915FC0EF900ABF4B3 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */; };
+		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A38BC1515FC117A00A8A51F /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
 		6A38BC1D15FC11C700A8A51F /* UpdateNotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BC1F15FC11C700A8A51F /* UpdateNotificationController.xib */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
@@ -74,17 +74,17 @@
 		6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/AppDelegate.h; sourceTree = "<group>"; };
-		6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/AppDelegate.m; sourceTree = "<group>"; };
-		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputMethodController.h; path = Source/InputMethodController.h; sourceTree = "<group>"; };
-		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = InputMethodController.mm; path = Source/InputMethodController.mm; sourceTree = "<group>"; };
-		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Source/main.m; sourceTree = "<group>"; };
-		6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OVInputSourceHelper.h; path = Source/OVInputSourceHelper.h; sourceTree = "<group>"; };
-		6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OVInputSourceHelper.m; path = Source/OVInputSourceHelper.m; sourceTree = "<group>"; };
-		6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferencesWindowController.h; path = Source/PreferencesWindowController.h; sourceTree = "<group>"; };
-		6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferencesWindowController.m; path = Source/PreferencesWindowController.m; sourceTree = "<group>"; };
-		6A0D4ECD15FC0D6400ABF4B3 /* UpdateNotificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpdateNotificationController.h; path = Source/UpdateNotificationController.h; sourceTree = "<group>"; };
-		6A0D4ECE15FC0D6400ABF4B3 /* UpdateNotificationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpdateNotificationController.m; path = Source/UpdateNotificationController.m; sourceTree = "<group>"; };
+		6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMethodController.h; sourceTree = "<group>"; };
+		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputMethodController.mm; sourceTree = "<group>"; };
+		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVInputSourceHelper.h; sourceTree = "<group>"; };
+		6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVInputSourceHelper.m; sourceTree = "<group>"; };
+		6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
+		6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
+		6A0D4ECD15FC0D6400ABF4B3 /* UpdateNotificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateNotificationController.h; sourceTree = "<group>"; };
+		6A0D4ECE15FC0D6400ABF4B3 /* UpdateNotificationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateNotificationController.m; sourceTree = "<group>"; };
 		6A0D4ED915FC0DA600ABF4B3 /* VTCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTCandidateController.h; sourceTree = "<group>"; };
 		6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTCandidateController.m; sourceTree = "<group>"; };
 		6A0D4EDB15FC0DA600ABF4B3 /* VTHorizontalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateController.h; sourceTree = "<group>"; };
@@ -99,8 +99,8 @@
 		6A0D4EE415FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTVerticalKeyLabelStripView.m; sourceTree = "<group>"; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
-		6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "McBopomofo-Info.plist"; path = "Source/McBopomofo-Info.plist"; sourceTree = "<group>"; };
-		6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "McBopomofo-Prefix.pch"; path = "Source/McBopomofo-Prefix.pch"; sourceTree = "<group>"; };
+		6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "McBopomofo-Info.plist"; sourceTree = "<group>"; };
+		6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Prefix.pch"; sourceTree = "<group>"; };
 		6A0D4F1415FC0EB100ABF4B3 /* Bigram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bigram.h; sourceTree = "<group>"; };
 		6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockReadingBuilder.h; sourceTree = "<group>"; };
 		6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gramambular.h; sourceTree = "<group>"; };
@@ -148,11 +148,12 @@
 		6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVWildcard.h; sourceTree = "<group>"; };
 		6A0D4F4915FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A0D4F4B15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6A0D4F4D15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Source/en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A0D4F4F15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Source/en.lproj/preferences.xib; sourceTree = "<group>"; };
 		6A0D4F5415FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		6A0D4F5515FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6A0D4F5615FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "Source/zh-Hant.lproj/preferences.xib"; sourceTree = "<group>"; };
+		6A187E2716004C5900466B2E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		6A187E2916004C7300466B2E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		6A38BBDE15FC117A00A8A51F /* 4_in_5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_5.txt; sourceTree = "<group>"; };
 		6A38BBDF15FC117A00A8A51F /* 4_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_6.txt; sourceTree = "<group>"; };
 		6A38BBE015FC117A00A8A51F /* 5_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 5_in_6.txt; sourceTree = "<group>"; };
@@ -188,20 +189,19 @@
 		6A38BC2015FC11CE00A8A51F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6A38BC2915FC161000A8A51F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
-		6A62F73615FD1DE400B95579 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = McBopomofo.iconset; sourceTree = "<group>"; };
 		6AA67FE915FC5B0D00B5A308 /* BopomofoTextMenu.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = BopomofoTextMenu.tiff; sourceTree = "<group>"; };
 		6AA67FEA15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "BopomofoTextMenu@2x.tiff"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
+		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Installer/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6ACA41ED15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/License.rtf; sourceTree = "<group>"; };
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F115FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Installer-Info.plist"; sourceTree = "<group>"; };
-		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Installer-Prefix.pch"; sourceTree = "<group>"; };
-		6ACA41F415FC1D9000935EF6 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Source/Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
+		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Source/Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		6ACA41F415FC1D9000935EF6 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Source/Installer/main.m; sourceTree = SOURCE_ROOT; };
 		6ACA41F515FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		6ACA41F615FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/License.rtf"; sourceTree = "<group>"; };
 		6ACA41F715FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -284,7 +284,7 @@
 				6A0D4ECD15FC0D6400ABF4B3 /* UpdateNotificationController.h */,
 				6A0D4ECE15FC0D6400ABF4B3 /* UpdateNotificationController.m */,
 			);
-			name = Source;
+			path = Source;
 			sourceTree = "<group>";
 		};
 		6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */ = {
@@ -303,8 +303,7 @@
 				6A0D4EE315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.h */,
 				6A0D4EE415FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m */,
 			);
-			name = CandidateUI;
-			path = Source/CandidateUI;
+			path = CandidateUI;
 			sourceTree = "<group>";
 		};
 		6A0D4EEE15FC0DA600ABF4B3 /* Images */ = {
@@ -318,8 +317,7 @@
 				6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */,
 				6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */,
 			);
-			name = Images;
-			path = Source/Images;
+			path = Images;
 			sourceTree = "<group>";
 		};
 		6A0D4F1215FC0EB100ABF4B3 /* Engine */ = {
@@ -331,8 +329,7 @@
 				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
 				6A0421A715FEF3F50061ED63 /* FastLM.h */,
 			);
-			name = Engine;
-			path = Source/Engine;
+			path = Engine;
 			sourceTree = "<group>";
 		};
 		6A0D4F1315FC0EB100ABF4B3 /* Gramambular */ = {
@@ -408,7 +405,7 @@
 				6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */,
 				6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */,
 				6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */,
-				6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */,
+				6A187E2816004C5900466B2E /* MainMenu.xib */,
 				6A38BC1F15FC11C700A8A51F /* UpdateNotificationController.xib */,
 				6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */,
 			);
@@ -436,8 +433,7 @@
 				6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */,
 				6A38BBFD15FC117A00A8A51F /* README */,
 			);
-			name = Data;
-			path = Source/Data;
+			path = Data;
 			sourceTree = "<group>";
 		};
 		6A38BBE115FC117A00A8A51F /* bin */ = {
@@ -476,8 +472,7 @@
 				6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */,
 				6ACA41F415FC1D9000935EF6 /* main.m */,
 			);
-			name = Installer;
-			path = Source/Installer;
+			path = Installer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -577,7 +572,6 @@
 				6A0D4F5315FC0EE100ABF4B3 /* preferences.xib in Resources */,
 				6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */,
 				6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */,
-				6A0D4F5915FC0EF900ABF4B3 /* MainMenu.xib in Resources */,
 				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
 				6AA67FEB15FC5B0D00B5A308 /* BopomofoTextMenu.tiff in Resources */,
 				6AA67FEC15FC5B0D00B5A308 /* BopomofoTextMenu@2x.tiff in Resources */,
@@ -585,6 +579,7 @@
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
 				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,
+				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -616,7 +611,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "FROM=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\nPREVIOUS=\"$HOME/Library/Input Methods/$FULL_PRODUCT_NAME\"\nTO=\"$HOME/Library/Input Methods/\"\nEXE=\"$HOME/Library/Input Methods/$EXECUTABLE_FOLDER_PATH/$EXECUTABLE_NAME\"\n\nif [ $CONFIGURATION = \"Debug\" ]\nthen\n    echo Stopping $PRODUCT_NAME\n    killall \"$PRODUCT_NAME\"\n\n    echo Removing the installed version at $PREVIOUS\n    rm -rf \"$PREVIOUS\"\n\n    echo Restarting SystemUIServer to ensure full removal of the old copy\n    killall SystemUIServer\n\n    echo Copying built product from $FROM to $TO\n    cp -R \"$FROM\" \"$TO\"\n\n    echo Invoking $EXE to activate $PRODUCT_NAME\n    \"$EXE\" install\nfi\n";
+			shellScript = "FROM=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\nPREVIOUS=\"$HOME/Library/Input Methods/$FULL_PRODUCT_NAME\"\nTO=\"$HOME/Library/Input Methods/\"\nEXE=\"$HOME/Library/Input Methods/$EXECUTABLE_FOLDER_PATH/$EXECUTABLE_NAME\"\n\nif [ $CONFIGURATION = \"Debug\" ]\nthen\n    echo Stopping $PRODUCT_NAME\n    killall \"$PRODUCT_NAME\"\n\n    echo Removing the installed version at $PREVIOUS\n    rm -rf \"$PREVIOUS\"\n\n    echo Restarting SystemUIServer to ensure full removal of the old copy\n    killall SystemUIServer\n\n    echo Copying built product from $FROM to $TO\n    cp -R \"$FROM\" \"$TO\"\n\n    echo Invoking $EXE to activate $PRODUCT_NAME\n    \"$EXE\" install --all\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -674,6 +669,7 @@
 				6A0D4F5415FC0EF900ABF4B3 /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */ = {
@@ -683,16 +679,16 @@
 				6A0D4F5515FC0EF900ABF4B3 /* zh-Hant */,
 			);
 			name = Localizable.strings;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				6A0D4F4D15FC0EE100ABF4B3 /* en */,
-				6A62F73615FD1DE400B95579 /* zh-Hant */,
 			);
 			name = MainMenu.xib;
-			sourceTree = "<group>";
+			path = /Users/lukhnos/projects/McBopomofo;
+			sourceTree = "<absolute>";
 		};
 		6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */ = {
 			isa = PBXVariantGroup;
@@ -701,6 +697,16 @@
 				6A0D4F5615FC0EF900ABF4B3 /* zh-Hant */,
 			);
 			name = preferences.xib;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		6A187E2816004C5900466B2E /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A187E2716004C5900466B2E /* en */,
+				6A187E2916004C7300466B2E /* zh-Hant */,
+			);
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 		6A38BC1F15FC11C700A8A51F /* UpdateNotificationController.xib */ = {
@@ -710,7 +716,6 @@
 				6A38BC2015FC11CE00A8A51F /* en */,
 			);
 			name = UpdateNotificationController.xib;
-			path = Source;
 			sourceTree = "<group>";
 		};
 		6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */ = {
@@ -720,7 +725,8 @@
 				6ACA41F515FC1D9000935EF6 /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
+			path = Source/Installer;
+			sourceTree = SOURCE_ROOT;
 		};
 		6ACA41EC15FC1D9000935EF6 /* License.rtf */ = {
 			isa = PBXVariantGroup;
@@ -729,7 +735,8 @@
 				6ACA41F615FC1D9000935EF6 /* zh-Hant */,
 			);
 			name = License.rtf;
-			sourceTree = "<group>";
+			path = Source/Installer;
+			sourceTree = SOURCE_ROOT;
 		};
 		6ACA41EE15FC1D9000935EF6 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
@@ -738,7 +745,8 @@
 				6ACA41F715FC1D9000935EF6 /* zh-Hant */,
 			);
 			name = Localizable.strings;
-			sourceTree = "<group>";
+			path = Source/Installer;
+			sourceTree = SOURCE_ROOT;
 		};
 		6ACA41F015FC1D9000935EF6 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
@@ -747,7 +755,8 @@
 				6ACA41F815FC1D9000935EF6 /* zh-Hant */,
 			);
 			name = MainMenu.xib;
-			sourceTree = "<group>";
+			path = Source/Installer;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXVariantGroup section */
 
