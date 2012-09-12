@@ -94,6 +94,17 @@ int main(int argc, char *argv[])
             }
         }
 
+        if (argc > 2 && !strcmp(argv[2], "--all")) {
+            BOOL enabled = [OVInputSourceHelper enableAllInputModesForInputSourceBundleID:bundleID];
+            if (enabled) {
+                NSLog(@"All input sources enabled for %@", bundleID);
+            }
+            else {
+                NSLog(@"Failed to enable all input sources for %@", bundleID);
+                return -1;
+            }
+        }
+
         return 0;
     }
 

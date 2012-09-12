@@ -85,6 +85,12 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
         [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:sourceDir destination:trashDir files:[NSArray arrayWithObject:kTargetBundle] tag:&tag]; 
         (void)tag;
 
+        // alno need to restart SystemUIServer to ensure that the icon is fully cleaned up
+        if (_currentVersion && [_currentVersion compare:@"0.9.4"] != NSOrderedDescending) {
+            NSTask *restartSystemUIServerTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/killall" arguments:[NSArray arrayWithObjects: @"-9", @"SystemUIServer", nil]];
+            [restartSystemUIServerTask waitUntilExit];
+        }
+
         NSTask *killTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/killall" arguments:[NSArray arrayWithObjects: @"-9", kTargetBin, nil]];
         [killTask waitUntilExit];
     }
@@ -95,18 +101,17 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
         NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
         [NSApp terminate:self];        
     }
-    
-    NSTask *installTask = [NSTask launchedTaskWithLaunchPath:[kTargetFullBinPartialPath stringByExpandingTildeInPath] arguments:[NSArray arrayWithObjects:@"install", nil]];
+
+    NSArray *installArgs = [NSArray arrayWithObjects:@"install", nil];
+    if (_currentVersion && [_currentVersion compare:@"0.9.4"] != NSOrderedDescending) {
+        installArgs = [installArgs arrayByAddingObject:@"--all"];
+    }
+
+    NSTask *installTask = [NSTask launchedTaskWithLaunchPath:[kTargetFullBinPartialPath stringByExpandingTildeInPath] arguments:installArgs];
     [installTask waitUntilExit];                                                                              
     if ([installTask terminationStatus] != 0) {
         NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
         [NSApp terminate:self];        
-    }
-
-    // alno need to restart SystemUIServer to reflect icon changes if the replaced version <= 0.9.4
-    if (_currentVersion && [_currentVersion compare:@"0.9.4"] != NSOrderedDescending) {
-        NSTask *restartSystemUIServerTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/killall" arguments:[NSArray arrayWithObjects: @"-9", @"SystemUIServer", nil]];
-        [restartSystemUIServerTask waitUntilExit];
     }
 
     NSRunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil), nil, nil);

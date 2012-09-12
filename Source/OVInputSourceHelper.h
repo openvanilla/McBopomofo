@@ -40,6 +40,7 @@
 // enable/disable an input source (along with all its input modes)
 + (BOOL)inputSourceEnabled:(TISInputSourceRef)inInputSource;
 + (BOOL)enableInputSource:(TISInputSourceRef)inInputSource;
++ (BOOL)enableAllInputModesForInputSourceBundleID:(NSString *)inID;
 + (BOOL)disableInputSource:(TISInputSourceRef)inInputSource;
 
 // register (i.e. make available to Input Source tab in Language & Text Preferences)
