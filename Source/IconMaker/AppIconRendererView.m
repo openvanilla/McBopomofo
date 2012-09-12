@@ -49,16 +49,15 @@
         
 //        imageRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:frame.size.width pixelsHigh:frame.size.height bitsPerSample:8 samplesPerPixel:1 hasAlpha:NO isPlanar:NO colorSpaceName:NSDeviceWhiteColorSpace bytesPerRow:0 bitsPerPixel:0];
         
-        NSRect bounds;
-        bounds.origin = NSZeroPoint;
-        bounds.size = frame.size;
+        NSRect bounds = [self bounds];
 
-        
-        
         image = [[NSImage alloc] initWithSize:frame.size];
         [image lockFocus];
-        
-        
+
+        [[NSColor blackColor] setFill];
+        [NSBezierPath fillRect:bounds];
+
+
         CIContext *imageContext = [[NSGraphicsContext currentContext] CIContext];
 
         CIFilter *filter = [CIFilter filterWithName:@"CIRandomGenerator"];
