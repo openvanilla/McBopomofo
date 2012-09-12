@@ -100,8 +100,7 @@ int main(int argc, char *argv[])
                 NSLog(@"All input sources enabled for %@", bundleID);
             }
             else {
-                NSLog(@"Failed to enable all input sources for %@", bundleID);
-                return -1;
+                NSLog(@"Cannot enable all input sources for %@, but this is ignored", bundleID);
             }
         }
 
