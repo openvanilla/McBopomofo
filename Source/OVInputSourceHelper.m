@@ -36,7 +36,6 @@
 
 + (TISInputSourceRef)inputSourceForProperty:(CFStringRef)inPropertyKey stringValue:(NSString *)inValue
 {
-
     CFTypeID stringID = CFStringGetTypeID();
 
     for (id source in [self allInstalledInputSources]) {
@@ -68,6 +67,27 @@
 {
     OSStatus status = TISEnableInputSource(inInputSource);
     return status == noErr;
+}
+
++ (BOOL)enableAllInputModesForInputSourceBundleID:(NSString *)inID
+{
+    BOOL enabled = NO;
+
+    for (id source in [self allInstalledInputSources]) {
+        TISInputSourceRef inputSource = (TISInputSourceRef)source;
+        NSString *bundleID = (NSString *)TISGetInputSourceProperty(inputSource, kTISPropertyBundleID);
+        NSString *mode = (NSString *)TISGetInputSourceProperty(inputSource, kTISPropertyInputModeID);
+        if (mode && [bundleID isEqualToString:inID]) {
+            BOOL modeEnabled = [self enableInputSource:inputSource];
+            if (!modeEnabled) {
+                return NO;
+            }
+
+            enabled = YES;
+        }
+    }
+
+    return enabled;
 }
 
 + (BOOL)disableInputSource:(TISInputSourceRef)inInputSource

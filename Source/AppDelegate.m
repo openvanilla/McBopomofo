@@ -112,7 +112,7 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-NSLog(@"error");
+    NSLog(@"error");
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
