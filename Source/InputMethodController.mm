@@ -73,6 +73,7 @@ static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizonta
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
+static NSString *const kSelectionKey = @"SelectionKey";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -1183,7 +1184,19 @@ public:
     gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
     gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
     
-    NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    NSMutableArray *keyLabels;
+    
+    // retrive user's preference for selection key
+    NSInteger selectionKey = [[NSUserDefaults standardUserDefaults] integerForKey:kSelectionKey];
+    switch (selectionKey) {
+        case 1: // asdfg for Hsu users
+            keyLabels = [NSMutableArray arrayWithObjects:@"a", @"s", @"d", @"f", @"g", @"h", @"j", @"k", @"l", nil];
+            break;
+        case 0: // classic 12345
+        default:
+            keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+            break;
+    }
     
     if ([ckeys length] > 1) {
         [keyLabels removeAllObjects];
