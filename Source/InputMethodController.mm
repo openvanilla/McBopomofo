@@ -1184,17 +1184,17 @@ public:
     gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
     gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
     
-    NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    NSMutableArray *keyLabels;
     
+    // retrive user's preference for selection key
     NSInteger selectionKey = [[NSUserDefaults standardUserDefaults] integerForKey:kSelectionKey];
     switch (selectionKey) {
-        case 0:
-            keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
-            break;
-        case 1:
+        case 1: // asdfg for Hsu users
             keyLabels = [NSMutableArray arrayWithObjects:@"a", @"s", @"d", @"f", @"g", @"h", @"j", @"k", @"l", nil];
             break;
+        case 0: // classic 12345
         default:
+            keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
             break;
     }
     
