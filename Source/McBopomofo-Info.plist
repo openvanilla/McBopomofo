@@ -34,10 +34,6 @@
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
-				<key>tsInputModeKeyEquivalentKey</key>
-				<string>H</string>
-				<key>tsInputModeKeyEquivalentModifiersKey</key>
-				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>Bopomofo.tiff</string>
 				<key>tsInputModePaletteIconFileKey</key>
@@ -55,10 +51,6 @@
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
-				<key>tsInputModeKeyEquivalentKey</key>
-				<string>H</string>
-				<key>tsInputModeKeyEquivalentModifiersKey</key>
-				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>PlainBopomofo.tiff</string>
 				<key>tsInputModePaletteIconFileKey</key>
