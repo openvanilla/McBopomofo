@@ -73,6 +73,7 @@ static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizonta
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
+static NSString *const kSelectionKey = @"SelectionKey";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -1184,6 +1185,18 @@ public:
     gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
     
     NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    
+    NSInteger selectionKey = [[NSUserDefaults standardUserDefaults] integerForKey:kSelectionKey];
+    switch (selectionKey) {
+        case 0:
+            keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+            break;
+        case 1:
+            keyLabels = [NSMutableArray arrayWithObjects:@"a", @"s", @"d", @"f", @"g", @"h", @"j", @"k", @"l", nil];
+            break;
+        default:
+            break;
+    }
     
     if ([ckeys length] > 1) {
         [keyLabels removeAllObjects];
