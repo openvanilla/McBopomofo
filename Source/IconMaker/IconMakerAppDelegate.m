@@ -95,16 +95,16 @@
     [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/BopomofoTextMenu.tiff"];
     [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/BopomofoTextMenu@2x.tiff"];
      
-    [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/Bopomofo_16x16.tiff"];
-    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo_16x16@2x.tiff"];
-    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/Bopomofo_32x32.tiff"];
-    [self makeIconForObject:iconRenderView size:NSMakeSize(64, 64) filename:@"/tmp/Bopomofo_32x32@2x.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(128, 128) filename:@"/tmp/Bopomofo_128x128.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/Bopomofo_128x128@2x.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/Bopomofo_256x256.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/Bopomofo_256x256@2x.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/Bopomofo_512x512.tiff"];
-    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(1024, 1024) filename:@"/tmp/Bopomofo_512x512@2x.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(16, 16) filename:@"/tmp/icon_16x16.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/icon_16x16@2x.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(32, 32) filename:@"/tmp/icon_32x32.tiff"];
+    [self makeIconForObject:iconRenderView size:NSMakeSize(64, 64) filename:@"/tmp/icon_32x32@2x.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(128, 128) filename:@"/tmp/icon_128x128.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/icon_128x128@2x.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(256, 256) filename:@"/tmp/icon_256x256.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/icon_256x256@2x.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(512, 512) filename:@"/tmp/icon_512x512.tiff"];
+    [self makeIconForObject:@"AppIconRendererView" size:NSMakeSize(1024, 1024) filename:@"/tmp/icon_512x512@2x.tiff"];
 
     NSRunAlertPanel(@"Icons Generated", @"TIFF files are placed in /tmp", @"Dismiss", nil, nil);    
 }
