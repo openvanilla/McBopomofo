@@ -67,6 +67,7 @@ static const NSInteger kMaxComposingBufferSize = 20;
 // NSUserDefaults throughout and do not wrap them in another config object
 static NSString *const kKeyboardLayoutPreferenceKey = @"KeyboardLayout";
 static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
+static NSString *const kFunctionKeyKeyboardLayoutPreferenceKey = @"FunctionKeyKeyboardLayout";  // alphanumeric ("ASCII") input basis
 static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
 static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
@@ -652,8 +653,39 @@ public:
     }    
 }
 
-- (BOOL)inputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
+- (NSUInteger)recognizedEvents:(id)sender
 {
+    return NSKeyDownMask | NSFlagsChangedMask;
+}
+
+- (BOOL)handleEvent:(NSEvent *)event client:(id)client
+{
+    if ([event type] == NSFlagsChanged) {
+        // function key pressed
+        if ([event modifierFlags]) {
+            NSString *functionKeyKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kFunctionKeyKeyboardLayoutPreferenceKey];
+            if (!functionKeyKeyboardLayoutID) {
+                functionKeyKeyboardLayoutID = @"com.apple.keylayout.US";
+            }
+
+            [client overrideKeyboardWithKeyboardNamed:functionKeyKeyboardLayoutID];
+        }
+        else {
+            // reset when function key is released
+            NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+            if (!basisKeyboardLayoutID) {
+                basisKeyboardLayoutID = @"com.apple.keylayout.US";
+            }
+
+            [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
+        }
+        return NO;
+    }
+
+    NSString *inputText = [event characters];
+    NSInteger keyCode = [event keyCode];
+    NSUInteger flags = [event modifierFlags];
+
     NSRect textFrame = NSZeroRect;
     NSDictionary *attributes = nil;
 
