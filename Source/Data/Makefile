@@ -1,7 +1,4 @@
-.PHONY: deploydata sort clean
-DATPATH=Contents/Resources/data.txt
-EXEPATH=Contents/MacOS/McBopomofo
-EXENAME=McBopomofo
+.PHONY: sort clean
 
 all: data.txt data-plain-bpmf.txt
 
@@ -9,28 +6,22 @@ data-plain-bpmf.txt: bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt
 	bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
 
 data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
-		  PhraseFreq.txt heterophony1.list heterophony2.list phrase.occ
+          PhraseFreq.txt heterophony1.list heterophony2.list phrase.occ \
+          Symbols.txt
 	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt $@
 	cat BPMFPunctuations.txt >> $@
-
-deploydata: data.txt
-	cp -p data.txt $${HOME}/Library/Input\ Methods/McBopomofo.app/$(DATPATH)
-	while [ `ps xww|grep $(EXENAME)|grep -v grep|wc -l` -gt 0 ]; do \
-	    killall -9 $(EXENAME); \
-	    sleep 1; \
-	done
-	if [ "`sw_vers | awk -F '.' '/oductV/{print $$2}'`" == "5" ]; then \
-	    $${HOME}/Library/Input\ Methods/McBopomofo.app/$(EXEPATH) install; \
-	    echo extra install; \
-	    sleep 2; \
-	fi
-	$${HOME}/Library/Input\ Methods/McBopomofo.app/$(EXEPATH) install
+	cat Symbols.txt >> $@
 
 PhraseFreq.txt: bin/buildFreq.bash phrase.occ
 	bin/buildFreq.bash
 
-phrase.list: bin/build4wlist.bash BPMFBase.txt BPMFMappings.txt textpool.utf8
-	bin/build4wlist.bash
+clean:
+	rm -f data.txt data-plain-bpmf.txt
+
+# FOR INTERNAL USE
+_install: tidy sort check all
+	cp -a data.txt data-plain-bpmf.txt $(HOME)/Library/Input\ Methods/McBopomofo.app/Contents/Resources/
+	killall -HUP McBopomofo
 
 sort: 
 	@env LANG=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
@@ -57,5 +48,6 @@ tidy:
 	@sed -i '' -e 's/ [:0-9:]*$$//g' BPMFMappings.txt
 	@sed -i '' -e 's/1/˙/g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g' BPMFMappings.txt
 
-clean:
-	rm -f data.txt data-plain-bpmf.txt
+#phrase.list: bin/build4wlist.bash BPMFBase.txt BPMFMappings.txt textpool.utf8
+#	bin/build4wlist.bash
+
