@@ -68,6 +68,7 @@ static const NSInteger kMaxComposingBufferSize = 20;
 static NSString *const kKeyboardLayoutPreferenceKey = @"KeyboardLayout";
 static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
 static NSString *const kFunctionKeyKeyboardLayoutPreferenceKey = @"FunctionKeyKeyboardLayout";  // alphanumeric ("ASCII") input basis
+static NSString *const kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = @"FunctionKeyKeyboardLayoutOverrideIncludeShift"; // whether include shift
 static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
 static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
@@ -662,23 +663,24 @@ public:
 {
     if ([event type] == NSFlagsChanged) {
         // function key pressed
-        if ([event modifierFlags]) {
+        BOOL includeShift = [[NSUserDefaults standardUserDefaults] boolForKey:kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey];
+        if (([event modifierFlags] & ~NSShiftKeyMask) || (([event modifierFlags] & NSShiftKeyMask) && includeShift)) {
             NSString *functionKeyKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kFunctionKeyKeyboardLayoutPreferenceKey];
             if (!functionKeyKeyboardLayoutID) {
                 functionKeyKeyboardLayoutID = @"com.apple.keylayout.US";
             }
 
             [client overrideKeyboardWithKeyboardNamed:functionKeyKeyboardLayoutID];
+            return NO;
         }
-        else {
-            // reset when function key is released
-            NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-            if (!basisKeyboardLayoutID) {
-                basisKeyboardLayoutID = @"com.apple.keylayout.US";
-            }
 
-            [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
+        // reset when function key is released
+        NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
+        if (!basisKeyboardLayoutID) {
+            basisKeyboardLayoutID = @"com.apple.keylayout.US";
         }
+
+        [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
         return NO;
     }
 
