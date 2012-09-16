@@ -12,8 +12,8 @@ data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
 	cat BPMFPunctuations.txt >> $@
 	cat Symbols.txt >> $@
 
-PhraseFreq.txt: bin/buildFreq.bash phrase.occ
-	bin/buildFreq.bash
+PhraseFreq.txt: bin/buildFreq.py phrase.occ exclusion.txt
+	bin/buildFreq.py
 
 clean:
 	rm -f data.txt data-plain-bpmf.txt

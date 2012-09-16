@@ -1,10 +1,12 @@
-#i!/bin/bash
+#!/bin/bash
 # Whom to blame: Mengjuei Hsieh
 TOTAL="$(perl -w bin/utf8length.pl < phrase.occ | \
          awk '{s+=($2+2.7^$3)}END{print s}' \
         )"
 # Getting a hint from algorithm of Max-match segmentation
 # Make it easier to greedily search from longer "phrase"
+# phrase  count   length
+# 龜裂    17      2
 perl -w bin/utf8length.pl < phrase.occ \
  | awk -v TOTAL=$TOTAL \
        ' $2>0{printf("%s %.8f\n",$1,log(( $2*3.7^($3-1))/TOTAL)/log(10))}
