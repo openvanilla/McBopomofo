@@ -14,6 +14,7 @@ bpmf_phon3 = {}
 bpmf_hetero = {}
 
 if __name__=='__main__':
+    """bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt data.txt"""
     if len(sys.argv) < 5:
         sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base output')
     # Read a list of heterophonic singulars and its estimated frequency
