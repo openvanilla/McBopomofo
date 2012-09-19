@@ -87,6 +87,7 @@ static NSString *const kPlainBopomofoModeIdentifier = @"org.openvanilla.inputmet
 
 // key code enums
 enum {
+    kEnterKeyCode = 76,
     kUpKeyCode = 126,
     kDownKeyCode = 125,
     kLeftKeyCode = 123,
@@ -94,7 +95,8 @@ enum {
     kPageUpKeyCode = 116,
     kPageDownKeyCode = 121,
     kHomeKeyCode = 115,
-    kEndKeyCode = 119
+    kEndKeyCode = 119,
+    kDeleteKeyCode = 117
 };
 
 // a global object for saving the "learned" user candidate selections
@@ -524,7 +526,7 @@ public:
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
-    else if (charCode == 13 || keyCode == 127) {
+    else if (charCode == 13 || keyCode == kEnterKeyCode) {
         [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
         return YES;
     }
@@ -765,7 +767,6 @@ public:
         return [self handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode];
     }
     
-    
     // see if it's valid BPMF reading
     if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
@@ -896,8 +897,50 @@ public:
                 return NO;
             }
 
-            if (_builder->cursorIndex() < [_composingBuffer length]) {
+            if (_builder->cursorIndex() < _builder->length()) {
                 _builder->setCursorIndex(_builder->cursorIndex() + 1);
+            }
+            else {
+                [self beep];
+            }
+        }
+
+        [self updateClientComposingBuffer:client];
+        return YES;
+    }
+
+    if (keyCode == kHomeKeyCode) {
+        if (!_bpmfReadingBuffer->isEmpty()) {
+            [self beep];
+        }
+        else {
+            if (![_composingBuffer length]) {
+                return NO;
+            }
+
+            if (_builder->cursorIndex()) {
+                _builder->setCursorIndex(0);
+            }
+            else {
+                [self beep];
+            }
+        }
+
+        [self updateClientComposingBuffer:client];
+        return YES;
+    }
+
+    if (keyCode == kEndKeyCode) {
+        if (!_bpmfReadingBuffer->isEmpty()) {
+            [self beep];
+        }
+        else {
+            if (![_composingBuffer length]) {
+                return NO;
+            }
+
+            if (_builder->cursorIndex() != _builder->length()) {
+                _builder->setCursorIndex(_builder->length());
             }
             else {
                 [self beep];
@@ -938,6 +981,30 @@ public:
         [self updateClientComposingBuffer:client];
         return YES;
     }
+
+    // Delete
+    if (keyCode == kDeleteKeyCode) {
+        if (_bpmfReadingBuffer->isEmpty()) {
+            if (![_composingBuffer length]) {
+                return NO;
+            }
+
+            if (_builder->cursorIndex() != _builder->length()) {
+                _builder->deleteReadingAfterCursor();
+                [self walk];
+            }
+            else {
+                [self beep];
+            }
+        }
+        else {
+            [self beep];
+        }
+
+        [self updateClientComposingBuffer:client];
+        return YES;
+    }
+
 
     // Enter
     if (charCode == 13) {
