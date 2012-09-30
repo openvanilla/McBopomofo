@@ -1,3 +1,8 @@
+#   Comment section:
+# 1 Fields are splitted by a tab
+# 2 first field is the piece of phrase that you want to adjust the occurance
+# 3 second field is the phrase you don't want to include when counting the
+# 4 occurance of the first field.
 一世	一世紀
 一隊	統一隊
 一黨	統一黨
@@ -218,6 +223,7 @@
 洛伊	佛洛伊德
 洛伊	特洛伊
 活字	活字典
+活性	靈活性
 派人	正派人
 海參	海參威
 海參	海參崴
