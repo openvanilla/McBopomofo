@@ -9135,6 +9135,7 @@
 挐 ㄋㄚˊ na2 s86 big5
 拏 ㄋㄚˊ na2 s86 big5
 誽 ㄋㄚˊ na2 s86 big5
+哪 ㄋㄚ˙ na5 s87 big5
 乃 ㄋㄞˇ nai3 s93 big5
 奶 ㄋㄞˇ nai3 s93 big5
 迺 ㄋㄞˇ nai3 s93 big5
@@ -9201,6 +9202,7 @@
 儺 ㄋㄨㄛˊ nuo2 sji6 big5
 捼 ㄋㄨㄛˊ nuo2 sji6 big5
 梛 ㄋㄨㄛˊ nuo2 sji6 big5
+哪 ㄋㄨㄛˊ nuo2 sji6 big5
 呢 ㄋㄜ ne sk big5
 呢 ㄋㄜ˙ ne sk7 big5
 峱 ㄋㄠ nao sl big5
