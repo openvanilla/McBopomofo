@@ -16,7 +16,7 @@ if __name__=='__main__':
     while True:
         line = handle.readline()
         if not line: break
-        if line[0] == '#': break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         if elements[0] in bpmf:
             pass
@@ -31,7 +31,7 @@ if __name__=='__main__':
     while True:
         line = handle.readline()
         if not line: break
-        if line[0] == '#': break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         if elements[0] in bpmf:
             pass
@@ -46,7 +46,7 @@ if __name__=='__main__':
     while True:
         line = handle.readline()
         if not line: break
-        if line[0] == '#': break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         word = elements[0]
         i = 0 
