@@ -20,7 +20,7 @@ if __name__=='__main__':
     while True:
         line = handle.readline()
         if not line: break
-        if line[0] == '#': break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         phrases[elements[0]]=int(elements[1])
     handle.close()
@@ -32,7 +32,7 @@ if __name__=='__main__':
     while True:
         line = handle.readline()
         if not line: break
-        if line[0] == '#': break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         #print "%s %s" % (elements[0],elements[1])
         if elements[1].count(elements[0]) > 0:
