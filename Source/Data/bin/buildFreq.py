@@ -34,17 +34,23 @@ if __name__=='__main__':
         if not line: break
         if line[0] == '#': continue
         elements = line.rstrip().split()
+        mykey = elements[0]
+        myval = elements[1]
+        if myval.count(mykey) < 1: continue
         #print "%s %s" % (elements[0],elements[1])
-        if elements[1].count(elements[0]) > 0:
-            exclusion[elements[0]]=elements[1]
+        if mykey in exclusion:
+            exclusion[mykey].append(myval)
+        else:
+            exclusion[mykey] = []
+            exclusion[mykey].append(myval)
     handle.close()
 
     # eg: if BC and ABC are not related ( BC is meaningless when ABC occurs)
     #     then count(BC) = count(BC) - count(ABC)
     for k in exclusion:
-        v = exclusion[k]
-        if k in phrases and v in phrases:
-            phrases[k]=phrases[k]-phrases[v]
+        for v in exclusion[k]:
+            if k in phrases and v in phrases:
+                phrases[k]=phrases[k]-phrases[v]
 
     # Getting a hint from algorithm of Max-match segmentation
     # norm = sum ( fscale^(len(phrase)-1) * count(phrase) )
