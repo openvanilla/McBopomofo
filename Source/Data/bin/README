@@ -1,9 +1,7 @@
-
-
-
-Fast substring counting
-
-Counting the occurrence
-
-
-while > split
+- Substring counting
+  For counting the occurrence of a single string, it's normally faster using
+  the C language based facility, e.g.:
+      bin/count.bash 詞詞詞
+  For global counting according to a phrase list, use the python facility, e.g.:
+      bin/count.occurrence.py mylist.txt > myphrase.occ
+- 
