@@ -48,6 +48,11 @@ tidy:
 	@sed -i '' -e 's/ [:0-9:]*$$//g' BPMFMappings.txt
 	@sed -i '' -e 's/1/˙/g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g' BPMFMappings.txt
 
-#phrase.list: bin/build4wlist.bash BPMFBase.txt BPMFMappings.txt textpool.utf8
-#	bin/build4wlist.bash
+phrase.occ: phrase.list
+	bin/count.occurrence.py phrase.list > tmp
+	mv tmp phrase.occ
 
+phrase.list: BPMFBase.txt BPMFMappings.txt
+	awk 'length($1)<4{print $1}' BPMFBase.txt >  tmp
+	awk '{print $1}'         BPMFMappings.txt >> tmp
+	sort -u tmp | uniq > phrase.list
