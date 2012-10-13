@@ -10,14 +10,13 @@
 ├── phrase.occ			table for appearance of a word in a text pool
 ├── Makefile			for conveniences for developers
 └── bin
-    ├── cook.rb			The tool to build the data.txt for McBopomofo
-    ├── BIG5toUTF8.pl		A tool for text pool preparation
-    ├── build4wlist.bash	A tool for text pool preparation
+    ├── cook.py			The tool to build the data.txt for McBopomofo
     ├── buildFreq.bash		The awk script for counting occurance
-    ├── countphrase.bash	some SGE script candidate to count occurance
-    ├── filter.bash		A tool for text pool preparation
-    ├── randomShuffle.bash	A tool to shuffle text pool
-    └── typocorrection.bash	A demo of common typo in the text pool
+    ├── bpmfmap.py		mapping bpmf automatically and primitively
+    ├── cook-plain-bpmf.py	build data file for tranditional bpmf ime
+    ├── count.bash		a wrapper for a C-based counting facility
+    ├── count.occurrence.c	a C-based counting facility for command line
+    └── count.occurrence.py	a python-based counter for the whole list
 
 ----- Editorial Rule -----
 * when in doubt, use google/yahoo search to confirm the rarity of the phrases
