@@ -41,6 +41,7 @@
 @private
     NSWindow *_window;
     NSURLConnection *_updateCheckConnection;
+    NSMutableData *_receivingData;
     UpdateNotificationController *_updateNotificationController;
 }
 

@@ -41,8 +41,11 @@ void LTLoadLanguageModel();
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
 static NSString *kUpdateInfoEndpointKey = @"UpdateInfoEndpoint";
 static NSString *kUpdateInfoSiteKey = @"UpdateInfoSite";
-static const NSTimeInterval kTimeoutInterval = 10.0;
 static const NSTimeInterval kNextCheckInterval = 86400.0;
+static const NSTimeInterval kTimeoutInterval = 60.0;
+
+@interface AppDelegate () <NSURLConnectionDataDelegate>
+@end
 
 @implementation AppDelegate
 @synthesize window = _window;
@@ -68,26 +71,27 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
 
 - (void)checkForUpdate
 {
-    NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:kNextUpdateCheckDateKey];
-    if (![date isKindOfClass:[NSDate class]]) {
-        date = [NSDate date];
+    if (_updateCheckConnection) {
+        // busy
+        return;
     }
 
-    if ([(NSDate *)[NSDate date] compare:date] == NSOrderedAscending) {
+    // time for update?
+    NSDate *now = [NSDate date];
+    NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:kNextUpdateCheckDateKey];
+    if (![date isKindOfClass:[NSDate class]]) {
+        date = now;
+    }
+
+    if ([now compare:date] == NSOrderedAscending) {
         return;
     }
 
     NSDate *nextUpdateDate = [NSDate dateWithTimeInterval:kNextCheckInterval sinceDate:[NSDate date]];
     [[NSUserDefaults standardUserDefaults] setObject:nextUpdateDate forKey:kNextUpdateCheckDateKey];
 
-    if (_updateCheckConnection) {
-        [_updateCheckConnection release];
-        _updateCheckConnection = nil;
-    }
-
     NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
     NSString *updateInfoURLString = [infoDict objectForKey:kUpdateInfoEndpointKey];
-
     if (![updateInfoURLString length]) {
         return;
     }
@@ -98,7 +102,6 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
     }
 
     NSURLRequest *request = [NSURLRequest requestWithURL:updateInfoURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:kTimeoutInterval];
-
     if (!request) {
         return;
     }
@@ -106,21 +109,37 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
     NSLog(@"about to request update url %@ ",updateInfoURL);
 #endif
 
+    if (_receivingData) {
+        [_receivingData release];
+        _receivingData = nil;
+    }
+
+    // create a new data buffer and connection
+    _receivingData = [[NSMutableData alloc] init];
     _updateCheckConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     [_updateCheckConnection start];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    NSLog(@"error");
+    [_receivingData release];
+    _receivingData = nil;
+    [_updateCheckConnection release];
+    _updateCheckConnection = nil;
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    id plist = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL];
+    id plist = [NSPropertyListSerialization propertyListFromData:_receivingData mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL];
 #if DEBUG
     NSLog(@"plist %@",plist);
 #endif
+
+    [_receivingData release];
+    _receivingData = nil;
+    [_updateCheckConnection release];
+    _updateCheckConnection = nil;
+
     if (!plist) {
         return;
     }
@@ -171,7 +190,11 @@ static const NSTimeInterval kNextCheckInterval = 86400.0;
                                               nil];
 
     [_updateNotificationController showWindow:self];
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];    
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    [_receivingData appendData:data];
+}
 @end
