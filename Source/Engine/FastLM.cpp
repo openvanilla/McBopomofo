@@ -71,121 +71,174 @@ bool FastLM::open(const char *path)
 		return false;
 	}
 
-    // we have 4 states, plus end and error
-    // 0
-    //  end -> end
-    //  lf -> forward, go to 0
-    //  space -> error
-    //  other -> record ptr, forward, goto 1
-    // 1
-    //  end -> error
-    //  lf -> error
-    //  space -> zero out, check length, record ptr, go to 2
-    //  other -> forward, go to 1
-    // 2
-    //  lf -> error
-    //  end -> error
-    //  space -> zero out, check length, record ptr, go to 3
-    //  other -> forward, go to 2
-    // 3
-    //  end -> error
-    //  lf -> save row, zero out, go to 0
-    //  space -> error
-    //  other -> forward, go to 3
 
+    // Regular expression for parsing:
+    //   (\n*\w\w*\s\w\w*\s\w\w*)*$
+    //
+    // Expanded as DFA (in Graphviz):
+    //
+    // digraph finite_state_machine {
+    // 	rankdir = LR;
+    // 	size = "10";
+    //
+    // 	node [shape = doublecircle]; End;
+    // 	node [shape = circle];
+    //
+    // 	Start -> End  	[ label = "EOF"];
+    // 	Start -> Error	[ label = "\\s" ];
+    // 	Start -> Start 	[ label = "\\n" ];
+    // 	Start -> 1 		[ label = "\\w" ];
+    //
+    // 	1 -> Error   	[ label = "\\n, EOF" ];
+    // 	1 -> 2      	[ label = "\\s" ];
+    // 	1 -> 1      	[ label = "\\w" ];
+    //
+    // 	2 -> Error 		[ label = "\\n, \\s, EOF" ];
+    // 	2 -> 3 			[ label = "\\w" ];
+    //
+    // 	3 -> Error 		[ label = "\\n, EOF "];
+    // 	3 -> 4 			[ label = "\\s" ];
+    // 	3 -> 3 			[ label = "\\w" ];
+    //
+    // 	4 -> Error 		[ label = "\\n, \\s, EOF" ];
+    // 	4 -> 5 			[ label = "\\w" ];
+    //
+    // 	5 -> Error 		[ label = "\\s, EOF" ];
+    // 	5 -> Start 		[ label = "\\n" ];
+    // 	5 -> 5 			[ label = "\\w" ];
+    // }
 
     char *head = (char *)data;
     char *end = (char *)data + length;
     char c;
     Row row;
 
-state0:
+start:
+    // EOF -> end
     if (head == end) {
         goto end;
     }
 
     c = *head;
-    if (c == '\n') {
-        head++;
-        goto state0;
-    }
-    else if (c == ' ') {
+    // \s -> error
+    if (c == ' ') {
         goto error;
     }
+    // \n -> start
+    else if (c == '\n') {
+        head++;
+        goto start;
+    }
 
+    // \w -> record column star, state1
     row.value = head;
     head++;
-    // fall through state 1
+    // fall through to state 1
 
 state1:
+    // EOF -> error
     if (head == end) {
         goto error;
     }
 
     c = *head;
+    // \n -> error
     if (c == '\n') {
         goto error;
     }
+    // \s -> state2 + zero out ending + record column start
     else if (c == ' ') {
-        if (row.value == head) {
-            goto error;
-        }
-
         *head = 0;
         head++;
         row.key = head;
         goto state2;
     }
 
+    // \w -> state1
     head++;
     goto state1;
 
 state2:
+    // eof -> error
     if (head == end) {
         goto error;
     }
 
     c = *head;
+    // \n, \s -> error
+    if (c == '\n' || c == ' ') {
+        goto error;
+    }
+
+    // \w -> state3
+    head++;
+
+    // fall through to state 3
+
+state3:
+    // eof -> error
+    if (head == end) {
+        goto error;
+    }
+
+    c = *head;
+
+    // \n -> error
     if (c == '\n') {
         goto error;
     }
+    // \s -> state4 + zero out ending + record column start
     else if (c == ' ') {
-        if (row.key == head) {
-            goto error;
-        }
-
         *head = 0;
         head++;
         row.logProbability = head;
-        goto state3;
+        goto state4;
     }
 
+    // \w -> state3
     head++;
-    goto state2;
+    goto state3;
 
-state3:
+state4:
+    // eof -> error
     if (head == end) {
         goto error;
     }
 
     c = *head;
-    if (c == '\n') {
-        if (row.logProbability == head) {
-            goto error;
-        }
-
-        *head = 0;
-        head++;
-        keyRowMap[row.key].push_back(row);
-        goto state0;
-    }
-
-    if (c == ' ') {
+    // \n, \s -> error
+    if (c == '\n' || c == ' ') {
         goto error;
     }
 
+    // \w -> state5
     head++;
-    goto state3;
+
+    // fall through to state 5
+
+
+state5:
+    // eof -> error
+    if (head == end) {
+        goto error;
+    }
+
+    c = *head;
+    // \s -> error
+    if (c == ' ') {
+        goto error;
+    }
+    // \n -> start
+    else if (c == '\n') {
+        *head = 0;
+        head++;
+        keyRowMap[row.key].push_back(row);
+        goto start;
+    }
+
+    // \w -> state 5
+    head++;
+    goto state5;
 
 error:
     close();
