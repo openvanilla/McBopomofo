@@ -53,24 +53,23 @@ bool FastLM::open(const char *path)
         return false;
     }
 
-	fd = ::open(path, O_RDONLY);
-	if (fd == -1) {
-		return false;
-	}
+    fd = ::open(path, O_RDONLY);
+    if (fd == -1) {
+        return false;
+    }
 
     struct stat sb;
-	if (fstat(fd, &sb) == -1) {
-		return false;
-	}
+    if (fstat(fd, &sb) == -1) {
+        return false;
+    }
 
     length = (size_t)sb.st_size;
 
-	data = mmap(NULL, length, PROT_WRITE, MAP_PRIVATE, fd, 0);
-	if (!data) {
+    data = mmap(NULL, length, PROT_WRITE, MAP_PRIVATE, fd, 0);
+    if (!data) {
         ::close(fd);
-		return false;
-	}
-
+        return false;
+    }
 
     // Regular expression for parsing:
     //   (\n*\w\w*\s\w\w*\s\w\w*)*$
@@ -78,34 +77,34 @@ bool FastLM::open(const char *path)
     // Expanded as DFA (in Graphviz):
     //
     // digraph finite_state_machine {
-    // 	rankdir = LR;
-    // 	size = "10";
+    //  rankdir = LR;
+    //  size = "10";
     //
-    // 	node [shape = doublecircle]; End;
-    // 	node [shape = circle];
+    //  node [shape = doublecircle]; End;
+    //  node [shape = circle];
     //
-    // 	Start -> End  	[ label = "EOF"];
-    // 	Start -> Error	[ label = "\\s" ];
-    // 	Start -> Start 	[ label = "\\n" ];
-    // 	Start -> 1 		[ label = "\\w" ];
+    //  Start -> End    [ label = "EOF"];
+    //  Start -> Error  [ label = "\\s" ];
+    //  Start -> Start  [ label = "\\n" ];
+    //  Start -> 1      [ label = "\\w" ];
     //
-    // 	1 -> Error   	[ label = "\\n, EOF" ];
-    // 	1 -> 2      	[ label = "\\s" ];
-    // 	1 -> 1      	[ label = "\\w" ];
+    //  1 -> Error      [ label = "\\n, EOF" ];
+    //  1 -> 2          [ label = "\\s" ];
+    //  1 -> 1          [ label = "\\w" ];
     //
-    // 	2 -> Error 		[ label = "\\n, \\s, EOF" ];
-    // 	2 -> 3 			[ label = "\\w" ];
+    //  2 -> Error      [ label = "\\n, \\s, EOF" ];
+    //  2 -> 3          [ label = "\\w" ];
     //
-    // 	3 -> Error 		[ label = "\\n, EOF "];
-    // 	3 -> 4 			[ label = "\\s" ];
-    // 	3 -> 3 			[ label = "\\w" ];
+    //  3 -> Error      [ label = "\\n, EOF "];
+    //  3 -> 4          [ label = "\\s" ];
+    //  3 -> 3          [ label = "\\w" ];
     //
-    // 	4 -> Error 		[ label = "\\n, \\s, EOF" ];
-    // 	4 -> 5 			[ label = "\\w" ];
+    //  4 -> Error      [ label = "\\n, \\s, EOF" ];
+    //  4 -> 5          [ label = "\\w" ];
     //
-    // 	5 -> Error 		[ label = "\\s, EOF" ];
-    // 	5 -> Start 		[ label = "\\n" ];
-    // 	5 -> 5 			[ label = "\\w" ];
+    //  5 -> Error      [ label = "\\s, EOF" ];
+    //  5 -> Start      [ label = "\\n" ];
+    //  5 -> 5          [ label = "\\w" ];
     // }
 
     char *head = (char *)data;
