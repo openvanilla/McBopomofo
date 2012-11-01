@@ -52,7 +52,7 @@ using namespace OpenVanilla;
 static const NSInteger kDefaultCandidateListTextSize = 16;
 static const NSInteger kMinKeyLabelSize = 10;
 static const NSInteger kMinCandidateListTextSize = 12;
-static const NSInteger kMaxCandidateListTextSize = 128;
+static const NSInteger kMaxCandidateListTextSize = 196;
 
 // default, min and max composing buffer size (in codepoints)
 // modern Macs can usually work up to 16 codepoints when the builder still
