@@ -44,7 +44,7 @@ static NSString *kUpdateInfoSiteKey = @"UpdateInfoSite";
 static const NSTimeInterval kNextCheckInterval = 86400.0;
 static const NSTimeInterval kTimeoutInterval = 60.0;
 
-@interface AppDelegate () <NSURLConnectionDataDelegate>
+@interface AppDelegate ()
 @end
 
 @implementation AppDelegate

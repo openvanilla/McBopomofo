@@ -131,6 +131,9 @@ FastLM gLanguageModelPlainBopomofo;
 - (void)beep;
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client;
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode;
+
+- (void)showAbout:(id)sender;
+- (void)updateClientComposingBuffer:(id)client;
 @end
 
 // sort helper

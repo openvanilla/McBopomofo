@@ -83,11 +83,6 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         
         _scrollView = [[NSScrollView alloc] initWithFrame:scrollViewRect];        
         
-        // >=10.7 only, elastic scroll causes some drawing issues with visible scroller, so we disable it
-        if ([_scrollView respondsToSelector:@selector(setVerticalScrollElasticity:)]) {
-            [_scrollView setVerticalScrollElasticity:NSScrollElasticityNone];
-        }
-        
         _tableView = [[VTVerticalCandidateTableView alloc] initWithFrame:contentRect];
         [_tableView setDataSource:self];
         [_tableView setDelegate:self];
@@ -380,15 +375,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         NSScroller *verticalScroller = [_scrollView verticalScroller];
         [verticalScroller setControlSize:controlSize];
         
-        // calling >=10.7 only API
-        if ([verticalScroller respondsToSelector:@selector(setScrollerStyle:)]) {
-            [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
-            scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
-        }
-        else {
-            // not on >=10.7
-            scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize];
-        }
+		scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize];
     }
 
     _keyLabelStripView.keyLabelFont = _keyLabelFont;
