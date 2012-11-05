@@ -1,8 +1,8 @@
-# OpenVanilla McBopomofo 小麥注音輸入法
+# McBopomofo 小麥注音輸入法
 
-0.9.3 搶先體驗版
+最新版本：0.9.5
 
-[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.3.zip)
+[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.5.zip)
 
 ## 特色
 
