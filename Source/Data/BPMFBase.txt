@@ -2276,6 +2276,7 @@
 滿 ㄇㄢˇ man3 a03 big5
 屘 ㄇㄢˇ man3 a03 big5
 矕 ㄇㄢˇ man3 a03 big5
+蟎 ㄇㄢˇ man3 a03 cns
 慢 ㄇㄢˋ man4 a04 big5
 漫 ㄇㄢˋ man4 a04 big5
 曼 ㄇㄢˋ man4 a04 big5
@@ -4894,6 +4895,7 @@
 魌 ㄑㄧ qi fu big5
 鶈 ㄑㄧ qi fu big5
 攲 ㄑㄧ qi fu big5
+槭 ㄑㄧ qi fu big5
 切 ㄑㄧㄝ qie fu, big5
 沏 ㄑㄧㄝ qie fu, big5
 且 ㄑㄧㄝˇ qie3 fu,3 big5

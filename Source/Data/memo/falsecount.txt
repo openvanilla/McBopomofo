@@ -1,1 +1,5 @@
-得與	85
+由中            is removed due to too many false positive count, we can add it
+                it back after modifying the original textpool files
+得與		is removed due to too many false positive count, we can add it
+                it back after modifying the original textpool files
+		beside, i don't remember this phrase.
