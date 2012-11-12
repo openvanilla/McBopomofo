@@ -147,8 +147,9 @@ if __name__=='__main__':
                         continue
                     elif str(bpmf_phon2[mykey]) == r:
                         # l(3/4) = -0.28768207245178 / 頻率打七五折之意
-                        if float(myvalue)-0.28768207245178 > H_DEFLT_FREQ:
-                            fout.write("%s %s %f\n" % ( mykey, r, float(myvalue)-0.28768207245178 ))
+                        # l(1/2) = -0.69314718055994 / 頻率打五折之意
+                        if float(myvalue)-0.69314718055994 > H_DEFLT_FREQ:
+                            fout.write("%s %s %f\n" % ( mykey, r, float(myvalue)-0.69314718055994 ))
                             continue
                         else:
                             fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))
@@ -158,8 +159,9 @@ if __name__=='__main__':
                         continue
                     elif str(bpmf_phon3[mykey]) == r:
                         # l(3/4*3/4) = -0.28768207245178*2
-                        if float(myvalue)-0.28768207245178*2 > H_DEFLT_FREQ:
-                            fout.write("%s %s %f\n" % ( mykey, r, float(myvalue)-0.28768207245178*2 ))
+                        # l(1/2*1/2) = -0.69314718055994*2
+                        if float(myvalue)-0.69314718055994*2 > H_DEFLT_FREQ:
+                            fout.write("%s %s %f\n" % ( mykey, r, float(myvalue)-0.69314718055994*2 ))
                             continue
                         else:
                             fout.write("%s %s %f\n" % ( mykey, r, H_DEFLT_FREQ ))

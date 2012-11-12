@@ -12541,6 +12541,7 @@
 瘌 ㄌㄚˋ la4 x84 big5
 揧 ㄌㄚˋ la4 x84 big5
 楋 ㄌㄚˋ la4 x84 big5
+鱲 ㄌㄚˋ la4 x84 cns
 剌 ㄌㄚˊ la2 x86 big5
 邋 ㄌㄚˊ la2 x86 big5
 旯 ㄌㄚˊ la2 x86 big5
