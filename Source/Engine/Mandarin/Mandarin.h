@@ -268,9 +268,10 @@ namespace Formosa {
             static const BopomofoKeyboardLayout* ETenLayout();
             static const BopomofoKeyboardLayout* HsuLayout();
             static const BopomofoKeyboardLayout* ETen26Layout();
+            static const BopomofoKeyboardLayout* IBMLayout();
             static const BopomofoKeyboardLayout* HanyuPinyinLayout();
             
-            // recognizes (case-insensitive): standard, eten, hsu, eten26
+            // recognizes (case-insensitive): standard, eten, hsu, eten26, ibm
             static const BopomofoKeyboardLayout* LayoutForName(const string& name);            
             
             BopomofoKeyboardLayout(const BopomofoKeyToComponentMap& ktcm, const string& name)
@@ -461,7 +462,8 @@ namespace Formosa {
             static const BopomofoKeyboardLayout* c_StandardLayout;
             static const BopomofoKeyboardLayout* c_ETenLayout;
             static const BopomofoKeyboardLayout* c_HsuLayout;
-            static const BopomofoKeyboardLayout* c_ETen26Layout;                                    
+            static const BopomofoKeyboardLayout* c_ETen26Layout;
+            static const BopomofoKeyboardLayout* c_IBMLayout;
 
             // this is essentially an empty layout, but we use pointer semantic to tell the differences--and pass on the responsibility to BopomofoReadingBuffer
             static const BopomofoKeyboardLayout* c_HanyuPinyinLayout;                                    
