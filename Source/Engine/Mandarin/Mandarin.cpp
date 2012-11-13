@@ -720,18 +720,20 @@ BopomofoCharacterMap::BopomofoCharacterMap()
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_StandardLayout = 0;
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_ETenLayout = 0;
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_HsuLayout = 0;
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_ETen26Layout = 0;                        
+const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_ETen26Layout = 0;
+const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_IBMLayout = 0;
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::c_HanyuPinyinLayout = 0;
 
 void BopomofoKeyboardLayout::FinalizeLayouts()
 {
     #define FL(x) if (x) { delete x; } x = 0
     FL(c_StandardLayout);
-    FL(c_ETen26Layout);
+    FL(c_ETenLayout);
     FL(c_HsuLayout);
     FL(c_ETen26Layout);
+    FL(c_IBMLayout);
     FL(c_HanyuPinyinLayout);
-    #undef FL    
+    #undef FL
 }
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::LayoutForName(const string& name)
@@ -747,6 +749,9 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::LayoutForName(const string
     
     if (OVWildcard::Match(name, "eten26"))
         return ETen26Layout();
+
+    if (OVWildcard::Match(name, "IBM"))
+        return IBMLayout();
 
     if (OVWildcard::Match(name, "hanyupinyin") || OVWildcard::Match(name, "hanyu pinyin") || OVWildcard::Match(name, "hanyu-pinyin") || OVWildcard::Match(name, "pinyin"))
         return HanyuPinyinLayout();
@@ -800,16 +805,69 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::StandardLayout()
         ASSIGNKEY1(ktcm, vec, 'p', BPMF::EN);
         ASSIGNKEY1(ktcm, vec, ';', BPMF::ANG);
         ASSIGNKEY1(ktcm, vec, '/', BPMF::ENG);
-        ASSIGNKEY1(ktcm, vec, '-', BPMF::ERR);                                                    
+        ASSIGNKEY1(ktcm, vec, '-', BPMF::ERR);
         ASSIGNKEY1(ktcm, vec, '3', BPMF::Tone3);
         ASSIGNKEY1(ktcm, vec, '4', BPMF::Tone4);
         ASSIGNKEY1(ktcm, vec, '6', BPMF::Tone2);
-        ASSIGNKEY1(ktcm, vec, '7', BPMF::Tone5);        
+        ASSIGNKEY1(ktcm, vec, '7', BPMF::Tone5);
         
         c_StandardLayout = new BopomofoKeyboardLayout(ktcm, "Standard");
     }
     
     return c_StandardLayout;
+}
+const BopomofoKeyboardLayout* BopomofoKeyboardLayout::IBMLayout()
+{
+    if (!c_IBMLayout) {
+        vector<BPMF::Component> vec;
+        BopomofoKeyToComponentMap ktcm;
+                
+        ASSIGNKEY1(ktcm, vec, '1', BPMF::B);
+        ASSIGNKEY1(ktcm, vec, '2', BPMF::P);
+        ASSIGNKEY1(ktcm, vec, '3', BPMF::M);
+        ASSIGNKEY1(ktcm, vec, '4', BPMF::F);
+        ASSIGNKEY1(ktcm, vec, '5', BPMF::D);
+        ASSIGNKEY1(ktcm, vec, '6', BPMF::T);
+        ASSIGNKEY1(ktcm, vec, '7', BPMF::N);
+        ASSIGNKEY1(ktcm, vec, '8', BPMF::L);
+        ASSIGNKEY1(ktcm, vec, '9', BPMF::G);
+        ASSIGNKEY1(ktcm, vec, '0', BPMF::K);
+        ASSIGNKEY1(ktcm, vec, '-', BPMF::H);
+        ASSIGNKEY1(ktcm, vec, 'q', BPMF::J);
+        ASSIGNKEY1(ktcm, vec, 'w', BPMF::Q);
+        ASSIGNKEY1(ktcm, vec, 'e', BPMF::X);
+        ASSIGNKEY1(ktcm, vec, 'r', BPMF::ZH);
+        ASSIGNKEY1(ktcm, vec, 't', BPMF::CH);
+        ASSIGNKEY1(ktcm, vec, 'y', BPMF::SH);
+        ASSIGNKEY1(ktcm, vec, 'u', BPMF::R);
+        ASSIGNKEY1(ktcm, vec, 'i', BPMF::Z);
+        ASSIGNKEY1(ktcm, vec, 'o', BPMF::C);
+        ASSIGNKEY1(ktcm, vec, 'p', BPMF::S);
+        ASSIGNKEY1(ktcm, vec, 'a', BPMF::I);
+        ASSIGNKEY1(ktcm, vec, 's', BPMF::U);
+        ASSIGNKEY1(ktcm, vec, 'd', BPMF::UE);
+        ASSIGNKEY1(ktcm, vec, 'f', BPMF::A);
+        ASSIGNKEY1(ktcm, vec, 'g', BPMF::O);
+        ASSIGNKEY1(ktcm, vec, 'h', BPMF::ER);
+        ASSIGNKEY1(ktcm, vec, 'j', BPMF::E);
+        ASSIGNKEY1(ktcm, vec, 'k', BPMF::AI);
+        ASSIGNKEY1(ktcm, vec, 'l', BPMF::EI);
+        ASSIGNKEY1(ktcm, vec, ';', BPMF::AO);
+        ASSIGNKEY1(ktcm, vec, 'z', BPMF::OU);
+        ASSIGNKEY1(ktcm, vec, 'x', BPMF::AN);
+        ASSIGNKEY1(ktcm, vec, 'c', BPMF::EN);
+        ASSIGNKEY1(ktcm, vec, 'v', BPMF::ANG);
+        ASSIGNKEY1(ktcm, vec, 'b', BPMF::ENG);
+        ASSIGNKEY1(ktcm, vec, 'n', BPMF::ERR);
+        ASSIGNKEY1(ktcm, vec, 'm', BPMF::Tone2);
+        ASSIGNKEY1(ktcm, vec, ',', BPMF::Tone3);
+        ASSIGNKEY1(ktcm, vec, '.', BPMF::Tone4);
+        ASSIGNKEY1(ktcm, vec, '/', BPMF::Tone5);
+        
+        c_IBMLayout = new BopomofoKeyboardLayout(ktcm, "IBM");
+    }
+    
+    return c_IBMLayout;
 }
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETenLayout()
@@ -854,7 +912,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETenLayout()
         ASSIGNKEY1(ktcm, vec, '9', BPMF::EN);
         ASSIGNKEY1(ktcm, vec, '0', BPMF::ANG);
         ASSIGNKEY1(ktcm, vec, '-', BPMF::ENG);
-        ASSIGNKEY1(ktcm, vec, '=', BPMF::ERR);                                                    
+        ASSIGNKEY1(ktcm, vec, '=', BPMF::ERR);
         ASSIGNKEY1(ktcm, vec, '2', BPMF::Tone2);
         ASSIGNKEY1(ktcm, vec, '3', BPMF::Tone3);
         ASSIGNKEY1(ktcm, vec, '4', BPMF::Tone4);
@@ -863,7 +921,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETenLayout()
         c_ETenLayout = new BopomofoKeyboardLayout(ktcm, "ETen");
     }
     
-    return c_ETenLayout;    
+    return c_ETenLayout;
 }
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HsuLayout()
@@ -872,8 +930,8 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HsuLayout()
         vector<BPMF::Component> vec;
         BopomofoKeyToComponentMap ktcm;
                 
-        ASSIGNKEY1(ktcm, vec, 'b', BPMF::B); 
-        ASSIGNKEY1(ktcm, vec, 'p', BPMF::P); 
+        ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
+        ASSIGNKEY1(ktcm, vec, 'p', BPMF::P);
         ASSIGNKEY2(ktcm, vec, 'm', BPMF::M, BPMF::AN);
         ASSIGNKEY2(ktcm, vec, 'f', BPMF::F, BPMF::Tone3);
         ASSIGNKEY2(ktcm, vec, 'd', BPMF::D, BPMF::Tone2);
@@ -901,7 +959,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HsuLayout()
         c_HsuLayout = new BopomofoKeyboardLayout(ktcm, "Hsu");
     }
     
-    return c_HsuLayout;    
+    return c_HsuLayout;
 }
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETen26Layout()
 {
@@ -939,13 +997,12 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETen26Layout()
         c_ETen26Layout = new BopomofoKeyboardLayout(ktcm, "ETen26");
     }
     
-    return c_ETen26Layout;       
+    return c_ETen26Layout;
 }
-
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HanyuPinyinLayout()
 {
     if (!c_HanyuPinyinLayout) {
-        BopomofoKeyToComponentMap ktcm;        
+        BopomofoKeyToComponentMap ktcm;
         c_HanyuPinyinLayout = new BopomofoKeyboardLayout(ktcm, "HanyuPinyin");
     }
     return c_HanyuPinyinLayout;

@@ -268,6 +268,9 @@ public:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETen26Layout());
             break;
         case 4:
+            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::IBMLayout());
+            break;
+        case 5:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
         default:
@@ -1048,6 +1051,9 @@ public:
             layout = string("Hsu_");
             break;
         case 4:
+            layout = string("IBM_");
+            break;
+        case 5:
             layout = string("HanyuPinyin_");
             break;
         default:
