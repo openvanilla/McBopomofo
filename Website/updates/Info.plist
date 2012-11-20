@@ -7,8 +7,8 @@
 	<key>UpdateInfoSite</key>
 	<string>https://github.com/mjhsieh/McBopomofo/downloads</string>
 	<key>CFBundleVersion</key>
-	<string>250</string>
+	<string>483</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.3</string>
+	<string>0.9.6</string>
 </dict>
 </plist>

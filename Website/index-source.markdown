@@ -1,8 +1,10 @@
 # McBopomofo 小麥注音輸入法
 
-最新版本：0.9.5
+最新版本：0.9.6
 
-[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.5.zip)
+[下載連結](https://github.com/downloads/mjhsieh/McBopomofo/McBopomofo-Installer-0.9.6.zip)
+
+[新版功能介紹](http://osxchat.tumblr.com/post/36028711104/0-9-6)
 
 ## 特色
 
