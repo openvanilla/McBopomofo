@@ -48,7 +48,7 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{557, 383}, {460, 266}}</string>
+				<string key="NSWindowRect">{{401, 295}, {460, 266}}</string>
 				<int key="NSWTFlags">544735232</int>
 				<string key="NSWindowTitle">Bopomofo Preferences</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -864,7 +864,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string key="NSFrame">{{225, 18}, {217, 18}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:239</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="1041607992">
