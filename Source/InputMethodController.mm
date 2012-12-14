@@ -304,8 +304,15 @@ public:
 
 - (void)deactivateServer:(id)client
 {
+    // clean up reading buffer residues
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        _bpmfReadingBuffer->clear();
+        [client setMarkedText:@"" selectionRange:NSMakeRange(0, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    }
+
     // commit any residue in the composing buffer
     [self commitComposition:client];
+
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
 
