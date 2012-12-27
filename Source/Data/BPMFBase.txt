@@ -13425,7 +13425,7 @@
 孜 ㄗ zi y big5
 諮 ㄗ zi y big5
 貲 ㄗ zi y big5
-玆 ㄗ zi y big5
+玆 ㄗ zi y big5-e
 ㄗ ㄗ zi y big5
 輜 ㄗ zi y big5
 淄 ㄗ zi y big5
