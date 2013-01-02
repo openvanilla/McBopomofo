@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = 'Mengjuei Hsieh et al.'
 import sys
 
 UNK_LOG_FREQ = -99.0
