@@ -9210,6 +9210,7 @@
 哪 ㄋㄨㄛˊ nuo2 sji6 big5
 呢 ㄋㄜ ne sk big5
 呢 ㄋㄜ˙ ne sk7 big5
+呢 ㄋㄜˋ ne4 sk4 big5
 峱 ㄋㄠ nao sl big5
 腦 ㄋㄠˇ nao3 sl3 big5
 惱 ㄋㄠˇ nao3 sl3 big5
@@ -13666,6 +13667,7 @@
 筰 ㄗㄨㄛˊ zuo2 yji6 big5
 稓 ㄗㄨㄛˊ zuo2 yji6 big5
 葃 ㄗㄨㄛˊ zuo2 yji6 big5
+作 ㄗㄨㄛ zuo yji big5
 堆 ㄗㄨㄟ zui yjo big5
 厜 ㄗㄨㄟ zui yjo big5
 羧 ㄗㄨㄟ zui yjo big5
