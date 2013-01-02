@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Mengjuei Hsieh
+__author__ = 'Mengjuei Hsieh'
+
 import sys
 import math
 
