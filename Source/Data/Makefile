@@ -34,6 +34,8 @@ sort:
 	@mv tmp heterophony2.list
 	@env LANG=C sort -k1 heterophony3.list|uniq>tmp
 	@mv tmp heterophony3.list
+	@env LANG=C sort -k1 exclusion.txt|uniq>tmp
+	@mv tmp exclusion.txt
 
 check:
 	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt

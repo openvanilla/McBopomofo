@@ -1105,6 +1105,7 @@
 氘 ㄉㄠ dao 2l big5
 幍 ㄉㄠ dao 2l big5
 魛 ㄉㄠ dao 2l big5
+捯 ㄉㄠˊ dao2 2l6 big5
 倒 ㄉㄠˇ dao3 2l3 big5
 島 ㄉㄠˇ dao3 2l3 big5
 導 ㄉㄠˇ dao3 2l3 big5
@@ -11502,6 +11503,7 @@
 撊 ㄒㄧㄢˋ xian4 vu04 big5
 錎 ㄒㄧㄢˋ xian4 vu04 big5
 姭 ㄒㄧㄢˋ xian4 vu04 big5
+献 ㄒㄧㄢˋ xian4 vu04 big5e
 賢 ㄒㄧㄢˊ xian2 vu06 big5
 閒 ㄒㄧㄢˊ xian2 vu06 big5
 嫌 ㄒㄧㄢˊ xian2 vu06 big5
@@ -13425,7 +13427,7 @@
 孜 ㄗ zi y big5
 諮 ㄗ zi y big5
 貲 ㄗ zi y big5
-玆 ㄗ zi y big5-e
+玆 ㄗ zi y big5e
 ㄗ ㄗ zi y big5
 輜 ㄗ zi y big5
 淄 ㄗ zi y big5
