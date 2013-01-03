@@ -6,7 +6,8 @@ __doc__    = """Extremely dumb self-check, is in need to adopt algorithms
 
 import sys
 XXXXXXX = ['ㄕㄨ˙','ㄌㄧ˙','ㄒㄧ˙','ㄍㄨ˙','ㄊㄞ˙','ㄨㄚ˙',
-           'ㄉㄧㄢ˙','ㄒㄧㄝ˙','ㄌㄡ˙','ㄋㄧㄤ˙','ㄌㄨ˙', 'ㄐㄧㄝ˙']
+           'ㄒㄧㄝ˙','ㄌㄡ˙','ㄌㄨ˙', 'ㄐㄧㄝ˙']
+# 'ㄋㄧㄤ˙','ㄉㄧㄢ˙',
 
 # TODO: move section of find highest score from the list to here
 

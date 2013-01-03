@@ -9210,7 +9210,7 @@
 哪 ㄋㄨㄛˊ nuo2 sji6 big5
 呢 ㄋㄜ ne sk big5
 呢 ㄋㄜ˙ ne sk7 big5
-呢 ㄋㄜˋ ne4 sk4 big5
+訥 ㄋㄜˋ ne4 sk4 big5
 峱 ㄋㄠ nao sl big5
 腦 ㄋㄠˇ nao3 sl3 big5
 惱 ㄋㄠˇ nao3 sl3 big5
@@ -13292,6 +13292,7 @@
 黐 ㄌㄧˊ li2 xu6 big5
 粍 ㄌㄧˊ li2 xu6 big5
 麶 ㄌㄧˊ li2 xu6 big5
+哩 ㄌㄧ˙ li5 xu7 big5
 倆 ㄌㄧㄚˇ lia3 xu83 big5
 兩 ㄌㄧㄤˇ liang3 xu;3 big5
 倆 ㄌㄧㄤˇ liang3 xu;3 big5
