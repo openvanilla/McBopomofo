@@ -8,13 +8,13 @@ import sys
 XXXXXXX = ['ㄕㄨ˙','ㄌㄧ˙','ㄒㄧ˙','ㄍㄨ˙','ㄊㄞ˙','ㄨㄚ˙','ㄋㄞ˙',
            'ㄒㄧㄝ˙','ㄌㄡ˙','ㄌㄨ˙', 'ㄐㄧㄝ˙','ㄉㄧ˙','ㄍㄨㄥ˙']
 
-def segPick(mytest,segcand='',segscore=0):
+def segPick(thisbpmf,segcand='',segscore=0):
     myscore = -9999.99
     mycand = ''
-    if mytest not in phrases:
-        print mytest
+    if thisbpmf not in phrases:
+        print thisbpmf
         sys.exit(1)
-    for a,b in phrases[mytest]:
+    for a,b in phrases[thisbpmf]:
         if myscore < b:
             mycand = a
             myscore = b
@@ -37,11 +37,11 @@ def twoCharWalk(bpmf2walk):
             (segcand, segscore) = segPick(mybpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #12
-    mytest = '-'.join(bpmfinput[0:2])
-    if mytest in phrases:
+    thisbpmf = '-'.join(bpmfinput[0:2])
+    if thisbpmf in phrases:
         segcand = ''
         segscore = 0
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
@@ -63,24 +63,24 @@ def threeCharWalk(bpmf2walk):
             print bpmf2walk
             sys.exit(0)
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
-        mytest = '-'.join(bpmfinput[1:3])
-        (a, b) = twoCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[1:3])
+        (a, b) = twoCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
     #123
-    mytest = '-'.join(bpmfinput[0:3])
-    if mytest in phrases:
+    thisbpmf = '-'.join(bpmfinput[0:3])
+    if thisbpmf in phrases:
         segcand = ''
         segscore = 0
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #12-3
     if bpmfinput[2] not in XXXXXXX and '-'.join(bpmfinput[0:2]) in phrases:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:2])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[0:2])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         mybpmf = bpmfinput[2]
         if mybpmf not in phrases:
             print mybpmf
@@ -101,8 +101,8 @@ def fourCharWalk(bpmf2walk):
         segscore = 0
         mybpmf = bpmfinput[0]
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
-        mytest = '-'.join(bpmfinput[1:4])
-        (a, b) = threeCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[1:4])
+        (a, b) = threeCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -110,10 +110,10 @@ def fourCharWalk(bpmf2walk):
     if bpmfinput[2] not in XXXXXXX and bpmfinput[3] not in XXXXXXX and '-'.join(bpmfinput[0:2]) in phrases:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:2])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
-        mytest = '-'.join(bpmfinput[2:4])
-        (a, b) = twoCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[0:2])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[2:4])
+        (a, b) = twoCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -121,17 +121,17 @@ def fourCharWalk(bpmf2walk):
     if bpmfinput[3] not in XXXXXXX and '-'.join(bpmfinput[0:3]) in phrases:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:3])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[0:3])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         mybpmf = bpmfinput[3]
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #1234
-    mytest = '-'.join(bpmfinput[0:4])
-    if mytest in phrases:
+    thisbpmf = '-'.join(bpmfinput[0:4])
+    if thisbpmf in phrases:
         segcand = ''
         segscore = 0
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
@@ -146,8 +146,8 @@ def fiveCharWalk(bpmf2walk):
         segscore = 0
         mybpmf = bpmfinput[0]
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
-        mytest = '-'.join(bpmfinput[1:5])
-        (a, b) = fourCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[1:5])
+        (a, b) = fourCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -155,10 +155,10 @@ def fiveCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:2]) in phrases and bpmfinput[2] not in XXXXXXX and bpmfinput[3] not in XXXXXXX and bpmfinput[4] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:2])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
-        mytest = '-'.join(bpmfinput[2:5])
-        (a, b) = threeCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[0:2])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[2:5])
+        (a, b) = threeCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -166,10 +166,10 @@ def fiveCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:3]) in phrases and bpmfinput[3] not in XXXXXXX and bpmfinput[4] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:3])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
-        mytest = '-'.join(bpmfinput[3:5])
-        (a, b) = twoCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[0:3])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[3:5])
+        (a, b) = twoCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -177,8 +177,8 @@ def fiveCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:4]) in phrases and bpmfinput[4] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:4])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[0:4])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         mybpmf = bpmfinput[4]
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
         candidate.append((segcand, segscore))
@@ -186,8 +186,8 @@ def fiveCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:5]) in phrases:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:5])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[0:5])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
@@ -202,8 +202,8 @@ def sixCharWalk(bpmf2walk):
         segscore = 0
         mybpmf = bpmfinput[0]
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
-        mytest = '-'.join(bpmfinput[1:6])
-        (a, b) = fourCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[1:6])
+        (a, b) = fourCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -211,10 +211,10 @@ def sixCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:2]) in phrases and bpmfinput[2] not in XXXXXXX and bpmfinput[3] not in XXXXXXX and bpmfinput[4] not in XXXXXXX and bpmfinput[5] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:2])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
-        mytest = '-'.join(bpmfinput[2:6])
-        (a, b) = threeCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[0:2])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[2:6])
+        (a, b) = threeCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -222,10 +222,10 @@ def sixCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:3]) in phrases and bpmfinput[3] not in XXXXXXX and bpmfinput[4] not in XXXXXXX and bpmfinput[5] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:3])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
-        mytest = '-'.join(bpmfinput[3:6])
-        (a, b) = threeCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[0:3])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[3:6])
+        (a, b) = threeCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -233,10 +233,10 @@ def sixCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:4]) in phrases and bpmfinput[4] not in XXXXXXX and bpmfinput[5] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:4])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
-        mytest = '-'.join(bpmfinput[4:6])
-        (a, b) = twoCharWalk(mytest)
+        thisbpmf = '-'.join(bpmfinput[0:4])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[4:6])
+        (a, b) = twoCharWalk(thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -244,8 +244,8 @@ def sixCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:5]) in phrases and bpmfinput[5] not in XXXXXXX:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:5])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[0:5])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         mybpmf = bpmfinput[5]
         (segcand, segscore) = segPick(mybpmf,segcand,segscore)
         candidate.append((segcand, segscore))
@@ -253,8 +253,8 @@ def sixCharWalk(bpmf2walk):
     if '-'.join(bpmfinput[0:6]) in phrases:
         segcand = ''
         segscore = 0
-        mytest = '-'.join(bpmfinput[0:6])
-        (segcand, segscore) = segPick(mytest,segcand,segscore)
+        thisbpmf = '-'.join(bpmfinput[0:6])
+        (segcand, segscore) = segPick(thisbpmf,segcand,segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
