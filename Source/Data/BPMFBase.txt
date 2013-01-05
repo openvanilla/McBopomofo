@@ -1006,6 +1006,7 @@
 哆 ㄉㄨㄛ duo 2ji big5
 柁 ㄉㄨㄛ duo 2ji big5
 茤 ㄉㄨㄛ duo 2ji big5
+掇 ㄉㄨㄛ duo 2ji big5
 躲 ㄉㄨㄛˇ duo3 2ji3 big5
 朵 ㄉㄨㄛˇ duo3 2ji3 big5
 埵 ㄉㄨㄛˇ duo3 2ji3 big5
@@ -1047,6 +1048,7 @@
 腏 ㄉㄨㄛˊ duo2 2ji6 big5
 鮵 ㄉㄨㄛˊ duo2 2ji6 big5
 襗 ㄉㄨㄛˊ duo2 2ji6 big5
+掇 ㄉㄨㄛ˙ duo5 2ji7 big5
 堆 ㄉㄨㄟ dui 2jo big5
 頧 ㄉㄨㄟ dui 2jo big5
 痽 ㄉㄨㄟ dui 2jo big5
