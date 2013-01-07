@@ -6,7 +6,8 @@ __doc__    = """Extremely dumb self-check, is in need to adopt algorithms
 
 import sys
 XXXXXXX = ['ㄕㄨ˙','ㄌㄧ˙','ㄒㄧ˙','ㄍㄨ˙','ㄊㄞ˙','ㄨㄚ˙','ㄋㄞ˙',
-           'ㄒㄧㄝ˙','ㄌㄡ˙','ㄌㄨ˙', 'ㄐㄧㄝ˙','ㄉㄧ˙','ㄍㄨㄥ˙']
+           'ㄒㄧㄝ˙','ㄌㄡ˙','ㄌㄨ˙', 'ㄐㄧㄝ˙','ㄉㄧ˙','ㄍㄨㄥ˙',
+           'ㄌㄠ˙']
 
 def segPick(thisbpmf,segcand='',segscore=0):
     myscore = -9999.99
