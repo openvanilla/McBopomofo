@@ -339,6 +339,12 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
                            
 - (void)layoutCandidateView
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredLayoutCandidateView) object:nil];
+    [self performSelector:@selector(deferredLayoutCandidateView) withObject:nil afterDelay:0.0];
+}
+
+- (void)deferredLayoutCandidateView
+{
     NSUInteger count = [_delegate candidateCountForController:self];
     if (!count) {
         return;
