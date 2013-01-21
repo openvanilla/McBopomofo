@@ -44,7 +44,7 @@ if __name__=='__main__':
         allstrings.append(elements[0])
     handle.close()
     pool = multiprocessing.Pool(ncores)
-    results = pool.map(count_string,allstrings)
+    results = pool.map_async(count_string,allstrings).get(9999999)
     outputs = [ (phrase, count) for phrase, count, state in results if state is True]
     for phrase, count in outputs:
         outstring = u'%s	%d' % (phrase,count)
