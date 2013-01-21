@@ -17,4 +17,3 @@ else
    echo "File \"${TEXTPOOL}\" not found."
 fi
 exit 0
-# TODO: use uniq to count occurance seems to be a viable way

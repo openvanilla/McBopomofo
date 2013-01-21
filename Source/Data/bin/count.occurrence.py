@@ -25,24 +25,39 @@ def count_string(substring):
         return substring, bigstring.count(substring), True
     return '', 0, False
 
+def my_open(filename, mode): 
+    return codecs.open(filename, mode, 'utf8') 
+
 if __name__=='__main__':
     """
     bin/count.occurrence.py phrase.list > phrase.occ
     """
     max_cores = multiprocessing.cpu_count()
     ncores    = max_cores
-    try:
-        handle = codecs.open(sys.argv[1], encoding='utf-8', mode='r')
-    except IOError as e:
-        print("({})".format(e))
-    allstrings = []
-    while True:
-        line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
-        elements = line.rstrip().split()
-        allstrings.append(elements[0])
-    handle.close()
+    if sys.argv[1] is '-':
+        allstrings = []
+        while True:
+            try:
+                line = raw_input().decode("utf-8")
+                if not line: break
+                if line[0] == '#': continue
+                elements = line.rstrip().split()
+                allstrings.append(elements[0])
+            except (EOFError):
+                break
+    else:
+        try:
+            handle = codecs.open(sys.argv[1], encoding='utf-8', mode='r')
+        except IOError as e:
+            print("({})".format(e))
+        allstrings = []
+        while True:
+            line = handle.readline()
+            if not line: break
+            if line[0] == '#': continue
+            elements = line.rstrip().split()
+            allstrings.append(elements[0])
+        handle.close()
     pool = multiprocessing.Pool(ncores)
     results = pool.map_async(count_string,allstrings).get(9999999)
     outputs = [ (phrase, count) for phrase, count, state in results if state is True]
