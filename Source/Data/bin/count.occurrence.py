@@ -13,7 +13,7 @@ __doc__    = """
 # not ideal, but should be sufficient.
 bigstring = ''
 try:
-    handle = codecs.open('/Volumes/ramdisk/textpool.10202012', encoding='utf-8', mode='r')
+    handle = codecs.open('/Volumes/ramdisk/textpool.01202013', encoding='utf-8', mode='r')
 except IOError as e:
     print("({})".format(e))
 bigstring=handle.read()
