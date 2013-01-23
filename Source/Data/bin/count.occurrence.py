@@ -25,17 +25,18 @@ def count_string(substring):
         return substring, bigstring.count(substring), True
     return '', 0, False
 
-def my_open(filename, mode): 
-    return codecs.open(filename, mode, 'utf8') 
-
 if __name__=='__main__':
     """
     bin/count.occurrence.py phrase.list > phrase.occ
     """
-    max_cores = multiprocessing.cpu_count()
-    ncores    = max_cores
-    if sys.argv[1] is '-':
-        allstrings = []
+    max_cores  = multiprocessing.cpu_count()
+    ncores     = max_cores
+    allstrings = []
+    if len(sys.argv) < 2:
+        print "Usage:"
+        print "bin/count.occurrence.py phrase.list > phrase.occ"
+        sys.exit(0)
+    elif sys.argv[1] is '-':
         while True:
             try:
                 line = raw_input().decode("utf-8")
@@ -50,7 +51,6 @@ if __name__=='__main__':
             handle = codecs.open(sys.argv[1], encoding='utf-8', mode='r')
         except IOError as e:
             print("({})".format(e))
-        allstrings = []
         while True:
             line = handle.readline()
             if not line: break
