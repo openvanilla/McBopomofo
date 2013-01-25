@@ -41,6 +41,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 - (BOOL)scrollPageByOne:(BOOL)forward;
 - (BOOL)moveSelectionByOne:(BOOL)forward;
 - (void)layoutCandidateView;
+- (void)forceUpdateVerticalScroller;
 @end
 
 @implementation VTVerticalCandidateController
@@ -244,7 +245,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
     // fix a subtle on 10.7 that, since we force the scroller to appear, scrolling sometimes shows a temporarily "broken" scroll bar (but quickly disappears)
     if ([_scrollView hasVerticalScroller]) {
-        [[_scrollView verticalScroller] setNeedsDisplay];
+        [self forceUpdateVerticalScroller];
     }
     
     return attrString;
@@ -339,12 +340,6 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
                            
 - (void)layoutCandidateView
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredLayoutCandidateView) object:nil];
-    [self performSelector:@selector(deferredLayoutCandidateView) withObject:nil afterDelay:0.0];
-}
-
-- (void)deferredLayoutCandidateView
-{
     NSUInteger count = [_delegate candidateCountForController:self];
     if (!count) {
         return;
@@ -401,5 +396,16 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     [_keyLabelStripView setFrame:NSMakeRect(0.0, 0.0, stripWidth, windowHeight)];
     [_scrollView setFrame:NSMakeRect(stripWidth + 1.0, 0.0, tableViewStartWidth, windowHeight)];
     [[self window] setFrame:frameRect display:YES];
+}
+
+- (void)forceUpdateVerticalScroller
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredForceUpdateVerticalScroller) object:nil];
+    [self performSelector:@selector(deferredForceUpdateVerticalScroller) withObject:nil afterDelay:0.0];
+}
+
+- (void)deferredForceUpdateVerticalScroller
+{
+    [[_scrollView verticalScroller] setNeedsDisplay];
 }
 @end
