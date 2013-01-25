@@ -243,11 +243,6 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         }
     }
 
-    // fix a subtle on 10.7 that, since we force the scroller to appear, scrolling sometimes shows a temporarily "broken" scroll bar (but quickly disappears)
-    if ([_scrollView hasVerticalScroller]) {
-        [self forceUpdateVerticalScroller];
-    }
-    
     return attrString;
 }
 
