@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
+import sys, os
 import codecs
+import ConfigParser
 import multiprocessing
 
 __author__ = 'Mengjuei Hsieh'
@@ -9,15 +10,20 @@ __doc__    = """
    A facility to print a list of counts for substrings / phrases
    in a text pool file, given a list of phrases."""
 
+config = ConfigParser.ConfigParser()
+config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1])+'/textpool.rc')
+corpus_path = config.get('data','corpus_path')
+
 # store the content of a text pool file in a global variable
 # not ideal, but should be sufficient.
 bigstring = ''
 try:
-    handle = codecs.open('/Volumes/ramdisk/textpool.01202013', encoding='utf-8', mode='r')
+    handle = codecs.open(corpus_path, encoding='utf-8', mode='r')
+    bigstring=handle.read()
+    handle.close()
 except IOError as e:
     print("({})".format(e))
-bigstring=handle.read()
-handle.close()
+    raise e
 
 # return a tuple of (substring, count, status)
 def count_string(substring):
