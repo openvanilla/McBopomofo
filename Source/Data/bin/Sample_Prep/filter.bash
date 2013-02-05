@@ -17,6 +17,7 @@ OVTrainingSetFilter(){
     s/廣播電臺/廣播電台/g
     s/馬克思/馬克斯/g
     s/臺灣光復/台灣光復/g
+    s/臺中企銀/台中企銀/g
     s/麻痹/麻痺/g
     s/証/證/g
     s/胱氨酸/胱胺酸/g
@@ -34,5 +35,7 @@ OVTrainingSetFilter(){
     /^$/d
     /^ *$/d
     /^頁$/d
-'
+' \
+| python2.7 filter.py \
+| env LANG=C sort -u
 }
