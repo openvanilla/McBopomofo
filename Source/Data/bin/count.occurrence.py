@@ -13,6 +13,8 @@ __doc__    = """
 config = ConfigParser.ConfigParser()
 config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1])+'/textpool.rc')
 corpus_path = config.get('data','corpus_path')
+if corpus_path[0] == '~':
+    corpus_path = os.path.expanduser(corpus_path)
 
 # store the content of a text pool file in a global variable
 # not ideal, but should be sufficient.
