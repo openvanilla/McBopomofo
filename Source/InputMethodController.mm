@@ -1497,7 +1497,7 @@ void LTLoadLanguageModel()
         }
 
         NSString *errorStr = nil;
-        NSPropertyListFormat format = 0;
+        NSPropertyListFormat format;
         id plist = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&errorStr];
         if (plist && [plist isKindOfClass:[NSDictionary class]]) {
             [gCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
