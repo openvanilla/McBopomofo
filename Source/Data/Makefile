@@ -58,9 +58,13 @@ phrase.list: BPMFBase.txt BPMFMappings.txt
 	awk '{print $$1}'         BPMFMappings.txt >> tmp
 	env LANG=C sort -u tmp | uniq > phrase.list
 _myinstall:
-	cd ../.. && xcodebuild -target McBopomofo -configuration Release
-	rsync -avx --delete ../../build/Release/McBopomofo.app/ ~/Library/Input\ Methods/McBopomofo.app/
-	killall -HUP McBopomofo
+	cd ../.. && \
+         xcodebuild -target McBopomofo -configuration Release && \
+	 rsync -avx --delete ../../build/Release/McBopomofo.app/ \
+            ~/Library/Input\ Methods/McBopomofo.app/ && \
+	 killall -HUP McBopomofo
+_myclean:
+	cd ../.. && xcodebuild clean
 _mydebuginstall:
 	cd ../.. && xcodebuild -target McBopomofo -configuration Debug
 	rsync -avx --delete ../../build/Debug/McBopomofo.app/ ~/Library/Input\ Methods/McBopomofo.app/
