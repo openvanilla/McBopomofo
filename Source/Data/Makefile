@@ -21,7 +21,7 @@ clean:
 # FOR INTERNAL USE
 _install: tidy sort check all
 	cp -a data.txt data-plain-bpmf.txt $(HOME)/Library/Input\ Methods/McBopomofo.app/Contents/Resources/
-	killall -HUP McBopomofo
+	pgrep McBopomofo && killall -HUP McBopomofo
 
 sort: 
 	@env LANG=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
@@ -60,12 +60,14 @@ phrase.list: BPMFBase.txt BPMFMappings.txt
 _myinstall:
 	cd ../.. && \
          xcodebuild -target McBopomofo -configuration Release && \
-	 rsync -avx --delete ../../build/Release/McBopomofo.app/ \
+	 rsync -avx --delete build/Release/McBopomofo.app/ \
             ~/Library/Input\ Methods/McBopomofo.app/ && \
-	 killall -HUP McBopomofo
+	 pgrep McBopomofo && killall -HUP McBopomofo || echo -n
 _myclean:
 	cd ../.. && xcodebuild clean
 _mydebuginstall:
-	cd ../.. && xcodebuild -target McBopomofo -configuration Debug
-	rsync -avx --delete ../../build/Debug/McBopomofo.app/ ~/Library/Input\ Methods/McBopomofo.app/
-	killall -HUP McBopomofo || echo -n
+	cd ../.. && \
+         xcodebuild -target McBopomofo -configuration Debug && \
+	 rsync -avx --delete build/Debug/McBopomofo.app/ \
+            ~/Library/Input\ Methods/McBopomofo.app/ && \
+	 pgrep McBopomofo && killall -HUP McBopomofo || echo -n
