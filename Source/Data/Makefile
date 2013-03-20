@@ -21,7 +21,7 @@ clean:
 # FOR INTERNAL USE
 _install: tidy sort check all
 	cp -a data.txt data-plain-bpmf.txt $(HOME)/Library/Input\ Methods/McBopomofo.app/Contents/Resources/
-	pgrep McBopomofo && killall -HUP McBopomofo
+	@pgrep McBopomofo > /dev/null && killall -HUP McBopomofo || echo McBopomofo is not running
 
 sort: 
 	@env LANG=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
