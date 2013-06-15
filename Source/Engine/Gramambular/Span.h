@@ -29,6 +29,7 @@
 #define Span_h
 
 #include <map>
+#include <set>
 #include <sstream>
 #include "Node.h"
 
@@ -76,9 +77,10 @@ namespace Formosa {
             }
             
             size_t max = 0;
-            for (map<size_t, Node>::iterator i = m_lengthNodeMap.begin() ; i != m_lengthNodeMap.end() ; ++i) {
+            set<size_t> removeSet;
+            for (map<size_t, Node>::iterator i = m_lengthNodeMap.begin(), e = m_lengthNodeMap.end() ; i != e ; ++i) {
                 if ((*i).first > inLength) {
-                    m_lengthNodeMap.erase(i);
+                    removeSet.insert((*i).first);
                 }
                 else {
                     if ((*i).first > max) {
@@ -87,6 +89,10 @@ namespace Formosa {
                 }
             }
             
+            for (set<size_t>::iterator i = removeSet.begin(), e = removeSet.end(); i != e; ++i) {
+                m_lengthNodeMap.erase(*i);
+            }
+
             m_maximumLength = max;
         }
         
