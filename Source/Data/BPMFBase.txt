@@ -5755,6 +5755,7 @@
 鷞 ㄕㄨㄤ shuang gj; big5
 孇 ㄕㄨㄤ shuang gj; big5
 礵 ㄕㄨㄤ shuang gj; big5
+双 ㄕㄨㄤ shuang gj; big5e
 爽 ㄕㄨㄤˇ shuang3 gj;3 big5
 塽 ㄕㄨㄤˇ shuang3 gj;3 big5
 樉 ㄕㄨㄤˇ shuang3 gj;3 big5
@@ -5762,6 +5763,7 @@
 慡 ㄕㄨㄤˇ shuang3 gj;3 big5
 縔 ㄕㄨㄤˇ shuang3 gj;3 big5
 灀 ㄕㄨㄤˋ shuang4 gj;4 big5
+双 ㄕㄨㄤˋ shuang4 gj;4 big5e
 說 ㄕㄨㄛ shuo gji big5
 朔 ㄕㄨㄛˋ shuo4 gji4 big5
 碩 ㄕㄨㄛˋ shuo4 gji4 big5
