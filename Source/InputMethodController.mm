@@ -234,6 +234,11 @@ public:
     }
     #endif //DEBUG
 
+    #if DEBUG
+    NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
+    [menu addItem:updateCheckItem];
+    #endif
+
     NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
     [menu addItem:aboutMenuItem];
 
@@ -1358,6 +1363,11 @@ public:
     // show the preferences panel, and also make the IME app itself the focus
     [super showPreferences:sender];
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+}
+
+- (void)checkForUpdate:(id)sender
+{
+    [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
 }
 
 - (void)showAbout:(id)sender
