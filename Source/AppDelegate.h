@@ -46,6 +46,7 @@
 }
 
 - (void)checkForUpdate;
+- (void)checkForUpdateForced:(BOOL)forced;
 
 @property (assign, nonatomic) IBOutlet NSWindow *window;
 @end

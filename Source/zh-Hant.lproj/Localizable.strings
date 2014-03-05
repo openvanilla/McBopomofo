@@ -24,3 +24,6 @@
 
 /* No comment provided by engineer. */
 "You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?" = "目前的輸入法版本是 %1$@ 版 (%2$@)，目前最新版本已經到第 %3$@ 版 (%4$@)。\n\n是否要前往輸入法網站，下載最新版本？";
+
+/* No comment provided by engineer. */
+"Check for Updates…" = "檢查是否有新版…";

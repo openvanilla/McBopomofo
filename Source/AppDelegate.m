@@ -71,20 +71,27 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)checkForUpdate
 {
+    [self checkForUpdateForced:NO];
+}
+
+- (void)checkForUpdateForced:(BOOL)forced
+{
     if (_updateCheckConnection) {
         // busy
         return;
     }
 
     // time for update?
-    NSDate *now = [NSDate date];
-    NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:kNextUpdateCheckDateKey];
-    if (![date isKindOfClass:[NSDate class]]) {
-        date = now;
-    }
+    if (!forced) {
+        NSDate *now = [NSDate date];
+        NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:kNextUpdateCheckDateKey];
+        if (![date isKindOfClass:[NSDate class]]) {
+            date = now;
+        }
 
-    if ([now compare:date] == NSOrderedAscending) {
-        return;
+        if ([now compare:date] == NSOrderedAscending) {
+            return;
+        }
     }
 
     NSDate *nextUpdateDate = [NSDate dateWithTimeInterval:kNextCheckInterval sinceDate:[NSDate date]];
