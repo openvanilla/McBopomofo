@@ -94,9 +94,9 @@
 	<key>TISIntendedLanguage</key>
 	<string>zh-Hant</string>
 	<key>UpdateInfoEndpoint</key>
-	<string>http://mcbopomofo.openvanilla.org/updates/Info.plist</string>
+	<string>https://mcbopomofo.openvanilla.org/updates/Info.plist</string>
 	<key>UpdateInfoSite</key>
-	<string>https://github.com/mjhsieh/McBopomofo/downloads</string>
+	<string>https://mcbopomofo.openvanilla.org/</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
 		<string>Hant</string>
