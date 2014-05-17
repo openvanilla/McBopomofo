@@ -52,7 +52,7 @@
     NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
     
     NSPanel *panel = [[[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO] autorelease];
-    [panel setLevel:CGShieldingWindowLevel() + 1];
+    [panel setLevel:kCGPopUpMenuWindowLevel];
     [panel setHasShadow:YES];
     
     self = [self initWithWindow:panel];
@@ -229,7 +229,7 @@
     frameRect.size = newSize;
     frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height);
     
-    [[self window] setFrame:frameRect display:YES];
+    [[self window] setFrame:frameRect display:NO];
     [_candidateView setNeedsDisplay:YES];
     
 }

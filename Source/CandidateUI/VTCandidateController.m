@@ -138,10 +138,10 @@
 - (void)setVisible:(BOOL)visible
 {
     if (visible) {
-        [[self window] orderFront:self];
+        [[self window] performSelector:@selector(orderFront:) withObject:self afterDelay:0.0];
     }
     else {
-        [[self window] orderOut:self];
+        [[self window] performSelector:@selector(orderOut:) withObject:self afterDelay:0.0];
     }
 }
 

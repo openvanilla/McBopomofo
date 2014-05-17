@@ -60,7 +60,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
     
     NSPanel *panel = [[[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO] autorelease];
-    [panel setLevel:CGShieldingWindowLevel() + 1];
+    [panel setLevel:kCGPopUpMenuWindowLevel];
     [panel setHasShadow:YES];
 
     self = [self initWithWindow:panel];
@@ -396,6 +396,6 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     
     [_keyLabelStripView setFrame:NSMakeRect(0.0, 0.0, stripWidth, windowHeight)];
     [_scrollView setFrame:NSMakeRect(stripWidth + 1.0, 0.0, tableViewStartWidth, windowHeight)];
-    [[self window] setFrame:frameRect display:YES];
+    [[self window] setFrame:frameRect display:NO];
 }
 @end
