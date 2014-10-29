@@ -92,7 +92,8 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         [_tableView setDataSource:self];
         [_tableView setDelegate:self];
         
-        NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier:@"candidate"] autorelease];    
+        NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier:@"candidate"] autorelease];
+        [column setDataCell:[[[NSTextFieldCell alloc] init] autorelease]];
         [column setEditable:NO];
         
         [_tableView addTableColumn:column];
