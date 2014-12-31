@@ -4,3 +4,6 @@
 
 本專案主要程式碼以及編譯後軟體採用 MIT License 釋出，使用者可自由使用、散播本軟體，惟散播時必須保持軟體完整、不得修改版權文字。
 
+## Continuous Integration
+
+我們使用 [![Build Status](https://travis-ci.org/mjhsieh/McBopomofo.svg?branch=master)](https://travis-ci.org/mjhsieh/McBopomofo) 作為雲端持續整合工具。
