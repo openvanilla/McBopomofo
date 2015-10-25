@@ -1328,6 +1328,7 @@
 鸐 ㄉㄧˊ di2 2u6 big5
 藋 ㄉㄧˊ di2 2u6 big5
 藡 ㄉㄧˊ di2 2u6 big5
+地 ㄉㄧ˙ di5 2u7 big5
 嗲 ㄉㄧㄚ dia 2u8 big5
 雕 ㄉㄧㄠ diao 2ul big5
 凋 ㄉㄧㄠ diao 2ul big5
@@ -4443,6 +4444,7 @@
 稒 ㄍㄨˋ gu4 ej4 big5
 骨 ㄍㄨˊ gu2 ej6 big5
 鶻 ㄍㄨˊ gu2 ej6 big5
+鼓 ㄍㄨ˙ gu5 ej7 big5
 瓜 ㄍㄨㄚ gua ej8 big5
 括 ㄍㄨㄚ gua ej8 big5
 刮 ㄍㄨㄚ gua ej8 big5
@@ -5735,6 +5737,7 @@
 跾 ㄕㄨˊ shu2 gj6 big5
 鸀 ㄕㄨˊ shu2 gj6 big5
 虪 ㄕㄨˊ shu2 gj6 big5
+叔 ㄕㄨ˙ shu5 gj7 big5
 刷 ㄕㄨㄚ shua gj8 big5
 唰 ㄕㄨㄚ shua gj8 big5
 鮛 ㄕㄨㄚ shua gj8 big5
@@ -6423,6 +6426,7 @@
 嗢 ㄨㄚˋ wa4 j84 big5
 膃 ㄨㄚˋ wa4 j84 big5
 娃 ㄨㄚˊ wa2 j86 big5
+娃 ㄨㄚ˙ wa5 j87 big5
 歪 ㄨㄞ wai j9 big5
 舀 ㄨㄞˇ wai3 j93 big5
 外 ㄨㄞˋ wai4 j94 big5
@@ -8442,6 +8446,7 @@
 緁 ㄐㄧㄝˊ jie2 ru,6 big5
 巀 ㄐㄧㄝˊ jie2 ru,6 big5
 緳 ㄐㄧㄝˊ jie2 ru,6 big5
+姊 ㄐㄧㄝ˙ jie5 ru,7 big5
 糾 ㄐㄧㄡ jiu ru. big5
 揪 ㄐㄧㄡ jiu ru. big5
 啾 ㄐㄧㄡ jiu ru. big5
@@ -9170,6 +9175,7 @@
 鼐 ㄋㄞˋ nai4 s94 big5
 孻 ㄋㄞˊ nai2 s96 big5
 摨 ㄋㄞˊ nai2 s96 big5
+奶 ㄋㄞ˙ nai5 s97 big5
 囔 ㄋㄤ nang s; big5
 曩 ㄋㄤˇ nang3 s;3 big5
 攮 ㄋㄤˇ nang3 s;3 big5
@@ -9217,7 +9223,7 @@
 梛 ㄋㄨㄛˊ nuo2 sji6 big5
 哪 ㄋㄨㄛˊ nuo2 sji6 big5
 呢 ㄋㄜ ne sk big5
-呢 ㄋㄜ˙ ne sk7 big5
+呢 ㄋㄜ˙ ne5 sk7 big5
 訥 ㄋㄜˋ ne4 sk4 big5
 峱 ㄋㄠ nao sl big5
 腦 ㄋㄠˇ nao3 sl3 big5
@@ -11259,6 +11265,7 @@
 闟 ㄒㄧ xi vu big5
 誒 ㄒㄧ xi vu big5
 礂 ㄒㄧ xi vu big5
+西 ㄒㄧ˙ xi5 vu7 big5
 些 ㄒㄧㄝ xie vu, big5
 歇 ㄒㄧㄝ xie vu, big5
 蠍 ㄒㄧㄝ xie vu, big5
@@ -11344,6 +11351,7 @@
 瑎 ㄒㄧㄝˊ xie2 vu,6 big5
 熁 ㄒㄧㄝˊ xie2 vu,6 big5
 燲 ㄒㄧㄝˊ xie2 vu,6 big5
+謝 ㄒㄧㄝ˙ xie5 vu,7 big5
 修 ㄒㄧㄡ xiu vu. big5
 休 ㄒㄧㄡ xiu vu. big5
 羞 ㄒㄧㄡ xiu vu. big5
@@ -11640,6 +11648,7 @@
 飁 ㄒㄧˊ xi2 vu6 big5
 騽 ㄒㄧˊ xi2 vu6 big5
 蝷 ㄒㄧˊ xi2 vu6 big5
+係 ㄒㄧ˙ xi5 vu7 big5
 瞎 ㄒㄧㄚ xia vu8 big5
 蝦 ㄒㄧㄚ xia vu8 big5
 岈 ㄒㄧㄚ xia vu8 big5
@@ -11990,6 +11999,7 @@
 籉 ㄊㄞˊ tai2 w96 big5
 旲 ㄊㄞˊ tai2 w96 big5
 秮 ㄊㄞˊ tai2 w96 big5
+太 ㄊㄞ˙ tai5 w97 big5
 湯 ㄊㄤ tang w; big5
 鏜 ㄊㄤ tang w; big5
 鼞 ㄊㄤ tang w; big5
@@ -12484,6 +12494,7 @@
 鞻 ㄌㄡˊ lou2 x.6 big5
 鷜 ㄌㄡˊ lou2 x.6 big5
 瞜 ㄌㄡˊ lou2 x.6 big5
+簍 ㄌㄡ˙ lou5 x.7 big5
 冷 ㄌㄥˇ leng3 x/3 big5
 愣 ㄌㄥˋ leng4 x/4 big5
 踜 ㄌㄥˋ leng4 x/4 big5
@@ -12743,6 +12754,7 @@
 攎 ㄌㄨˊ lu2 xj6 big5
 蠦 ㄌㄨˊ lu2 xj6 big5
 纑 ㄌㄨˊ lu2 xj6 big5
+碌 ㄌㄨ˙ lu5 xj7 big5
 囉 ㄌㄨㄛ luo xji big5
 裸 ㄌㄨㄛˇ luo3 xji3 big5
 瘰 ㄌㄨㄛˇ luo3 xji3 big5
@@ -12854,6 +12866,7 @@
 簩 ㄌㄠˊ lao2 xl6 big5
 蟧 ㄌㄠˊ lao2 xl6 big5
 嶗 ㄌㄠˊ lao2 xl6 big5
+姥 ㄌㄠ˙ lao5 xl7 big5
 略 ㄌㄩㄝˋ lue4 xm,4 big5
 掠 ㄌㄩㄝˋ lue4 xm,4 big5
 鋝 ㄌㄩㄝˋ lue4 xm,4 big5
