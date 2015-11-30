@@ -20,8 +20,11 @@ clean:
 
 # FOR INTERNAL USE
 _install: tidy sort check all
-	cp -a data.txt data-plain-bpmf.txt $(HOME)/Library/Input\ Methods/McBopomofo.app/Contents/Resources/
-	@pgrep McBopomofo > /dev/null && killall -HUP McBopomofo || echo McBopomofo is not running
+	@cp -a data.txt data-plain-bpmf.txt $(HOME)/Library/Input\ Methods/McBopomofo.app/Contents/Resources/
+	@pkill -HUP -f McBopomofo || echo McBopomofo is not running
+_deploy: _install
+	@rsync -avx data.txt data-plain-bpmf.txt mini.local:"Library/Input\ Methods/McBopomofo.app/Contents/Resources/"
+	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
 sort: 
 	@env LANG=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
