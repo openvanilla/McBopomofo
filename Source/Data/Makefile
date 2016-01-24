@@ -23,7 +23,7 @@ _install: tidy sort check all
 	@cp -a data.txt data-plain-bpmf.txt $(HOME)/Library/Input\ Methods/McBopomofo.app/Contents/Resources/
 	@pkill -HUP -f McBopomofo || echo McBopomofo is not running
 _deploy: _install
-	@rsync -avx data.txt data-plain-bpmf.txt mini.local:"Library/Input\ Methods/McBopomofo.app/Contents/Resources/"
+	@rsync -avx data.txt data-plain-bpmf.txt $(RHOST):"Library/Input\ Methods/McBopomofo.app/Contents/Resources/"
 	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
 sort: 
