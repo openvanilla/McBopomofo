@@ -51,14 +51,11 @@ if __name__ == '__main__':
         while True:
             try:
                 line = raw_input().decode("utf-8")
-                if not line:
-                    break
-                if line[0] == '#':
-                    continue
+                if not line: break
+                if line[0] == '#': continue
                 elements = line.rstrip().split()
                 allstrings.append(elements[0])
-            except (EOFError):
-                break
+            except (EOFError): break
     else:
         try:
             handle = codecs.open(sys.argv[1], encoding='utf-8', mode='r')
@@ -66,10 +63,8 @@ if __name__ == '__main__':
             print("({})".format(e))
         while True:
             line = handle.readline()
-            if not line:
-                break
-            if line[0] == '#':
-                continue
+            if not line: break
+            if line[0] == '#': continue
             elements = line.rstrip().split()
             allstrings.append(elements[0])
         handle.close()

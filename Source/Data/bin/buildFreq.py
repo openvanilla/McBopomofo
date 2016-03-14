@@ -20,10 +20,8 @@ if __name__ == '__main__':
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         phrases[elements[0]] = int(elements[1])
     handle.close()
@@ -34,15 +32,12 @@ if __name__ == '__main__':
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         mykey = elements[0]
         myval = elements[1]
-        if myval.count(mykey) < 1:
-            continue
+        if myval.count(mykey) < 1: continue
         # print "%s %s" % (elements[0], elements[1])
         if mykey in exclusion:
             exclusion[mykey].append(myval)
@@ -70,7 +65,7 @@ if __name__ == '__main__':
     for k in phrases:
         # if it's zero count, we treat it as a 0.5 count.
         if phrases[k] < 1:
-            handle.write('%s %.8f\n' % (k, math.log(fscale**(len(k)/3-1)*0.5       /norm, 10)))
+            handle.write('%s %.8f\n' % (k, math.log(fscale**(len(k)/3-1)*0.5/norm, 10)))
         else:
             handle.write('%s %.8f\n' % (k, math.log(fscale**(len(k)/3-1)*phrases[k]/norm, 10)))
     handle.close()
