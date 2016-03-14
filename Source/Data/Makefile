@@ -74,3 +74,7 @@ _mydebuginstall:
 	 rsync -avx --delete build/Debug/McBopomofo.app/ \
             ~/Library/Input\ Methods/McBopomofo.app/ && \
 	 @pgrep McBopomofo && killall -HUP McBopomofo || echo -n
+_mycodecheck:
+	@for myfile in bin/*.py; do \
+            pep8-2.7 --ignore=E221,E226,E501,E701 $$myfile; \
+        done
