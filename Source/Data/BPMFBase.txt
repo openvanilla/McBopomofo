@@ -917,6 +917,7 @@
 礑 ㄉㄤˋ dang4 2;4 big5
 簜 ㄉㄤˋ dang4 2;4 big5
 闣 ㄉㄤˋ dang4 2;4 big5
+氹 ㄉㄤˋ dang4 2;4 utf8
 都 ㄉㄨ du 2j big5
 督 ㄉㄨ du 2j big5
 嘟 ㄉㄨ du 2j big5

@@ -25,17 +25,18 @@ LHan = [[0x2E80, 0x2E99],    # Han # So  [26] CJK RADICAL REPEAT, CJK RADICAL RA
         [0x20000, 0x2A6D6],  # Han # Lo [42711] CJK UNIFIED IDEOGRAPH-20000, CJK UNIFIED IDEOGRAPH-2A6D6
         [0x2F800, 0x2FA1D]]  # Han # Lo [542] CJK COMPATIBILITY IDEOGRAPH-2F800, CJK COMPATIBILITY IDEOGRAPH-2FA1D
 
+
 def build_re():
     L = []
     for i in LHan:
         if isinstance(i, list):
             f, t = i
-            try: 
+            try:
                 f = unichr(f)
                 t = unichr(t)
                 L.append('%s-%s' % (f, t))
-            except: 
-                pass # A narrow python build, so can't use chars > 65535 without surrogate pairs!
+            except:
+                pass  # A narrow python build, so can't use chars > 65535 without surrogate pairs!
 
         else:
             try:
@@ -52,5 +53,5 @@ while True:
     line = sys.stdin.readline()
     if not line: break
     line = line.decode('utf-8', 'ignore')
-    lineout = u' '.join(re.findall(RE,line.rstrip()))
+    lineout = u' '.join(re.findall(RE, line.rstrip()))
     print lineout.encode('utf-8')
