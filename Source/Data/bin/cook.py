@@ -46,10 +46,8 @@ if __name__ == '__main__':
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon1[elements[0]] = elements[1]
@@ -60,10 +58,8 @@ if __name__ == '__main__':
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon2[elements[0]] = elements[1]
@@ -74,10 +70,8 @@ if __name__ == '__main__':
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon3[elements[0]] = elements[1]
@@ -86,10 +80,8 @@ if __name__ == '__main__':
     handle = open(sys.argv[3], "r")
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         mytype = elements[4]
         mykey = elements[0]
@@ -110,10 +102,8 @@ if __name__ == '__main__':
     handle = open(sys.argv[2], "r")
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = "-".join(elements)
@@ -130,10 +120,8 @@ if __name__ == '__main__':
     fout = open(sys.argv[4], "w")
     while True:
         line = handle.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
+        if not line: break
+        if line[0] == '#': continue
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = elements.pop(0)

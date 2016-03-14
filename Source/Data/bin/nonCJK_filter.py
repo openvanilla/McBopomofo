@@ -51,8 +51,7 @@ RE = build_re()
 
 while True:
     line = sys.stdin.readline()
-    if not line:
-        break
+    if not line: break
     line = line.decode('utf-8', 'ignore')
     lineout = u' '.join(re.findall(RE, line.rstrip()))
     print lineout.encode('utf-8')
