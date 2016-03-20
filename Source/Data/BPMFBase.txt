@@ -5599,6 +5599,7 @@
 溡 ㄕˊ shi2 g6 big5
 鼭 ㄕˊ shi2 g6 big5
 寔 ㄕˊ shi2 g6 big5
+乭 ㄕˊ shi2 g6 utf8
 匙 ㄕ˙ shi5 g7 big5
 殺 ㄕㄚ sha g8 big5
 沙 ㄕㄚ sha g8 big5
@@ -6743,6 +6744,7 @@
 詏 ㄠˋ ao4 l4 big5
 嶴 ㄠˋ ao4 l4 big5
 敖 ㄠˋ ao4 l4 big5
+驁 ㄠˋ ao4 l4 big5
 熬 ㄠˊ ao2 l6 big5
 敖 ㄠˊ ao2 l6 big5
 遨 ㄠˊ ao2 l6 big5
