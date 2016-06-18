@@ -125,7 +125,10 @@ if __name__ == '__main__':
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = elements.pop(0)
-        readings = bpmf_phrases[mykey]
+        try:
+            readings = bpmf_phrases[mykey]
+        except:
+            sys.exit('[ERROR] %s key mismatches.' % mykey)
         phrases[mykey] = True
         # print mykey
         if readings:
