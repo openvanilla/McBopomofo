@@ -3952,6 +3952,7 @@
 懭 ㄎㄨㄤˋ kuang4 dj;4 big5
 爌 ㄎㄨㄤˋ kuang4 dj;4 big5
 彉 ㄎㄨㄤˋ kuang4 dj;4 big5
+鑛 ㄎㄨㄤˋ kuang4 dj;4 utf8
 狂 ㄎㄨㄤˊ kuang2 dj;6 big5
 誑 ㄎㄨㄤˊ kuang2 dj;6 big5
 鵟 ㄎㄨㄤˊ kuang2 dj;6 big5
