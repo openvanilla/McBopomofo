@@ -52,7 +52,7 @@ Q: 為什麼只支援 Mac？
 
 Q: 哪裡可以取得原始碼？
 
-> 請到 [github](https://github.com/mjhsieh/McBopomofo) 取得。
+> 請到 [github](https://github.com/OpenVanilla/McBopomofo/) 取得。
 
 Q: 選字的原理是什麼？
 
