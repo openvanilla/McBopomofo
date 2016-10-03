@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
    exit 0
 fi
 myPATH=$(dirname $0)
-$myPATH/count.occurrence.py - << EOF
+$myPATH/count.occurrence.py -j 1 - << EOF
 $1
 EOF
 exit 0
