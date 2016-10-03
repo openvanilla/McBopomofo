@@ -45,7 +45,7 @@ if __name__ == '__main__':
     ncores     = max_cores
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-j", type=int, help="specify number of simutaneous search thread")
+    parser.add_argument("-j", metavar='<nproc>', type=int, help="specify number of simutaneous search thread")
     parser.add_argument("phraselist", help="file with one phrase per line, use - for standard input")
     args = parser.parse_args()
 
