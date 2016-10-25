@@ -38,7 +38,7 @@
 @interface VTCandidateController : NSWindowController
 {
 @protected
-    __weak id<VTCandidateControllerDelegate> _delegate;
+    id<VTCandidateControllerDelegate> _delegate;
     NSArray *_keyLabels;
     NSFont *_keyLabelFont;
     NSFont *_candidateFont;

@@ -41,7 +41,7 @@
     NSUInteger _highlightedIndex;
     NSUInteger _trackingHighlightedIndex;
     SEL _action;
-    __weak id _target;
+    id _target;
 }
 
 - (void)setKeyLabels:(NSArray *)labels displayedCandidates:(NSArray *)candidates;
