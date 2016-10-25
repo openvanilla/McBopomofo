@@ -40,14 +40,24 @@ if __name__ == '__main__':
     """
     bin/count.occurrence.py phrase.list > phrase.occ
     """
+    import argparse
     max_cores  = multiprocessing.cpu_count()
     ncores     = max_cores
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-j", metavar='<nproc>', type=int, help="specify number of simutaneous search thread")
+    parser.add_argument("phraselist", help="file with one phrase per line, use - for standard input")
+    args = parser.parse_args()
+
     allstrings = []
-    if len(sys.argv) < 2:
-        print "Usage:"
-        print "bin/count.occurrence.py phrase.list > phrase.occ"
-        sys.exit(0)
-    elif sys.argv[1] is '-':
+
+    if not args.j:
+        pass
+    elif max_cores >= args.j:
+        max_cores = args.j
+    else:
+        pass
+    if args.phraselist is '-':
         while True:
             try:
                 line = raw_input().decode("utf-8")
@@ -58,7 +68,7 @@ if __name__ == '__main__':
             except (EOFError): break
     else:
         try:
-            handle = codecs.open(sys.argv[1], encoding='utf-8', mode='r')
+            handle = codecs.open(args.phraselist, encoding='utf-8', mode='r')
         except IOError as e:
             print("({})".format(e))
         while True:
@@ -74,3 +84,4 @@ if __name__ == '__main__':
     for phrase, count in outputs:
         outstring = u'%s	%d' % (phrase, count)
         print outstring.encode('utf-8', 'ignore')
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
