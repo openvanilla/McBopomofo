@@ -62,11 +62,6 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     LTLoadLanguageModel();
 
     [self checkForUpdate];
-
-    if (0) {
-        PreferencesWindowController *controller = [[PreferencesWindowController alloc] initWithWindowNibName:@"preferences"];
-        [[controller window] orderFront:nil];
-    }
 }
 
 - (void)checkForUpdate
