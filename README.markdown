@@ -6,4 +6,4 @@
 
 ## Continuous Integration
 
-我們使用 Travis-CI [![Build Status](https://travis-ci.org/OpenVanilla/McBopomofo.svg?branch=master)](https://travis-ci.org/OpenVanilla/McBopomofo) 作為雲端持續整合工具。
+我們使用 Travis-CI [![Build Status](https://travis-ci.org/openvanilla/McBopomofo.svg?branch=master)](https://travis-ci.org/openvanilla/McBopomofo) 作為雲端持續整合工具。
