@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
             NSLog(@"Enabling input source %@ at %@.", bundleID, [bundleURL absoluteString]);
             BOOL status = [OVInputSourceHelper enableInputSource:inputSource];
 
-            if (!status != noErr) {
+            if (!status) {
                 NSLog(@"Fatal error: Cannot enable input source %@.", bundleID);
                 [pool drain];
                 return -1;
