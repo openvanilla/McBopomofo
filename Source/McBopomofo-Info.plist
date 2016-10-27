@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>McBopomofo.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>org.openvanilla.inputmethod.McBopomofo</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
