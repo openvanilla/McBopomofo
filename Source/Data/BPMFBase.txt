@@ -262,6 +262,7 @@
 蹳 ㄅㄛ bo 1i big5
 岥 ㄅㄛ bo 1i big5
 蔔 ㄅㄛ bo 1i big5
+波 ㄅㄛ bo 1i big5
 跛 ㄅㄛˇ bo3 1i3 big5
 簸 ㄅㄛˇ bo3 1i3 big5
 蚾 ㄅㄛˇ bo3 1i3 big5
