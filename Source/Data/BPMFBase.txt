@@ -6706,6 +6706,7 @@
 嶭 ㄜˋ e4 k4 big5
 餩 ㄜˋ e4 k4 big5
 蘁 ㄜˋ e4 k4 big5
+砈 ㄜˋ e4 k4 big5
 額 ㄜˊ e2 k6 big5
 訛 ㄜˊ e2 k6 big5
 鵝 ㄜˊ e2 k6 big5
