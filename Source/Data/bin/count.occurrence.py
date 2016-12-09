@@ -42,7 +42,6 @@ if __name__ == '__main__':
     """
     import argparse
     max_cores  = multiprocessing.cpu_count()
-    ncores     = max_cores
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-j", metavar='<nproc>', type=int, help="specify number of simutaneous search thread")
@@ -57,6 +56,7 @@ if __name__ == '__main__':
         max_cores = args.j
     else:
         pass
+    ncores = max_cores
     if args.phraselist is '-':
         while True:
             try:

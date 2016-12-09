@@ -149,6 +149,7 @@
 鈑 ㄅㄢˇ ban3 103 big5
 粄 ㄅㄢˇ ban3 103 big5
 蝂 ㄅㄢˇ ban3 103 big5
+坂 ㄅㄢˇ ban3 103 big5
 半 ㄅㄢˋ ban4 104 big5
 辦 ㄅㄢˋ ban4 104 big5
 伴 ㄅㄢˋ ban4 104 big5
@@ -262,6 +263,7 @@
 蹳 ㄅㄛ bo 1i big5
 岥 ㄅㄛ bo 1i big5
 蔔 ㄅㄛ bo 1i big5
+波 ㄅㄛ bo 1i big5
 跛 ㄅㄛˇ bo3 1i3 big5
 簸 ㄅㄛˇ bo3 1i3 big5
 蚾 ㄅㄛˇ bo3 1i3 big5
@@ -6705,6 +6707,7 @@
 嶭 ㄜˋ e4 k4 big5
 餩 ㄜˋ e4 k4 big5
 蘁 ㄜˋ e4 k4 big5
+砈 ㄜˋ e4 k4 big5
 額 ㄜˊ e2 k6 big5
 訛 ㄜˊ e2 k6 big5
 鵝 ㄜˊ e2 k6 big5
@@ -12386,6 +12389,7 @@
 湉 ㄊㄧㄢˊ tian2 wu06 big5
 菾 ㄊㄧㄢˊ tian2 wu06 big5
 磌 ㄊㄧㄢˊ tian2 wu06 big5
+畑 ㄊㄧㄢˊ tian2 wu06 cns
 體 ㄊㄧˇ ti3 wu3 big5
 体 ㄊㄧˇ ti3 wu3 big5
 綈 ㄊㄧˇ ti3 wu3 big5
