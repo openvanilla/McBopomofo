@@ -149,6 +149,7 @@
 鈑 ㄅㄢˇ ban3 103 big5
 粄 ㄅㄢˇ ban3 103 big5
 蝂 ㄅㄢˇ ban3 103 big5
+坂 ㄅㄢˇ ban3 103 big5
 半 ㄅㄢˋ ban4 104 big5
 辦 ㄅㄢˋ ban4 104 big5
 伴 ㄅㄢˋ ban4 104 big5
@@ -12388,6 +12389,7 @@
 湉 ㄊㄧㄢˊ tian2 wu06 big5
 菾 ㄊㄧㄢˊ tian2 wu06 big5
 磌 ㄊㄧㄢˊ tian2 wu06 big5
+畑 ㄊㄧㄢˊ tian2 wu06 cns
 體 ㄊㄧˇ ti3 wu3 big5
 体 ㄊㄧˇ ti3 wu3 big5
 綈 ㄊㄧˇ ti3 wu3 big5
