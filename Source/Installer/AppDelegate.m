@@ -26,6 +26,7 @@
 //
 
 #import "AppDelegate.h"
+#import <sys/mount.h>
 
 static NSString *const kTargetBin = @"McBopomofo";
 static NSString *const kTargetType = @"app";
@@ -34,49 +35,75 @@ static NSString *const kDestinationPartial = @"~/Library/Input Methods/";
 static NSString *const kTargetPartialPath = @"~/Library/Input Methods/McBopomofo.app";
 static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McBopomofo.app/Contents/MacOS/McBopomofo";
 
+static const NSTimeInterval kTranslocationRemovalTickInterval = 0.5;
+static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
+
 @implementation AppDelegate
 @synthesize installButton = _installButton;
 @synthesize cancelButton = _cancelButton;
 @synthesize textView = _textView;
+@synthesize progressSheet = _progressSheet;
+@synthesize progressIndicator = _progressIndicator;
 
 - (void)dealloc
 {
     [_installingVersion release];
-    [_currentVersion release];
+    [_translocationRemovalStartTime release];
     [super dealloc];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [[self window] center];
-    [[self window] orderFront:self];
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [self.cancelButton setNextKeyView:self.installButton];
+    [self.installButton setNextKeyView:self.cancelButton];
+    [[self window] setDefaultButtonCell:[self.installButton cell]];
 
     NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL] autorelease];
 
     [[self.textView textStorage] setAttributedString:attrStr];
     
     NSBundle *installingBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType]];
-    _installingVersion = [[[installingBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"] retain];
-    
-    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ (for version %@)", nil), [[self window] title], _installingVersion]];
+    _installingVersion = [[[installingBundle infoDictionary] objectForKey:(id)kCFBundleVersionKey] retain];
+    NSString *versionString = [[installingBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+
+    [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ (for version %@, r%@)", nil), [[self window] title], versionString, _installingVersion]];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:[kTargetPartialPath stringByExpandingTildeInPath]]) {
         NSBundle *currentBundle = [NSBundle bundleWithPath:[kTargetPartialPath stringByExpandingTildeInPath]];
-        _currentVersion = [[[currentBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"] retain];
+
+        NSString *shortVersion = [[currentBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+        NSString *currentVersion = [[currentBundle infoDictionary] objectForKey:(id)kCFBundleVersionKey];
+
+        _currentVersionNumber = [currentVersion integerValue];
+        if (shortVersion && currentVersion && [currentVersion compare:_installingVersion options:NSNumericSearch] == NSOrderedAscending) {
+            _upgrading = YES;
+        }
     }
-    
-    if (_currentVersion && [_currentVersion compare:_installingVersion] == NSOrderedAscending) {
+
+    if (_upgrading) {
         [_installButton setTitle:NSLocalizedString(@"Agree and Upgrade", nil)];
     }
+
+    [[self window] center];
+    [[self window] orderFront:self];
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
 - (IBAction)agreeAndInstallAction:(id)sender
 {
     [_cancelButton setEnabled:NO];
     [_installButton setEnabled:NO];
-    
+    [self removeThenInstallInputMethod];
+}
+
+- (void)removeThenInstallInputMethod
+{
     if ([[NSFileManager defaultManager] fileExistsAtPath:[kTargetPartialPath stringByExpandingTildeInPath]]) {
+
+        BOOL shouldWaitForTranslocationRemoval =
+            [self appBundleTranslocatedToARandomizedPath:kTargetPartialPath] &&
+            [self.window respondsToSelector:@selector(beginSheet:completionHandler:)];
+
         // http://www.cocoadev.com/index.pl?MoveToTrash
         NSString *sourceDir = [kDestinationPartial stringByExpandingTildeInPath];
         NSString *trashDir = [NSHomeDirectory() stringByAppendingPathComponent:@".Trash"];
@@ -85,16 +112,50 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
         [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:sourceDir destination:trashDir files:[NSArray arrayWithObject:kTargetBundle] tag:&tag]; 
         (void)tag;
 
-        // alno need to restart SystemUIServer to ensure that the icon is fully cleaned up
-        if (_currentVersion && [_currentVersion compare:@"0.9.4"] != NSOrderedDescending) {
-            NSTask *restartSystemUIServerTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/killall" arguments:[NSArray arrayWithObjects: @"-9", @"SystemUIServer", nil]];
-            [restartSystemUIServerTask waitUntilExit];
-        }
-
         NSTask *killTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/killall" arguments:[NSArray arrayWithObjects: @"-9", kTargetBin, nil]];
         [killTask waitUntilExit];
+
+        if (shouldWaitForTranslocationRemoval) {
+            [self.progressIndicator startAnimation:self];
+            [self.window beginSheet:self.progressSheet completionHandler:^(NSModalResponse returnCode) {
+                // Schedule the install action in runloop so that the sheet gets a change to dismiss itself.
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (returnCode == NSModalResponseContinue) {
+                        [self installInputMethodWithWarning:NO];
+                    } else {
+                        [self installInputMethodWithWarning:YES];
+                    }
+                });
+            }];
+
+            [_translocationRemovalStartTime release];
+            _translocationRemovalStartTime = [[NSDate date] retain];
+            [NSTimer scheduledTimerWithTimeInterval:kTranslocationRemovalTickInterval target:self selector:@selector(timerTick:) userInfo:nil repeats:YES];
+            return;
+        }
     }
     
+    [self installInputMethodWithWarning:NO];
+}
+
+- (void)timerTick:(NSTimer *)timer
+{
+    NSTimeInterval elapsed = [[NSDate date] timeIntervalSinceDate:_translocationRemovalStartTime];
+    [self.progressIndicator setDoubleValue:MIN(elapsed / kTranslocationRemovalDeadline, 1.0)];
+
+    if (elapsed >= kTranslocationRemovalDeadline) {
+        [timer invalidate];
+        [self.window endSheet:self.progressSheet returnCode:NSModalResponseCancel];
+    } else if (![self appBundleTranslocatedToARandomizedPath:kTargetPartialPath]) {
+        [self.progressIndicator setDoubleValue:1.0];
+        [timer invalidate];
+        [self.window endSheet:self.progressSheet returnCode:NSModalResponseContinue];
+    }
+}
+
+
+- (void)installInputMethodWithWarning:(BOOL)warning
+{
     NSTask *cpTask = [NSTask launchedTaskWithLaunchPath:@"/bin/cp" arguments:[NSArray arrayWithObjects:@"-R", [[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType], [kDestinationPartial stringByExpandingTildeInPath], nil]];
     [cpTask waitUntilExit];
     if ([cpTask terminationStatus] != 0) {
@@ -103,19 +164,20 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
     }
 
     NSArray *installArgs = [NSArray arrayWithObjects:@"install", nil];
-    if (_currentVersion && [_currentVersion compare:@"0.9.4"] != NSOrderedDescending) {
-        installArgs = [installArgs arrayByAddingObject:@"--all"];
-    }
-
     NSTask *installTask = [NSTask launchedTaskWithLaunchPath:[kTargetFullBinPartialPath stringByExpandingTildeInPath] arguments:installArgs];
-    [installTask waitUntilExit];                                                                              
+    [installTask waitUntilExit];
     if ([installTask terminationStatus] != 0) {
         NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
         [NSApp terminate:self];        
     }
 
-    NSRunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
-    [NSApp terminate:self];
+    if (warning) {
+        NSRunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
+    } else {
+        NSRunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
+    }
+
+    [[NSApplication sharedApplication] performSelector:@selector(terminate:) withObject:self afterDelay:0.1];
 }
                                    
 
@@ -127,5 +189,23 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
 - (void)windowWillClose:(NSNotification *)notification
 {
     [NSApp terminate:self];    
+}
+
+// Determines if an app is translocated by Gatekeeper to a randomized path
+// See https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/
+- (BOOL)appBundleTranslocatedToARandomizedPath:(NSString *)bundle
+{
+    const char *bundleAbsPath = [[bundle stringByExpandingTildeInPath] UTF8String];
+    int entryCount = getfsstat(NULL, 0, 0);
+    int entrySize = sizeof(struct statfs);
+    struct statfs *bufs = (struct statfs *)calloc(entryCount, entrySize);
+    entryCount = getfsstat(bufs, entryCount * entrySize, MNT_NOWAIT);
+    for (int i = 0; i < entryCount; i++) {
+        if (!strcmp(bundleAbsPath, bufs[i].f_mntfromname)) {
+            return YES;
+        }
+    }
+    return NO;
+
 }
 @end
