@@ -2,6 +2,8 @@
 
 all: data.txt data-plain-bpmf.txt
 
+install: all
+
 data-plain-bpmf.txt: bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt
 	bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
 
