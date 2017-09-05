@@ -34,6 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class PreferencesWindowController;
 @class UpdateNotificationController;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
@@ -42,11 +43,13 @@
     NSWindow *_window;
     NSURLConnection *_updateCheckConnection;
     NSMutableData *_receivingData;
+    PreferencesWindowController *_preferencesWindowController;
     UpdateNotificationController *_updateNotificationController;
 }
 
 - (void)checkForUpdate;
 - (void)checkForUpdateForced:(BOOL)forced;
+- (void)showPreferences;
 
 @property (assign, nonatomic) IBOutlet NSWindow *window;
 @end

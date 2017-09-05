@@ -52,6 +52,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)dealloc
 {
+    [_preferencesWindowController release];
     [_updateCheckConnection release];
     [_updateNotificationController release];
     [super dealloc];
@@ -120,6 +121,15 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     _receivingData = [[NSMutableData alloc] init];
     _updateCheckConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     [_updateCheckConnection start];
+}
+
+- (void)showPreferences
+{
+    if (!_preferencesWindowController) {
+        _preferencesWindowController = [[PreferencesWindowController alloc] initWithWindowNibName:@"preferences"];
+    }
+    [[_preferencesWindowController window] center];
+    [[_preferencesWindowController window] orderFront:self];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
