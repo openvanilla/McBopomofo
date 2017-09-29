@@ -73,7 +73,6 @@ static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
 static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
-static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 
 // advanced (usually optional) settings
@@ -122,10 +121,7 @@ FastLM gLanguageModelPlainBopomofo;
 - (void)collectCandidates;
 
 - (size_t)actualCandidateCursorIndex;
-- (NSString *)neighborTrigramString;
 
-- (void)_performDeferredSaveUserCandidatesDictionary;
-- (void)saveUserCandidatesDictionary;
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
 
 - (void)beep;
@@ -186,11 +182,6 @@ public:
         // create the composing buffer
         _composingBuffer = [[NSMutableString alloc] init];
 
-        // populate the settings, by default, DISABLE user candidate learning
-        if (![[NSUserDefaults standardUserDefaults] objectForKey:kDisableUserCandidateSelectionLearning]) {
-            [[NSUserDefaults standardUserDefaults] setObject:(id)kCFBooleanTrue forKey:kDisableUserCandidateSelectionLearning];
-        }
-
         _inputMode = kBopomofoModeIdentifier;
     }
 
@@ -203,36 +194,6 @@ public:
     NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Input Method Menu"] autorelease];
     NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
     [menu addItem:preferenceMenuItem];
-
-    // If Option key is pressed, show the learning-related menu
-
-    #if DEBUG
-    //I think the following line is 10.6+ specific
-    if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
-
-        BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
-
-        NSMenuItem *learnMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""] autorelease];
-        if (learningEnabled) {
-            [learnMenuItem setState:NSOnState];
-        }
-        else {
-            [learnMenuItem setState:NSOffState];
-        }
-
-        [menu addItem:learnMenuItem];
-
-        if (learningEnabled) {
-            NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[gCandidateLearningDictionary count]];
-            NSMenuItem *clearMenuItem = [[[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""] autorelease];
-            [menu addItem:clearMenuItem];
-
-
-            NSMenuItem *dumpMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""] autorelease];
-            [menu addItem:dumpMenuItem];
-        }
-    }
-    #endif //DEBUG
 
     #if DEBUG
     NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
@@ -648,17 +609,6 @@ public:
 
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
-
-        // see if we need to override the selection if a learned one exists
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
-            NSString *trigram = [self neighborTrigramString];
-
-            // Lookup from the user dict to see if the trigram fit or not
-            NSString *overrideCandidateString = [gCandidateLearningDictionary objectForKey:trigram];
-            if (overrideCandidateString) {
-                [self candidateSelected:(NSAttributedString *)overrideCandidateString];
-            }
-        }
 
         // then update the text
         _bpmfReadingBuffer->clear();
@@ -1229,61 +1179,6 @@ public:
     return cursorIndex;
 }
 
-- (NSString *)neighborTrigramString
-{
-    // gather the "trigram" for user candidate selection learning
-
-    NSMutableArray *termArray = [NSMutableArray array];
-
-    size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    const Node* prev = 0;
-    const Node* current = 0;
-    const Node* next = 0;
-
-    size_t wni = 0;
-    size_t wnc = _walkedNodes.size();
-    size_t accuSpanningLength = 0;
-    for (wni = 0; wni < wnc; wni++) {
-        NodeAnchor& anchor = _walkedNodes[wni];
-        if (!anchor.node) {
-            continue;
-        }
-
-        accuSpanningLength += anchor.spanningLength;
-        if (accuSpanningLength >= cursorIndex) {
-            prev = current;
-            current = anchor.node;
-            break;
-        }
-
-        current = anchor.node;
-    }
-
-    if (wni + 1 < wnc) {
-        next = _walkedNodes[wni + 1].node;
-    }
-
-    string term;
-    if (prev) {
-        term = prev->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    if (current) {
-        term = current->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    if (next) {
-        term = next->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    return [termArray componentsJoinedByString:@"-"];
-}
-
 - (void)_performDeferredSaveUserCandidatesDictionary
 {
     BOOL __unused success = [gCandidateLearningDictionary writeToFile:gUserCandidatesDictionaryPath atomically:YES];
@@ -1404,24 +1299,6 @@ public:
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
-- (void)toggleLearning:(id)sender
-{
-    BOOL toggle = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
-
-    [[NSUserDefaults standardUserDefaults] setBool:toggle forKey:kDisableUserCandidateSelectionLearning];
-}
-
-- (void)clearLearningDictionary:(id)sender
-{
-    [gCandidateLearningDictionary removeAllObjects];
-    [self _performDeferredSaveUserCandidatesDictionary];
-}
-
-- (void)dumpLearningDictionary:(id)sender
-{
-    NSLog(@"%@", gCandidateLearningDictionary);
-}
-
 - (NSUInteger)candidateCountForController:(VTCandidateController *)controller
 {
     return [_candidates count];
@@ -1438,13 +1315,6 @@ public:
 
     // candidate selected, override the node with selection
     string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
-
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
-        NSString *trigram = [self neighborTrigramString];
-        NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
-        [gCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
-        [self saveUserCandidatesDictionary];
-    }
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
