@@ -48,6 +48,7 @@
 		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
 		6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */; };
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
+		6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -209,6 +210,8 @@
 		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlainBopomofo.tiff; sourceTree = "<group>"; };
 		6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "PlainBopomofo@2x.tiff"; sourceTree = "<group>"; };
+		6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
+		6AE30A481F7F40B7008735BD /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +286,8 @@
 				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
 				6A0D4ECD15FC0D6400ABF4B3 /* UpdateNotificationController.h */,
 				6A0D4ECE15FC0D6400ABF4B3 /* UpdateNotificationController.m */,
+				6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */,
+				6AE30A481F7F40B7008735BD /* UserOverrideModel.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -612,6 +617,7 @@
 				6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */,
 				6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */,
 				6A0D4F0115FC0DA600ABF4B3 /* VTVerticalCandidateController.m in Sources */,
+				6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */,
 				6A0D4F0215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m in Sources */,
 				6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
