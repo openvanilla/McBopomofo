@@ -37,6 +37,7 @@
 #import "Mandarin.h"
 #import "Gramambular.h"
 #import "FastLM.h"
+#import "UserOverrideModel.h"
 
 @interface McBopomofoInputMethodController : IMKInputController
 {
@@ -52,6 +53,9 @@
 
     // latest walked path (trellis) using the Viterbi algorithm
     std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
+
+    // user override model
+    McBopomofo::UserOverrideModel *_uom;
 
     // the latest composing buffer that is updated to the foreground app
     NSMutableString *_composingBuffer;

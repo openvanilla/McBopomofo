@@ -112,6 +112,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 // shared language model object that stores our phrase-term probability database
 FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
+McBopomofo::UserOverrideModel gUserOverrideModel(200, 60.0);
 
 // private methods
 @interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
@@ -175,6 +176,7 @@ public:
         // create the lattice builder
         _languageModel = &gLanguageModel;
         _builder = new BlockReadingBuilder(_languageModel);
+        _uom = &gUserOverrideModel;
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -609,6 +611,33 @@ public:
 
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
+
+        // get user override model suggestion
+        string overrideCandidate = _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        if (!overrideCandidate.empty()) {
+            size_t cursorIndex = [self actualCandidateCursorIndex];
+            vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+
+            double highestScore = 0.0;
+            for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+                double score = ni->node->highestUnigramScore();
+                if (score > highestScore) {
+                    highestScore = score;
+                }
+            }
+            highestScore += 0.00001;
+
+            for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+                const vector<KeyValuePair>& candidates = (*ni).node->candidates();
+                for (size_t i = 0, c = candidates.size(); i < c; ++i) {
+                    if (candidates[i].value == overrideCandidate) {
+                        // found our node
+                        const_cast<Node*>((*ni).node)->selectFloatingCandidateAtIndex(i, highestScore);
+                        break;
+                    }
+                }
+            }
+        }
 
         // then update the text
         _bpmfReadingBuffer->clear();
@@ -1315,10 +1344,11 @@ public:
 
     // candidate selected, override the node with selection
     string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
-
     size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
 
+    _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+
+    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
     for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         const vector<KeyValuePair>& candidates = (*ni).node->candidates();
 
