@@ -28,6 +28,7 @@
 #ifndef KeyValuePair_h
 #define KeyValuePair_h
 
+#include <ostream>
 #include <string>
 
 namespace Formosa {
