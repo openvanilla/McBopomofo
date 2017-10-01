@@ -112,7 +112,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 // shared language model object that stores our phrase-term probability database
 FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
-McBopomofo::UserOverrideModel gUserOverrideModel(200, 60.0);
+
+static const int kUserOverrideModelCapacity = 500;
+static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
+McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 // private methods
 @interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
