@@ -150,6 +150,19 @@ public:
     }
 };
 
+static const double kEpsilon = 0.000001;
+
+static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) {
+    double highestScore = 0.0;
+    for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        double score = ni->node->highestUnigramScore();
+        if (score > highestScore) {
+            highestScore = score;
+        }
+    }
+    return highestScore + epsilon;
+}
+
 @implementation McBopomofoInputMethodController
 - (void)dealloc
 {
@@ -665,32 +678,14 @@ public:
         [self popOverflowComposingTextAndWalk:client];
 
         // get user override model suggestion
-        string overrideCandidate =
+        string overrideValue =
             (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
                 _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
-        if (!overrideCandidate.empty()) {
+        if (!overrideValue.empty()) {
             size_t cursorIndex = [self actualCandidateCursorIndex];
             vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-            double highestScore = 0.0;
-            for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-                double score = ni->node->highestUnigramScore();
-                if (score > highestScore) {
-                    highestScore = score;
-                }
-            }
-            highestScore += 0.00001;
-
-            for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-                const vector<KeyValuePair>& candidates = (*ni).node->candidates();
-                for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-                    if (candidates[i].value == overrideCandidate) {
-                        // found our node
-                        const_cast<Node*>((*ni).node)->selectFloatingCandidateAtIndex(i, highestScore);
-                        break;
-                    }
-                }
-            }
+            double highestScore = FindHighestScore(nodes, kEpsilon);
+            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, highestScore);
         }
 
         // then update the text
