@@ -665,7 +665,9 @@ public:
         [self popOverflowComposingTextAndWalk:client];
 
         // get user override model suggestion
-        string overrideCandidate = _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        string overrideCandidate =
+            (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
+                _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
         if (!overrideCandidate.empty()) {
             size_t cursorIndex = [self actualCandidateCursorIndex];
             vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
@@ -1405,7 +1407,9 @@ public:
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
-    _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    if (_inputMode != kPlainBopomofoModeIdentifier) {
+        _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    }
 
     [_candidates removeAllObjects];
 
