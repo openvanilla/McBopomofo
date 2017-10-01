@@ -41,6 +41,7 @@ static double Score(size_t eventCount,
                     double eventTimestamp,
                     double timestamp,
                     double lambda);
+static bool IsEndingPunctuation(const string& value);
 static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
                                size_t cursorIndex);
 
@@ -141,6 +142,10 @@ static double Score(size_t eventCount,
     return prob * decay;
 }
 
+static bool IsEndingPunctuation(const string& value) {
+    return value == "，" || value == "。" || value== "！" || value == "？" ||
+        value == "」" || value == "』" || value== "”" || value == "”";
+}
 static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
                                size_t cursorIndex) {
     std::stringstream s;
@@ -169,12 +174,18 @@ static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
     s.clear();
     s.str(std::string());
     if (r != n.rend()) {
-        s << "("
-                << (*r).node->currentKeyValue().key
-                << ","
-                << (*r).node->currentKeyValue().value
-                << ")";
-        ++r;
+        string value = (*r).node->currentKeyValue().value;
+        if (IsEndingPunctuation(value)) {
+            s << "()";
+            r = n.rend();
+        } else {
+            s << "("
+                    << (*r).node->currentKeyValue().key
+                    << ","
+                    << value
+                    << ")";
+            ++r;
+        }
     } else {
         s << "()";
     }
@@ -183,12 +194,18 @@ static string WalkedNodesToKey(const std::vector<NodeAnchor>& walkedNodes,
     s.clear();
     s.str(std::string());
     if (r != n.rend()) {
-        s << "("
-                << (*r).node->currentKeyValue().key
-                << ","
-                << (*r).node->currentKeyValue().value
-                << ")";
-        ++r;
+        string value = (*r).node->currentKeyValue().value;
+        if (IsEndingPunctuation(value)) {
+            s << "()";
+            r = n.rend();
+        } else {
+            s << "("
+            << (*r).node->currentKeyValue().key
+            << ","
+            << value
+            << ")";
+            ++r;
+        }
     } else {
         s << "()";
     }
