@@ -593,6 +593,11 @@ public:
             return NO;
         }
 
+        // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
+        if (charCode < 0x80 && !isprint(charCode)) {
+            return NO;
+        }
+
         // when shift is pressed, don't do further processing, since it outputs capital letter anyway.
         NSString *popedText = [inputText lowercaseString];
         [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
