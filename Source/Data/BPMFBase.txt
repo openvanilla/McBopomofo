@@ -6624,6 +6624,7 @@
 瞃 ㄨㄣ wen jp big5
 豱 ㄨㄣ wen jp big5
 殟 ㄨㄣ wen jp big5
+温 ㄨㄣ wen jp big5
 穩 ㄨㄣˇ wen3 jp3 big5
 吻 ㄨㄣˇ wen3 jp3 big5
 刎 ㄨㄣˇ wen3 jp3 big5
