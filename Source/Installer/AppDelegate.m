@@ -202,9 +202,11 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
     entryCount = getfsstat(bufs, entryCount * entrySize, MNT_NOWAIT);
     for (int i = 0; i < entryCount; i++) {
         if (!strcmp(bundleAbsPath, bufs[i].f_mntfromname)) {
+            free(bufs);
             return YES;
         }
     }
+    free(bufs);
     return NO;
 
 }
