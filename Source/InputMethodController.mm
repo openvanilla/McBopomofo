@@ -1539,9 +1539,7 @@ void LTLoadLanguageModel()
             return;
         }
 
-        NSString *errorStr = nil;
-        NSPropertyListFormat format;
-        id plist = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&errorStr];
+        id plist = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
         if (plist && [plist isKindOfClass:[NSDictionary class]]) {
             [gCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
             NSLog(@"User dictionary read, item count: %ju", (uintmax_t)[gCandidateLearningDictionary count]);
