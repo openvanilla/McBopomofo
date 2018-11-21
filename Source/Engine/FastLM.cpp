@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
+#include <unistd.h>
 
 using namespace Formosa::Gramambular;
 

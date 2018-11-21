@@ -160,7 +160,7 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
     [cpTask waitUntilExit];
     if ([cpTask terminationStatus] != 0) {
         NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
-        [NSApp terminate:self];        
+        [NSApp terminate:self];
     }
 
     NSArray *installArgs = [NSArray arrayWithObjects:@"install", nil];

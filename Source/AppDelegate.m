@@ -36,7 +36,7 @@
 #import "UpdateNotificationController.h"
 #import "PreferencesWindowController.h"
 
-void LTLoadLanguageModel();
+extern void LTLoadLanguageModel(void);
 
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
 static NSString *kUpdateInfoEndpointKey = @"UpdateInfoEndpoint";
@@ -142,7 +142,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    id plist = [NSPropertyListSerialization propertyListFromData:_receivingData mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL];
+    id plist = [NSPropertyListSerialization propertyListWithData:_receivingData options:NSPropertyListImmutable format:NULL error:NULL];
 #if DEBUG
     NSLog(@"plist %@",plist);
 #endif
@@ -188,7 +188,8 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 
     if (_updateNotificationController) {
-        [_updateNotificationController release], _updateNotificationController = nil;
+        [_updateNotificationController release];
+        _updateNotificationController = nil;
     }
 
     _updateNotificationController = [[UpdateNotificationController alloc] initWithWindowNibName:@"UpdateNotificationController"];

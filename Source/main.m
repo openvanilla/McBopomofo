@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    BOOL loadResult = [NSBundle loadNibNamed:mainNibName owner:[NSApplication sharedApplication]];
+    BOOL loadResult = [[NSBundle mainBundle] loadNibNamed:mainNibName owner:[NSApplication sharedApplication] topLevelObjects:NULL];
     if (!loadResult) {
         NSLog(@"Fatal error: Cannot load %@.", mainNibName);
         [pool drain];

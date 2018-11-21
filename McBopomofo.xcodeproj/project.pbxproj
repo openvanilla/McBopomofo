@@ -148,11 +148,13 @@
 		6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVWildcard.h; sourceTree = "<group>"; };
 		6A0D4F4915FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6A0D4F4B15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Source/en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6A0D4F4F15FC0EE100ABF4B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Source/en.lproj/preferences.xib; sourceTree = "<group>"; };
 		6A0D4F5415FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		6A0D4F5515FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Source/zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		6A0D4F5615FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "Source/zh-Hant.lproj/preferences.xib"; sourceTree = "<group>"; };
-		6A187E2716004C5900466B2E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		6A15B32621A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
+		6A15B32721A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/Base.lproj/preferences.xib; sourceTree = "<group>"; };
 		6A187E2916004C7300466B2E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		6A38BBDE15FC117A00A8A51F /* 4_in_5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_5.txt; sourceTree = "<group>"; };
 		6A38BBDF15FC117A00A8A51F /* 4_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_6.txt; sourceTree = "<group>"; };
@@ -186,7 +188,6 @@
 		6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PhraseFreq.txt; sourceTree = "<group>"; };
 		6A38BBFD15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		6A38BC1E15FC11C700A8A51F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/UpdateNotificationController.xib"; sourceTree = "<group>"; };
-		6A38BC2015FC11CE00A8A51F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6A38BC2915FC161000A8A51F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
 		6A719D0315FC5FD200C8B8E3 /* McBopomofo.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = McBopomofo.iconset; sourceTree = "<group>"; };
@@ -198,7 +199,6 @@
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6ACA41ED15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/License.rtf; sourceTree = "<group>"; };
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6ACA41F115FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Source/Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Source/Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		6ACA41F415FC1D9000935EF6 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Source/Installer/main.m; sourceTree = SOURCE_ROOT; };
@@ -239,6 +239,7 @@
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				6A0D4EA515FC0D2D00ABF4B3 /* Frameworks */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
+				6A34199F21A3D6A700B2CA44 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -412,6 +413,14 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		6A34199F21A3D6A700B2CA44 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		6A38BBDD15FC115800A8A51F /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -537,7 +546,7 @@
 		6A0D4E9415FC0CFA00ABF4B3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 1010;
 			};
 			buildConfigurationList = 6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "McBopomofo" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -546,6 +555,7 @@
 			knownRegions = (
 				en,
 				"zh-Hant",
+				Base,
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			productRefGroup = 6A0D4EA315FC0D2D00ABF4B3 /* Products */;
@@ -675,8 +685,8 @@
 		6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				6A0D4F4F15FC0EE100ABF4B3 /* en */,
 				6A0D4F5615FC0EF900ABF4B3 /* zh-Hant */,
+				6A15B32721A51F2300B92CD3 /* Base */,
 			);
 			name = preferences.xib;
 			path = ..;
@@ -685,8 +695,8 @@
 		6A187E2816004C5900466B2E /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				6A187E2716004C5900466B2E /* en */,
 				6A187E2916004C7300466B2E /* zh-Hant */,
+				6A15B32521A51F2300B92CD3 /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -695,7 +705,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				6A38BC1E15FC11C700A8A51F /* zh-Hant */,
-				6A38BC2015FC11CE00A8A51F /* en */,
+				6A15B32621A51F2300B92CD3 /* Base */,
 			);
 			name = UpdateNotificationController.xib;
 			sourceTree = "<group>";
@@ -733,8 +743,8 @@
 		6ACA41F015FC1D9000935EF6 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				6ACA41F115FC1D9000935EF6 /* en */,
 				6ACA41F815FC1D9000935EF6 /* zh-Hant */,
+				6A15B32421A51F2300B92CD3 /* Base */,
 			);
 			name = MainMenu.xib;
 			path = Source/Installer;
@@ -746,12 +756,66 @@
 		6A0D4E9915FC0CFA00ABF4B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
 		6A0D4E9A15FC0CFA00ABF4B3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 			};
 			name = Release;
 		};
@@ -759,8 +823,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
@@ -795,8 +859,9 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Source/McBopomofo-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.openvanilla.inputmethod.McBopomofo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
@@ -807,8 +872,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
@@ -837,7 +902,8 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Source/McBopomofo-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = org.openvanilla.inputmethod.McBopomofo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
@@ -849,6 +915,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -881,6 +948,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
@@ -903,8 +971,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -924,8 +992,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Source/Installer/Installer-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
@@ -936,8 +1005,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -951,7 +1020,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Source/Installer/Installer-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
