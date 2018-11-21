@@ -378,17 +378,9 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         [_scrollView setHasVerticalScroller:YES];
 
         NSScroller *verticalScroller = [_scrollView verticalScroller];
-        [verticalScroller setControlSize:controlSize];
-        
-        // calling >=10.7 only API
-        if ([verticalScroller respondsToSelector:@selector(setScrollerStyle:)]) {
-            [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
-            scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
-        }
-        else {
-            // not on >=10.7
-            scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize];
-        }
+        [verticalScroller setControlSize:controlSize];        
+        [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
+        scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
     }
 
     _keyLabelStripView.keyLabelFont = _keyLabelFont;
