@@ -131,13 +131,13 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    NSColor *white = [NSColor whiteColor];
+    NSColor *backgroundColor = [NSColor controlBackgroundColor];
     NSColor *darkGray = [NSColor colorWithDeviceWhite:0.7 alpha:1.0];
     NSColor *lightGray = [NSColor colorWithDeviceWhite:0.8 alpha:1.0];
     
     NSRect bounds = [self bounds];
     
-    [white setFill];
+    [backgroundColor setFill];
     [NSBezierPath fillRect:bounds];
     
     [[NSColor darkGrayColor] setStroke];
@@ -169,7 +169,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
             [(NSMutableDictionary *)activeCandidateAttr setObject:[NSColor selectedTextColor] forKey:NSForegroundColorAttributeName];
         }
         else {
-            [white setFill];
+            [backgroundColor setFill];
         }        
         
         [NSBezierPath fillRect:candidateRect];
