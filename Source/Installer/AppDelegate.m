@@ -60,8 +60,11 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
 
     NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL] autorelease];
 
-    [[self.textView textStorage] setAttributedString:attrStr];
-    
+    NSMutableAttributedString *mutableAttrStr = [[attrStr mutableCopy] autorelease];
+    [mutableAttrStr addAttribute:NSForegroundColorAttributeName value:[NSColor controlTextColor] range:NSMakeRange(0, [mutableAttrStr length])];
+    [[self.textView textStorage] setAttributedString:mutableAttrStr];
+    [self.textView setSelectedRange:NSMakeRange(0, 0)];
+
     NSBundle *installingBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType]];
     _installingVersion = [[[installingBundle infoDictionary] objectForKey:(id)kCFBundleVersionKey] retain];
     NSString *versionString = [[installingBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"];
