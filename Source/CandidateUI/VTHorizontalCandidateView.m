@@ -87,7 +87,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
     _keyLabelAttrDict = [[NSDictionary dictionaryWithObjectsAndKeys:
                          labelFont, NSFontAttributeName,
                          paraStyle, NSParagraphStyleAttributeName,
-                         [NSColor textColor], NSForegroundColorAttributeName,
+                         [NSColor blackColor], NSForegroundColorAttributeName,
                           nil] retain];
     [tmp release];
     
