@@ -114,6 +114,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
 
+// https://clang-analyzer.llvm.org/faq.html
+__attribute__((annotate("returns_localized_nsstring")))
+static inline NSString *LocalizationNotNeeded(NSString *s) {
+    return s;
+}
+
 // private methods
 @interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
 + (VTHorizontalCandidateController *)horizontalCandidateController;
@@ -200,7 +206,7 @@ public:
 - (NSMenu *)menu
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
-    NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Input Method Menu"] autorelease];
+    NSMenu *menu = [[[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")] autorelease];
     NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
     [menu addItem:preferenceMenuItem];
 
