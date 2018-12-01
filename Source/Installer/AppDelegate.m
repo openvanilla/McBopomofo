@@ -38,6 +38,17 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
 static const NSTimeInterval kTranslocationRemovalTickInterval = 0.5;
 static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
 
+/// A simple replacement for the deprecated NSRunAlertPanel.
+void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setAlertStyle:NSAlertStyleInformational];
+    [alert setMessageText:title];
+    [alert setInformativeText:message];
+    [alert addButtonWithTitle:buttonTitle];
+    [alert runModal];
+    [alert autorelease];
+}
+
 @implementation AppDelegate
 @synthesize installButton = _installButton;
 @synthesize cancelButton = _cancelButton;
@@ -162,7 +173,7 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
     NSTask *cpTask = [NSTask launchedTaskWithLaunchPath:@"/bin/cp" arguments:[NSArray arrayWithObjects:@"-R", [[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType], [kDestinationPartial stringByExpandingTildeInPath], nil]];
     [cpTask waitUntilExit];
     if ([cpTask terminationStatus] != 0) {
-        NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil));
         [NSApp terminate:self];
     }
 
@@ -170,14 +181,14 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
     NSTask *installTask = [NSTask launchedTaskWithLaunchPath:[kTargetFullBinPartialPath stringByExpandingTildeInPath] arguments:installArgs];
     [installTask waitUntilExit];
     if ([installTask terminationStatus] != 0) {
-        NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil));
         [NSApp terminate:self];        
     }
 
     if (warning) {
-        NSRunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil));
     } else {
-        NSRunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil));
     }
 
     [[NSApplication sharedApplication] performSelector:@selector(terminate:) withObject:self afterDelay:0.1];
