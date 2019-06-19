@@ -1010,6 +1010,7 @@ public:
         if (!updated) {
             [self beep];
         }
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (keyCode == kPageUpKeyCode) {
@@ -1017,6 +1018,7 @@ public:
         if (!updated) {
             [self beep];
         }
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (keyCode == kLeftKeyCode) {
@@ -1025,10 +1027,12 @@ public:
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
             [self beep];
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1038,10 +1042,12 @@ public:
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
             [self beep];
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1051,6 +1057,7 @@ public:
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
@@ -1058,6 +1065,7 @@ public:
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1067,6 +1075,7 @@ public:
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
@@ -1074,6 +1083,7 @@ public:
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1086,6 +1096,7 @@ public:
             gCurrentCandidateController.selectedCandidateIndex = 0;
         }
 
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
@@ -1096,6 +1107,7 @@ public:
             gCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
         }
 
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else {
@@ -1127,6 +1139,7 @@ public:
         }
 
         [self beep];
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
 }
