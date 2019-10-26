@@ -66,8 +66,8 @@ _myinstall:
 	cd ../.. && \
          xcodebuild -target McBopomofo -configuration Release && \
 	 rsync -avx --delete build/Release/McBopomofo.app/ \
-            ~/Library/Input\ Methods/McBopomofo.app/ && \
-	 @pgrep McBopomofo && killall -HUP McBopomofo || echo -n
+            ~/Library/Input\ Methods/McBopomofo.app/
+	@pgrep McBopomofo && killall -HUP McBopomofo || echo -n
 _myclean:
 	cd ../.. && xcodebuild clean
 _mydebuginstall:
