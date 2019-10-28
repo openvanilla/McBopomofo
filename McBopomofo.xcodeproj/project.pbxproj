@@ -29,6 +29,8 @@
 		6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */; };
 		6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */; };
 		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
+		6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */ = {isa = PBXBuildFile; fileRef = 6A225A1E23679F2600F685C6 /* NotarizedArchives */; };
+		6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A225A222367A1D700F685C6 /* ArchiveUtil.m */; };
 		6A38BC1515FC117A00A8A51F /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
 		6A38BC1D15FC11C700A8A51F /* UpdateNotificationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BC1F15FC11C700A8A51F /* UpdateNotificationController.xib */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
@@ -156,6 +158,9 @@
 		6A15B32621A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/UpdateNotificationController.xib; sourceTree = "<group>"; };
 		6A15B32721A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Source/Base.lproj/preferences.xib; sourceTree = "<group>"; };
 		6A187E2916004C7300466B2E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.xib"; sourceTree = "<group>"; };
+		6A225A1E23679F2600F685C6 /* NotarizedArchives */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NotarizedArchives; sourceTree = "<group>"; };
+		6A225A212367A1D700F685C6 /* ArchiveUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveUtil.h; sourceTree = "<group>"; };
+		6A225A222367A1D700F685C6 /* ArchiveUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArchiveUtil.m; sourceTree = "<group>"; };
 		6A38BBDE15FC117A00A8A51F /* 4_in_5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_5.txt; sourceTree = "<group>"; };
 		6A38BBDF15FC117A00A8A51F /* 4_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_6.txt; sourceTree = "<group>"; };
 		6A38BBE015FC117A00A8A51F /* 5_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 5_in_6.txt; sourceTree = "<group>"; };
@@ -471,6 +476,9 @@
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
 			isa = PBXGroup;
 			children = (
+				6A225A212367A1D700F685C6 /* ArchiveUtil.h */,
+				6A225A222367A1D700F685C6 /* ArchiveUtil.m */,
+				6A225A1E23679F2600F685C6 /* NotarizedArchives */,
 				6ACA41E815FC1D9000935EF6 /* AppDelegate.h */,
 				6ACA41E915FC1D9000935EF6 /* AppDelegate.m */,
 				6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */,
@@ -529,6 +537,7 @@
 				6ACA41C715FC1D7500935EF6 /* Sources */,
 				6ACA41C815FC1D7500935EF6 /* Frameworks */,
 				6ACA41C915FC1D7500935EF6 /* Resources */,
+				6A225A2023679F5F00F685C6 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -553,6 +562,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				"zh-Hant",
 				Base,
@@ -598,6 +608,7 @@
 			files = (
 				6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */,
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
+				6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */,
 				6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */,
 				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
 				6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */,
@@ -606,6 +617,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6A225A2023679F5F00F685C6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Remove the README.md in the NotarizedArchives directory\nrm -f \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/NotarizedArchives/README.md\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
@@ -634,6 +665,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */,
+				6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */,
 				6ACA41FF15FC1D9000935EF6 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
