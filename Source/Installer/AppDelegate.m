@@ -58,6 +58,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 
 - (void)dealloc
 {
+    [_archiveUtil release];
     [_installingVersion release];
     [_translocationRemovalStartTime release];
     [super dealloc];
@@ -65,6 +66,12 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    _installingVersion = [[[[NSBundle mainBundle] infoDictionary] objectForKey:(id)kCFBundleVersionKey] retain];
+    NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+
+    _archiveUtil = [[ArchiveUtil alloc] initWithAppName:kTargetBin targetAppBundleName:kTargetBundle];
+    [_archiveUtil validateIfNotarizedArchiveExists];
+
     [self.cancelButton setNextKeyView:self.installButton];
     [self.installButton setNextKeyView:self.cancelButton];
     [[self window] setDefaultButtonCell:[self.installButton cell]];
@@ -75,11 +82,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     [mutableAttrStr addAttribute:NSForegroundColorAttributeName value:[NSColor controlTextColor] range:NSMakeRange(0, [mutableAttrStr length])];
     [[self.textView textStorage] setAttributedString:mutableAttrStr];
     [self.textView setSelectedRange:NSMakeRange(0, 0)];
-
-    NSBundle *installingBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType]];
-    _installingVersion = [[[installingBundle infoDictionary] objectForKey:(id)kCFBundleVersionKey] retain];
-    NSString *versionString = [[installingBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-
+  
     [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ (for version %@, r%@)", nil), [[self window] title], versionString, _installingVersion]];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:[kTargetPartialPath stringByExpandingTildeInPath]]) {
@@ -170,7 +173,13 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 
 - (void)installInputMethodWithWarning:(BOOL)warning
 {
-    NSTask *cpTask = [NSTask launchedTaskWithLaunchPath:@"/bin/cp" arguments:[NSArray arrayWithObjects:@"-R", [[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType], [kDestinationPartial stringByExpandingTildeInPath], nil]];
+    // If the unzipped archive does not exist, this must be a dev-mode installer.
+    NSString *targetBundle = [_archiveUtil unzipNotarizedArchive];
+    if (!targetBundle) {
+        targetBundle = [[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType];
+    }
+    
+    NSTask *cpTask = [NSTask launchedTaskWithLaunchPath:@"/bin/cp" arguments:[NSArray arrayWithObjects:@"-R", targetBundle, [kDestinationPartial stringByExpandingTildeInPath], nil]];
     [cpTask waitUntilExit];
     if ([cpTask terminationStatus] != 0) {
         RunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil));

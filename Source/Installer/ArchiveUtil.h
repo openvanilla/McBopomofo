@@ -1,7 +1,4 @@
-//
-// AppDelegate.h
-//
-// Copyright (c) 2011-2012 The McBopomofo Project.
+// Copyright (c) 2011-2019 The McBopomofo Project.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -23,31 +20,20 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-//
 
-#import <Cocoa/Cocoa.h>
-#import "ArchiveUtil.h"
+#import <Foundation/Foundation.h>
 
-@interface AppDelegate : NSWindowController <NSApplicationDelegate>
-{
-@protected
-    ArchiveUtil *_archiveUtil;
-    NSString *_installingVersion;
-    BOOL _upgrading;
-    NSButton *_installButton;
-    NSButton *_cancelButton;
-    NSTextView *_textView;
-    NSWindow *_progressSheet;
-    NSProgressIndicator *_progressIndicator;
-    NSDate *_translocationRemovalStartTime;
-    NSInteger _currentVersionNumber;
+@interface ArchiveUtil : NSObject {
+    NSString *_appName;
+    NSString *_targetAppBundleName;
 }
-- (IBAction)agreeAndInstallAction:(id)sender;
-- (IBAction)cancelAction:(id)sender;
+- (instancetype _Nonnull)initWithAppName:(NSString *_Nonnull)name
+                     targetAppBundleName:(NSString *_Nonnull)invalidAppBundleName;
 
-@property (assign) IBOutlet NSButton *installButton;
-@property (assign) IBOutlet NSButton *cancelButton;    
-@property (assign) IBOutlet NSTextView *textView;
-@property (assign) IBOutlet NSWindow *progressSheet;
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
+// Returns YES if (1) a zip file under
+// Resources/NotarizedArchives/$_appName-$bundleVersion.zip exists, and (2) if
+// Resources/$_invalidAppBundleName does not exist.
+- (BOOL)validateIfNotarizedArchiveExists;
+
+- (NSString *_Nullable)unzipNotarizedArchive;
 @end
