@@ -7,3 +7,6 @@ build
 project.xcworkspace
 xcuserdata
 Credits.rtf
+# the executable we used to count the occurance of a string in a file
+# that can be built by make -C Source/Data/bin/C_Version
+# C_count.occ.exe
