@@ -1,0 +1,15 @@
+name: Build
+on: [push]
+
+jobs:
+  build:
+    name: Build
+    runs-on: macOS-latest
+    env:
+        DEVELOPER_DIR: /Applications/Xcode_11.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v1
+      - name: Clean
+        run: xcodebuild -target McBopomofo -configuration Release clean
+      - name: Build
+        run: xcodebuild -target McBopomofo -configuration Release
