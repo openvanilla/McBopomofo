@@ -28,6 +28,8 @@
 		<dict>
 			<key>org.openvanilla.inputmethod.McBopomofo.Bopomofo</key>
 			<dict>
+				<key>TISDoubleSpaceSubstitution</key>
+				<string>。</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
 				<string>Bopomofo.tiff</string>
 				<key>tsInputModeDefaultStateKey</key>
@@ -41,10 +43,21 @@
 				<key>tsInputModePrimaryInScriptKey</key>
 				<true/>
 				<key>tsInputModeScriptKey</key>
-				<string>smUnicodeScript</string>
+				<string>smTradChinese</string>
+                <key>TISIntendedLanguage</key>
+                <string>zh-Hant</string>
+                <key>tsInputModeCharacterRepertoireKey</key>
+                <array>
+                    <string>Hant</string>
+                    <string>Han</string>
+                </array>
+                <key>tsInputModeKeyEquivalentModifiersKey</key>
+                <integer>4608</integer>
 			</dict>
 			<key>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</key>
 			<dict>
+				<key>TISDoubleSpaceSubstitution</key>
+				<string>。</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
 				<string>PlainBopomofo.tiff</string>
 				<key>tsInputModeDefaultStateKey</key>
@@ -58,7 +71,16 @@
 				<key>tsInputModePrimaryInScriptKey</key>
 				<true/>
 				<key>tsInputModeScriptKey</key>
-				<string>smUnicodeScript</string>
+				<string>smTradChinese</string>
+                <key>TISIntendedLanguage</key>
+                <string>zh-Hant</string>
+                <key>tsInputModeCharacterRepertoireKey</key>
+                <array>
+                    <string>Hant</string>
+                    <string>Han</string>
+                </array>
+                <key>tsInputModeKeyEquivalentModifiersKey</key>
+                <integer>4608</integer>
 			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
@@ -89,10 +111,14 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>TICapsLockLanguageSwitchCapable</key>
+	<true/>
 	<key>TISInputSourceID</key>
 	<string>org.openvanilla.inputmethod.McBopomofo</string>
 	<key>TISIntendedLanguage</key>
 	<string>zh-Hant</string>
+	<key>TISParticipatesInTouchBar</key>
+	<false/>
 	<key>UpdateInfoEndpoint</key>
 	<string>https://mcbopomofo.openvanilla.org/updates/Info.plist</string>
 	<key>UpdateInfoSite</key>
