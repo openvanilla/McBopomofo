@@ -36,9 +36,10 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 static const CGFloat kCandidateTextPadding = 24.0;
 static const CGFloat kCandidateTextLeftMargin = 8.0;
 
+#if defined(__MAC_10_16)
 static const CGFloat kCandidateTextPaddingWithMandatedTableViewPadding = 18.0;
 static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
-
+#endif
 
 @interface VTVerticalCandidateController (Private) <NSTableViewDataSource, NSTableViewDelegate>
 - (void)rowDoubleClicked:(id)sender;
@@ -113,11 +114,14 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         [_tableView setAllowsEmptySelection:YES];
         [_tableView setDoubleAction:@selector(rowDoubleClicked:)];
         [_tableView setTarget:self];
+
+        #if defined(__MAC_10_16)
         if (@available(macOS 10.16, *)) {
             [_tableView setStyle:NSTableViewStyleFullWidth];
             _candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding;
             _candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding;
         }
+        #endif
 
         [_scrollView setDocumentView:_tableView];
         [[panel contentView] addSubview:_scrollView];
