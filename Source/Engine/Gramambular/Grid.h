@@ -182,6 +182,10 @@ namespace Formosa {
             vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
             for (auto nodeAnchor : nodes) {
                 auto candidates = nodeAnchor.node->candidates();
+
+                // Reset the candidate-fixed state of every node at the location.
+                const_cast<Node*>(nodeAnchor.node)->resetCandidate();
+
                 for (size_t i = 0, c = candidates.size(); i < c; ++i) {
                     if (candidates[i].value == value) {
                         const_cast<Node*>(nodeAnchor.node)->selectCandidateAtIndex(i);
