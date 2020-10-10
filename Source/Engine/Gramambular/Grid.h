@@ -47,6 +47,7 @@ namespace Formosa {
             size_t width() const;
             vector<NodeAnchor> nodesEndingAt(size_t inLocation);
             vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
+            void fixNodeSelectedCandidate(size_t location, const string& value);
             
             const string dumpDOT();
             
@@ -175,6 +176,20 @@ namespace Formosa {
             return result;
         }
 
+        // For nodes found at the location, fix their currently-selected candidate using the supplied string value.
+        inline void Grid::fixNodeSelectedCandidate(size_t location, const string& value)
+        {
+            vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+            for (auto nodeAnchor : nodes) {
+                auto candidates = nodeAnchor.node->candidates();
+                for (size_t i = 0, c = candidates.size(); i < c; ++i) {
+                    if (candidates[i].value == value) {
+                        const_cast<Node*>(nodeAnchor.node)->selectCandidateAtIndex(i);
+                        break;
+                    }
+                }
+            }
+        }
         
         inline const string Grid::dumpDOT()
         {
