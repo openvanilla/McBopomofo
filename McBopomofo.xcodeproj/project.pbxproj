@@ -24,7 +24,6 @@
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
-		6A0D4F5215FC0EE100ABF4B3 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */; };
 		6A0D4F5315FC0EE100ABF4B3 /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */; };
 		6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */; };
 		6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4F4A15FC0EE100ABF4B3 /* Localizable.strings */; };
@@ -244,7 +243,6 @@
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				6A0D4EA515FC0D2D00ABF4B3 /* Frameworks */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
-				6A34199F21A3D6A700B2CA44 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -418,14 +416,6 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		6A34199F21A3D6A700B2CA44 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		6A38BBDD15FC115800A8A51F /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -559,10 +549,9 @@
 			};
 			buildConfigurationList = 6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "McBopomofo" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				"zh-Hant",
 				Base,
@@ -587,7 +576,6 @@
 				6A38BC1D15FC11C700A8A51F /* UpdateNotificationController.xib in Resources */,
 				6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */,
 				6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */,
-				6A0D4F5215FC0EE100ABF4B3 /* MainMenu.xib in Resources */,
 				6A0D4F5315FC0EE100ABF4B3 /* preferences.xib in Resources */,
 				6A0D4F5715FC0EF900ABF4B3 /* InfoPlist.strings in Resources */,
 				6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */,
@@ -705,14 +693,6 @@
 			name = Localizable.strings;
 			path = ..;
 			sourceTree = "<group>";
-		};
-		6A0D4F4C15FC0EE100ABF4B3 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-			);
-			name = MainMenu.xib;
-			path = /Users/lukhnos/projects/McBopomofo;
-			sourceTree = "<absolute>";
 		};
 		6A0D4F4E15FC0EE100ABF4B3 /* preferences.xib */ = {
 			isa = PBXVariantGroup;
