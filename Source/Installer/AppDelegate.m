@@ -226,6 +226,17 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     for (int i = 0; i < entryCount; i++) {
         if (!strcmp(bundleAbsPath, bufs[i].f_mntfromname)) {
             free(bufs);
+
+            // getfsstat() may return us a cached result, and so we need to get the stat of the mounted fs.
+            // If statfs() returns an error, the mounted fs is already gone.
+            struct statfs stat;
+            int checkResult = statfs(bundleAbsPath, &stat);
+            if (checkResult != 0) {
+                // Meaning the app's bundle is not mounted, that is it's not translocated.
+                // It also means that the app is not loaded.
+                return NO;
+            }
+
             return YES;
         }
     }
