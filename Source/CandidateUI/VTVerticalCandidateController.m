@@ -36,6 +36,10 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 static const CGFloat kCandidateTextPadding = 24.0;
 static const CGFloat kCandidateTextLeftMargin = 8.0;
 
+static const CGFloat kCandidateTextPaddingWithMandatedTableViewPadding = 18.0;
+static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
+
+
 @interface VTVerticalCandidateController (Private) <NSTableViewDataSource, NSTableViewDelegate>
 - (void)rowDoubleClicked:(id)sender;
 - (BOOL)scrollPageByOne:(BOOL)forward;
@@ -44,6 +48,13 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 @end
 
 @implementation VTVerticalCandidateController
+{
+    // Total padding added to the left and the right of the table view cell text.
+    CGFloat _candidateTextPadding;
+
+    // The indent of the table view cell text from the left.
+    CGFloat _candidateTextLeftMargin;
+}
 
 - (void)dealloc
 {
@@ -65,10 +76,6 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
     self = [self initWithWindow:panel];
     if (self) {
-        _candidateTextParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [_candidateTextParagraphStyle setFirstLineHeadIndent:kCandidateTextLeftMargin];
-        [_candidateTextParagraphStyle setLineBreakMode:NSLineBreakByClipping];
-        
         contentRect.origin = NSMakePoint(0.0, 0.0);
         
         NSRect stripRect = contentRect;
@@ -95,7 +102,10 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier:@"candidate"] autorelease];
         [column setDataCell:[[[NSTextFieldCell alloc] init] autorelease]];
         [column setEditable:NO];
-        
+
+        _candidateTextPadding = kCandidateTextPadding;
+        _candidateTextLeftMargin = kCandidateTextLeftMargin;
+
         [_tableView addTableColumn:column];
         [_tableView setIntercellSpacing:NSMakeSize(0.0, 1.0)];
         [_tableView setHeaderView:nil];
@@ -103,9 +113,18 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         [_tableView setAllowsEmptySelection:YES];
         [_tableView setDoubleAction:@selector(rowDoubleClicked:)];
         [_tableView setTarget:self];
+        if (@available(macOS 10.16, *)) {
+            [_tableView setStyle:NSTableViewStyleFullWidth];
+            _candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding;
+            _candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding;
+        }
 
         [_scrollView setDocumentView:_tableView];
         [[panel contentView] addSubview:_scrollView];
+
+        _candidateTextParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [_candidateTextParagraphStyle setFirstLineHeadIndent:_candidateTextLeftMargin];
+        [_candidateTextParagraphStyle setLineBreakMode:NSLineBreakByClipping];
     }
     
     return self;
@@ -113,7 +132,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
 - (void)reloadData
 {
-    _maxCandidateAttrStringWidth = ceil([_candidateFont pointSize] * 2.0 + kCandidateTextPadding);
+    _maxCandidateAttrStringWidth = ceil([_candidateFont pointSize] * 2.0 + _candidateTextPadding);
 
     [_tableView reloadData];
     [self layoutCandidateView];
@@ -221,7 +240,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
     
     // expand the window width if text overflows
     NSRect boundingRect = [attrString boundingRectWithSize:NSMakeSize(10240.0, 10240.0) options:NSStringDrawingUsesLineFragmentOrigin];
-    CGFloat textWidth = boundingRect.size.width + kCandidateTextPadding;
+    CGFloat textWidth = boundingRect.size.width + _candidateTextPadding;
     if (textWidth > _maxCandidateAttrStringWidth) {
         _maxCandidateAttrStringWidth = textWidth;
         [self layoutCandidateView];
