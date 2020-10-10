@@ -1471,19 +1471,7 @@ public:
     }
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const vector<KeyValuePair>& candidates = (*ni).node->candidates();
-
-        for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-            if (candidates[i].value == selectedValue) {
-                // found our node
-                const_cast<Node*>((*ni).node)->selectCandidateAtIndex(i);
-                break;
-            }
-        }
-    }
+    _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
 
     [_candidates removeAllObjects];
 
