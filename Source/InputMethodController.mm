@@ -989,7 +989,12 @@ public:
         }
     }
 
-    if (charCode == 27) {
+    BOOL cancelCandidateKey =
+        (charCode == 27) ||
+        ((_inputMode == kPlainBopomofoModeIdentifier) &&
+         (charCode == 8 || keyCode == kDeleteKeyCode));
+
+    if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
