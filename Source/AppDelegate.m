@@ -34,7 +34,6 @@
 
 #import "AppDelegate.h"
 #import "OVNonModalAlertWindowController.h"
-#import "UpdateNotificationController.h"
 #import "PreferencesWindowController.h"
 
 extern void LTLoadLanguageModel(void);
@@ -55,7 +54,6 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 {
     [_preferencesWindowController release];
     [_updateCheckConnection release];
-    [_updateNotificationController release];
     [super dealloc];
 }
 
@@ -218,25 +216,35 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
         }
         return;
     }
+    [_updateNextStepURL release];
+    _updateNextStepURL = nil;
+    _updateNextStepURL = [siteInfoURL retain];
 
+    NSDictionary *versionDescriptions = [plist objectForKey:@"Description"];
+    NSString *versionDescription = @"";
+    if ([versionDescriptions isKindOfClass:[NSDictionary class]]) {
+        NSString *locale = @"en";
+        NSArray *supportedLocales = [NSArray arrayWithObjects:@"en", @"zh-Hant", @"zh-Hans", nil];
+        NSArray *preferredTags = [NSBundle preferredLocalizationsFromArray:supportedLocales];
+        if ([preferredTags count]) {
+            locale = [preferredTags objectAtIndex:0];
+        }
+        versionDescription = [versionDescriptions objectForKey:locale];
+        if (!versionDescription) {
+            versionDescription = [versionDescriptions objectForKey:@"en"];
+        }
 
-    if (_updateNotificationController) {
-        [_updateNotificationController release];
-        _updateNotificationController = nil;
+        if (!versionDescription) {
+            versionDescription = @"";
+        }
+        else {
+            versionDescription = [@"\n\n" stringByAppendingString:versionDescription];
+        }
     }
 
-    _updateNotificationController = [[UpdateNotificationController alloc] initWithWindowNibName:@"UpdateNotificationController"];
+    NSString *content = [NSString stringWithFormat:NSLocalizedString(@"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", nil), [infoDict objectForKey:@"CFBundleShortVersionString"], currentVersion, [plist objectForKey:@"CFBundleShortVersionString"], remoteVersion, versionDescription];
 
-    _updateNotificationController.siteURL = siteInfoURL;
-    _updateNotificationController.infoText = [NSString stringWithFormat:NSLocalizedString(@"You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?", @""),
-                                              [infoDict objectForKey:@"CFBundleShortVersionString"],
-                                              [infoDict objectForKey:(id)kCFBundleVersionKey],
-                                              [plist objectForKey:@"CFBundleShortVersionString"],
-                                              [plist objectForKey:(id)kCFBundleVersionKey],
-                                              nil];
-
-    [_updateNotificationController showWindow:self];
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"New Version Available", nil) content:content confirmButtonTitle:NSLocalizedString(@"Visit Website", nil) cancelButtonTitle:NSLocalizedString(@"Not Now", nil) cancelAsDefault:NO delegate:self];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -246,5 +254,18 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)nonModalAlertWindowControllerDidConfirm:(OVNonModalAlertWindowController *)controller
 {
+    if (_updateNextStepURL) {
+        [[NSWorkspace sharedWorkspace] openURL:_updateNextStepURL];
+    }
+
+    [_updateNextStepURL release];
+    _updateNextStepURL = nil;
 }
+
+- (void)nonModalAlertWindowControllerDidCancel:(OVNonModalAlertWindowController *)controller
+{
+    [_updateNextStepURL release];
+    _updateNextStepURL = nil;
+}
+
 @end
