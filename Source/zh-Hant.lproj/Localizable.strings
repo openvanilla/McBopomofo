@@ -27,3 +27,22 @@
 
 /* No comment provided by engineer. */
 "Check for Updates…" = "檢查是否有新版…";
+
+/* No comment provided by engineer. */
+"Check for Update Completed" = "新版檢查完畢";
+
+/* No comment provided by engineer. */
+"You are already using the latest version of McBopomofo." = "目前使用的已經是最新版本。";
+
+/* No comment provided by engineer. */
+"Update Check Failed" = "無法檢查新版";
+
+/* No comment provided by engineer. */
+"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "網路連線失敗，或是伺服器沒有回應。\n\n錯誤說明：%@";
+
+/* No comment provided by engineer. */
+"OK" = "好";
+
+/* No comment provided by engineer. */
+"Dismiss" = "關閉本視窗";
+

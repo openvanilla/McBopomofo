@@ -42,6 +42,7 @@
 @private
     NSWindow *_window;
     NSURLConnection *_updateCheckConnection;
+    BOOL _currentUpdateCheckIsForced;
     NSMutableData *_receivingData;
     PreferencesWindowController *_preferencesWindowController;
     UpdateNotificationController *_updateNotificationController;

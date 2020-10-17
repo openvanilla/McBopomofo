@@ -33,6 +33,7 @@
 //
 
 #import "AppDelegate.h"
+#import "OVNonModalAlertWindowController.h"
 #import "UpdateNotificationController.h"
 #import "PreferencesWindowController.h"
 
@@ -44,7 +45,7 @@ static NSString *kUpdateInfoSiteKey = @"UpdateInfoSite";
 static const NSTimeInterval kNextCheckInterval = 86400.0;
 static const NSTimeInterval kTimeoutInterval = 60.0;
 
-@interface AppDelegate () <NSURLConnectionDataDelegate>
+@interface AppDelegate () <NSURLConnectionDataDelegate, OVNonModalAlertWindowControllerDelegate>
 @end
 
 @implementation AppDelegate
@@ -76,6 +77,8 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
         // busy
         return;
     }
+
+    _currentUpdateCheckIsForced = forced;
 
     // time for update?
     if (!forced) {
@@ -134,10 +137,22 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+    BOOL isForcedCheck = _currentUpdateCheckIsForced;
+
     [_receivingData release];
     _receivingData = nil;
     [_updateCheckConnection release];
     _updateCheckConnection = nil;
+    _currentUpdateCheckIsForced = NO;
+
+    if (isForcedCheck) {
+        [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Update Check Failed", nil) content:[NSString stringWithFormat:NSLocalizedString(@"There may be no internet connection or the server failed to respond.\n\nError message: %@", nil), [error localizedDescription]] confirmButtonTitle:NSLocalizedString(@"Dismiss", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+    }
+}
+
+- (void)showNoUpdateAvailableAlert
+{
+    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Check for Update Completed", nil) content:NSLocalizedString(@"You are already using the latest version of McBopomofo.", nil) confirmButtonTitle:NSLocalizedString(@"OK", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -147,12 +162,18 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     NSLog(@"plist %@",plist);
 #endif
 
+    BOOL isForcedCheck = _currentUpdateCheckIsForced;
+
     [_receivingData release];
     _receivingData = nil;
     [_updateCheckConnection release];
     _updateCheckConnection = nil;
+    _currentUpdateCheckIsForced = NO;
 
     if (!plist) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
@@ -161,6 +182,9 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     NSLog(@"the remoteversion is %@",remoteVersion);
 #endif
     if (!remoteVersion) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
@@ -172,17 +196,26 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     NSComparisonResult result  = [currentVersion compare:remoteVersion options:NSNumericSearch];
 
     if (result != NSOrderedAscending) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
 
     NSString *siteInfoURLString = [plist objectForKey:kUpdateInfoSiteKey];
     if (!siteInfoURLString) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
     NSURL *siteInfoURL = [NSURL URLWithString:siteInfoURLString];
     if (!siteInfoURL) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
@@ -209,5 +242,9 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
     [_receivingData appendData:data];
+}
+
+- (void)nonModalAlertWindowControllerDidConfirm:(OVNonModalAlertWindowController *)controller
+{
 }
 @end
