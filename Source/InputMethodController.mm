@@ -240,10 +240,8 @@ public:
     }
     #endif //DEBUG
 
-    #if DEBUG
     NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
     [menu addItem:updateCheckItem];
-    #endif
 
     NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
     [menu addItem:aboutMenuItem];
