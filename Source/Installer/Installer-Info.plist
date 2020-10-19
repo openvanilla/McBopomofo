@@ -15,11 +15,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0-beta1</string>
+	<string>1.0-beta2</string>
 	<key>CFBundleSignature</key>
 	<string>MBIN</string>
 	<key>CFBundleVersion</key>
-	<string>838</string>
+	<string>840</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSHasLocalizedDisplayName</key>
