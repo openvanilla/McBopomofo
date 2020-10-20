@@ -38,6 +38,7 @@
 
 extern void LTLoadLanguageModel(void);
 
+static NSString *kCheckUpdateAutomatically = @"CheckUpdateAutomatically";
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
 static NSString *kUpdateInfoEndpointKey = @"UpdateInfoEndpoint";
 static NSString *kUpdateInfoSiteKey = @"UpdateInfoSite";
@@ -61,6 +62,11 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 {
     LTLoadLanguageModel();
 
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:kCheckUpdateAutomatically]) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCheckUpdateAutomatically];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+
     [self checkForUpdate];
 }
 
@@ -80,6 +86,10 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
     // time for update?
     if (!forced) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:kCheckUpdateAutomatically]) {
+            return;
+        }
+
         NSDate *now = [NSDate date];
         NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:kNextUpdateCheckDateKey];
         if (![date isKindOfClass:[NSDate class]]) {
