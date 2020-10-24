@@ -35,16 +35,16 @@
 #import <Cocoa/Cocoa.h>
 
 @class PreferencesWindowController;
-@class UpdateNotificationController;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 {
 @private
     NSWindow *_window;
     NSURLConnection *_updateCheckConnection;
+    BOOL _currentUpdateCheckIsForced;
     NSMutableData *_receivingData;
+    NSURL *_updateNextStepURL;
     PreferencesWindowController *_preferencesWindowController;
-    UpdateNotificationController *_updateNotificationController;
 }
 
 - (void)checkForUpdate;

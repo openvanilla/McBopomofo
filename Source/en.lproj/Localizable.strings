@@ -17,13 +17,34 @@
 "Check Later" = "Check Later";
 
 /* No comment provided by engineer. */
+"Check for Updates…" = "Check for Updates…";
+
+/* No comment provided by engineer. */
+"Check for Update Completed" = "Check for Update Completed";
+
+/* No comment provided by engineer. */
+"You are already using the latest version of McBopomofo." = "You are already using the latest version of McBopomofo.";
+
+/* No comment provided by engineer. */
+"Update Check Failed" = "Update Check Failed";
+
+/* No comment provided by engineer. */
+"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "There may be no internet connection or the server failed to respond.\n\nError message: %@";
+
+/* No comment provided by engineer. */
+"OK" = "OK";
+
+/* No comment provided by engineer. */
+"Dismiss" = "Dismiss";
+
+/* No comment provided by engineer. */
 "New Version Available" = "New Version Available";
+
+/* No comment provided by engineer. */
+"Not Now" = "Not Now";
 
 /* No comment provided by engineer. */
 "Visit Website" = "Visit Website";
 
 /* No comment provided by engineer. */
-"You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?" = "You are running version %1$@ (%2$@), and the new version %3$@ (%4$@) is now available.\n\nVisit the website to download it?";
-
-/* No comment provided by engineer. */
-"Check for Updates…" = "Check for Updates…";
+"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@";
