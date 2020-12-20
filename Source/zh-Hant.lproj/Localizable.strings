@@ -17,13 +17,34 @@
 "Check Later" = "晚點再通知我";
 
 /* No comment provided by engineer. */
-"New Version Available" = "New Version Available";
-
-/* No comment provided by engineer. */
-"Visit Website" = "開啟網站";
-
-/* No comment provided by engineer. */
-"You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?" = "目前的輸入法版本是 %1$@ 版 (%2$@)，目前最新版本已經到第 %3$@ 版 (%4$@)。\n\n是否要前往輸入法網站，下載最新版本？";
-
-/* No comment provided by engineer. */
 "Check for Updates…" = "檢查是否有新版…";
+
+/* No comment provided by engineer. */
+"Check for Update Completed" = "新版檢查完畢";
+
+/* No comment provided by engineer. */
+"You are already using the latest version of McBopomofo." = "目前使用的已經是最新版本。";
+
+/* No comment provided by engineer. */
+"Update Check Failed" = "無法檢查新版";
+
+/* No comment provided by engineer. */
+"There may be no internet connection or the server failed to respond.\n\nError message: %@" = "網路連線失敗，或是伺服器沒有回應。\n\n錯誤說明：%@";
+
+/* No comment provided by engineer. */
+"OK" = "好";
+
+/* No comment provided by engineer. */
+"Dismiss" = "關閉本視窗";
+
+/* No comment provided by engineer. */
+"New Version Available" = "有新版可下載";
+
+/* No comment provided by engineer. */
+"Not Now" = "以後再說";
+
+/* No comment provided by engineer. */
+"Visit Website" = "前往網站";
+
+/* No comment provided by engineer. */
+"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "目前使用的小麥注音版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往小麥注音網站下載新版來安裝？%5$@";
