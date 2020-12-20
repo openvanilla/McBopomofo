@@ -240,10 +240,8 @@ public:
     }
     #endif //DEBUG
 
-    #if DEBUG
     NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
     [menu addItem:updateCheckItem];
-    #endif
 
     NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
     [menu addItem:aboutMenuItem];
@@ -989,7 +987,12 @@ public:
         }
     }
 
-    if (charCode == 27) {
+    BOOL cancelCandidateKey =
+        (charCode == 27) ||
+        ((_inputMode == kPlainBopomofoModeIdentifier) &&
+         (charCode == 8 || keyCode == kDeleteKeyCode));
+
+    if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
@@ -1471,19 +1474,7 @@ public:
     }
 
     size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const vector<KeyValuePair>& candidates = (*ni).node->candidates();
-
-        for (size_t i = 0, c = candidates.size(); i < c; ++i) {
-            if (candidates[i].value == selectedValue) {
-                // found our node
-                const_cast<Node*>((*ni).node)->selectCandidateAtIndex(i);
-                break;
-            }
-        }
-    }
+    _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
 
     [_candidates removeAllObjects];
 

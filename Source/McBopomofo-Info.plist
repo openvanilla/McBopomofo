@@ -6,8 +6,6 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string>McBopomofo.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -17,11 +15,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.11</string>
+	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>BPMF</string>
 	<key>CFBundleVersion</key>
-	<string>812</string>
+	<string>846</string>
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
@@ -32,10 +30,17 @@
 				<string>。</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
 				<string>Bopomofo.tiff</string>
+				<key>tsInputModeCharacterRepertoireKey</key>
+				<array>
+					<string>Hant</string>
+					<string>Han</string>
+				</array>
 				<key>tsInputModeDefaultStateKey</key>
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
+				<key>tsInputModeKeyEquivalentModifiersKey</key>
+				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>Bopomofo.tiff</string>
 				<key>tsInputModePaletteIconFileKey</key>
@@ -60,10 +65,17 @@
 				<string>。</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
 				<string>PlainBopomofo.tiff</string>
+				<key>tsInputModeCharacterRepertoireKey</key>
+				<array>
+					<string>Hant</string>
+					<string>Han</string>
+				</array>
 				<key>tsInputModeDefaultStateKey</key>
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
+				<key>tsInputModeKeyEquivalentModifiersKey</key>
+				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>PlainBopomofo.tiff</string>
 				<key>tsInputModePaletteIconFileKey</key>
@@ -102,11 +114,11 @@
 	<key>LSHasLocalizedDisplayName</key>
 	<true/>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.5</string>
+	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2011-2018 Mengjuei Hsieh et al.</string>
+	<string>Copyright © 2011-2020 Mengjuei Hsieh et al.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -129,6 +141,6 @@
 		<string>Hans</string>
 	</array>
 	<key>tsInputMethodIconFileKey</key>
-	<string>BopomofoTextMenu.tiff</string>
+	<string>Bopomofo.tiff</string>
 </dict>
 </plist>
