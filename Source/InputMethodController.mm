@@ -216,13 +216,7 @@ public:
         BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
 
         NSMenuItem *learnMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""];
-        if (learningEnabled) {
-            [learnMenuItem setState:NSOnState];
-        }
-        else {
-            [learnMenuItem setState:NSOffState];
-        }
-
+        learnMenuItem.state = learningEnabled ? NSControlStateValueOn : NSControlStateValueOff;
         [menu addItem:learnMenuItem];
 
         if (learningEnabled) {
@@ -458,9 +452,8 @@ public:
 
     // we must use NSAttributedString so that the cursor is visible --
     // can't just use NSString
-    NSDictionary *attrDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
-                              [NSNumber numberWithInt:0], NSMarkedClauseSegmentAttributeName, nil];
+    NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+                               NSMarkedClauseSegmentAttributeName: @0};
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,

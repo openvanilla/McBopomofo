@@ -46,7 +46,7 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
     NSMenuItem *usKeyboardLayoutItem = nil;
     NSMenuItem *chosenItem = nil;
 
-    [[self.basisKeyboardLayoutButton menu] removeAllItems];
+    [self.basisKeyboardLayoutButton.menu removeAllItems];
 
     NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
 
@@ -72,8 +72,8 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
         NSString *localizedName = (__bridge NSString *)TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
 
         NSMenuItem *item = [[NSMenuItem alloc] init];
-        [item setTitle:localizedName];
-        [item setRepresentedObject:sourceID];
+        item.title = localizedName;
+        item.representedObject = sourceID;
 
         if ([sourceID isEqualToString:@"com.apple.keylayout.US"]) {
             usKeyboardLayoutItem = item;
@@ -84,7 +84,7 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
             chosenItem = item;
         }
 
-        [[self.basisKeyboardLayoutButton menu] addItem:item];
+        [self.basisKeyboardLayoutButton.menu addItem:item];
     }
 
     [self.basisKeyboardLayoutButton selectItem:(chosenItem ? chosenItem : usKeyboardLayoutItem)];
