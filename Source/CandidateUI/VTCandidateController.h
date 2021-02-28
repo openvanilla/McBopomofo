@@ -56,7 +56,7 @@
 
 - (NSUInteger)candidateIndexAtKeyLabelIndex:(NSUInteger)index;
 
-@property (assign, weak, nonatomic) id<VTCandidateControllerDelegate> delegate;
+@property (weak, nonatomic) id<VTCandidateControllerDelegate> delegate;
 @property (assign, nonatomic) NSUInteger selectedCandidateIndex;
 
 @property (assign, nonatomic) BOOL visible;

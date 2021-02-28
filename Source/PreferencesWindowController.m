@@ -68,10 +68,10 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
             continue;
         }
 
-        NSString *sourceID = (NSString *)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
-        NSString *localizedName = (NSString *)TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
+        NSString *sourceID = (__bridge NSString *)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+        NSString *localizedName = (__bridge NSString *)TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
 
-        NSMenuItem *item = [[[NSMenuItem alloc] init] autorelease];
+        NSMenuItem *item = [[NSMenuItem alloc] init];
         [item setTitle:localizedName];
         [item setRepresentedObject:sourceID];
 

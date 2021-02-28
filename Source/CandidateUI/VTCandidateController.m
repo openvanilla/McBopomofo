@@ -36,10 +36,9 @@
 
 - (void)dealloc
 {
-    [_keyLabels release];
-    [_keyLabelFont release];
-    [_candidateFont release];
-    [super dealloc];
+    _keyLabels = nil;
+    _keyLabelFont = nil;
+    _candidateFont = nil;
 }
 
 - (id)initWithWindow:(NSWindow *)window
@@ -47,11 +46,10 @@
     self = [super initWithWindow:window];
     if (self) {
         // populate the default values        
-        _keyLabels = [[NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil] retain];
-        _keyLabelFont = [[NSFont systemFontOfSize:14.0] retain];
-        _candidateFont = [[NSFont systemFontOfSize:18.0] retain];
+        _keyLabels = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+        _keyLabelFont = [NSFont systemFontOfSize:14.0];
+        _candidateFont = [NSFont systemFontOfSize:18.0];
     }
-    
     return self;
 }
 
