@@ -160,14 +160,11 @@ public:
         delete _builder;
     }
 
-    [_composingBuffer release];
 
-    [_candidates release];
 
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
 
-    [super dealloc];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
@@ -206,8 +203,8 @@ public:
 - (NSMenu *)menu
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
-    NSMenu *menu = [[[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")] autorelease];
-    NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
+    NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
+    NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
 
     // If Option key is pressed, show the learning-related menu
@@ -218,7 +215,7 @@ public:
 
         BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
 
-        NSMenuItem *learnMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""] autorelease];
+        NSMenuItem *learnMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""];
         if (learningEnabled) {
             [learnMenuItem setState:NSOnState];
         }
@@ -230,20 +227,20 @@ public:
 
         if (learningEnabled) {
             NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[gCandidateLearningDictionary count]];
-            NSMenuItem *clearMenuItem = [[[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""] autorelease];
+            NSMenuItem *clearMenuItem = [[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""];
             [menu addItem:clearMenuItem];
 
 
-            NSMenuItem *dumpMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""] autorelease];
+            NSMenuItem *dumpMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""];
             [menu addItem:dumpMenuItem];
         }
     }
     #endif //DEBUG
 
-    NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
+    NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
 
-    NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
+    NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
 
     return menu;
@@ -464,7 +461,7 @@ public:
     NSDictionary *attrDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               [NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
                               [NSNumber numberWithInt:0], NSMarkedClauseSegmentAttributeName, nil];
-    NSMutableAttributedString *attrString = [[[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict] autorelease];
+    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
@@ -1540,7 +1537,7 @@ void LTLoadLanguageModel()
 
     // TODO: Change this
     NSString *userDictFile = [userDictPath stringByAppendingPathComponent:@"UserCandidatesCache.plist"];
-    gUserCandidatesDictionaryPath = [userDictFile retain];
+    gUserCandidatesDictionaryPath = userDictFile;
 
     exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictFile isDirectory:&isDir];
     if (exists && !isDir) {

@@ -53,9 +53,8 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)dealloc
 {
-    [_preferencesWindowController release];
-    [_updateCheckConnection release];
-    [super dealloc];
+    _preferencesWindowController = nil;
+    _updateCheckConnection = nil;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
@@ -124,7 +123,6 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 #endif
 
     if (_receivingData) {
-        [_receivingData release];
         _receivingData = nil;
     }
 
@@ -147,9 +145,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 {
     BOOL isForcedCheck = _currentUpdateCheckIsForced;
 
-    [_receivingData release];
     _receivingData = nil;
-    [_updateCheckConnection release];
     _updateCheckConnection = nil;
     _currentUpdateCheckIsForced = NO;
 
@@ -172,9 +168,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
     BOOL isForcedCheck = _currentUpdateCheckIsForced;
 
-    [_receivingData release];
     _receivingData = nil;
-    [_updateCheckConnection release];
     _updateCheckConnection = nil;
     _currentUpdateCheckIsForced = NO;
 
@@ -226,9 +220,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
         }
         return;
     }
-    [_updateNextStepURL release];
-    _updateNextStepURL = nil;
-    _updateNextStepURL = [siteInfoURL retain];
+    _updateNextStepURL = siteInfoURL;
 
     NSDictionary *versionDescriptions = [plist objectForKey:@"Description"];
     NSString *versionDescription = @"";
@@ -268,13 +260,11 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
         [[NSWorkspace sharedWorkspace] openURL:_updateNextStepURL];
     }
 
-    [_updateNextStepURL release];
     _updateNextStepURL = nil;
 }
 
 - (void)nonModalAlertWindowControllerDidCancel:(OVNonModalAlertWindowController *)controller
 {
-    [_updateNextStepURL release];
     _updateNextStepURL = nil;
 }
 

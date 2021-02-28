@@ -20,11 +20,11 @@
 @interface OVNonModalAlertWindowController : NSWindowController
 {
 @private
-    NSTextField *_titleTextField;
-    NSTextField *_contentTextField;
-    NSButton *_confirmButton;
-    NSButton *_cancelButton;
-    id<OVNonModalAlertWindowControllerDelegate> _delegate;
+//    NSTextField *_titleTextField;
+//    NSTextField *_contentTextField;
+//    NSButton *_confirmButton;
+//    NSButton *_cancelButton;
+//    id<OVNonModalAlertWindowControllerDelegate> _delegate;
 }
 
 + (OVNonModalAlertWindowController *)sharedInstance;
