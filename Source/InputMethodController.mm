@@ -41,6 +41,9 @@
 #import "AppDelegate.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
+#import "McBopomofo-Swift.h"
+
+//@import SwiftUI;
 
 // C++ namespace usages
 using namespace std;
@@ -75,6 +78,7 @@ static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizonta
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
+static NSString *const kChineseConvertionEnanledKey = @"ChineseConvertionEnanledKey";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -159,12 +163,8 @@ public:
     if (_builder) {
         delete _builder;
     }
-
-
-
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
-
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
@@ -195,6 +195,7 @@ public:
         }
 
         _inputMode = kBopomofoModeIdentifier;
+        _chineseConvertionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConvertionEnanledKey];
     }
 
     return self;
@@ -230,6 +231,11 @@ public:
         }
     }
     #endif //DEBUG
+
+    NSMenuItem *chineseConvertionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Convertion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
+    chineseConvertionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    chineseConvertionMenuItem.state = _chineseConvertionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    [menu addItem:chineseConvertionMenuItem];
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
@@ -388,8 +394,13 @@ public:
         return;
     }
 
+    NSString *buffer = _composingBuffer;
+    if (_chineseConvertionEnabled) {
+        buffer = [OpenCCBridge convert:_composingBuffer];
+    }
+
     // commit the text, clear the state
-    [client insertText:_composingBuffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
@@ -1426,6 +1437,12 @@ public:
     BOOL toggle = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
 
     [[NSUserDefaults standardUserDefaults] setBool:toggle forKey:kDisableUserCandidateSelectionLearning];
+}
+
+- (void)toggleChineseConverter:(id)sender
+{
+    _chineseConvertionEnabled = !_chineseConvertionEnabled;
+    [[NSUserDefaults standardUserDefaults] setBool:_chineseConvertionEnabled forKey:kChineseConvertionEnanledKey];
 }
 
 - (void)clearLearningDictionary:(id)sender
