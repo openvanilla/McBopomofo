@@ -69,8 +69,8 @@
     // current input mode
     NSString *_inputMode;
 
+    // if Chinese convertion is enabled
     BOOL _chineseConvertionEnabled;
-
 }
 @end
 
