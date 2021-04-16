@@ -49,7 +49,7 @@
 		6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
-		D48550C325EC0EF2006A204C /* OpenCCDictionary.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = D48550A625EBF2CF006A204C /* OpenCCDictionary.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E7582E69262A528E0003B31B /* OpenCCDictionary.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = E7582E68262A528E0003B31B /* OpenCCDictionary.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,7 +76,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				D48550C325EC0EF2006A204C /* OpenCCDictionary.bundle in Embed PlugIns */,
+				E7582E69262A528E0003B31B /* OpenCCDictionary.bundle in Embed PlugIns */,
 			);
 			name = "Embed PlugIns";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -227,7 +227,7 @@
 		6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVNonModalAlertWindowController.m; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
-		D48550A625EBF2CF006A204C /* OpenCCDictionary.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = OpenCCDictionary.bundle; path = "../../Library/Developer/Xcode/DerivedData/McBopomofo-czkkfmaoaedhszarcriztoynjmen/SourcePackages/checkouts/SwiftyOpenCC/OpenCCDictionary.bundle"; sourceTree = "<group>"; };
+		E7582E68262A528E0003B31B /* OpenCCDictionary.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = OpenCCDictionary.bundle; path = "../../../Library/Developer/Xcode/DerivedData/McBopomofo-cqkraatnslbuvlhcaetfahesllst/SourcePackages/checkouts/SwiftyOpenCC/OpenCCDictionary.bundle"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,7 +277,7 @@
 				6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */,
 				6A38BC2915FC161000A8A51F /* Carbon.framework */,
 				6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */,
-				D48550A625EBF2CF006A204C /* OpenCCDictionary.bundle */,
+				E7582E68262A528E0003B31B /* OpenCCDictionary.bundle */,
 				6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */,
 				6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */,
 			);
