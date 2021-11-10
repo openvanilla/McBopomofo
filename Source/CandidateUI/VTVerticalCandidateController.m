@@ -57,21 +57,13 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
     CGFloat _candidateTextLeftMargin;
 }
 
-- (void)dealloc
-{
-    [_candidateTextParagraphStyle release];
-    [_keyLabelStripView release];
-    [_scrollView release];
-    [_tableView release];
-    [super dealloc];
-}
 
 - (id)init
 {
     NSRect contentRect = NSMakeRect(128.0, 128.0, 0.0, 0.0);
     NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
     
-    NSPanel *panel = [[[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO] autorelease];
+    NSPanel *panel = [[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
     [panel setLevel:kCGPopUpMenuWindowLevel];
     [panel setHasShadow:YES];
 
@@ -100,8 +92,8 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         [_tableView setDataSource:self];
         [_tableView setDelegate:self];
         
-        NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier:@"candidate"] autorelease];
-        [column setDataCell:[[[NSTextFieldCell alloc] init] autorelease]];
+        NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"candidate"];
+        [column setDataCell:[[NSTextFieldCell alloc] init]];
         [column setEditable:NO];
 
         _candidateTextPadding = kCandidateTextPadding;
@@ -238,7 +230,7 @@ static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
         candidate = [_delegate candidateController:self candidateAtIndex:row];
     }
 
-    NSAttributedString *attrString = [[[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]] autorelease];    
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]];    
     
     // we do more work than what this method is expected to; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
     

@@ -35,9 +35,8 @@
 
 - (void)dealloc
 {
-    [_keyLabelFont release];
-    [_keyLabels release];
-    [super dealloc];
+    _keyLabelFont = nil;
+    _keyLabels = nil;
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -71,7 +70,7 @@
     NSColor *darkGray = [NSColor colorWithDeviceWhite:0.7 alpha:1.0];
     NSColor *lightGray = [NSColor colorWithDeviceWhite:0.8 alpha:1.0];
 
-    NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     [style setAlignment:NSCenterTextAlignment];
     
     NSDictionary *textAttr = [NSDictionary dictionaryWithObjectsAndKeys:

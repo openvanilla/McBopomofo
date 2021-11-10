@@ -46,7 +46,6 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     [alert setInformativeText:message];
     [alert addButtonWithTitle:buttonTitle];
     [alert runModal];
-    [alert autorelease];
 }
 
 @implementation AppDelegate
@@ -56,17 +55,10 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 @synthesize progressSheet = _progressSheet;
 @synthesize progressIndicator = _progressIndicator;
 
-- (void)dealloc
-{
-    [_archiveUtil release];
-    [_installingVersion release];
-    [_translocationRemovalStartTime release];
-    [super dealloc];
-}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    _installingVersion = [[[[NSBundle mainBundle] infoDictionary] objectForKey:(id)kCFBundleVersionKey] retain];
+    _installingVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:(id)kCFBundleVersionKey];
     NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 
     _archiveUtil = [[ArchiveUtil alloc] initWithAppName:kTargetBin targetAppBundleName:kTargetBundle];
@@ -76,9 +68,9 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     [self.installButton setNextKeyView:self.cancelButton];
     [[self window] setDefaultButtonCell:[self.installButton cell]];
 
-    NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL] autorelease];
+    NSAttributedString *attrStr = [[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL];
 
-    NSMutableAttributedString *mutableAttrStr = [[attrStr mutableCopy] autorelease];
+    NSMutableAttributedString *mutableAttrStr = [attrStr mutableCopy];
     [mutableAttrStr addAttribute:NSForegroundColorAttributeName value:[NSColor controlTextColor] range:NSMakeRange(0, [mutableAttrStr length])];
     [[self.textView textStorage] setAttributedString:mutableAttrStr];
     [self.textView setSelectedRange:NSMakeRange(0, 0)];
@@ -145,8 +137,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
                 });
             }];
 
-            [_translocationRemovalStartTime release];
-            _translocationRemovalStartTime = [[NSDate date] retain];
+            _translocationRemovalStartTime = [NSDate date];
             [NSTimer scheduledTimerWithTimeInterval:kTranslocationRemovalTickInterval target:self selector:@selector(timerTick:) userInfo:nil repeats:YES];
             return;
         }

@@ -28,16 +28,15 @@
             targetAppBundleName:(NSString *)targetAppBundleName {
     self = [super init];
     if (self) {
-        _appName = [name retain];
-        _targetAppBundleName = [targetAppBundleName retain];
+        _appName = name;
+        _targetAppBundleName = targetAppBundleName;
     }
     return self;
 }
 
 - (void)delloc {
-    [_appName release];
-    [_targetAppBundleName release];
-    [super dealloc];
+    _appName = nil;
+    _targetAppBundleName = nil;
 }
 
 - (BOOL)validateIfNotarizedArchiveExists {
@@ -67,7 +66,6 @@
                                                devModeAppBundleExists]];
             [alert addButtonWithTitle:@"Terminate"];
             [alert runModal];
-            [alert autorelease];
 
             [[NSApplication sharedApplication] terminate:nil];
         } else {
@@ -84,8 +82,6 @@
                                                           devModeAppBundlePath]];
         [alert addButtonWithTitle:@"Terminate"];
         [alert runModal];
-        [alert autorelease];
-
         [[NSApplication sharedApplication] terminate:nil];
     }
 
