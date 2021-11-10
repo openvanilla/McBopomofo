@@ -78,7 +78,7 @@ static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizonta
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
-static NSString *const kChineseConvertionEnanledKey = @"ChineseConvertionEnanledKey";
+static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -195,7 +195,7 @@ public:
         }
 
         _inputMode = kBopomofoModeIdentifier;
-        _chineseConvertionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConvertionEnanledKey];
+        _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
     }
 
     return self;
@@ -232,10 +232,10 @@ public:
     }
     #endif //DEBUG
 
-    NSMenuItem *chineseConvertionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Convertion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
-    chineseConvertionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
-    chineseConvertionMenuItem.state = _chineseConvertionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    [menu addItem:chineseConvertionMenuItem];
+    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
+    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    [menu addItem:chineseConversionMenuItem];
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
@@ -395,7 +395,7 @@ public:
     }
 
     NSString *buffer = _composingBuffer;
-    if (_chineseConvertionEnabled) {
+    if (_chineseConversionEnabled) {
         buffer = [OpenCCBridge convert:_composingBuffer];
     }
 
@@ -1441,8 +1441,8 @@ public:
 
 - (void)toggleChineseConverter:(id)sender
 {
-    _chineseConvertionEnabled = !_chineseConvertionEnabled;
-    [[NSUserDefaults standardUserDefaults] setBool:_chineseConvertionEnabled forKey:kChineseConvertionEnanledKey];
+    _chineseConversionEnabled = !_chineseConversionEnabled;
+    [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
 }
 
 - (void)clearLearningDictionary:(id)sender
