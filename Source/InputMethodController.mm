@@ -41,6 +41,9 @@
 #import "AppDelegate.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
+#import "McBopomofo-Swift.h"
+
+//@import SwiftUI;
 
 // C++ namespace usages
 using namespace std;
@@ -75,6 +78,7 @@ static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizonta
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
+static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -159,15 +163,8 @@ public:
     if (_builder) {
         delete _builder;
     }
-
-    [_composingBuffer release];
-
-    [_candidates release];
-
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
-
-    [super dealloc];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
@@ -198,6 +195,7 @@ public:
         }
 
         _inputMode = kBopomofoModeIdentifier;
+        _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
     }
 
     return self;
@@ -206,8 +204,8 @@ public:
 - (NSMenu *)menu
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
-    NSMenu *menu = [[[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")] autorelease];
-    NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
+    NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
+    NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
 
     // If Option key is pressed, show the learning-related menu
@@ -218,32 +216,31 @@ public:
 
         BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
 
-        NSMenuItem *learnMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""] autorelease];
-        if (learningEnabled) {
-            [learnMenuItem setState:NSOnState];
-        }
-        else {
-            [learnMenuItem setState:NSOffState];
-        }
-
+        NSMenuItem *learnMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""];
+        learnMenuItem.state = learningEnabled ? NSControlStateValueOn : NSControlStateValueOff;
         [menu addItem:learnMenuItem];
 
         if (learningEnabled) {
             NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[gCandidateLearningDictionary count]];
-            NSMenuItem *clearMenuItem = [[[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""] autorelease];
+            NSMenuItem *clearMenuItem = [[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""];
             [menu addItem:clearMenuItem];
 
 
-            NSMenuItem *dumpMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""] autorelease];
+            NSMenuItem *dumpMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""];
             [menu addItem:dumpMenuItem];
         }
     }
     #endif //DEBUG
 
-    NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
+    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
+    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    [menu addItem:chineseConversionMenuItem];
+
+    NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
 
-    NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
+    NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
 
     return menu;
@@ -397,8 +394,13 @@ public:
         return;
     }
 
+    NSString *buffer = _composingBuffer;
+    if (_chineseConversionEnabled) {
+        buffer = [OpenCCBridge convert:_composingBuffer];
+    }
+
     // commit the text, clear the state
-    [client insertText:_composingBuffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
@@ -461,10 +463,9 @@ public:
 
     // we must use NSAttributedString so that the cursor is visible --
     // can't just use NSString
-    NSDictionary *attrDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
-                              [NSNumber numberWithInt:0], NSMarkedClauseSegmentAttributeName, nil];
-    NSMutableAttributedString *attrString = [[[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict] autorelease];
+    NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+                               NSMarkedClauseSegmentAttributeName: @0};
+    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
@@ -1438,6 +1439,12 @@ public:
     [[NSUserDefaults standardUserDefaults] setBool:toggle forKey:kDisableUserCandidateSelectionLearning];
 }
 
+- (void)toggleChineseConverter:(id)sender
+{
+    _chineseConversionEnabled = !_chineseConversionEnabled;
+    [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
+}
+
 - (void)clearLearningDictionary:(id)sender
 {
     [gCandidateLearningDictionary removeAllObjects];
@@ -1540,7 +1547,7 @@ void LTLoadLanguageModel()
 
     // TODO: Change this
     NSString *userDictFile = [userDictPath stringByAppendingPathComponent:@"UserCandidatesCache.plist"];
-    gUserCandidatesDictionaryPath = [userDictFile retain];
+    gUserCandidatesDictionaryPath = userDictFile;
 
     exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictFile isDirectory:&isDir];
     if (exists && !isDir) {

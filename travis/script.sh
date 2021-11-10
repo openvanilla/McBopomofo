@@ -1,4 +1,4 @@
 #!/bin/bash -e
 
-xcodebuild -target McBopomofo -configuration Release clean
-xcodebuild -target McBopomofo -configuration Release
+xcodebuild -scheme McBopomofo -configuration Release clean
+xcodebuild -scheme McBopomofo -configuration Release

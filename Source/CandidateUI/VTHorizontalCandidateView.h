@@ -50,5 +50,5 @@
 @property (readonly, nonatomic) NSSize sizeForView;
 @property (assign, nonatomic) NSUInteger highlightedIndex;
 @property (assign, nonatomic) SEL action;
-@property (weak, assign, nonatomic) id target;
+@property (weak, nonatomic) id target;
 @end
