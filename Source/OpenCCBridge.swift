@@ -8,14 +8,7 @@ class OpenCCBridge : NSObject {
     private var conveter: ChineseConverter?
 
     override init() {
-        let mainBundle = Bundle.main
-        let dictionaryBundleUrl = mainBundle.bundleURL
-            .appendingPathComponent("Contents", isDirectory: true)
-            .appendingPathComponent("Plugins", isDirectory: true)
-            .appendingPathComponent("OpenCCDictionary.bundle")
-        if let dictionaryBundle = Bundle(url:dictionaryBundleUrl) {
-            try? conveter = ChineseConverter(bundle: dictionaryBundle, option: .simplify)
-        }
+        try? conveter = ChineseConverter(options: .simplify)
         super.init()
     }
 
