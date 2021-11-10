@@ -542,6 +542,35 @@ public:
     NSBeep();
 }
 
+- (string)currentLayout
+{
+    string layout = string("Standard_");;
+    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
+    switch (keyboardLayout) {
+        case 0:
+            layout = string("Standard_");
+            break;
+        case 1:
+            layout = string("ETen_");
+            break;
+        case 2:
+            layout = string("ETen26_");
+            break;
+        case 3:
+            layout = string("Hsu_");
+            break;
+        case 4:
+            layout = string("HanyuPinyin_");
+            break;
+        case 5:
+            layout = string("IBM_");
+            break;
+        default:
+            break;
+    }
+    return layout;
+}
+
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
     NSRect textFrame = NSZeroRect;
@@ -891,31 +920,7 @@ public:
         }
     }
 
-    string layout = string("Standard_");;
-    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
-    switch (keyboardLayout) {
-        case 0:
-            layout = string("Standard_");
-            break;
-        case 1:
-            layout = string("ETen_");
-            break;
-        case 2:
-            layout = string("ETen26_");
-            break;
-        case 3:
-            layout = string("Hsu_");
-            break;
-        case 4:
-            layout = string("HanyuPinyin_");
-            break;
-        case 5:
-            layout = string("IBM_");
-            break;
-        default:
-            break;
-    }
-
+    string layout = [self currentLayout];
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
     if (_languageModel->hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
@@ -1133,7 +1138,15 @@ public:
         }
 
         if (_inputMode == kPlainBopomofoModeIdentifier) {
-            if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
+            // TODO: also commit punctuation.
+            string layout = [self currentLayout];
+            string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
+            string punctuation = string("_punctuation_") + string(1, (char)charCode);
+
+            BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
+                _languageModel->hasUnigramsForKey(punctuation);
+
+            if (shouldAutoSelectCandidate) {
                 NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
                 if (candidateIndex != NSUIntegerMax) {
                     [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
