@@ -10,6 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Clean
-        run: xcodebuild -target McBopomofo -configuration Release clean
+        run: xcodebuild -scheme McBopomofo -configuration Release clean
       - name: Build
-        run: xcodebuild -target McBopomofo -configuration Release
+        run: xcodebuild -scheme McBopomofo -configuration Release
