@@ -11,5 +11,10 @@ jobs:
       - uses: actions/checkout@v1
       - name: Clean
         run: xcodebuild -scheme McBopomofo -configuration Release clean
+      - name: Clean
+        run: xcodebuild -scheme McBopomofoInstaller -configuration Release clean
       - name: Build
-        run: xcodebuild -scheme McBopomofo -configuration Release
+        run: xcodebuild -scheme McBopomofo -configuration Release build
+      - name: Build
+        run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
+
