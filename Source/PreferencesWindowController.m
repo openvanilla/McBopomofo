@@ -36,6 +36,7 @@
 
 static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
 static NSString *const kCandidateKeys = @"CandidateKeys";
+static NSString *const kDefaultKeys = @"123456789";
 
 @implementation PreferencesWindowController
 @synthesize fontSizePopUpButton = _fontSizePopUpButton;
@@ -95,14 +96,14 @@ static NSString *const kCandidateKeys = @"CandidateKeys";
     self.selectionKeyComboBox.usesDataSource = NO;
     [self.selectionKeyComboBox removeAllItems];
     [self.selectionKeyComboBox addItemsWithObjectValues:@[
-        @"123456789",
+        kDefaultKeys,
         @"asdfghjkl",
         @"asdfzxcvb"
     ]];
 
     NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
     if (!ckeys || [ckeys stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0) {
-        ckeys = @"123456789";
+        ckeys = kDefaultKeys;
     }
 
     [self.selectionKeyComboBox setStringValue:ckeys];
@@ -120,17 +121,19 @@ static NSString *const kCandidateKeys = @"CandidateKeys";
 {
     NSString *keys = [[sender stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (keys.length != 9 ||
-        ![keys canBeConvertedToEncoding:NSASCIIStringEncoding]
-        ) {
-        NSString *defaultKeys = @"123456789";
-        [self.selectionKeyComboBox setStringValue:defaultKeys];
-        [[NSUserDefaults standardUserDefaults] setObject:defaultKeys forKey:kCandidateKeys];
+        ![keys canBeConvertedToEncoding:NSASCIIStringEncoding]) {
+        [self.selectionKeyComboBox setStringValue:kDefaultKeys];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCandidateKeys];
         NSBeep();
         return;
     }
 
     [self.selectionKeyComboBox setStringValue:keys];
-    [[NSUserDefaults standardUserDefaults] setObject:keys forKey:kCandidateKeys];
+    if ([keys isEqualToString:kDefaultKeys]) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCandidateKeys];
+    } else {
+        [[NSUserDefaults standardUserDefaults] setObject:keys forKey:kCandidateKeys];
+    }
 }
 
 @end
