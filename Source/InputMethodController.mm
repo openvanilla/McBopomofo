@@ -1045,7 +1045,10 @@ public:
             return YES;
         }
         else {
-            [self beep];
+            BOOL updated = [gCurrentCandidateController showPreviousPage];
+            if (!updated) {
+                [self beep];
+            }
             [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
@@ -1060,7 +1063,10 @@ public:
             return YES;
         }
         else {
-            [self beep];
+            BOOL updated = [gCurrentCandidateController showNextPage];
+            if (!updated) {
+                [self beep];
+            }
             [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
