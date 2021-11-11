@@ -989,14 +989,14 @@ public:
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
 {
-    if (_inputMode == kPlainBopomofoModeIdentifier) {
-        if (charCode == '<') {
-            keyCode = kPageUpKeyCode;
-        }
-        else if (charCode == '>') {
-            keyCode = kPageDownKeyCode;
-        }
-    }
+//    if (_inputMode == kPlainBopomofoModeIdentifier) {
+//        if (charCode == '<') {
+//            keyCode = kPageUpKeyCode;
+//        }
+//        else if (charCode == '>') {
+//            keyCode = kPageDownKeyCode;
+//        }
+//    }
 
     BOOL cancelCandidateKey =
         (charCode == 27) ||
@@ -1143,7 +1143,6 @@ public:
         }
 
         if (_inputMode == kPlainBopomofoModeIdentifier) {
-            // TODO: also commit punctuation.
             string layout = [self currentLayout];
             string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
             string punctuation = string("_punctuation_") + string(1, (char)charCode);
