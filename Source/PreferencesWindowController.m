@@ -35,10 +35,12 @@
 #import <Carbon/Carbon.h>
 
 static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
+static NSString *const kCandidateKeys = @"CandidateKeys";
 
 @implementation PreferencesWindowController
 @synthesize fontSizePopUpButton = _fontSizePopUpButton;
 @synthesize basisKeyboardLayoutButton = _basisKeyboardLayoutButton;
+@synthesize selectionKeyComboBox = _selectionKeyComboBox;
 
 - (void)awakeFromNib
 {
@@ -89,6 +91,21 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
 
     [self.basisKeyboardLayoutButton selectItem:(chosenItem ? chosenItem : usKeyboardLayoutItem)];
     CFRelease(list);
+
+    self.selectionKeyComboBox.usesDataSource = NO;
+    [self.selectionKeyComboBox removeAllItems];
+    [self.selectionKeyComboBox addItemsWithObjectValues:@[
+        @"123456789",
+        @"asdfghjkl",
+        @"asdfzxcvb"
+    ]];
+
+    NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
+    if (!ckeys || [ckeys stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0) {
+        ckeys = @"123456789";
+    }
+
+    [self.selectionKeyComboBox setStringValue:ckeys];
 }
 
 - (IBAction)updateBasisKeyboardLayoutAction:(id)sender
@@ -98,4 +115,22 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
         [[NSUserDefaults standardUserDefaults] setObject:sourceID forKey:kBasisKeyboardLayoutPreferenceKey];
     }
 }
+
+- (IBAction)changeSelectionKeyAction:(id)sender
+{
+    NSString *keys = [[sender stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (keys.length != 9 ||
+        ![keys canBeConvertedToEncoding:NSASCIIStringEncoding]
+        ) {
+        NSString *defaultKeys = @"123456789";
+        [self.selectionKeyComboBox setStringValue:defaultKeys];
+        [[NSUserDefaults standardUserDefaults] setObject:defaultKeys forKey:kCandidateKeys];
+        NSBeep();
+        return;
+    }
+
+    [self.selectionKeyComboBox setStringValue:keys];
+    [[NSUserDefaults standardUserDefaults] setObject:keys forKey:kCandidateKeys];
+}
+
 @end
