@@ -1,5 +1,5 @@
 CFBundleName = "小麥注音";
 CFBundleDisplayName = "小麥注音";
-NSHumanReadableCopyright = "Copyright © 2011-2017 Mengjuei Hsieh et al.\nAll Rights Reserved.";
+NSHumanReadableCopyright = "Copyright © 2011-2020 Mengjuei Hsieh et al.\nAll Rights Reserved.";
 "org.openvanilla.inputmethod.McBopomofo.Bopomofo" = "小麥注音";
 "org.openvanilla.inputmethod.McBopomofo.PlainBopomofo" = "傳統注音";

@@ -41,6 +41,9 @@
 #import "AppDelegate.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
+#import "McBopomofo-Swift.h"
+
+//@import SwiftUI;
 
 // C++ namespace usages
 using namespace std;
@@ -74,6 +77,8 @@ static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"Sele
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
+static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
+static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 
 // advanced (usually optional) settings
 static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
@@ -116,6 +121,12 @@ FastLM gLanguageModelPlainBopomofo;
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+
+// https://clang-analyzer.llvm.org/faq.html
+__attribute__((annotate("returns_localized_nsstring")))
+static inline NSString *LocalizationNotNeeded(NSString *s) {
+    return s;
+}
 
 // private methods
 @interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
@@ -183,15 +194,8 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
     if (_builder) {
         delete _builder;
     }
-
-    [_composingBuffer release];
-
-    [_candidates release];
-
     // the two client pointers are weak pointers (i.e. we don't retain them)
     // therefore we don't do anything about it
-
-    [super dealloc];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
@@ -218,6 +222,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         _composingBuffer = [[NSMutableString alloc] init];
 
         _inputMode = kBopomofoModeIdentifier;
+        _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
     }
 
     return self;
@@ -226,16 +231,43 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 - (NSMenu *)menu
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
-    NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Input Method Menu"] autorelease];
-    NSMenuItem *preferenceMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""] autorelease];
+    NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
+    NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
 
-    #if DEBUG
-    NSMenuItem *updateCheckItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""] autorelease];
-    [menu addItem:updateCheckItem];
-    #endif
+    // If Option key is pressed, show the learning-related menu
 
-    NSMenuItem *aboutMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""] autorelease];
+    #if DEBUG
+    //I think the following line is 10.6+ specific
+    if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
+
+        BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
+
+        NSMenuItem *learnMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""];
+        learnMenuItem.state = learningEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+        [menu addItem:learnMenuItem];
+
+        if (learningEnabled) {
+            NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[gCandidateLearningDictionary count]];
+            NSMenuItem *clearMenuItem = [[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""];
+            [menu addItem:clearMenuItem];
+
+
+            NSMenuItem *dumpMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""];
+            [menu addItem:dumpMenuItem];
+        }
+    }
+    #endif //DEBUG
+
+    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
+    chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
+    chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    [menu addItem:chineseConversionMenuItem];
+
+    NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
+    [menu addItem:updateCheckItem];
+
+    NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
 
     return menu;
@@ -389,8 +421,13 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         return;
     }
 
+    NSString *buffer = _composingBuffer;
+    if (_chineseConversionEnabled) {
+        buffer = [OpenCCBridge convert:_composingBuffer];
+    }
+
     // commit the text, clear the state
-    [client insertText:_composingBuffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _builder->clear();
     _walkedNodes.clear();
     [_composingBuffer setString:@""];
@@ -453,10 +490,9 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 
     // we must use NSAttributedString so that the cursor is visible --
     // can't just use NSString
-    NSDictionary *attrDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
-                              [NSNumber numberWithInt:0], NSMarkedClauseSegmentAttributeName, nil];
-    NSMutableAttributedString *attrString = [[[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict] autorelease];
+    NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+                               NSMarkedClauseSegmentAttributeName: @0};
+    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
@@ -586,6 +622,11 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 
         // first commit everything in the buffer.
         if (flags & NSShiftKeyMask) {
+            return NO;
+        }
+
+        // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
+        if (charCode < 0x80 && !isprint(charCode)) {
             return NO;
         }
 
@@ -974,7 +1015,12 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         }
     }
 
-    if (charCode == 27) {
+    BOOL cancelCandidateKey =
+        (charCode == 27) ||
+        ((_inputMode == kPlainBopomofoModeIdentifier) &&
+         (charCode == 8 || keyCode == kDeleteKeyCode));
+
+    if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
         [_candidates removeAllObjects];
 
@@ -995,6 +1041,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         if (!updated) {
             [self beep];
         }
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (keyCode == kPageUpKeyCode) {
@@ -1002,6 +1049,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         if (!updated) {
             [self beep];
         }
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (keyCode == kLeftKeyCode) {
@@ -1010,10 +1058,12 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
             [self beep];
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1023,10 +1073,12 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
             [self beep];
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1036,6 +1088,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
@@ -1043,6 +1096,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1052,6 +1106,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
         else {
@@ -1059,6 +1114,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             if (!updated) {
                 [self beep];
             }
+            [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
     }
@@ -1071,6 +1127,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             gCurrentCandidateController.selectedCandidateIndex = 0;
         }
 
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else if (keyCode == kEndKeyCode && [_candidates count] > 0) {
@@ -1081,6 +1138,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             gCurrentCandidateController.selectedCandidateIndex = [_candidates count] - 1;
         }
 
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
     else {
@@ -1112,6 +1170,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         }
 
         [self beep];
+        [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
 }
@@ -1345,6 +1404,30 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
+- (void)toggleLearning:(id)sender
+{
+    BOOL toggle = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
+
+    [[NSUserDefaults standardUserDefaults] setBool:toggle forKey:kDisableUserCandidateSelectionLearning];
+}
+
+- (void)toggleChineseConverter:(id)sender
+{
+    _chineseConversionEnabled = !_chineseConversionEnabled;
+    [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
+}
+
+- (void)clearLearningDictionary:(id)sender
+{
+    [gCandidateLearningDictionary removeAllObjects];
+    [self _performDeferredSaveUserCandidatesDictionary];
+}
+
+- (void)dumpLearningDictionary:(id)sender
+{
+    NSLog(@"%@", gCandidateLearningDictionary);
+}
+
 - (NSUInteger)candidateCountForController:(VTCandidateController *)controller
 {
     return [_candidates count];
@@ -1366,6 +1449,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
     if (_inputMode != kPlainBopomofoModeIdentifier) {
         _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
     }
+    _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
 
     vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
     OverrideCandidate(nodes, selectedValue, true, 0.0);
@@ -1433,7 +1517,7 @@ void LTLoadLanguageModel()
 
     // TODO: Change this
     NSString *userDictFile = [userDictPath stringByAppendingPathComponent:@"UserCandidatesCache.plist"];
-    gUserCandidatesDictionaryPath = [userDictFile retain];
+    gUserCandidatesDictionaryPath = userDictFile;
 
     exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictFile isDirectory:&isDir];
     if (exists && !isDir) {
@@ -1442,9 +1526,7 @@ void LTLoadLanguageModel()
             return;
         }
 
-        NSString *errorStr = nil;
-        NSPropertyListFormat format;
-        id plist = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&errorStr];
+        id plist = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
         if (plist && [plist isKindOfClass:[NSDictionary class]]) {
             [gCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
             NSLog(@"User dictionary read, item count: %ju", (uintmax_t)[gCandidateLearningDictionary count]);

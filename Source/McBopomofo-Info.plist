@@ -1,108 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string>McBopomofo.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>org.openvanilla.inputmethod.McBopomofo</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.9.9.2</string>
-	<key>CFBundleSignature</key>
-	<string>BPMF</string>
-	<key>CFBundleVersion</key>
-	<string>794</string>
-	<key>ComponentInputModeDict</key>
 	<dict>
-		<key>tsInputModeListKey</key>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>English</string>
+		<key>CFBundleExecutable</key>
+		<string>${EXECUTABLE_NAME}</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>${PRODUCT_NAME}</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>1.0</string>
+		<key>CFBundleSignature</key>
+		<string>BPMF</string>
+		<key>CFBundleVersion</key>
+		<string>846</string>
+		<key>ComponentInputModeDict</key>
 		<dict>
-			<key>org.openvanilla.inputmethod.McBopomofo.Bopomofo</key>
+			<key>tsInputModeListKey</key>
 			<dict>
-				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>Bopomofo.tiff</string>
-				<key>tsInputModeDefaultStateKey</key>
-				<true/>
-				<key>tsInputModeIsVisibleKey</key>
-				<true/>
-				<key>tsInputModeMenuIconFileKey</key>
-				<string>Bopomofo.tiff</string>
-				<key>tsInputModePaletteIconFileKey</key>
-				<string>Bopomofo.tiff</string>
-				<key>tsInputModePrimaryInScriptKey</key>
-				<true/>
-				<key>tsInputModeScriptKey</key>
-				<string>smUnicodeScript</string>
+				<key>org.openvanilla.inputmethod.McBopomofo.Bopomofo</key>
+				<dict>
+					<key>TISDoubleSpaceSubstitution</key>
+					<string>。</string>
+					<key>tsInputModeAlternateMenuIconFileKey</key>
+					<string>Bopomofo.tiff</string>
+					<key>tsInputModeCharacterRepertoireKey</key>
+					<array>
+						<string>Hant</string>
+						<string>Han</string>
+					</array>
+					<key>tsInputModeDefaultStateKey</key>
+					<true />
+					<key>tsInputModeIsVisibleKey</key>
+					<true />
+					<key>tsInputModeKeyEquivalentModifiersKey</key>
+					<integer>4608</integer>
+					<key>tsInputModeMenuIconFileKey</key>
+					<string>Bopomofo.tiff</string>
+					<key>tsInputModePaletteIconFileKey</key>
+					<string>Bopomofo.tiff</string>
+					<key>tsInputModePrimaryInScriptKey</key>
+					<true />
+					<key>tsInputModeScriptKey</key>
+					<string>smTradChinese</string>
+					<key>TISIntendedLanguage</key>
+					<string>zh-Hant</string>
+					<key>tsInputModeCharacterRepertoireKey</key>
+					<array>
+						<string>Hant</string>
+						<string>Han</string>
+					</array>
+					<key>tsInputModeKeyEquivalentModifiersKey</key>
+					<integer>4608</integer>
+				</dict>
+				<key>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</key>
+				<dict>
+					<key>TISDoubleSpaceSubstitution</key>
+					<string>。</string>
+					<key>tsInputModeAlternateMenuIconFileKey</key>
+					<string>PlainBopomofo.tiff</string>
+					<key>tsInputModeCharacterRepertoireKey</key>
+					<array>
+						<string>Hant</string>
+						<string>Han</string>
+					</array>
+					<key>tsInputModeDefaultStateKey</key>
+					<true />
+					<key>tsInputModeIsVisibleKey</key>
+					<true />
+					<key>tsInputModeKeyEquivalentModifiersKey</key>
+					<integer>4608</integer>
+					<key>tsInputModeMenuIconFileKey</key>
+					<string>PlainBopomofo.tiff</string>
+					<key>tsInputModePaletteIconFileKey</key>
+					<string>PlainBopomofo.tiff</string>
+					<key>tsInputModePrimaryInScriptKey</key>
+					<true />
+					<key>tsInputModeScriptKey</key>
+					<string>smTradChinese</string>
+					<key>TISIntendedLanguage</key>
+					<string>zh-Hant</string>
+					<key>tsInputModeCharacterRepertoireKey</key>
+					<array>
+						<string>Hant</string>
+						<string>Han</string>
+					</array>
+					<key>tsInputModeKeyEquivalentModifiersKey</key>
+					<integer>4608</integer>
+				</dict>
 			</dict>
-			<key>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</key>
-			<dict>
-				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>PlainBopomofo.tiff</string>
-				<key>tsInputModeDefaultStateKey</key>
-				<true/>
-				<key>tsInputModeIsVisibleKey</key>
-				<true/>
-				<key>tsInputModeMenuIconFileKey</key>
-				<string>PlainBopomofo.tiff</string>
-				<key>tsInputModePaletteIconFileKey</key>
-				<string>PlainBopomofo.tiff</string>
-				<key>tsInputModePrimaryInScriptKey</key>
-				<true/>
-				<key>tsInputModeScriptKey</key>
-				<string>smUnicodeScript</string>
-			</dict>
+			<key>tsVisibleInputModeOrderedArrayKey</key>
+			<array>
+				<string>org.openvanilla.inputmethod.McBopomofo.Bopomofo</string>
+				<string>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</string>
+			</array>
 		</dict>
-		<key>tsVisibleInputModeOrderedArrayKey</key>
+		<key>InputMethodConnectionName</key>
+		<string>McBopomofo_1_Connection</string>
+		<key>InputMethodServerControllerClass</key>
+		<string>McBopomofoInputMethodController</string>
+		<key>InputMethodServerDelegateClass</key>
+		<string>McBopomofoInputMethodController</string>
+		<key>InputMethodServerPreferencesWindowControllerClass</key>
+		<string>PreferencesWindowController</string>
+		<key>LSApplicationCategoryType</key>
+		<string>public.app-category.utilities</string>
+		<key>LSHasLocalizedDisplayName</key>
+		<true />
+		<key>LSMinimumSystemVersion</key>
+		<string>${MACOSX_DEPLOYMENT_TARGET}</string>
+		<key>LSUIElement</key>
+		<true />
+		<key>NSHumanReadableCopyright</key>
+		<string>Copyright © 2011-2020 Mengjuei Hsieh et al.</string>
+		<key>NSMainNibFile</key>
+		<string>MainMenu</string>
+		<key>NSPrincipalClass</key>
+		<string>NSApplication</string>
+		<key>TICapsLockLanguageSwitchCapable</key>
+		<true />
+		<key>TISInputSourceID</key>
+		<string>org.openvanilla.inputmethod.McBopomofo</string>
+		<key>TISIntendedLanguage</key>
+		<string>zh-Hant</string>
+		<key>TISParticipatesInTouchBar</key>
+		<false />
+		<key>UpdateInfoEndpoint</key>
+		<string>https://mcbopomofo.openvanilla.org/updates/Info.plist</string>
+		<key>UpdateInfoSite</key>
+		<string>https://mcbopomofo.openvanilla.org/</string>
+		<key>tsInputMethodCharacterRepertoireKey</key>
 		<array>
-			<string>org.openvanilla.inputmethod.McBopomofo.Bopomofo</string>
-			<string>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</string>
+			<string>Hant</string>
+			<string>Hans</string>
 		</array>
+		<key>tsInputMethodIconFileKey</key>
+		<string>Bopomofo.tiff</string>
 	</dict>
-	<key>InputMethodConnectionName</key>
-	<string>McBopomofo_1_Connection</string>
-	<key>InputMethodServerControllerClass</key>
-	<string>McBopomofoInputMethodController</string>
-	<key>InputMethodServerDelegateClass</key>
-	<string>McBopomofoInputMethodController</string>
-	<key>InputMethodServerPreferencesWindowControllerClass</key>
-	<string>PreferencesWindowController</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.utilities</string>
-	<key>LSHasLocalizedDisplayName</key>
-	<true/>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.5</string>
-	<key>LSUIElement</key>
-	<true/>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2011-2017 Mengjuei Hsieh et al.</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-	<key>TISInputSourceID</key>
-	<string>org.openvanilla.inputmethod.McBopomofo</string>
-	<key>TISIntendedLanguage</key>
-	<string>zh-Hant</string>
-	<key>UpdateInfoEndpoint</key>
-	<string>https://mcbopomofo.openvanilla.org/updates/Info.plist</string>
-	<key>UpdateInfoSite</key>
-	<string>https://mcbopomofo.openvanilla.org/</string>
-	<key>tsInputMethodCharacterRepertoireKey</key>
-	<array>
-		<string>Hant</string>
-		<string>Hans</string>
-	</array>
-	<key>tsInputMethodIconFileKey</key>
-	<string>BopomofoTextMenu.tiff</string>
-</dict>
 </plist>

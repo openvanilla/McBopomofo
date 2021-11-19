@@ -39,26 +39,18 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 
 - (void)dealloc
 {
-    [_keyLabels release];
-    [_displayedCandidates release];
-    [_keyLabelAttrDict release];
-    [_candidateAttrDict release];
-    [_elementWidths release];
-    [super dealloc];
+    _keyLabels = nil;
+    _displayedCandidates = nil;
+    _keyLabelAttrDict = nil;
+    _candidateAttrDict = nil;
+    _elementWidths = nil;
 }
 
 - (void)setKeyLabels:(NSArray *)labels displayedCandidates:(NSArray *)candidates
 {
     NSUInteger count = min([labels count], [candidates count]);
-    id tmp;
-    
-    tmp = _keyLabels;
-    _keyLabels = [[labels subarrayWithRange:NSMakeRange(0, count)] retain];
-    [tmp release];
-    
-    tmp = _displayedCandidates;
-    _displayedCandidates = [[candidates subarrayWithRange:NSMakeRange(0, count)] retain];
-    [tmp release];
+    _keyLabels = [labels subarrayWithRange:NSMakeRange(0, count)];
+    _displayedCandidates = [candidates subarrayWithRange:NSMakeRange(0, count)];
     
     NSMutableArray *newWidths = [NSMutableArray array];
     
@@ -71,33 +63,25 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
         CGFloat width = max(labelRect.size.width, candidateRect.size.width) + _cellPadding;
         [newWidths addObject:[NSNumber numberWithDouble:width]];
     }
-    
-    tmp = _elementWidths;
-    _elementWidths = [newWidths retain];
-    [tmp release];
+
+    _elementWidths = newWidths;
 }
 
 - (void)setKeyLabelFont:(NSFont *)labelFont candidateFont:(NSFont *)candidateFont
 {
-    NSMutableParagraphStyle *paraStyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    NSMutableParagraphStyle *paraStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     [paraStyle setAlignment:NSCenterTextAlignment];
-    
-    id tmp;
-    tmp = _keyLabelAttrDict;
-    _keyLabelAttrDict = [[NSDictionary dictionaryWithObjectsAndKeys:
+
+    _keyLabelAttrDict = [NSDictionary dictionaryWithObjectsAndKeys:
                          labelFont, NSFontAttributeName,
                          paraStyle, NSParagraphStyleAttributeName,
-                         [NSColor textColor], NSForegroundColorAttributeName,
-                          nil] retain];
-    [tmp release];
-    
-    tmp = _candidateAttrDict;
-    _candidateAttrDict = [[NSDictionary dictionaryWithObjectsAndKeys:
+                         [NSColor blackColor], NSForegroundColorAttributeName,
+                          nil];
+    _candidateAttrDict = [NSDictionary dictionaryWithObjectsAndKeys:
                            candidateFont, NSFontAttributeName,
                            paraStyle, NSParagraphStyleAttributeName,
                            [NSColor textColor], NSForegroundColorAttributeName,
-                           nil] retain];
-    [tmp release];
+                           nil];
     
     CGFloat labelFontSize = [labelFont pointSize];
     CGFloat candidateFontSize = [candidateFont pointSize];
@@ -131,13 +115,13 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    NSColor *white = [NSColor whiteColor];
+    NSColor *backgroundColor = [NSColor controlBackgroundColor];
     NSColor *darkGray = [NSColor colorWithDeviceWhite:0.7 alpha:1.0];
     NSColor *lightGray = [NSColor colorWithDeviceWhite:0.8 alpha:1.0];
     
     NSRect bounds = [self bounds];
     
-    [white setFill];
+    [backgroundColor setFill];
     [NSBezierPath fillRect:bounds];
     
     [[NSColor darkGrayColor] setStroke];
@@ -165,11 +149,11 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
         if (index == _highlightedIndex) {
             [[NSColor selectedTextBackgroundColor] setFill];
             
-            activeCandidateAttr = [[_candidateAttrDict mutableCopy] autorelease];
+            activeCandidateAttr = [_candidateAttrDict mutableCopy];
             [(NSMutableDictionary *)activeCandidateAttr setObject:[NSColor selectedTextColor] forKey:NSForegroundColorAttributeName];
         }
         else {
-            [white setFill];
+            [backgroundColor setFill];
         }        
         
         [NSBezierPath fillRect:candidateRect];
@@ -230,9 +214,12 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
     _trackingHighlightedIndex = 0;
     [self setNeedsDisplay:YES];
 
+#       pragma clang diagnostic push
+#       pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     if (triggerAction && _target && _action) {
         [_target performSelector:_action withObject:self];            
     }
+#       pragma clang diagnostic pop
 }
 
 @end

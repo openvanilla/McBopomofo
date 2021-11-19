@@ -47,6 +47,7 @@ namespace Formosa {
             const vector<KeyValuePair>& candidates() const;
             void selectCandidateAtIndex(size_t inIndex = 0, bool inFix = true);
             void selectFloatingCandidateAtIndex(size_t index, double score);
+            void resetCandidate();
             
             const string& key() const;
             double score() const;
@@ -176,6 +177,15 @@ namespace Formosa {
             }
             m_candidateFixed = false;
             m_score = score;
+        }
+
+        inline void Node::resetCandidate()
+        {
+            m_selectedUnigramIndex = 0;
+            m_candidateFixed = 0;
+            if (m_unigrams.size()) {
+                m_score = m_unigrams[0].score;
+            }
         }
         
         inline const string& Node::key() const

@@ -36,6 +36,11 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 static const CGFloat kCandidateTextPadding = 24.0;
 static const CGFloat kCandidateTextLeftMargin = 8.0;
 
+#if defined(__MAC_10_16)
+static const CGFloat kCandidateTextPaddingWithMandatedTableViewPadding = 18.0;
+static const CGFloat kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0;
+#endif
+
 @interface VTVerticalCandidateController (Private) <NSTableViewDataSource, NSTableViewDelegate>
 - (void)rowDoubleClicked:(id)sender;
 - (BOOL)scrollPageByOne:(BOOL)forward;
@@ -44,31 +49,26 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 @end
 
 @implementation VTVerticalCandidateController
-
-- (void)dealloc
 {
-    [_candidateTextParagraphStyle release];
-    [_keyLabelStripView release];
-    [_scrollView release];
-    [_tableView release];
-    [super dealloc];
+    // Total padding added to the left and the right of the table view cell text.
+    CGFloat _candidateTextPadding;
+
+    // The indent of the table view cell text from the left.
+    CGFloat _candidateTextLeftMargin;
 }
+
 
 - (id)init
 {
     NSRect contentRect = NSMakeRect(128.0, 128.0, 0.0, 0.0);
     NSUInteger styleMask = NSBorderlessWindowMask | NSNonactivatingPanelMask;
     
-    NSPanel *panel = [[[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO] autorelease];
+    NSPanel *panel = [[NSPanel alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
     [panel setLevel:kCGPopUpMenuWindowLevel];
     [panel setHasShadow:YES];
 
     self = [self initWithWindow:panel];
     if (self) {
-        _candidateTextParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [_candidateTextParagraphStyle setFirstLineHeadIndent:kCandidateTextLeftMargin];
-        [_candidateTextParagraphStyle setLineBreakMode:NSLineBreakByClipping];
-        
         contentRect.origin = NSMakePoint(0.0, 0.0);
         
         NSRect stripRect = contentRect;
@@ -92,10 +92,13 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         [_tableView setDataSource:self];
         [_tableView setDelegate:self];
         
-        NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier:@"candidate"] autorelease];
-        [column setDataCell:[[[NSTextFieldCell alloc] init] autorelease]];
+        NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"candidate"];
+        [column setDataCell:[[NSTextFieldCell alloc] init]];
         [column setEditable:NO];
-        
+
+        _candidateTextPadding = kCandidateTextPadding;
+        _candidateTextLeftMargin = kCandidateTextLeftMargin;
+
         [_tableView addTableColumn:column];
         [_tableView setIntercellSpacing:NSMakeSize(0.0, 1.0)];
         [_tableView setHeaderView:nil];
@@ -104,8 +107,20 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         [_tableView setDoubleAction:@selector(rowDoubleClicked:)];
         [_tableView setTarget:self];
 
+        #if defined(__MAC_10_16)
+        if (@available(macOS 10.16, *)) {
+            [_tableView setStyle:NSTableViewStyleFullWidth];
+            _candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding;
+            _candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding;
+        }
+        #endif
+
         [_scrollView setDocumentView:_tableView];
         [[panel contentView] addSubview:_scrollView];
+
+        _candidateTextParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [_candidateTextParagraphStyle setFirstLineHeadIndent:_candidateTextLeftMargin];
+        [_candidateTextParagraphStyle setLineBreakMode:NSLineBreakByClipping];
     }
     
     return self;
@@ -113,7 +128,7 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
 
 - (void)reloadData
 {
-    _maxCandidateAttrStringWidth = ceil([_candidateFont pointSize] * 2.0 + kCandidateTextPadding);
+    _maxCandidateAttrStringWidth = ceil([_candidateFont pointSize] * 2.0 + _candidateTextPadding);
 
     [_tableView reloadData];
     [self layoutCandidateView];
@@ -215,13 +230,13 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         candidate = [_delegate candidateController:self candidateAtIndex:row];
     }
 
-    NSAttributedString *attrString = [[[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]] autorelease];    
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:candidate attributes:[NSDictionary dictionaryWithObjectsAndKeys:_candidateFont, NSFontAttributeName, _candidateTextParagraphStyle, NSParagraphStyleAttributeName, nil]];    
     
     // we do more work than what this method is expected to; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
     
     // expand the window width if text overflows
     NSRect boundingRect = [attrString boundingRectWithSize:NSMakeSize(10240.0, 10240.0) options:NSStringDrawingUsesLineFragmentOrigin];
-    CGFloat textWidth = boundingRect.size.width + kCandidateTextPadding;
+    CGFloat textWidth = boundingRect.size.width + _candidateTextPadding;
     if (textWidth > _maxCandidateAttrStringWidth) {
         _maxCandidateAttrStringWidth = textWidth;
         [self layoutCandidateView];
@@ -378,17 +393,9 @@ static const CGFloat kCandidateTextLeftMargin = 8.0;
         [_scrollView setHasVerticalScroller:YES];
 
         NSScroller *verticalScroller = [_scrollView verticalScroller];
-        [verticalScroller setControlSize:controlSize];
-        
-        // calling >=10.7 only API
-        if ([verticalScroller respondsToSelector:@selector(setScrollerStyle:)]) {
-            [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
-            scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
-        }
-        else {
-            // not on >=10.7
-            scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize];
-        }
+        [verticalScroller setControlSize:controlSize];        
+        [verticalScroller setScrollerStyle:NSScrollerStyleLegacy];
+        scrollerWidth = [NSScroller scrollerWidthForControlSize:controlSize scrollerStyle:NSScrollerStyleLegacy];
     }
 
     _keyLabelStripView.keyLabelFont = _keyLabelFont;

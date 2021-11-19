@@ -38,7 +38,7 @@
 @interface VTCandidateController : NSWindowController
 {
 @protected
-    id<VTCandidateControllerDelegate> _delegate;
+    __weak id<VTCandidateControllerDelegate> _delegate;
     NSArray *_keyLabels;
     NSFont *_keyLabelFont;
     NSFont *_candidateFont;
@@ -56,7 +56,7 @@
 
 - (NSUInteger)candidateIndexAtKeyLabelIndex:(NSUInteger)index;
 
-@property (assign, weak, nonatomic) id<VTCandidateControllerDelegate> delegate;
+@property (weak, nonatomic) id<VTCandidateControllerDelegate> delegate;
 @property (assign, nonatomic) NSUInteger selectedCandidateIndex;
 
 @property (assign, nonatomic) BOOL visible;

@@ -26,26 +26,28 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "ArchiveUtil.h"
 
 @interface AppDelegate : NSWindowController <NSApplicationDelegate>
 {
 @protected
+    ArchiveUtil *_archiveUtil;
     NSString *_installingVersion;
     BOOL _upgrading;
-    NSButton *_installButton;
-    NSButton *_cancelButton;
-    NSTextView *_textView;
-    NSWindow *_progressSheet;
-    NSProgressIndicator *_progressIndicator;
+    NSButton *__weak _installButton;
+    NSButton *__weak _cancelButton;
+    NSTextView *__unsafe_unretained _textView;
+    NSWindow *__weak _progressSheet;
+    NSProgressIndicator *__weak _progressIndicator;
     NSDate *_translocationRemovalStartTime;
     NSInteger _currentVersionNumber;
 }
 - (IBAction)agreeAndInstallAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
 
-@property (assign) IBOutlet NSButton *installButton;
-@property (assign) IBOutlet NSButton *cancelButton;    
-@property (assign) IBOutlet NSTextView *textView;
-@property (assign) IBOutlet NSWindow *progressSheet;
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
+@property (weak) IBOutlet NSButton *installButton;
+@property (weak) IBOutlet NSButton *cancelButton;    
+@property (unsafe_unretained) IBOutlet NSTextView *textView;
+@property (weak) IBOutlet NSWindow *progressSheet;
+@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 @end

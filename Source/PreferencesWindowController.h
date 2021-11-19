@@ -36,10 +36,15 @@
 @interface PreferencesWindowController : NSWindowController
 {
 @private
-    NSPopUpButton *_fontSizePopUpButton;
-    NSPopUpButton *_basisKeyboardLayoutButton;
+    NSPopUpButton *__weak _fontSizePopUpButton;
+    NSPopUpButton *__weak _basisKeyboardLayoutButton;
+    NSComboBox *__weak _selectionKeyComboBox;
 }
+
 - (IBAction)updateBasisKeyboardLayoutAction:(id)sender;
-@property (assign, nonatomic) IBOutlet NSPopUpButton *fontSizePopUpButton;
-@property (assign, nonatomic) IBOutlet NSPopUpButton *basisKeyboardLayoutButton;
+- (IBAction)changeSelectionKeyAction:(id)sender;
+
+@property (weak, nonatomic) IBOutlet NSPopUpButton *fontSizePopUpButton;
+@property (weak, nonatomic) IBOutlet NSPopUpButton *basisKeyboardLayoutButton;
+@property (weak, nonatomic) IBOutlet NSComboBox *selectionKeyComboBox;
 @end

@@ -31,7 +31,7 @@
 + (NSArray *)allInstalledInputSources
 {
     CFArrayRef list = TISCreateInputSourceList(NULL, true);
-    return [NSMakeCollectable(list) autorelease];
+    return (__bridge NSArray *)list;
 }
 
 + (TISInputSourceRef)inputSourceForProperty:(CFStringRef)inPropertyKey stringValue:(NSString *)inValue
@@ -39,16 +39,15 @@
     CFTypeID stringID = CFStringGetTypeID();
 
     for (id source in [self allInstalledInputSources]) {
-        CFTypeRef property = TISGetInputSourceProperty((TISInputSourceRef)source, inPropertyKey);
+        CFTypeRef property = TISGetInputSourceProperty((__bridge TISInputSourceRef)source, inPropertyKey);
         if (!property || CFGetTypeID(property) != stringID) {
             continue;
         }
 
-        if (inValue && [inValue compare:(NSString *)property] == NSOrderedSame) {
-            return (TISInputSourceRef)source;
+        if (inValue && [inValue compare:(__bridge NSString *)property] == NSOrderedSame) {
+            return (__bridge TISInputSourceRef)source;
         }
     }
-
     return NULL;
 }
 
@@ -74,9 +73,9 @@
     BOOL enabled = NO;
 
     for (id source in [self allInstalledInputSources]) {
-        TISInputSourceRef inputSource = (TISInputSourceRef)source;
-        NSString *bundleID = (NSString *)TISGetInputSourceProperty(inputSource, kTISPropertyBundleID);
-        NSString *mode = (NSString *)TISGetInputSourceProperty(inputSource, kTISPropertyInputModeID);
+        TISInputSourceRef inputSource = (__bridge TISInputSourceRef)source;
+        NSString *bundleID = (__bridge NSString *)TISGetInputSourceProperty(inputSource, kTISPropertyBundleID);
+        NSString *mode = (NSString *)CFBridgingRelease(TISGetInputSourceProperty(inputSource, kTISPropertyInputModeID));
         if (mode && [bundleID isEqualToString:inID]) {
             BOOL modeEnabled = [self enableInputSource:inputSource];
             if (!modeEnabled) {
@@ -98,7 +97,7 @@
 
 + (BOOL)registerInputSource:(NSURL *)inBundleURL
 {
-    OSStatus status = TISRegisterInputSource((CFURLRef)inBundleURL);
+    OSStatus status = TISRegisterInputSource((__bridge CFURLRef)inBundleURL);
     return status == noErr;
 }
 @end

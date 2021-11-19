@@ -38,6 +38,16 @@ static NSString *const kTargetFullBinPartialPath = @"~/Library/Input Methods/McB
 static const NSTimeInterval kTranslocationRemovalTickInterval = 0.5;
 static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
 
+/// A simple replacement for the deprecated NSRunAlertPanel.
+void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setAlertStyle:NSAlertStyleInformational];
+    [alert setMessageText:title];
+    [alert setInformativeText:message];
+    [alert addButtonWithTitle:buttonTitle];
+    [alert runModal];
+}
+
 @implementation AppDelegate
 @synthesize installButton = _installButton;
 @synthesize cancelButton = _cancelButton;
@@ -45,27 +55,26 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
 @synthesize progressSheet = _progressSheet;
 @synthesize progressIndicator = _progressIndicator;
 
-- (void)dealloc
-{
-    [_installingVersion release];
-    [_translocationRemovalStartTime release];
-    [super dealloc];
-}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    _installingVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:(id)kCFBundleVersionKey];
+    NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+
+    _archiveUtil = [[ArchiveUtil alloc] initWithAppName:kTargetBin targetAppBundleName:kTargetBundle];
+    [_archiveUtil validateIfNotarizedArchiveExists];
+
     [self.cancelButton setNextKeyView:self.installButton];
     [self.installButton setNextKeyView:self.cancelButton];
     [[self window] setDefaultButtonCell:[self.installButton cell]];
 
-    NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL] autorelease];
+    NSAttributedString *attrStr = [[NSAttributedString alloc] initWithRTF:[NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"License" ofType:@"rtf"]] documentAttributes:NULL];
 
-    [[self.textView textStorage] setAttributedString:attrStr];
-    
-    NSBundle *installingBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType]];
-    _installingVersion = [[[installingBundle infoDictionary] objectForKey:(id)kCFBundleVersionKey] retain];
-    NSString *versionString = [[installingBundle infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-
+    NSMutableAttributedString *mutableAttrStr = [attrStr mutableCopy];
+    [mutableAttrStr addAttribute:NSForegroundColorAttributeName value:[NSColor controlTextColor] range:NSMakeRange(0, [mutableAttrStr length])];
+    [[self.textView textStorage] setAttributedString:mutableAttrStr];
+    [self.textView setSelectedRange:NSMakeRange(0, 0)];
+  
     [[self window] setTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ (for version %@, r%@)", nil), [[self window] title], versionString, _installingVersion]];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:[kTargetPartialPath stringByExpandingTildeInPath]]) {
@@ -128,8 +137,7 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
                 });
             }];
 
-            [_translocationRemovalStartTime release];
-            _translocationRemovalStartTime = [[NSDate date] retain];
+            _translocationRemovalStartTime = [NSDate date];
             [NSTimer scheduledTimerWithTimeInterval:kTranslocationRemovalTickInterval target:self selector:@selector(timerTick:) userInfo:nil repeats:YES];
             return;
         }
@@ -156,25 +164,31 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
 
 - (void)installInputMethodWithWarning:(BOOL)warning
 {
-    NSTask *cpTask = [NSTask launchedTaskWithLaunchPath:@"/bin/cp" arguments:[NSArray arrayWithObjects:@"-R", [[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType], [kDestinationPartial stringByExpandingTildeInPath], nil]];
+    // If the unzipped archive does not exist, this must be a dev-mode installer.
+    NSString *targetBundle = [_archiveUtil unzipNotarizedArchive];
+    if (!targetBundle) {
+        targetBundle = [[NSBundle mainBundle] pathForResource:kTargetBin ofType:kTargetType];
+    }
+    
+    NSTask *cpTask = [NSTask launchedTaskWithLaunchPath:@"/bin/cp" arguments:[NSArray arrayWithObjects:@"-R", targetBundle, [kDestinationPartial stringByExpandingTildeInPath], nil]];
     [cpTask waitUntilExit];
     if ([cpTask terminationStatus] != 0) {
-        NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
-        [NSApp terminate:self];        
+        RunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot copy the file to the destination.", nil),  NSLocalizedString(@"Cancel", nil));
+        [NSApp terminate:self];
     }
 
     NSArray *installArgs = [NSArray arrayWithObjects:@"install", nil];
     NSTask *installTask = [NSTask launchedTaskWithLaunchPath:[kTargetFullBinPartialPath stringByExpandingTildeInPath] arguments:installArgs];
     [installTask waitUntilExit];
     if ([installTask terminationStatus] != 0) {
-        NSRunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil));
         [NSApp terminate:self];        
     }
 
     if (warning) {
-        NSRunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil));
     } else {
-        NSRunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil), nil, nil);
+        RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil));
     }
 
     [[NSApplication sharedApplication] performSelector:@selector(terminate:) withObject:self afterDelay:0.1];
@@ -202,9 +216,22 @@ static const NSTimeInterval kTranslocationRemovalDeadline = 60.0;
     entryCount = getfsstat(bufs, entryCount * entrySize, MNT_NOWAIT);
     for (int i = 0; i < entryCount; i++) {
         if (!strcmp(bundleAbsPath, bufs[i].f_mntfromname)) {
+            free(bufs);
+
+            // getfsstat() may return us a cached result, and so we need to get the stat of the mounted fs.
+            // If statfs() returns an error, the mounted fs is already gone.
+            struct statfs stat;
+            int checkResult = statfs(bundleAbsPath, &stat);
+            if (checkResult != 0) {
+                // Meaning the app's bundle is not mounted, that is it's not translocated.
+                // It also means that the app is not loaded.
+                return NO;
+            }
+
             return YES;
         }
     }
+    free(bufs);
     return NO;
 
 }

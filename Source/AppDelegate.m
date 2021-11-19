@@ -33,18 +33,19 @@
 //
 
 #import "AppDelegate.h"
-#import "UpdateNotificationController.h"
+#import "OVNonModalAlertWindowController.h"
 #import "PreferencesWindowController.h"
 
-void LTLoadLanguageModel();
+extern void LTLoadLanguageModel(void);
 
+static NSString *kCheckUpdateAutomatically = @"CheckUpdateAutomatically";
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
 static NSString *kUpdateInfoEndpointKey = @"UpdateInfoEndpoint";
 static NSString *kUpdateInfoSiteKey = @"UpdateInfoSite";
 static const NSTimeInterval kNextCheckInterval = 86400.0;
 static const NSTimeInterval kTimeoutInterval = 60.0;
 
-@interface AppDelegate () <NSURLConnectionDataDelegate>
+@interface AppDelegate () <NSURLConnectionDataDelegate, OVNonModalAlertWindowControllerDelegate>
 @end
 
 @implementation AppDelegate
@@ -52,15 +53,18 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)dealloc
 {
-    [_preferencesWindowController release];
-    [_updateCheckConnection release];
-    [_updateNotificationController release];
-    [super dealloc];
+    _preferencesWindowController = nil;
+    _updateCheckConnection = nil;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
     LTLoadLanguageModel();
+
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:kCheckUpdateAutomatically]) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCheckUpdateAutomatically];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 
     [self checkForUpdate];
 }
@@ -77,8 +81,14 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
         return;
     }
 
+    _currentUpdateCheckIsForced = forced;
+
     // time for update?
     if (!forced) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:kCheckUpdateAutomatically]) {
+            return;
+        }
+
         NSDate *now = [NSDate date];
         NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:kNextUpdateCheckDateKey];
         if (![date isKindOfClass:[NSDate class]]) {
@@ -113,7 +123,6 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 #endif
 
     if (_receivingData) {
-        [_receivingData release];
         _receivingData = nil;
     }
 
@@ -134,25 +143,39 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    [_receivingData release];
+    BOOL isForcedCheck = _currentUpdateCheckIsForced;
+
     _receivingData = nil;
-    [_updateCheckConnection release];
     _updateCheckConnection = nil;
+    _currentUpdateCheckIsForced = NO;
+
+    if (isForcedCheck) {
+        [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Update Check Failed", nil) content:[NSString stringWithFormat:NSLocalizedString(@"There may be no internet connection or the server failed to respond.\n\nError message: %@", nil), [error localizedDescription]] confirmButtonTitle:NSLocalizedString(@"Dismiss", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+    }
+}
+
+- (void)showNoUpdateAvailableAlert
+{
+    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Check for Update Completed", nil) content:NSLocalizedString(@"You are already using the latest version of McBopomofo.", nil) confirmButtonTitle:NSLocalizedString(@"OK", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    id plist = [NSPropertyListSerialization propertyListFromData:_receivingData mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL];
+    id plist = [NSPropertyListSerialization propertyListWithData:_receivingData options:NSPropertyListImmutable format:NULL error:NULL];
 #if DEBUG
     NSLog(@"plist %@",plist);
 #endif
 
-    [_receivingData release];
+    BOOL isForcedCheck = _currentUpdateCheckIsForced;
+
     _receivingData = nil;
-    [_updateCheckConnection release];
     _updateCheckConnection = nil;
+    _currentUpdateCheckIsForced = NO;
 
     if (!plist) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
@@ -161,6 +184,9 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     NSLog(@"the remoteversion is %@",remoteVersion);
 #endif
     if (!remoteVersion) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
@@ -172,41 +198,74 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     NSComparisonResult result  = [currentVersion compare:remoteVersion options:NSNumericSearch];
 
     if (result != NSOrderedAscending) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
 
     NSString *siteInfoURLString = [plist objectForKey:kUpdateInfoSiteKey];
     if (!siteInfoURLString) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
 
     NSURL *siteInfoURL = [NSURL URLWithString:siteInfoURLString];
     if (!siteInfoURL) {
+        if (isForcedCheck) {
+            [self showNoUpdateAvailableAlert];
+        }
         return;
     }
+    _updateNextStepURL = siteInfoURL;
 
+    NSDictionary *versionDescriptions = [plist objectForKey:@"Description"];
+    NSString *versionDescription = @"";
+    if ([versionDescriptions isKindOfClass:[NSDictionary class]]) {
+        NSString *locale = @"en";
+        NSArray *supportedLocales = [NSArray arrayWithObjects:@"en", @"zh-Hant", @"zh-Hans", nil];
+        NSArray *preferredTags = [NSBundle preferredLocalizationsFromArray:supportedLocales];
+        if ([preferredTags count]) {
+            locale = [preferredTags objectAtIndex:0];
+        }
+        versionDescription = [versionDescriptions objectForKey:locale];
+        if (!versionDescription) {
+            versionDescription = [versionDescriptions objectForKey:@"en"];
+        }
 
-    if (_updateNotificationController) {
-        [_updateNotificationController release], _updateNotificationController = nil;
+        if (!versionDescription) {
+            versionDescription = @"";
+        }
+        else {
+            versionDescription = [@"\n\n" stringByAppendingString:versionDescription];
+        }
     }
 
-    _updateNotificationController = [[UpdateNotificationController alloc] initWithWindowNibName:@"UpdateNotificationController"];
+    NSString *content = [NSString stringWithFormat:NSLocalizedString(@"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", nil), [infoDict objectForKey:@"CFBundleShortVersionString"], currentVersion, [plist objectForKey:@"CFBundleShortVersionString"], remoteVersion, versionDescription];
 
-    _updateNotificationController.siteURL = siteInfoURL;
-    _updateNotificationController.infoText = [NSString stringWithFormat:NSLocalizedString(@"You are running version %@ (%@), and the new version %@ (%@) is now available.\n\nVisit the website to download it?", @""),
-                                              [infoDict objectForKey:@"CFBundleShortVersionString"],
-                                              [infoDict objectForKey:(id)kCFBundleVersionKey],
-                                              [plist objectForKey:@"CFBundleShortVersionString"],
-                                              [plist objectForKey:(id)kCFBundleVersionKey],
-                                              nil];
-
-    [_updateNotificationController showWindow:self];
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"New Version Available", nil) content:content confirmButtonTitle:NSLocalizedString(@"Visit Website", nil) cancelButtonTitle:NSLocalizedString(@"Not Now", nil) cancelAsDefault:NO delegate:self];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
     [_receivingData appendData:data];
 }
+
+- (void)nonModalAlertWindowControllerDidConfirm:(OVNonModalAlertWindowController *)controller
+{
+    if (_updateNextStepURL) {
+        [[NSWorkspace sharedWorkspace] openURL:_updateNextStepURL];
+    }
+
+    _updateNextStepURL = nil;
+}
+
+- (void)nonModalAlertWindowControllerDidCancel:(OVNonModalAlertWindowController *)controller
+{
+    _updateNextStepURL = nil;
+}
+
 @end

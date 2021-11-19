@@ -35,10 +35,13 @@
 #import <Carbon/Carbon.h>
 
 static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
+static NSString *const kCandidateKeys = @"CandidateKeys";
+static NSString *const kDefaultKeys = @"123456789";
 
 @implementation PreferencesWindowController
 @synthesize fontSizePopUpButton = _fontSizePopUpButton;
 @synthesize basisKeyboardLayoutButton = _basisKeyboardLayoutButton;
+@synthesize selectionKeyComboBox = _selectionKeyComboBox;
 
 - (void)awakeFromNib
 {
@@ -46,7 +49,7 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
     NSMenuItem *usKeyboardLayoutItem = nil;
     NSMenuItem *chosenItem = nil;
 
-    [[self.basisKeyboardLayoutButton menu] removeAllItems];
+    [self.basisKeyboardLayoutButton.menu removeAllItems];
 
     NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
 
@@ -68,12 +71,12 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
             continue;
         }
 
-        NSString *sourceID = (NSString *)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
-        NSString *localizedName = (NSString *)TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
+        NSString *sourceID = (__bridge NSString *)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+        NSString *localizedName = (__bridge NSString *)TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
 
-        NSMenuItem *item = [[[NSMenuItem alloc] init] autorelease];
-        [item setTitle:localizedName];
-        [item setRepresentedObject:sourceID];
+        NSMenuItem *item = [[NSMenuItem alloc] init];
+        item.title = localizedName;
+        item.representedObject = sourceID;
 
         if ([sourceID isEqualToString:@"com.apple.keylayout.US"]) {
             usKeyboardLayoutItem = item;
@@ -84,11 +87,26 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
             chosenItem = item;
         }
 
-        [[self.basisKeyboardLayoutButton menu] addItem:item];
+        [self.basisKeyboardLayoutButton.menu addItem:item];
     }
 
     [self.basisKeyboardLayoutButton selectItem:(chosenItem ? chosenItem : usKeyboardLayoutItem)];
     CFRelease(list);
+
+    self.selectionKeyComboBox.usesDataSource = NO;
+    [self.selectionKeyComboBox removeAllItems];
+    [self.selectionKeyComboBox addItemsWithObjectValues:@[
+        kDefaultKeys,
+        @"asdfghjkl",
+        @"asdfzxcvb"
+    ]];
+
+    NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
+    if (!ckeys || [ckeys stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0) {
+        ckeys = kDefaultKeys;
+    }
+
+    [self.selectionKeyComboBox setStringValue:ckeys];
 }
 
 - (IBAction)updateBasisKeyboardLayoutAction:(id)sender
@@ -98,4 +116,24 @@ static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout
         [[NSUserDefaults standardUserDefaults] setObject:sourceID forKey:kBasisKeyboardLayoutPreferenceKey];
     }
 }
+
+- (IBAction)changeSelectionKeyAction:(id)sender
+{
+    NSString *keys = [[sender stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (keys.length != 9 ||
+        ![keys canBeConvertedToEncoding:NSASCIIStringEncoding]) {
+        [self.selectionKeyComboBox setStringValue:kDefaultKeys];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCandidateKeys];
+        NSBeep();
+        return;
+    }
+
+    [self.selectionKeyComboBox setStringValue:keys];
+    if ([keys isEqualToString:kDefaultKeys]) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCandidateKeys];
+    } else {
+        [[NSUserDefaults standardUserDefaults] setObject:keys forKey:kCandidateKeys];
+    }
+}
+
 @end
