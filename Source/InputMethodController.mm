@@ -394,6 +394,7 @@ public:
         return;
     }
 
+    // Chinese conversion.
     NSString *buffer = _composingBuffer;
     if (_chineseConversionEnabled) {
         buffer = [OpenCCBridge convert:_composingBuffer];
@@ -528,6 +529,10 @@ public:
         if (_walkedNodes.size() > 0) {
             NodeAnchor &anchor = _walkedNodes[0];
             NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
+            // Chinese conversion.
+            if (_chineseConversionEnabled) {
+                popedText = [OpenCCBridge convert:popedText];
+            }
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
