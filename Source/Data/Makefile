@@ -18,7 +18,7 @@ PhraseFreq.txt: bin/buildFreq.py phrase.occ exclusion.txt
 	bin/buildFreq.py
 
 clean:
-	rm -f data.txt data-plain-bpmf.txt phrase.list
+	rm -f data.txt data-plain-bpmf.txt phrase.list PhraseFreq.txt
 
 # FOR INTERNAL USE
 _install: tidy sort check all
