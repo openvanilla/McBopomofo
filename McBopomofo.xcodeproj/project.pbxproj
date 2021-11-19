@@ -188,7 +188,7 @@
 		6A38BBFB15FC117A00A8A51F /* phrase.occ */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = phrase.occ; sourceTree = "<group>"; };
 		6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PhraseFreq.txt; sourceTree = "<group>"; };
 		6A38BBFD15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
+		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		6ACA41E915FC1D9000935EF6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Installer/AppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -544,7 +544,7 @@
 		6A0D4E9415FC0CFA00ABF4B3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1310;
 				TargetAttributes = {
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1240;
