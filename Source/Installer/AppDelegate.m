@@ -27,6 +27,7 @@
 
 #import "AppDelegate.h"
 #import <sys/mount.h>
+#import "OVInputSourceHelper.h"
 
 static NSString *const kTargetBin = @"McBopomofo";
 static NSString *const kTargetType = @"app";
@@ -54,7 +55,6 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 @synthesize textView = _textView;
 @synthesize progressSheet = _progressSheet;
 @synthesize progressIndicator = _progressIndicator;
-
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -130,9 +130,9 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
                 // Schedule the install action in runloop so that the sheet gets a change to dismiss itself.
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (returnCode == NSModalResponseContinue) {
-                        [self installInputMethodWithWarning:NO];
+                        [self installInputMethodWithPreviousExists:YES previousVersionNotFullyDeactivatedWarning:NO];
                     } else {
-                        [self installInputMethodWithWarning:YES];
+                        [self installInputMethodWithPreviousExists:YES previousVersionNotFullyDeactivatedWarning:YES];
                     }
                 });
             }];
@@ -143,7 +143,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
         }
     }
     
-    [self installInputMethodWithWarning:NO];
+    [self installInputMethodWithPreviousExists:NO previousVersionNotFullyDeactivatedWarning:NO];
 }
 
 - (void)timerTick:(NSTimer *)timer
@@ -162,7 +162,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
 }
 
 
-- (void)installInputMethodWithWarning:(BOOL)warning
+- (void)installInputMethodWithPreviousExists:(BOOL)previousVersionExists previousVersionNotFullyDeactivatedWarning:(BOOL)warning
 {
     // If the unzipped archive does not exist, this must be a dev-mode installer.
     NSString *targetBundle = [_archiveUtil unzipNotarizedArchive];
@@ -177,23 +177,80 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
         [NSApp terminate:self];
     }
 
-    NSArray *installArgs = [NSArray arrayWithObjects:@"install", nil];
-    NSTask *installTask = [NSTask launchedTaskWithLaunchPath:[kTargetFullBinPartialPath stringByExpandingTildeInPath] arguments:installArgs];
-    [installTask waitUntilExit];
-    if ([installTask terminationStatus] != 0) {
-        RunAlertPanel(NSLocalizedString(@"Install Failed", nil), NSLocalizedString(@"Cannot activate the input method.", nil),  NSLocalizedString(@"Cancel", nil));
-        [NSApp terminate:self];        
+    NSBundle *imeBundle = [NSBundle bundleWithPath:[kTargetPartialPath stringByExpandingTildeInPath]];
+    NSCAssert(imeBundle != nil, @"Target bundle must exists");
+    NSURL *imeBundleURL = imeBundle.bundleURL;
+    NSString *imeIdentifier = imeBundle.bundleIdentifier;
+    
+    TISInputSourceRef inputSource = [OVInputSourceHelper inputSourceForInputSourceID:imeIdentifier];
+
+    // if this IME name is not found in the list of available IMEs
+    if (!inputSource) {
+        NSLog(@"Registering input source %@ at %@.", imeIdentifier, imeBundleURL.absoluteString);
+        // then register
+        BOOL status = [OVInputSourceHelper registerInputSource:imeBundleURL];
+
+        if (!status) {
+            // TODO: Localize.
+            NSString *message = [NSString stringWithFormat:@"Fatal error: Cannot register input source %@ at %@.", imeIdentifier, imeBundleURL.absoluteString];
+            RunAlertPanel(@"Fatal Error", message, @"Abort");
+            [self endAppWithDelay];
+            return;
+        }
+
+        inputSource = [OVInputSourceHelper inputSourceForInputSourceID:imeIdentifier];
+        // if it still doesn't register successfully, bail.
+        if (!inputSource) {
+            // TODO: Localize.
+            NSString *message = [NSString stringWithFormat:@"Fatal error: Cannot find input source %@ after registration.", imeIdentifier];
+            RunAlertPanel(@"Fatal Error", message, @"Abort");
+            [self endAppWithDelay];
+            return;
+        }
+    }
+    
+    BOOL isMacOS12OrAbove = NO;
+    if (@available(macOS 12.0, *)) {
+        NSLog(@"macOS 12 or later detected.");
+        isMacOS12OrAbove = YES;
+    } else {
+        NSLog(@"Installer runs with the pre-macOS 12 flow.");
+    }
+
+    // If the IME is not enabled, enable it. Also, unconditionally enable it on macOS 12.0+,
+    // as the kTISPropertyInputSourceIsEnabled can still be true even if the IME is *not*
+    // enabled in the user's current set of IMEs (which means the IME does not show up in
+    // the user's input menu).
+    BOOL mainInputSourceEnabled = [OVInputSourceHelper inputSourceEnabled:inputSource];
+    if (!mainInputSourceEnabled || isMacOS12OrAbove) {
+        
+        mainInputSourceEnabled = [OVInputSourceHelper enableInputSource:inputSource];
+        if (mainInputSourceEnabled) {
+            NSLog(@"Input method enabled: %@", imeIdentifier);
+        } else {
+            NSLog(@"Failed to enable input method: %@", imeIdentifier);
+        }
     }
 
     if (warning) {
         RunAlertPanel(NSLocalizedString(@"Attention", nil), NSLocalizedString(@"McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", nil),  NSLocalizedString(@"OK", nil));
     } else {
-        RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil));
+        // Only prompt a warning if pre-macOS 12. The flag is not indicative of anything meaningful due to the need of user intervention in Prefernces.app on macOS 12.
+        if (!mainInputSourceEnabled && !isMacOS12OrAbove) {
+            // TODO: Localize
+            RunAlertPanel(@"Warning", @"Input method may not be fully enabled. Please check Preferences.app.", @"Continue");
+        } else {
+            RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil));
+        }
     }
 
+    [self endAppWithDelay];
+}
+
+- (void)endAppWithDelay
+{
     [[NSApplication sharedApplication] performSelector:@selector(terminate:) withObject:self afterDelay:0.1];
 }
-                                   
 
 - (IBAction)cancelAction:(id)sender
 {

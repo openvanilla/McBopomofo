@@ -41,6 +41,7 @@
 + (BOOL)inputSourceEnabled:(TISInputSourceRef)inInputSource;
 + (BOOL)enableInputSource:(TISInputSourceRef)inInputSource;
 + (BOOL)enableAllInputModesForInputSourceBundleID:(NSString *)inID;
++ (BOOL)enableInputMode:(NSString *)modeID forInputSourceBundleID:(NSString *)bundleID;
 + (BOOL)disableInputSource:(TISInputSourceRef)inInputSource;
 
 // register (i.e. make available to Input Source tab in Language & Text Preferences)
