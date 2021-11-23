@@ -544,7 +544,7 @@
 		6A0D4E9415FC0CFA00ABF4B3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1310;
 				TargetAttributes = {
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1240;
@@ -837,6 +837,7 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
+				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
