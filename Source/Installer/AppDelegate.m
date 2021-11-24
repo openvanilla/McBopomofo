@@ -191,9 +191,8 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
         BOOL status = [OVInputSourceHelper registerInputSource:imeBundleURL];
 
         if (!status) {
-            // TODO: Localize.
-            NSString *message = [NSString stringWithFormat:@"Fatal error: Cannot register input source %@ at %@.", imeIdentifier, imeBundleURL.absoluteString];
-            RunAlertPanel(@"Fatal Error", message, @"Abort");
+            NSString *message = [NSString stringWithFormat:NSLocalizedString(@"Cannot register input source %@ at %@.", nil), imeIdentifier, imeBundleURL.absoluteString];
+            RunAlertPanel(NSLocalizedString(@"Fatal Error", nil), message, NSLocalizedString(@"Abort", nil));
             [self endAppWithDelay];
             return;
         }
@@ -201,9 +200,8 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
         inputSource = [OVInputSourceHelper inputSourceForInputSourceID:imeIdentifier];
         // if it still doesn't register successfully, bail.
         if (!inputSource) {
-            // TODO: Localize.
-            NSString *message = [NSString stringWithFormat:@"Fatal error: Cannot find input source %@ after registration.", imeIdentifier];
-            RunAlertPanel(@"Fatal Error", message, @"Abort");
+            NSString *message = [NSString stringWithFormat:NSLocalizedString(@"Cannot find input source %@ after registration.", nil), imeIdentifier];
+            RunAlertPanel(NSLocalizedString(@"Fatal Error", nil), message, NSLocalizedString(@"Abort", nil));
             [self endAppWithDelay];
             return;
         }
@@ -237,8 +235,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     } else {
         // Only prompt a warning if pre-macOS 12. The flag is not indicative of anything meaningful due to the need of user intervention in Prefernces.app on macOS 12.
         if (!mainInputSourceEnabled && !isMacOS12OrAbove) {
-            // TODO: Localize
-            RunAlertPanel(@"Warning", @"Input method may not be fully enabled. Please check Preferences.app.", @"Continue");
+            RunAlertPanel(NSLocalizedString(@"Warning", nil), NSLocalizedString(@"Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.", nil), NSLocalizedString(@"Continue", nil));
         } else {
             RunAlertPanel(NSLocalizedString(@"Installation Successful", nil), NSLocalizedString(@"McBopomofo is ready to use.", nil),  NSLocalizedString(@"OK", nil));
         }
