@@ -13,5 +13,6 @@
 
 ## 軟體授權
 
-本專案主要程式碼以及編譯後軟體採用 MIT License 釋出。
+本專案採用 MIT License 釋出，使用者可自由使用、散播本軟體，惟散播時必須
+完整保留版權聲明及軟體授權（[詳全文](https://github.com/openvanilla/McBopomofo/blob/master/LICENSE.txt)）。
 
