@@ -1436,7 +1436,11 @@ public:
 - (void)showPreferences:(id)sender
 {
     // show the preferences panel, and also make the IME app itself the focus
-    [(AppDelegate *)[NSApp delegate] showPreferences];
+    if ([IMKInputController instancesRespondToSelector:@selector(showPreferences:)]) {
+        [super showPreferences:sender];
+    } else {
+        [(AppDelegate *)[NSApp delegate] showPreferences];
+    }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
