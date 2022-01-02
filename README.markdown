@@ -1,5 +1,12 @@
 # OpenVanilla McBopomofo 小麥注音輸入法
 
+## 系統需求
+
+- macOS 10.15 Catalina 以上版本
+- Xcode 12.0 以上版本
+
+由於小麥注音輸入法開始使用 SPM（Swift Package Manager）管理相依套件，因此必須使用 Xcode 12 開發。
+
 ## 開發流程
 
 用 Xcode 開啟 `McBopomofo.xcodeproj`，選 "McBopomofo Installer" target，build 完之後直接執行該安裝程式，就可以安裝小麥注音。
