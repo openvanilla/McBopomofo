@@ -89,6 +89,24 @@
     return enabled;
 }
 
++ (BOOL)enableInputMode:(NSString *)modeID forInputSourceBundleID:(NSString *)bundleID
+{
+    for (id source in [self allInstalledInputSources]) {
+        TISInputSourceRef inputSource = (__bridge TISInputSourceRef)source;
+        NSString *inputSoureBundleID = (__bridge NSString *)TISGetInputSourceProperty(inputSource, kTISPropertyBundleID);
+        NSString *inputSourceModeID = (NSString *)CFBridgingRelease(TISGetInputSourceProperty(inputSource, kTISPropertyInputModeID));
+
+        if ([modeID isEqual:inputSourceModeID] && [bundleID isEqual:inputSoureBundleID]) {
+            BOOL enabled = [self enableInputSource:inputSource];
+            NSLog(@"Attempt to enable input source of mode: %@, bundle ID: %@, result: %d", modeID, bundleID, enabled);
+            return enabled;
+        }
+    }
+
+    NSLog(@"Failed to find any matching input source of mode: %@, bundle ID: %@", modeID, bundleID);
+    return NO;
+}
+
 + (BOOL)disableInputSource:(TISInputSourceRef)inInputSource
 {
     OSStatus status = TISDisableInputSource(inInputSource);

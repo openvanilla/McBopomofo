@@ -421,6 +421,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         return;
     }
 
+    // Chinese conversion.
     NSString *buffer = _composingBuffer;
     if (_chineseConversionEnabled) {
         buffer = [OpenCCBridge convert:_composingBuffer];
@@ -555,6 +556,10 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         if (_walkedNodes.size() > 0) {
             NodeAnchor &anchor = _walkedNodes[0];
             NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
+            // Chinese conversion.
+            if (_chineseConversionEnabled) {
+                popedText = [OpenCCBridge convert:popedText];
+            }
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
@@ -567,6 +572,35 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 {
     // use the system's default sound (configurable in System Preferences) to give a warning
     NSBeep();
+}
+
+- (string)currentLayout
+{
+    string layout = string("Standard_");;
+    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
+    switch (keyboardLayout) {
+        case 0:
+            layout = string("Standard_");
+            break;
+        case 1:
+            layout = string("ETen_");
+            break;
+        case 2:
+            layout = string("ETen26_");
+            break;
+        case 3:
+            layout = string("Hsu_");
+            break;
+        case 4:
+            layout = string("HanyuPinyin_");
+            break;
+        case 5:
+            layout = string("IBM_");
+            break;
+        default:
+            break;
+    }
+    return layout;
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -918,31 +952,7 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         }
     }
 
-    string layout = string("Standard_");;
-    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
-    switch (keyboardLayout) {
-        case 0:
-            layout = string("Standard_");
-            break;
-        case 1:
-            layout = string("ETen_");
-            break;
-        case 2:
-            layout = string("ETen26_");
-            break;
-        case 3:
-            layout = string("Hsu_");
-            break;
-        case 4:
-            layout = string("HanyuPinyin_");
-            break;
-        case 5:
-            layout = string("IBM_");
-            break;
-        default:
-            break;
-    }
-
+    string layout = [self currentLayout];
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
     if (_languageModel->hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
@@ -1006,14 +1016,14 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
 {
-    if (_inputMode == kPlainBopomofoModeIdentifier) {
-        if (charCode == '<') {
-            keyCode = kPageUpKeyCode;
-        }
-        else if (charCode == '>') {
-            keyCode = kPageDownKeyCode;
-        }
-    }
+//    if (_inputMode == kPlainBopomofoModeIdentifier) {
+//        if (charCode == '<') {
+//            keyCode = kPageUpKeyCode;
+//        }
+//        else if (charCode == '>') {
+//            keyCode = kPageDownKeyCode;
+//        }
+//    }
 
     BOOL cancelCandidateKey =
         (charCode == 27) ||
@@ -1062,7 +1072,10 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             return YES;
         }
         else {
-            [self beep];
+            BOOL updated = [gCurrentCandidateController showPreviousPage];
+            if (!updated) {
+                [self beep];
+            }
             [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
@@ -1077,7 +1090,10 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
             return YES;
         }
         else {
-            [self beep];
+            BOOL updated = [gCurrentCandidateController showNextPage];
+            if (!updated) {
+                [self beep];
+            }
             [self updateClientComposingBuffer:_currentCandidateClient];
             return YES;
         }
@@ -1160,7 +1176,14 @@ static void OverrideCandidate(const vector<NodeAnchor>& nodes, const string& can
         }
 
         if (_inputMode == kPlainBopomofoModeIdentifier) {
-            if (_bpmfReadingBuffer->isValidKey((char)charCode)) {
+            string layout = [self currentLayout];
+            string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
+            string punctuation = string("_punctuation_") + string(1, (char)charCode);
+
+            BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
+                _languageModel->hasUnigramsForKey(punctuation);
+
+            if (shouldAutoSelectCandidate) {
                 NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
                 if (candidateIndex != NSUIntegerMax) {
                     [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];

@@ -20,7 +20,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="489" y="334" width="406" height="353"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="406" height="353"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -223,7 +223,7 @@
                         <rect key="frame" x="69" y="243" width="108" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="選字鍵：" id="eBT-Tv-vED">
-                            <font key="font" size="13" name=".PingFangTC-Regular"/>
+                            <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>

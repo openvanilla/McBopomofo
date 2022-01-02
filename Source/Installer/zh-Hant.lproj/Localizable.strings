@@ -28,3 +28,12 @@
 "Finish" = "結束";
 "Attention" = "請注意";
 "McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional." = "McBopomofo 安裝完成，但建議您登出或重新開機，以便順利使用新版。";
+
+"Fatal Error" = "安裝錯誤";
+"Abort" = "放棄安裝";
+"Cannot register input source %@ at %@." = "無法從檔案位置 %2$@ 安裝輸入法 \"%1$@\"。";
+"Cannot find input source %@ after registration." = "在註冊完輸入法 \"%@\" 仍然無法找到輸入法。";
+
+"Warning" = "安裝不完整";
+"Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "輸入法已經安裝好，但可能沒有完全啟用。請從「系統偏好設定」 > 「鍵盤」 > 「輸入方式」分頁加入輸入法。";
+"Continue" = "繼續";
