@@ -98,7 +98,7 @@
     
     for (NSScreen *screen in [NSScreen screens]) {
         NSRect frame = [screen visibleFrame];
-        if (topLeftPoint.x >= NSMinX(frame) && topLeftPoint.x <= NSMaxX(frame)) {
+        if (topLeftPoint.x >= NSMinX(frame) && topLeftPoint.x <= NSMaxX(frame) && topLeftPoint.y >= NSMinY(frame) && topLeftPoint.y <= NSMaxY(frame)) {
             screenFrame = frame;
             break;
         }

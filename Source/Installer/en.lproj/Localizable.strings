@@ -28,3 +28,12 @@
 "Stopping the old version. This may take up to one minute…" = "Stopping the old version. This may take up to one minute…";
 "Attention" = "Attention";
 "McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional." = "McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.";
+
+"Fatal Error" = "Fatal Error";
+"Abort" = "Abort";
+"Cannot register input source %@ at %@." = "Cannot register input source %@ at %@.";
+"Cannot find input source %@ after registration." = "Cannot find input source %@ after registration.";
+
+"Warning" = "Warning";
+"Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.";
+"Continue" = "Continue";
