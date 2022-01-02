@@ -6,7 +6,7 @@ jobs:
     name: Build
     runs-on: macOS-latest
     env:
-        DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
       - uses: actions/checkout@v1
       - name: Clean
