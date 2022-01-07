@@ -76,7 +76,6 @@ static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
 static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
 static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
-static NSString *const kDisableUserCandidateSelectionLearning = @"DisableUserCandidateSelectionLearning";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
 static NSString *const kEscToCleanInputBufferKey = @"EscToCleanInputBufferKey";
@@ -104,9 +103,6 @@ enum {
     kDeleteKeyCode = 117
 };
 
-// a global object for saving the "learned" user candidate selections
-NSMutableDictionary *gCandidateLearningDictionary = nil;
-NSString *gUserCandidatesDictionaryPath = nil;
 VTCandidateController *gCurrentCandidateController = nil;
 
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
@@ -118,6 +114,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 // shared language model object that stores our phrase-term probability database
 FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
+
+static const int kUserOverrideModelCapacity = 500;
+static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
+McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -133,10 +133,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 - (void)collectCandidates;
 
 - (size_t)actualCandidateCursorIndex;
-- (NSString *)neighborTrigramString;
 
-- (void)_performDeferredSaveUserCandidatesDictionary;
-- (void)saveUserCandidatesDictionary;
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
 
 - (void)beep;
@@ -152,6 +149,19 @@ public:
         return a.node->key().length() > b.node->key().length();
     }
 };
+
+static const double kEpsilon = 0.000001;
+
+static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) {
+    double highestScore = 0.0;
+    for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        double score = ni->node->highestUnigramScore();
+        if (score > highestScore) {
+            highestScore = score;
+        }
+    }
+    return highestScore + epsilon;
+}
 
 @implementation McBopomofoInputMethodController
 - (void)dealloc
@@ -183,17 +193,13 @@ public:
         // create the lattice builder
         _languageModel = &gLanguageModel;
         _builder = new BlockReadingBuilder(_languageModel);
+        _uom = &gUserOverrideModel;
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
 
         // create the composing buffer
         _composingBuffer = [[NSMutableString alloc] init];
-
-        // populate the settings, by default, DISABLE user candidate learning
-        if (![[NSUserDefaults standardUserDefaults] objectForKey:kDisableUserCandidateSelectionLearning]) {
-            [[NSUserDefaults standardUserDefaults] setObject:(id)kCFBooleanTrue forKey:kDisableUserCandidateSelectionLearning];
-        }
 
         _inputMode = kBopomofoModeIdentifier;
         _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
@@ -208,30 +214,6 @@ public:
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
     NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
-
-    // If Option key is pressed, show the learning-related menu
-
-    #if DEBUG
-    //I think the following line is 10.6+ specific
-    if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
-
-        BOOL learningEnabled = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
-
-        NSMenuItem *learnMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Enable Selection Learning", @"") action:@selector(toggleLearning:) keyEquivalent:@""];
-        learnMenuItem.state = learningEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-        [menu addItem:learnMenuItem];
-
-        if (learningEnabled) {
-            NSString *clearMenuItemTitle = [NSString stringWithFormat:NSLocalizedString(@"Clear Learning Dictionary (%ju Items)", @""), (uintmax_t)[gCandidateLearningDictionary count]];
-            NSMenuItem *clearMenuItem = [[NSMenuItem alloc] initWithTitle:clearMenuItemTitle action:@selector(clearLearningDictionary:) keyEquivalent:@""];
-            [menu addItem:clearMenuItem];
-
-
-            NSMenuItem *dumpMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Dump Learning Data to Console", @"") action:@selector(dumpLearningDictionary:) keyEquivalent:@""];
-            [menu addItem:dumpMenuItem];
-        }
-    }
-    #endif //DEBUG
 
     NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
@@ -695,15 +677,15 @@ public:
         // then walk the lattice
         [self popOverflowComposingTextAndWalk:client];
 
-        // see if we need to override the selection if a learned one exists
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
-            NSString *trigram = [self neighborTrigramString];
-
-            // Lookup from the user dict to see if the trigram fit or not
-            NSString *overrideCandidateString = [gCandidateLearningDictionary objectForKey:trigram];
-            if (overrideCandidateString) {
-                [self candidateSelected:(NSAttributedString *)overrideCandidateString];
-            }
+        // get user override model suggestion
+        string overrideValue =
+            (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
+                _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        if (!overrideValue.empty()) {
+            size_t cursorIndex = [self actualCandidateCursorIndex];
+            vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+            double highestScore = FindHighestScore(nodes, kEpsilon);
+            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, highestScore);
         }
 
         // then update the text
@@ -1292,78 +1274,6 @@ public:
     return cursorIndex;
 }
 
-- (NSString *)neighborTrigramString
-{
-    // gather the "trigram" for user candidate selection learning
-
-    NSMutableArray *termArray = [NSMutableArray array];
-
-    size_t cursorIndex = [self actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    const Node* prev = 0;
-    const Node* current = 0;
-    const Node* next = 0;
-
-    size_t wni = 0;
-    size_t wnc = _walkedNodes.size();
-    size_t accuSpanningLength = 0;
-    for (wni = 0; wni < wnc; wni++) {
-        NodeAnchor& anchor = _walkedNodes[wni];
-        if (!anchor.node) {
-            continue;
-        }
-
-        accuSpanningLength += anchor.spanningLength;
-        if (accuSpanningLength >= cursorIndex) {
-            prev = current;
-            current = anchor.node;
-            break;
-        }
-
-        current = anchor.node;
-    }
-
-    if (wni + 1 < wnc) {
-        next = _walkedNodes[wni + 1].node;
-    }
-
-    string term;
-    if (prev) {
-        term = prev->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    if (current) {
-        term = current->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    if (next) {
-        term = next->currentKeyValue().key;
-        [termArray addObject:[NSString stringWithUTF8String:term.c_str()]];
-    }
-
-    return [termArray componentsJoinedByString:@"-"];
-}
-
-- (void)_performDeferredSaveUserCandidatesDictionary
-{
-    BOOL __unused success = [gCandidateLearningDictionary writeToFile:gUserCandidatesDictionaryPath atomically:YES];
-}
-
-- (void)saveUserCandidatesDictionary
-{
-    if (!gUserCandidatesDictionaryPath) {
-        return;
-    }
-
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_performDeferredSaveUserCandidatesDictionary) object:nil];
-
-    // TODO: Const-ize the delay
-    [self performSelector:@selector(_performDeferredSaveUserCandidatesDictionary) withObject:nil afterDelay:5.0];
-}
-
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
 {
     // set the candidate panel style
@@ -1467,28 +1377,10 @@ public:
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
-- (void)toggleLearning:(id)sender
-{
-    BOOL toggle = ![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning];
-
-    [[NSUserDefaults standardUserDefaults] setBool:toggle forKey:kDisableUserCandidateSelectionLearning];
-}
-
 - (void)toggleChineseConverter:(id)sender
 {
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
-}
-
-- (void)clearLearningDictionary:(id)sender
-{
-    [gCandidateLearningDictionary removeAllObjects];
-    [self _performDeferredSaveUserCandidatesDictionary];
-}
-
-- (void)dumpLearningDictionary:(id)sender
-{
-    NSLog(@"%@", gCandidateLearningDictionary);
 }
 
 - (NSUInteger)candidateCountForController:(VTCandidateController *)controller
@@ -1508,15 +1400,11 @@ public:
     // candidate selected, override the node with selection
     string selectedValue = [[_candidates objectAtIndex:index] UTF8String];
 
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:kDisableUserCandidateSelectionLearning]) {
-        NSString *trigram = [self neighborTrigramString];
-        NSString *selectedNSString = [NSString stringWithUTF8String:selectedValue.c_str()];
-        [gCandidateLearningDictionary setObject:selectedNSString forKey:trigram];
-        [self saveUserCandidatesDictionary];
-    }
-
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
+    if (_inputMode != kPlainBopomofoModeIdentifier) {
+        _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+    }
 
     [_candidates removeAllObjects];
 
@@ -1545,57 +1433,4 @@ void LTLoadLanguageModel()
 {
     LTLoadLanguageModelFile(@"data", gLanguageModel);
     LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
-
-
-    // initialize the singleton learning dictionary
-    // putting singleton in @synchronized is the standard way in Objective-C
-    // to avoid race condition
-    gCandidateLearningDictionary = [[NSMutableDictionary alloc] init];
-
-    // the first instance is also responsible for loading the dictionary
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    if (![paths count]) {
-        NSLog(@"Fatal error: cannot find Applicaiton Support directory.");
-        return;
-    }
-
-    NSString *appSupportPath = [paths objectAtIndex:0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
-
-    BOOL isDir = NO;
-    BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictPath isDirectory:&isDir];
-
-    if (exists) {
-        if (!isDir) {
-            NSLog(@"Fatal error: Path '%@' is not a directory", userDictPath);
-            return;
-        }
-    }
-    else {
-        NSError *error = nil;
-        BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:userDictPath withIntermediateDirectories:YES attributes:nil error:&error];
-        if (!success) {
-            NSLog(@"Failed to create directory '%@', error: %@", userDictPath, error);
-            return;
-        }
-    }
-
-    // TODO: Change this
-    NSString *userDictFile = [userDictPath stringByAppendingPathComponent:@"UserCandidatesCache.plist"];
-    gUserCandidatesDictionaryPath = userDictFile;
-
-    exists = [[NSFileManager defaultManager] fileExistsAtPath:userDictFile isDirectory:&isDir];
-    if (exists && !isDir) {
-        NSData *data = [NSData dataWithContentsOfFile:userDictFile];
-        if (!data) {
-            return;
-        }
-
-        id plist = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
-        if (plist && [plist isKindOfClass:[NSDictionary class]]) {
-            [gCandidateLearningDictionary setDictionary:(NSDictionary *)plist];
-            NSLog(@"User dictionary read, item count: %ju", (uintmax_t)[gCandidateLearningDictionary count]);
-        }
-    }
-
 }

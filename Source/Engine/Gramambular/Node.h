@@ -47,10 +47,12 @@ namespace Formosa {
             const vector<KeyValuePair>& candidates() const;
             void selectCandidateAtIndex(size_t inIndex = 0, bool inFix = true);
             void resetCandidate();
+            void selectFloatingCandidateAtIndex(size_t index, double score);
             
             const string& key() const;
             double score() const;
             const KeyValuePair currentKeyValue() const;
+            double highestUnigramScore() const;
             
         protected:
             const LanguageModel* m_LM;
@@ -175,6 +177,16 @@ namespace Formosa {
                 m_score = m_unigrams[0].score;
             }
         }
+
+        inline void Node::selectFloatingCandidateAtIndex(size_t index, double score) {
+            if (index >= m_unigrams.size()) {
+                m_selectedUnigramIndex = 0;
+            } else {
+                m_selectedUnigramIndex = index;
+            }
+            m_candidateFixed = false;
+            m_score = score;
+        }
         
         inline const string& Node::key() const
         {
@@ -184,6 +196,13 @@ namespace Formosa {
         inline double Node::score() const
         {
             return m_score;
+        }
+
+        inline double Node::highestUnigramScore() const {
+            if (m_unigrams.empty()) {
+                return 0.0;
+            }
+            return m_unigrams[0].score;
         }
         
         inline const KeyValuePair Node::currentKeyValue() const

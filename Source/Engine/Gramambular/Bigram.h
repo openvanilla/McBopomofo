@@ -28,6 +28,8 @@
 #ifndef Bigram_h
 #define Bigram_h
 
+#include <vector>
+
 #include "KeyValuePair.h"
 
 namespace Formosa {

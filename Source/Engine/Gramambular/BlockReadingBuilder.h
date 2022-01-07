@@ -199,7 +199,7 @@ namespace Formosa {
             }
         }
         
-        const string BlockReadingBuilder::Join(vector<string>::const_iterator begin, vector<string>::const_iterator end, const string& separator)
+        inline const string BlockReadingBuilder::Join(vector<string>::const_iterator begin, vector<string>::const_iterator end, const string& separator)
         {
             string result;
             for (vector<string>::const_iterator iter = begin ; iter != end ; ) {
