@@ -114,6 +114,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 // shared language model object that stores our phrase-term probability database
 FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
+FastLM gUserPhraseLanguageModel;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
@@ -451,6 +452,22 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
                                NSMarkedClauseSegmentAttributeName: @0};
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
 
+    if (_bpmfReadingBuffer->isEmpty() && _builder->markerCursorIndex() != -1) {
+        NSInteger begin = 0;
+        NSInteger end = 0;
+        if (_builder->markerCursorIndex() > _builder->cursorIndex()) {
+            begin = _builder->cursorIndex();
+            end = _builder->markerCursorIndex();
+        } else {
+            end = _builder->cursorIndex();
+            begin = _builder->markerCursorIndex();
+        }
+        NSRange range = NSMakeRange(begin, end - begin);
+        NSDictionary *highlightAttrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleDouble),
+                                   NSMarkedClauseSegmentAttributeName: @0};
+        [attrString addAttributes:highlightAttrDict range:range];
+    }
+
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
@@ -557,6 +574,41 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
             break;
     }
     return layout;
+}
+
+- (NSString *)_currentHighlighText
+{
+    if (_builder->markerCursorIndex() == -1) {
+        return @"";
+    }
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        return @"";
+    }
+
+    NSInteger begin = 0;
+    NSInteger end = 0;
+    if (_builder->markerCursorIndex() > _builder->cursorIndex()) {
+        begin = _builder->cursorIndex();
+        end = _builder->markerCursorIndex();
+    } else {
+        end = _builder->cursorIndex();
+        begin = _builder->markerCursorIndex();
+    }
+    NSRange range = NSMakeRange(begin, end - begin);
+    NSString *reading = [_composingBuffer substringWithRange:range];
+    NSMutableString *string = [[NSMutableString alloc] init];
+    [string appendString:reading];
+    [string appendString:@" "];
+    NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
+    vector<std::string> v = _builder->readingsAtRange(begin,end);
+    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
+        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
+    }
+    NSString *joined = [readingsArray componentsJoinedByString:@"-"];
+    [string appendString:joined];
+    [string appendString:@" "];
+    [string appendString:@"-1.0"];
+    return string;
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -771,11 +823,30 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
                 return NO;
             }
 
-            if (_builder->cursorIndex() > 0) {
-                _builder->setCursorIndex(_builder->cursorIndex() - 1);
-            }
-            else {
-                [self beep];
+            if (flags & NSShiftKeyMask) {
+                if (_builder->markerCursorIndex() == -1) {
+                    if (_builder->cursorIndex() > 0) {
+                        _builder->setMarkerCursorIndex(_builder->cursorIndex() - 1);
+                    } else {
+                        [self beep];
+                    }
+                    NSString *tmp = [self _currentHighlighText];
+                    NSLog(@"%@", tmp);
+                }
+                else {
+                    if (_builder->markerCursorIndex() > 0) {
+                        _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
+                    } else {
+                        [self beep];
+                    }
+                }
+            } else {
+                if (_builder->cursorIndex() > 0) {
+                    _builder->setCursorIndex(_builder->cursorIndex() - 1);
+                }
+                else {
+                    [self beep];
+                }
             }
         }
 
@@ -793,11 +864,32 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
                 return NO;
             }
 
-            if (_builder->cursorIndex() < _builder->length()) {
-                _builder->setCursorIndex(_builder->cursorIndex() + 1);
-            }
-            else {
-                [self beep];
+            if (flags & NSShiftKeyMask) {
+                if (_builder->markerCursorIndex() == -1) {
+                    if (_builder->cursorIndex() < _builder->length()) {
+                        _builder->setMarkerCursorIndex(_builder->cursorIndex() + 1);
+                    } else {
+                        [self beep];
+                    }
+                    NSString *tmp = [self _currentHighlighText];
+                    NSLog(@"%@", tmp);
+                }
+                else {
+                    if (_builder->markerCursorIndex() < _builder->length()) {
+                        _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
+                    } else {
+                        [self beep];
+                    }
+                    NSString *tmp = [self _currentHighlighText];
+                    NSLog(@"%@", tmp);
+                }
+            } else {
+                if (_builder->cursorIndex() < _builder->length()) {
+                    _builder->setCursorIndex(_builder->cursorIndex() + 1);
+                }
+                else {
+                    [self beep];
+                }
             }
         }
 
@@ -1419,6 +1511,13 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 @end
 
+static NSString *userDataFolderPath() {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
+    NSString *appSupportPath = [paths objectAtIndex:0];
+    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
+    return userDictPath;
+}
+
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
 {
     NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
@@ -1428,6 +1527,15 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
     }
 }
 
+static void LTLoadUserLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
+{
+    NSString *filename = [filenameWithoutExtension stringByAppendingPathExtension:@"txt"];
+    NSString *dataPath = [userDataFolderPath() stringByAppendingPathComponent:filename];
+    bool result = lm.open([dataPath UTF8String]);
+    if (!result) {
+        NSLog(@"Failed opening language model: %@", dataPath);
+    }
+}
 
 void LTLoadLanguageModel()
 {
