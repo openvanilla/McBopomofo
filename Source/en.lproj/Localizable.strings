@@ -50,3 +50,7 @@
 "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@";
 
 "Chinese Conversion" = "Convert to Simplified Chinese";
+
+"Edit User Phrases" = "Edit User Phrases";
+
+"Reload User Phrases" = "Reload User Phrases";

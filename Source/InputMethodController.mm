@@ -233,8 +233,13 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
-    NSMenuItem *editUserPhraseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-    [menu addItem:editUserPhraseItem];
+    if (_inputMode != kPlainBopomofoModeIdentifier) {
+        NSMenuItem *editUserPhraseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+        [menu addItem:editUserPhraseItem];
+
+        NSMenuItem *reloadUserPhraseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+        [menu addItem:reloadUserPhraseItem];
+    }
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
@@ -666,6 +671,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
     [file writeData:data];
     [file closeFile];
+
+    LTLoadUserLanguageModelFile();
     return YES;
 }
 
@@ -1550,11 +1557,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
     NSURL *url = [NSURL fileURLWithPath:path];
     [[NSWorkspace sharedWorkspace] openURL:url];
-//    NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
-//    [[NSWorkspace sharedWorkspace] openURL:url configuration:config completionHandler:^(NSRunningApplication * app, NSError * error) {
-//        NSLog(@"app %@", app);
-//        NSLog(@"error %@", error);
-//    }];
+}
+
+- (void)reloadUserPhrases:(id)sender
+{
+    LTLoadUserLanguageModelFile();
 }
 
 - (void)showAbout:(id)sender
