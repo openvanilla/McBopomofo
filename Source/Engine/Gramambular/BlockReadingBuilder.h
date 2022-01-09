@@ -38,7 +38,7 @@ namespace Formosa {
         
         class BlockReadingBuilder {
         public:
-            BlockReadingBuilder(LanguageModel *inLM);
+            BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM);
             void clear();
             
             size_t length() const;
@@ -73,11 +73,13 @@ namespace Formosa {
             
             Grid m_grid;
             LanguageModel *m_LM;
+            LanguageModel *m_UserPhraseLM;
             string m_joinSeparator;
         };
         
-        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM)
+        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM)
             : m_LM(inLM)
+            , m_UserPhraseLM(inUserPhraseLM)
             , m_cursorIndex(0)
             , m_markerCursorIndex(SIZE_MAX)
         {
@@ -219,6 +221,13 @@ namespace Formosa {
             for (size_t p = begin ; p < end ; p++) {
                 for (size_t q = 1 ; q <= MaximumBuildSpanLength && p+q <= end ; q++) {
                     string combinedReading = Join(m_readings.begin() + p, m_readings.begin() + p + q, m_joinSeparator);
+                    if (m_UserPhraseLM != NULL) {
+                        if (m_UserPhraseLM->hasUnigramsForKey(combinedReading) && !m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
+                            Node n(combinedReading, m_UserPhraseLM->unigramsForKeys(combinedReading), vector<Bigram>());
+                            m_grid.insertNode(n, p, q);
+                            continue;
+                        }
+                    }
                     
                     if (m_LM->hasUnigramsForKey(combinedReading) && !m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
                         Node n(combinedReading, m_LM->unigramsForKeys(combinedReading), vector<Bigram>());                        
