@@ -5,18 +5,18 @@ import OpenCC
 // in Swift in order to bridge the Swift classes into our Objective-C++ project.
 class OpenCCBridge : NSObject {
     private static let shared = OpenCCBridge()
-    private var conveter: ChineseConverter?
+    private var converter: ChineseConverter?
 
     override init() {
-        try? conveter = ChineseConverter(options: .simplify)
+        try? converter = ChineseConverter(options: .simplify)
         super.init()
     }
 
     @objc static func convert(_ string:String) -> String? {
-        return shared.conveter?.convert(string)
+        return shared.converter?.convert(string)
     }
 
     private func convert(_ string:String) -> String? {
-        return conveter?.convert(string)
+        return converter?.convert(string)
     }
 }
