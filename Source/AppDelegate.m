@@ -37,6 +37,7 @@
 #import "PreferencesWindowController.h"
 
 extern void LTLoadLanguageModel(void);
+extern void LTLoadUserLanguageModelFile(void);
 
 static NSString *kCheckUpdateAutomatically = @"CheckUpdateAutomatically";
 static NSString *kNextUpdateCheckDateKey = @"NextUpdateCheckDate";
@@ -60,6 +61,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
     LTLoadLanguageModel();
+    LTLoadUserLanguageModelFile();
 
     if (![[NSUserDefaults standardUserDefaults] objectForKey:kCheckUpdateAutomatically]) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCheckUpdateAutomatically];

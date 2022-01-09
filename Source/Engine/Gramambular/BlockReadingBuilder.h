@@ -79,14 +79,14 @@ namespace Formosa {
         inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM)
             : m_LM(inLM)
             , m_cursorIndex(0)
-            , m_markerCursorIndex(-1)
+            , m_markerCursorIndex(SIZE_MAX)
         {
         }
         
         inline void BlockReadingBuilder::clear()
         {
             m_cursorIndex = 0;
-            m_markerCursorIndex = -1;
+            m_markerCursorIndex = SIZE_MAX;
             m_readings.clear();
             m_grid.clear();
         }
@@ -113,6 +113,11 @@ namespace Formosa {
 
         inline void BlockReadingBuilder::setMarkerCursorIndex(size_t inNewIndex)
         {
+            if (inNewIndex == SIZE_MAX) {
+                m_markerCursorIndex = SIZE_MAX;
+                return;
+            }
+
             m_markerCursorIndex = inNewIndex > m_readings.size() ? m_readings.size() : inNewIndex;
         }
         

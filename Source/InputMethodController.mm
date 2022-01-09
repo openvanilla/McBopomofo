@@ -116,6 +116,21 @@ FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
 FastLM gUserPhraseLanguageModel;
 
+static NSString *userDataFolderPath()
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
+    NSString *appSupportPath = [paths objectAtIndex:0];
+    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
+    return userDictPath;
+}
+
+static NSString *userPhrasesDataPath()
+{
+    return [userDataFolderPath() stringByAppendingPathComponent:@"data.txt"];
+}
+
+
+
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
@@ -132,9 +147,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 + (VTVerticalCandidateController *)verticalCandidateController;
 
 - (void)collectCandidates;
-
 - (size_t)actualCandidateCursorIndex;
-
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
 
 - (void)beep;
@@ -220,6 +233,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
+
+    NSMenuItem *editUserPhraseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+    [menu addItem:editUserPhraseItem];
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
@@ -393,6 +409,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [_candidates removeAllObjects];
 }
 
+NS_INLINE size_t min(size_t a, size_t b) { return a < b ? a : b; }
+NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
+
 // TODO: bug #28 is more likely to live in this method.
 - (void)updateClientComposingBuffer:(id)client
 {
@@ -446,33 +465,39 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
-    // we must use NSAttributedString so that the cursor is visible --
-    // can't just use NSString
-    NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
-                               NSMarkedClauseSegmentAttributeName: @0};
-    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
+    if (_bpmfReadingBuffer->isEmpty() && _builder->markerCursorIndex() != SIZE_MAX) {
+        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText];
+        size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
+        size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+        [attrString setAttributes:@{
+            NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+            NSMarkedClauseSegmentAttributeName: @0
+        } range:NSMakeRange(0, begin)];
+        [attrString setAttributes:@{
+            NSUnderlineStyleAttributeName: @(NSUnderlineStyleThick),
+            NSMarkedClauseSegmentAttributeName: @1
+        } range:NSMakeRange(begin, end - begin)];
+        [attrString setAttributes:@{
+            NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+            NSMarkedClauseSegmentAttributeName: @2
+        } range:NSMakeRange(end, [composedText length] - end)];
+        NSLog(@"marked %@", [self _currentMarkedText]);
+        NSLog(@"attrString %@", attrString);
+        [client setMarkedText:attrString selectionRange:NSMakeRange((NSInteger)_builder->markerCursorIndex(), 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+        _latestReadingCursor = (NSInteger)_builder->markerCursorIndex();
 
-    if (_bpmfReadingBuffer->isEmpty() && _builder->markerCursorIndex() != -1) {
-        NSInteger begin = 0;
-        NSInteger end = 0;
-        if (_builder->markerCursorIndex() > _builder->cursorIndex()) {
-            begin = _builder->cursorIndex();
-            end = _builder->markerCursorIndex();
-        } else {
-            end = _builder->cursorIndex();
-            begin = _builder->markerCursorIndex();
-        }
-        NSRange range = NSMakeRange(begin, end - begin);
-        NSDictionary *highlightAttrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleDouble),
+    } else {
+        // we must use NSAttributedString so that the cursor is visible --
+        // can't just use NSString
+        NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                    NSMarkedClauseSegmentAttributeName: @0};
-        [attrString addAttributes:highlightAttrDict range:range];
+        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText attributes:attrDict];
+
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put ths composing buffer
+        [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+        _latestReadingCursor = cursorIndex;
     }
-
-    // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-    // i.e. the client app needs to take care of where to put ths composing buffer
-    [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-
-    _latestReadingCursor = cursorIndex;
 }
 
 - (void)walk
@@ -576,25 +601,22 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     return layout;
 }
 
-- (NSString *)_currentHighlighText
+- (NSString *)_currentMarkedText
 {
-    if (_builder->markerCursorIndex() == -1) {
+    if (_builder->markerCursorIndex() < 0) {
         return @"";
     }
     if (!_bpmfReadingBuffer->isEmpty()) {
         return @"";
     }
 
-    NSInteger begin = 0;
-    NSInteger end = 0;
-    if (_builder->markerCursorIndex() > _builder->cursorIndex()) {
-        begin = _builder->cursorIndex();
-        end = _builder->markerCursorIndex();
-    } else {
-        end = _builder->cursorIndex();
-        begin = _builder->markerCursorIndex();
+    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
+    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+    if (end - begin < 2) {
+        return @"";
     }
-    NSRange range = NSMakeRange(begin, end - begin);
+
+    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
     NSString *reading = [_composingBuffer substringWithRange:range];
     NSMutableString *string = [[NSMutableString alloc] init];
     [string appendString:reading];
@@ -609,6 +631,39 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [string appendString:@" "];
     [string appendString:@"-1.0"];
     return string;
+}
+
+- (BOOL)_writeUserPhrase
+{
+    NSString *currentMarkedPhrase = [self _currentMarkedText];
+    if (![currentMarkedPhrase length]) {
+        return NO;
+    }
+    NSString *path = userPhrasesDataPath();
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+        if (result) {
+            NSLog(@"user phrases file is creates");
+        }
+        else {
+            NSLog(@"failed to create user phrases file");
+            return NO;
+        }
+    }
+
+    NSLog(@"About to write %@ into %@", currentMarkedPhrase, path);
+    currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
+    NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
+    NSLog(@"file %@", file);
+    if (!file) {
+        NSLog(@"Failed to write to %@", path);
+        return NO;
+    }
+    [file seekToEndOfFile];
+    NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
+    [file writeData:data];
+    [file closeFile];
+    return YES;
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -651,7 +706,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         return NO;
     }
 
-
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
     if (charCode == 8 || charCode == 13 || keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey || keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
         // do nothing if backspace is pressed -- we ignore the key
@@ -693,6 +747,50 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     // if we have candidate, it means we need to pass the event to the candidate handler
     if ([_candidates count]) {
         return [self handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode];
+    }
+
+    // If we have marker index.
+    if (_builder->markerCursorIndex() != SIZE_MAX) {
+        // ESC
+        if (charCode == 27) {
+            _builder->setMarkerCursorIndex(SIZE_MAX);
+            [self updateClientComposingBuffer:client];
+            return YES;
+        }
+        // Enter
+        if (charCode == 13) {
+            if ([self _writeUserPhrase]) {
+                _builder->setMarkerCursorIndex(SIZE_MAX);
+            } else {
+                [self beep];
+            }
+            [self updateClientComposingBuffer:client];
+            return YES;
+        }
+        // Shift + left
+        if (keyCode == cursorBackwardKey && (flags & NSShiftKeyMask)) {
+            if (_builder->markerCursorIndex() > 0) {
+                _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
+            }
+            else {
+                [self beep];
+            }
+            [self updateClientComposingBuffer:client];
+            return YES;
+        }
+        // Shift + Right
+        if (keyCode == cursorForwardKey && (flags & NSShiftKeyMask)) {
+            if (_builder->markerCursorIndex() < _builder->length()) {
+                _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
+            }
+            else {
+                [self beep];
+            }
+            [self updateClientComposingBuffer:client];
+            return YES;
+        }
+
+        _builder->setMarkerCursorIndex(SIZE_MAX);
     }
 
     // see if it's valid BPMF reading
@@ -824,21 +922,11 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
             }
 
             if (flags & NSShiftKeyMask) {
-                if (_builder->markerCursorIndex() == -1) {
-                    if (_builder->cursorIndex() > 0) {
-                        _builder->setMarkerCursorIndex(_builder->cursorIndex() - 1);
-                    } else {
-                        [self beep];
-                    }
-                    NSString *tmp = [self _currentHighlighText];
-                    NSLog(@"%@", tmp);
+                if (_builder->cursorIndex() > 0) {
+                    _builder->setMarkerCursorIndex(_builder->cursorIndex() - 1);
                 }
                 else {
-                    if (_builder->markerCursorIndex() > 0) {
-                        _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
-                    } else {
-                        [self beep];
-                    }
+                    [self beep];
                 }
             } else {
                 if (_builder->cursorIndex() > 0) {
@@ -865,23 +953,10 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
             }
 
             if (flags & NSShiftKeyMask) {
-                if (_builder->markerCursorIndex() == -1) {
-                    if (_builder->cursorIndex() < _builder->length()) {
-                        _builder->setMarkerCursorIndex(_builder->cursorIndex() + 1);
-                    } else {
-                        [self beep];
-                    }
-                    NSString *tmp = [self _currentHighlighText];
-                    NSLog(@"%@", tmp);
-                }
-                else {
-                    if (_builder->markerCursorIndex() < _builder->length()) {
-                        _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
-                    } else {
-                        [self beep];
-                    }
-                    NSString *tmp = [self _currentHighlighText];
-                    NSLog(@"%@", tmp);
+                if (_builder->cursorIndex() < _builder->length()) {
+                    _builder->setMarkerCursorIndex(_builder->cursorIndex() + 1);
+                } else {
+                    [self beep];
                 }
             } else {
                 if (_builder->cursorIndex() < _builder->length()) {
@@ -1463,6 +1538,22 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
 }
 
+- (void)openUserPhrases:(id)sender
+{
+    NSString *path = userPhrasesDataPath();
+    NSLog(@"path: %@", path);
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+    }
+    NSURL *url = [NSURL fileURLWithPath:path];
+    [[NSWorkspace sharedWorkspace] openURL:url];
+//    NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+//    [[NSWorkspace sharedWorkspace] openURL:url configuration:config completionHandler:^(NSRunningApplication * app, NSError * error) {
+//        NSLog(@"app %@", app);
+//        NSLog(@"error %@", error);
+//    }];
+}
+
 - (void)showAbout:(id)sender
 {
     [[NSApplication sharedApplication] orderFrontStandardAboutPanel:sender];
@@ -1511,12 +1602,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 @end
 
-static NSString *userDataFolderPath() {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = [paths objectAtIndex:0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
-    return userDictPath;
-}
 
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
 {
@@ -1527,18 +1612,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
     }
 }
 
-static void LTLoadUserLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
-{
-    NSString *filename = [filenameWithoutExtension stringByAppendingPathExtension:@"txt"];
-    NSString *dataPath = [userDataFolderPath() stringByAppendingPathComponent:filename];
-    bool result = lm.open([dataPath UTF8String]);
-    if (!result) {
-        NSLog(@"Failed opening language model: %@", dataPath);
-    }
-}
-
 void LTLoadLanguageModel()
 {
     LTLoadLanguageModelFile(@"data", gLanguageModel);
     LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+}
+
+void LTLoadUserLanguageModelFile()
+{
+    gUserPhraseLanguageModel.close();
+    gUserPhraseLanguageModel.open([userPhrasesDataPath() UTF8String]);
 }
