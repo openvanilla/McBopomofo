@@ -47,7 +47,7 @@
 
     // language model
     Formosa::Gramambular::FastLM *_languageModel;
-    Formosa::Gramambular::FastLM *_userPhrases;
+    Formosa::Gramambular::FastLM *_userPhrasesModel;
 
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;

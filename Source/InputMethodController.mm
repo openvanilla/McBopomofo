@@ -116,6 +116,10 @@ FastLM gLanguageModel;
 FastLM gLanguageModelPlainBopomofo;
 FastLM gUserPhraseLanguageModel;
 
+static const int kUserOverrideModelCapacity = 500;
+static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
+McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+
 static NSString *userDataFolderPath()
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
@@ -128,12 +132,6 @@ static NSString *userPhrasesDataPath()
 {
     return [userDataFolderPath() stringByAppendingPathComponent:@"data.txt"];
 }
-
-
-
-static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
-McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
@@ -206,7 +204,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         // create the lattice builder
         _languageModel = &gLanguageModel;
-        _builder = new BlockReadingBuilder(_languageModel);
+        _userPhrasesModel = &gUserPhraseLanguageModel;
+        _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
         _uom = &gUserOverrideModel;
 
         // each Mandarin syllable is separated by a hyphen
@@ -338,14 +337,17 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 {
     NSString *newInputMode;
     Formosa::Gramambular::FastLM *newLanguageModel;
+    Formosa::Gramambular::FastLM *userPhraseModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
         newInputMode = kPlainBopomofoModeIdentifier;
         newLanguageModel = &gLanguageModelPlainBopomofo;
+        userPhraseModel = NULL;
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = &gLanguageModel;
+        userPhraseModel = &gUserPhraseLanguageModel;
     }
 
     // Only apply the changes if the value is changed
@@ -361,6 +363,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
+        _userPhrasesModel = userPhraseModel;
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
@@ -373,7 +376,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel);
+            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
             _builder->setJoinSeparator("-");
         }
     }
