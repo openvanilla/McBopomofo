@@ -236,8 +236,10 @@ namespace Formosa {
                             unigrams.insert(unigrams.end(), globalUnigrams.begin(), globalUnigrams.end());
                         }
 
-                        Node n(combinedReading, unigrams, vector<Bigram>());
-                        m_grid.insertNode(n, p, q);
+                        if (unigrams.size() > 0) {
+                            Node n(combinedReading, unigrams, vector<Bigram>());
+                            m_grid.insertNode(n, p, q);
+                        }
                     }
                 }
             }
