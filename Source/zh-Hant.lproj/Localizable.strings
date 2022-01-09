@@ -50,3 +50,8 @@
 "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "目前使用的小麥注音版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往小麥注音網站下載新版來安裝？%5$@";
 
 "Chinese Conversion" = "輸出簡體中文";
+
+"Edit User Phrases" = "編輯使用者詞彙";
+
+"Reload User Phrases" = "重新載入使用者詞彙";
+
