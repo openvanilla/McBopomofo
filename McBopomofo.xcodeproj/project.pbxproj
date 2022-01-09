@@ -45,11 +45,11 @@
 		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
 		6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */; };
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
+		6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */; };
 		6AFF97F2253B299E007F1C49 /* OVNonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */; };
 		6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
-		6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -159,37 +159,7 @@
 		6A225A212367A1D700F685C6 /* ArchiveUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveUtil.h; sourceTree = "<group>"; };
 		6A225A222367A1D700F685C6 /* ArchiveUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArchiveUtil.m; sourceTree = "<group>"; };
 		6A2E40F5253A69DA00D1AE1D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		6A38BBDE15FC117A00A8A51F /* 4_in_5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_5.txt; sourceTree = "<group>"; };
-		6A38BBDF15FC117A00A8A51F /* 4_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 4_in_6.txt; sourceTree = "<group>"; };
-		6A38BBE015FC117A00A8A51F /* 5_in_6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 5_in_6.txt; sourceTree = "<group>"; };
-		6A38BBE215FC117A00A8A51F /* BIG5toUTF8.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = BIG5toUTF8.pl; sourceTree = "<group>"; };
-		6A38BBE315FC117A00A8A51F /* build4wlist.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build4wlist.bash; sourceTree = "<group>"; };
-		6A38BBE415FC117A00A8A51F /* buildFreq.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = buildFreq.bash; sourceTree = "<group>"; };
-		6A38BBE515FC117A00A8A51F /* cook.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = cook.py; sourceTree = "<group>"; };
-		6A38BBE615FC117A00A8A51F /* cook.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = cook.rb; sourceTree = "<group>"; };
-		6A38BBE715FC117A00A8A51F /* count.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = count.bash; sourceTree = "<group>"; };
-		6A38BBE815FC117A00A8A51F /* count.occurrence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = count.occurrence.c; sourceTree = "<group>"; };
-		6A38BBE915FC117A00A8A51F /* count.occurrence.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = count.occurrence.pl; sourceTree = "<group>"; };
-		6A38BBEA15FC117A00A8A51F /* count.occurrence.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = count.occurrence.py; sourceTree = "<group>"; };
-		6A38BBEB15FC117A00A8A51F /* countphrase.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = countphrase.bash; sourceTree = "<group>"; };
-		6A38BBEC15FC117A00A8A51F /* filter.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = filter.bash; sourceTree = "<group>"; };
-		6A38BBED15FC117A00A8A51F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		6A38BBEE15FC117A00A8A51F /* randomShuffle.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = randomShuffle.bash; sourceTree = "<group>"; };
-		6A38BBEF15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		6A38BBF015FC117A00A8A51F /* typocorrection.bash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = typocorrection.bash; sourceTree = "<group>"; };
-		6A38BBF115FC117A00A8A51F /* utf8length.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = utf8length.pl; sourceTree = "<group>"; };
-		6A38BBF215FC117A00A8A51F /* blacklist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = blacklist.txt; sourceTree = "<group>"; };
-		6A38BBF315FC117A00A8A51F /* BPMFBase.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BPMFBase.txt; sourceTree = "<group>"; };
-		6A38BBF415FC117A00A8A51F /* BPMFMappings.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BPMFMappings.txt; sourceTree = "<group>"; };
-		6A38BBF515FC117A00A8A51F /* BPMFPunctuations.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BPMFPunctuations.txt; sourceTree = "<group>"; };
 		6A38BBF615FC117A00A8A51F /* data.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.txt; sourceTree = "<group>"; };
-		6A38BBF715FC117A00A8A51F /* heterophony1.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = heterophony1.list; sourceTree = "<group>"; };
-		6A38BBF815FC117A00A8A51F /* heterophony2.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = heterophony2.list; sourceTree = "<group>"; };
-		6A38BBF915FC117A00A8A51F /* heterophony3.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = heterophony3.list; sourceTree = "<group>"; };
-		6A38BBFA15FC117A00A8A51F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		6A38BBFB15FC117A00A8A51F /* phrase.occ */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = phrase.occ; sourceTree = "<group>"; };
-		6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PhraseFreq.txt; sourceTree = "<group>"; };
-		6A38BBFD15FC117A00A8A51F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = InputMethodKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/InputMethodKit.framework; sourceTree = DEVELOPER_DIR; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41E815FC1D9000935EF6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Installer/AppDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -207,13 +177,13 @@
 		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlainBopomofo.tiff; sourceTree = "<group>"; };
 		6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "PlainBopomofo@2x.tiff"; sourceTree = "<group>"; };
+		6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
+		6AE30A481F7F40B7008735BD /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVNonModalAlertWindowController.h; sourceTree = "<group>"; };
 		6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OVNonModalAlertWindowController.xib; sourceTree = "<group>"; };
 		6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVNonModalAlertWindowController.m; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
-		6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
-		6AE30A481F7F40B7008735BD /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -289,8 +259,6 @@
 				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
 				D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */,
-				6A0D4ECD15FC0D6400ABF4B3 /* UpdateNotificationController.h */,
-				6A0D4ECE15FC0D6400ABF4B3 /* UpdateNotificationController.m */,
 				6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */,
 				6AE30A481F7F40B7008735BD /* UserOverrideModel.h */,
 			);
@@ -423,48 +391,10 @@
 		6A38BBDD15FC115800A8A51F /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				6A38BBE115FC117A00A8A51F /* bin */,
-				6A38BBDE15FC117A00A8A51F /* 4_in_5.txt */,
-				6A38BBDF15FC117A00A8A51F /* 4_in_6.txt */,
-				6A38BBE015FC117A00A8A51F /* 5_in_6.txt */,
-				6A38BBF215FC117A00A8A51F /* blacklist.txt */,
-				6A38BBF315FC117A00A8A51F /* BPMFBase.txt */,
-				6A38BBF415FC117A00A8A51F /* BPMFMappings.txt */,
-				6A38BBF515FC117A00A8A51F /* BPMFPunctuations.txt */,
 				6A38BBF615FC117A00A8A51F /* data.txt */,
 				6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */,
-				6A38BBF715FC117A00A8A51F /* heterophony1.list */,
-				6A38BBF815FC117A00A8A51F /* heterophony2.list */,
-				6A38BBF915FC117A00A8A51F /* heterophony3.list */,
-				6A38BBFA15FC117A00A8A51F /* Makefile */,
-				6A38BBFB15FC117A00A8A51F /* phrase.occ */,
-				6A38BBFC15FC117A00A8A51F /* PhraseFreq.txt */,
-				6A38BBFD15FC117A00A8A51F /* README */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		6A38BBE115FC117A00A8A51F /* bin */ = {
-			isa = PBXGroup;
-			children = (
-				6A38BBE215FC117A00A8A51F /* BIG5toUTF8.pl */,
-				6A38BBE315FC117A00A8A51F /* build4wlist.bash */,
-				6A38BBE415FC117A00A8A51F /* buildFreq.bash */,
-				6A38BBE515FC117A00A8A51F /* cook.py */,
-				6A38BBE615FC117A00A8A51F /* cook.rb */,
-				6A38BBE715FC117A00A8A51F /* count.bash */,
-				6A38BBE815FC117A00A8A51F /* count.occurrence.c */,
-				6A38BBE915FC117A00A8A51F /* count.occurrence.pl */,
-				6A38BBEA15FC117A00A8A51F /* count.occurrence.py */,
-				6A38BBEB15FC117A00A8A51F /* countphrase.bash */,
-				6A38BBEC15FC117A00A8A51F /* filter.bash */,
-				6A38BBED15FC117A00A8A51F /* Makefile */,
-				6A38BBEE15FC117A00A8A51F /* randomShuffle.bash */,
-				6A38BBEF15FC117A00A8A51F /* README */,
-				6A38BBF015FC117A00A8A51F /* typocorrection.bash */,
-				6A38BBF115FC117A00A8A51F /* utf8length.pl */,
-			);
-			path = bin;
 			sourceTree = "<group>";
 		};
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
