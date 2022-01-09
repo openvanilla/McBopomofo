@@ -221,16 +221,22 @@ namespace Formosa {
             for (size_t p = begin ; p < end ; p++) {
                 for (size_t q = 1 ; q <= MaximumBuildSpanLength && p+q <= end ; q++) {
                     string combinedReading = Join(m_readings.begin() + p, m_readings.begin() + p + q, m_joinSeparator);
-                    if (m_UserPhraseLM != NULL) {
-                        if (m_UserPhraseLM->hasUnigramsForKey(combinedReading) && !m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
-                            Node n(combinedReading, m_UserPhraseLM->unigramsForKeys(combinedReading), vector<Bigram>());
-                            m_grid.insertNode(n, p, q);
-                            continue;
+                    if (!m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
+                        vector<Unigram> unigrams;
+
+                        if (m_UserPhraseLM != NULL) {
+                            if (m_UserPhraseLM->hasUnigramsForKey(combinedReading)) {
+                                vector<Unigram> userUnigrams = m_UserPhraseLM->unigramsForKeys(combinedReading);
+                                unigrams.insert(unigrams.end(), userUnigrams.begin(), userUnigrams.end());
+                            }
                         }
-                    }
-                    
-                    if (m_LM->hasUnigramsForKey(combinedReading) && !m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
-                        Node n(combinedReading, m_LM->unigramsForKeys(combinedReading), vector<Bigram>());                        
+
+                        if (m_LM->hasUnigramsForKey(combinedReading)) {
+                            vector<Unigram> globalUnigrams = m_LM->unigramsForKeys(combinedReading);
+                            unigrams.insert(unigrams.end(), globalUnigrams.begin(), globalUnigrams.end());
+                        }
+
+                        Node n(combinedReading, unigrams, vector<Bigram>());
                         m_grid.insertNode(n, p, q);
                     }
                 }
