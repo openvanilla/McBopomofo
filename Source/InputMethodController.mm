@@ -474,6 +474,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
     if (_bpmfReadingBuffer->isEmpty() && _builder->markerCursorIndex() != SIZE_MAX) {
+        // if there is a marked range, we need to tear the string into three parts.
         NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:composedText];
         size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
         size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
@@ -489,11 +490,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
             NSMarkedClauseSegmentAttributeName: @2
         } range:NSMakeRange(end, [composedText length] - end)];
-        NSLog(@"marked %@", [self _currentMarkedText]);
-        NSLog(@"attrString %@", attrString);
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange((NSInteger)_builder->markerCursorIndex(), 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = (NSInteger)_builder->markerCursorIndex();
-
     } else {
         // we must use NSAttributedString so that the cursor is visible --
         // can't just use NSString
@@ -620,6 +620,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
     size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+    // A phrase should contian at least two characters.
     if (end - begin < 2) {
         return @"";
     }
@@ -634,8 +635,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
-    NSString *joined = [readingsArray componentsJoinedByString:@"-"];
-    [string appendString:joined];
+    [string appendString:[readingsArray componentsJoinedByString:@"-"]];
     [string appendString:@" "];
     [string appendString:@"-1.0"];
     return string;
@@ -650,21 +650,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     NSString *path = userPhrasesDataPath();
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
-        if (result) {
-            NSLog(@"user phrases file is creates");
-        }
-        else {
-            NSLog(@"failed to create user phrases file");
+        if (!result) {
             return NO;
         }
     }
 
-    NSLog(@"About to write %@ into %@", currentMarkedPhrase, path);
     currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
     NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-    NSLog(@"file %@", file);
     if (!file) {
-        NSLog(@"Failed to write to %@", path);
         return NO;
     }
     [file seekToEndOfFile];
@@ -932,6 +925,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             }
 
             if (flags & NSShiftKeyMask) {
+                // Shift + left
                 if (_builder->cursorIndex() > 0) {
                     _builder->setMarkerCursorIndex(_builder->cursorIndex() - 1);
                 }
@@ -963,6 +957,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             }
 
             if (flags & NSShiftKeyMask) {
+                // Shift + Right
                 if (_builder->cursorIndex() < _builder->length()) {
                     _builder->setMarkerCursorIndex(_builder->cursorIndex() + 1);
                 } else {
@@ -1551,7 +1546,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (void)openUserPhrases:(id)sender
 {
     NSString *path = userPhrasesDataPath();
-    NSLog(@"path: %@", path);
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
     }
@@ -1631,5 +1625,8 @@ void LTLoadLanguageModel()
 void LTLoadUserLanguageModelFile()
 {
     gUserPhraseLanguageModel.close();
-    gUserPhraseLanguageModel.open([userPhrasesDataPath() UTF8String]);
+    bool result = gUserPhraseLanguageModel.open([userPhrasesDataPath() UTF8String]);
+    if (!result) {
+        NSLog(@"Failed opening language model for user phrases.");
+    }
 }
