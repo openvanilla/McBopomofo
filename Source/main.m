@@ -33,7 +33,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "OVInputSourceHelper.h"
+#import <InputMethodKit/InputMethodKit.h>
+#import "McBopomofo-Swift.h"
 
 static NSString *const kConnectionName = @"McBopomofo_1_Connection";
 
@@ -54,20 +55,20 @@ int main(int argc, char *argv[])
             bundleURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
         }
 
-        TISInputSourceRef inputSource = [OVInputSourceHelper inputSourceForInputSourceID:bundleID];
+        TISInputSourceRef inputSource = [InputSourceHelper inputSourceForInputSourceID:bundleID];
 
         // if this IME name is not found in the list of available IMEs
         if (!inputSource) {
             NSLog(@"Registering input source %@ at %@.", bundleID, [bundleURL absoluteString]);
             // then register
-            BOOL status = [OVInputSourceHelper registerInputSource:bundleURL];
+            BOOL status = [InputSourceHelper registerInputSource:bundleURL];
 
             if (!status) {
                 NSLog(@"Fatal error: Cannot register input source %@ at %@.", bundleID, [bundleURL absoluteString]);
                 return -1;
             }
 
-            inputSource = [OVInputSourceHelper inputSourceForInputSourceID:bundleID];
+            inputSource = [InputSourceHelper inputSourceForInputSourceID:bundleID];
             // if it still doesn't register successfully, bail.
             if (!inputSource) {
                 NSLog(@"Fatal error: Cannot find input source %@ after registration.", bundleID);
@@ -76,22 +77,22 @@ int main(int argc, char *argv[])
         }
 
         // if it's not enabled, just enabled it
-        if (inputSource && ![OVInputSourceHelper inputSourceEnabled:inputSource]) {
+        if (inputSource && ![InputSourceHelper inputSourceEnabled:inputSource]) {
             NSLog(@"Enabling input source %@ at %@.", bundleID, [bundleURL absoluteString]);
-            BOOL status = [OVInputSourceHelper enableInputSource:inputSource];
+            BOOL status = [InputSourceHelper enableInputSource:inputSource];
 
             if (!status) {
                 NSLog(@"Fatal error: Cannot enable input source %@.", bundleID);
                 return -1;
             }
-            if (![OVInputSourceHelper inputSourceEnabled:inputSource]){
+            if (![InputSourceHelper inputSourceEnabled:inputSource]){
                 NSLog(@"Fatal error: Cannot enable input source %@.", bundleID);
                 return -1;
             }
         }
 
         if (argc > 2 && !strcmp(argv[2], "--all")) {
-            BOOL enabled = [OVInputSourceHelper enableAllInputModesForInputSourceBundleID:bundleID];
+            BOOL enabled = [InputSourceHelper enableAllInputModesForInputSourceBundleID:bundleID];
             if (enabled) {
                 NSLog(@"All input sources enabled for %@", bundleID);
             }

@@ -12,7 +12,6 @@
 		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
-		6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */; };
 		6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */; };
 		6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDC15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m */; };
 		6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDE15FC0DA600ABF4B3 /* VTHorizontalCandidateView.m */; };
@@ -32,7 +31,6 @@
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A38BC1515FC117A00A8A51F /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
 		6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A38BC2715FC158A00A8A51F /* InputMethodKit.framework */; };
-		6AB3620D274CA50700AC7547 /* OVInputSourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */; };
 		6ACA41CD15FC1D7500935EF6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
 		6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41E915FC1D9000935EF6 /* AppDelegate.m */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
@@ -49,6 +47,8 @@
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
+		D47F7DD5278C25A0002F9DD7 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */; };
+		D47F7DD6278C3075002F9DD7 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
 /* End PBXBuildFile section */
 
@@ -81,8 +81,6 @@
 		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMethodController.h; sourceTree = "<group>"; };
 		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputMethodController.mm; sourceTree = "<group>"; };
 		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVInputSourceHelper.h; sourceTree = "<group>"; };
-		6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVInputSourceHelper.m; sourceTree = "<group>"; };
 		6A0D4ED915FC0DA600ABF4B3 /* VTCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTCandidateController.h; sourceTree = "<group>"; };
 		6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTCandidateController.m; sourceTree = "<group>"; };
 		6A0D4EDB15FC0DA600ABF4B3 /* VTHorizontalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateController.h; sourceTree = "<group>"; };
@@ -182,6 +180,7 @@
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
+		D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -249,8 +248,7 @@
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
-				6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */,
-				6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */,
+				D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */,
 				D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */,
 				D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
@@ -573,7 +571,7 @@
 				6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
-				6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */,
+				D47F7DD5278C25A0002F9DD7 /* InputSourceHelper.swift in Sources */,
 				6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */,
 				6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
@@ -595,8 +593,8 @@
 			files = (
 				6ACA41F915FC1D9000935EF6 /* AppDelegate.m in Sources */,
 				6A225A232367A1D700F685C6 /* ArchiveUtil.m in Sources */,
-				6AB3620D274CA50700AC7547 /* OVInputSourceHelper.m in Sources */,
 				6ACA41FF15FC1D9000935EF6 /* main.m in Sources */,
+				D47F7DD6278C3075002F9DD7 /* InputSourceHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -981,6 +979,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1013,6 +1012,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openvanilla.McBopomofo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

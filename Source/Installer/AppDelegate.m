@@ -27,7 +27,7 @@
 
 #import "AppDelegate.h"
 #import <sys/mount.h>
-#import "OVInputSourceHelper.h"
+#import "McBopomofoInstaller-Swift.h"
 
 static NSString *const kTargetBin = @"McBopomofo";
 static NSString *const kTargetType = @"app";
@@ -182,13 +182,13 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     NSURL *imeBundleURL = imeBundle.bundleURL;
     NSString *imeIdentifier = imeBundle.bundleIdentifier;
     
-    TISInputSourceRef inputSource = [OVInputSourceHelper inputSourceForInputSourceID:imeIdentifier];
+    TISInputSourceRef inputSource = [InputSourceHelper inputSourceForInputSourceID:imeIdentifier];
 
     // if this IME name is not found in the list of available IMEs
     if (!inputSource) {
         NSLog(@"Registering input source %@ at %@.", imeIdentifier, imeBundleURL.absoluteString);
         // then register
-        BOOL status = [OVInputSourceHelper registerInputSource:imeBundleURL];
+        BOOL status = [InputSourceHelper registerInputSource:imeBundleURL];
 
         if (!status) {
             NSString *message = [NSString stringWithFormat:NSLocalizedString(@"Cannot register input source %@ at %@.", nil), imeIdentifier, imeBundleURL.absoluteString];
@@ -197,7 +197,7 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
             return;
         }
 
-        inputSource = [OVInputSourceHelper inputSourceForInputSourceID:imeIdentifier];
+        inputSource = [InputSourceHelper inputSourceForInputSourceID:imeIdentifier];
         // if it still doesn't register successfully, bail.
         if (!inputSource) {
             NSString *message = [NSString stringWithFormat:NSLocalizedString(@"Cannot find input source %@ after registration.", nil), imeIdentifier];
@@ -219,10 +219,10 @@ void RunAlertPanel(NSString *title, NSString *message, NSString *buttonTitle) {
     // as the kTISPropertyInputSourceIsEnabled can still be true even if the IME is *not*
     // enabled in the user's current set of IMEs (which means the IME does not show up in
     // the user's input menu).
-    BOOL mainInputSourceEnabled = [OVInputSourceHelper inputSourceEnabled:inputSource];
+    BOOL mainInputSourceEnabled = [InputSourceHelper inputSourceEnabled:inputSource];
     if (!mainInputSourceEnabled || isMacOS12OrAbove) {
         
-        mainInputSourceEnabled = [OVInputSourceHelper enableInputSource:inputSource];
+        mainInputSourceEnabled = [InputSourceHelper enableInputSource:inputSource];
         if (mainInputSourceEnabled) {
             NSLog(@"Input method enabled: %@", imeIdentifier);
         } else {
