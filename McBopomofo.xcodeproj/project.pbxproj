@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0421A615FEF3F50061ED63 /* FastLM.cpp */; };
 		6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */; };
-		6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */; };
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
@@ -39,6 +38,7 @@
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F769278C9E29004A2160 /* CandidateUI */; };
+		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
@@ -71,8 +71,6 @@
 		6A0D4EA615FC0D2D00ABF4B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6A0D4EA915FC0D2D00ABF4B3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6A0D4EAB15FC0D2D00ABF4B3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMethodController.h; sourceTree = "<group>"; };
 		6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputMethodController.mm; sourceTree = "<group>"; };
 		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -160,6 +158,7 @@
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
 		D427F768278C9D0D004A2160 /* CandidateUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateUI; path = Packages/CandidateUI; sourceTree = "<group>"; };
+		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
@@ -227,11 +226,10 @@
 				6A0D4F1215FC0EB100ABF4B3 /* Engine */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4F4715FC0EB900ABF4B3 /* Resources */,
-				6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */,
-				6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */,
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
+				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
 				D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */,
 				D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */,
 				D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */,
@@ -543,7 +541,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */,
+				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
 				D47F7DD5278C25A0002F9DD7 /* InputSourceHelper.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */,
