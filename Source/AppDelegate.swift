@@ -106,7 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         let request = URLRequest(url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: kTimeoutInterval)
 
         func showNoUpdateAvailableAlert() {
-
+            NonModalAlertWindowController.shared.show(title: NSLocalizedString("Check for Update Completed", comment: ""), content: NSLocalizedString("You are already using the latest version of McBopomofo.", comment: ""), confirmButtonTitle: NSLocalizedString("OK", comment: "") , cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -152,6 +152,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                             showNoUpdateAvailableAlert()
                         }
                     }
+                    return
                 }
 
                 guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
