@@ -1,6 +1,6 @@
 import Cocoa
 
-class HorizontalCandidateView: NSView {
+fileprivate class HorizontalCandidateView: NSView {
     var highlightedIndex: UInt = 0
     var action: Selector?
     weak var target: AnyObject?
@@ -159,6 +159,7 @@ class HorizontalCandidateView: NSView {
     }
 }
 
+@objc(HorizontalCandidateController)
 public class HorizontalCandidateController : CandidateController {
     private var candidateView: HorizontalCandidateView
     private var prevPageButton: NSButton
@@ -295,7 +296,7 @@ public class HorizontalCandidateController : CandidateController {
 
 extension HorizontalCandidateController {
 
-    var pageCount: UInt {
+    private var pageCount: UInt {
         guard let delegate = delegate else {
             return 0
         }
@@ -304,7 +305,7 @@ extension HorizontalCandidateController {
         return totalCount / keyLabelCount + ((totalCount % keyLabelCount) != 0 ? 1 : 0)
     }
 
-    func layoutCandidateView() {
+    private func layoutCandidateView() {
         guard let delegate = delegate else {
             return
         }
@@ -363,7 +364,7 @@ extension HorizontalCandidateController {
         self.candidateView.setNeedsDisplay(candidateView.bounds)
     }
 
-    @objc func pageButtonAction(_ sender: Any) {
+    @objc fileprivate func pageButtonAction(_ sender: Any) {
         guard let sender = sender as? NSButton else {
             return
         }
@@ -374,7 +375,7 @@ extension HorizontalCandidateController {
         }
     }
 
-    @objc func candidateViewMouseDidClick(_ sender: Any) {
+    @objc fileprivate func candidateViewMouseDidClick(_ sender: Any) {
         delegate?.candidateController(self, didSelectCandidateAtIndex: self.selectedCandidateIndex)
     }
 
