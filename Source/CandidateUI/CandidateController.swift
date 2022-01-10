@@ -1,13 +1,13 @@
 import Cocoa
 
-@objc(CandidateControllerDelegate)
+@objc(VTCandidateControllerDelegate)
 public protocol CandidateControllerDelegate: AnyObject {
     func candidateCountForController(_ controller: CandidateController) -> UInt
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt)
 }
 
-@objc(CandidateController)
+@objc(VTCandidateController)
 public class CandidateController: NSWindowController {
     @objc public weak var delegate: CandidateControllerDelegate?
     @objc public var selectedCandidateIndex: UInt = UInt.max
@@ -42,22 +42,33 @@ public class CandidateController: NSWindowController {
     }
 
     @objc public func showNextPage() -> Bool {
-        return false
+        false
     }
 
     @objc public func showPreviousPage() -> Bool {
-        return false
+        false
     }
 
     @objc public func highlightNextCandidate() -> Bool {
-        return false
+        false
     }
 
     @objc public func highlightPreviousCandidate() -> Bool {
-        return false
+        false
     }
 
-    func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height:CGFloat) {
+    @objc public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+        UInt.max
+    }
+
+    @objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
+    func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+            self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
+        }
+    }
+
+    func doSet(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
         var adjustedPoint = windowTopLeftPoint
         var adjustedHeight = height
 
@@ -80,7 +91,7 @@ public class CandidateController: NSWindowController {
         let windowSize = window?.frame.size ?? NSSize.zero
 
         // bottom beneath the screen?
-        if adjustedPoint.y - windowSize.height < screenFrame.maxY {
+        if adjustedPoint.y - windowSize.height < screenFrame.minY {
             adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
         }
 
@@ -91,7 +102,7 @@ public class CandidateController: NSWindowController {
 
         // right
         if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
-            adjustedPoint.x = NSMaxX(screenFrame) - windowSize.width
+            adjustedPoint.x = screenFrame.maxX - windowSize.width
         }
 
         // left

@@ -159,7 +159,7 @@ fileprivate class HorizontalCandidateView: NSView {
     }
 }
 
-@objc(HorizontalCandidateController)
+@objc(VTHorizontalCandidateController)
 public class HorizontalCandidateController : CandidateController {
     private var candidateView: HorizontalCandidateView
     private var prevPageButton: NSButton
@@ -267,7 +267,7 @@ public class HorizontalCandidateController : CandidateController {
         return true
     }
 
-    @objc public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+    public override func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
         guard let delegate = delegate else {
             return UInt.max
         }

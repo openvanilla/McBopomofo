@@ -63,7 +63,7 @@ private let kCandidateTextPaddingWithMandatedTableViewPadding = 18.0
 private let kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0
 
 
-@objc(VerticalCandidateController)
+@objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
     private var keyLabelStripView: VerticalKeyLabelStripView
     private var scrollView: NSScrollView
@@ -94,7 +94,7 @@ public class VerticalCandidateController: CandidateController {
 
         tableView = NSTableView(frame: contentRect)
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "candidate"))
-        column.dataCell = NSTextFieldCell.self
+        column.dataCell = NSTextFieldCell()
         column.isEditable = false
 
         candidateTextPadding = kCandidateTextPadding
@@ -160,7 +160,7 @@ public class VerticalCandidateController: CandidateController {
         moveSelectionByOne(false)
     }
 
-    @objc public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+    public override func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
         guard let delegate = delegate else {
             return UInt.max
         }

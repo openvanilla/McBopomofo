@@ -39,8 +39,6 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
-#import "VTHorizontalCandidateController.h"
-#import "VTVerticalCandidateController.h"
 #import "McBopomofo-Swift.h"
 
 //@import SwiftUI;
@@ -285,9 +283,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
-
-    NSLog(@"menu %@", menu);
-
     return menu;
 }
 
