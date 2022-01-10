@@ -51,6 +51,12 @@
 
 "Chinese Conversion" = "Convert to Simplified Chinese";
 
+"User Phrases" = "User Phrases";
+
 "Edit User Phrases" = "Edit User Phrases";
 
 "Reload User Phrases" = "Reload User Phrases";
+
+"Unable to create the user phrase file." = "Unable to create the user phrase file.";
+
+"Please check the permission of at \"%@\"." = "Please check the permission of at \"%@\".";

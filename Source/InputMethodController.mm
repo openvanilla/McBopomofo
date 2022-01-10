@@ -39,6 +39,7 @@
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
 #import "AppDelegate.h"
+#import "OVNonModalAlertWindowController.h"
 #import "VTHorizontalCandidateController.h"
 #import "VTVerticalCandidateController.h"
 #import "McBopomofo-Swift.h"
@@ -120,7 +121,7 @@ static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
-static NSString *userDataFolderPath()
+static NSString *LTUserDataFolderPath()
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
     NSString *appSupportPath = [paths objectAtIndex:0];
@@ -128,9 +129,43 @@ static NSString *userDataFolderPath()
     return userDictPath;
 }
 
-static NSString *userPhrasesDataPath()
+static NSString *LTUserPhrasesDataPath()
 {
-    return [userDataFolderPath() stringByAppendingPathComponent:@"data.txt"];
+    return [LTUserDataFolderPath() stringByAppendingPathComponent:@"data.txt"];
+}
+
+static BOOL LTCheckIfUserLanguageModelFileExists() {
+
+    NSString *folderPath = LTUserDataFolderPath();
+    BOOL isFolder = NO;
+    BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
+    if (folderExist && !isFolder) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] removeItemAtPath:folderPath error:&error];
+        if (error) {
+            NSLog(@"Failed to remove folder %@", error);
+            return NO;
+        }
+        folderExist = NO;
+    }
+    if (!folderExist) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:&error];
+        if (error) {
+            NSLog(@"Failed to create folder %@", error);
+            return NO;
+        }
+    }
+
+    NSString *filePath = LTUserPhrasesDataPath();
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
+        if (!result) {
+            NSLog(@"Failed to write file");
+            return NO;
+        }
+    }
+    return YES;
 }
 
 // https://clang-analyzer.llvm.org/faq.html
@@ -234,11 +269,16 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [menu addItem:chineseConversionMenuItem];
 
     if (_inputMode != kPlainBopomofoModeIdentifier) {
-        NSMenuItem *editUserPhraseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-        [menu addItem:editUserPhraseItem];
+        [menu addItem:[NSMenuItem separatorItem]];
+        [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
+        NSMenuItem *editUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+        [editUserPheaseItem setIndentationLevel:2];
+        [menu addItem:editUserPheaseItem];
 
-        NSMenuItem *reloadUserPhraseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-        [menu addItem:reloadUserPhraseItem];
+        NSMenuItem *reloadUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+        [reloadUserPheaseItem setIndentationLevel:2];
+        [menu addItem:reloadUserPheaseItem];
+        [menu addItem:[NSMenuItem separatorItem]];
     }
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
@@ -246,6 +286,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     [menu addItem:aboutMenuItem];
+
+    NSLog(@"menu %@", menu);
 
     return menu;
 }
@@ -643,19 +685,18 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (BOOL)_writeUserPhrase
 {
+    if (!LTCheckIfUserLanguageModelFileExists()) {
+        return NO;
+    }
+
     NSString *currentMarkedPhrase = [self _currentMarkedText];
     if (![currentMarkedPhrase length]) {
         return NO;
     }
-    NSString *path = userPhrasesDataPath();
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
-        if (!result) {
-            return NO;
-        }
-    }
 
     currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
+
+    NSString *path = LTUserPhrasesDataPath();
     NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
     if (!file) {
         return NO;
@@ -1545,7 +1586,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)openUserPhrases:(id)sender
 {
-    NSString *path = userPhrasesDataPath();
+    NSLog(@"openUserPhrases called");
+    if (!LTCheckIfUserLanguageModelFileExists()) {
+        NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), LTUserDataFolderPath()];
+        [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+        return;
+    }
+
+    NSString *path = LTUserPhrasesDataPath();
+    NSLog(@"Open %@", path);
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
     }
@@ -1555,6 +1604,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)reloadUserPhrases:(id)sender
 {
+    NSLog(@"reloadUserPhrases called");
     LTLoadUserLanguageModelFile();
 }
 
@@ -1606,7 +1656,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 @end
 
-
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
 {
     NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
@@ -1622,10 +1671,11 @@ void LTLoadLanguageModel()
     LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
 }
 
+
 void LTLoadUserLanguageModelFile()
 {
     gUserPhraseLanguageModel.close();
-    bool result = gUserPhraseLanguageModel.open([userPhrasesDataPath() UTF8String]);
+    bool result = gUserPhraseLanguageModel.open([LTUserPhrasesDataPath() UTF8String]);
     if (!result) {
         NSLog(@"Failed opening language model for user phrases.");
     }

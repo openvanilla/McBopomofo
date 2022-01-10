@@ -51,7 +51,12 @@
 
 "Chinese Conversion" = "輸出簡體中文";
 
+"User Phrases" = "使用者詞彙";
+
 "Edit User Phrases" = "編輯使用者詞彙";
 
 "Reload User Phrases" = "重新載入使用者詞彙";
 
+"Unable to create the user phrase file." = "無法建立使用者詞彙檔案";
+
+"Please check the permission of at \"%@\"." = "請檢查以下路徑的寫入權限 \"%@\"。";
