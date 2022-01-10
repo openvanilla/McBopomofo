@@ -34,10 +34,10 @@ fileprivate class VerticalKeyLabelStripView: NSView {
             .paragraphStyle: paraStyle]
         for index in 0..<count {
             let textRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight + labelOffsetY, width: bounds.size.width, height: cellHeight - labelOffsetY)
-            var cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight - 1);
+            var cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight - 1)
 
             if index + 1 >= count {
-                cellRect.size.height += 1.0;
+                cellRect.size.height += 1.0
             }
 
             (index == highlightedIndex ? darkGray : lightGray).setFill()
@@ -51,14 +51,14 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 fileprivate class VerticalCandidateTableView: NSTableView {
     override func adjustScroll(_ newVisible: NSRect) -> NSRect {
         var scrollRect = newVisible
-        let rowHeightPlusSpacing = rowHeight + intercellSpacing.height;
-        scrollRect.origin.y = (scrollRect.origin.y / rowHeightPlusSpacing) * rowHeightPlusSpacing;
+        let rowHeightPlusSpacing = rowHeight + intercellSpacing.height
+        scrollRect.origin.y = (scrollRect.origin.y / rowHeightPlusSpacing) * rowHeightPlusSpacing
         return scrollRect
     }
 }
 
-private let kCandidateTextPadding = 24.0;
-private let kCandidateTextLeftMargin = 8.0;
+private let kCandidateTextPadding = 24.0
+private let kCandidateTextLeftMargin = 8.0
 private let kCandidateTextPaddingWithMandatedTableViewPadding = 18.0
 private let kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0
 
@@ -167,9 +167,9 @@ public class VerticalCandidateController: CandidateController {
 
         let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
         if firstVisibleRow != -1 {
-            let result = UInt(firstVisibleRow) + index;
+            let result = UInt(firstVisibleRow) + index
             if result < delegate.candidateCountForController(self) {
-                return result;
+                return result
             }
         }
 
@@ -239,7 +239,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
 
         // expand the window width if text overflows
         let boundingRect = attrString.boundingRect(with: NSSize(width: 10240.0, height: 10240.0) , options: .usesLineFragmentOrigin)
-        let textWidth = boundingRect.size.width + candidateTextPadding;
+        let textWidth = boundingRect.size.width + candidateTextPadding
         if textWidth > maxCandidateAttrStringWidth {
             maxCandidateAttrStringWidth = textWidth
             layoutCandidateView()
@@ -254,17 +254,17 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
 
             if keyLabelStripView.highlightedIndex != -1 &&
                 (row >= selectedRow + Int(count) || (selectedRow > count && row <= selectedRow - Int(count))) {
-                newHilightIndex = -1;
+                newHilightIndex = -1
             } else {
                 let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
-                newHilightIndex = selectedRow - firstVisibleRow;
+                newHilightIndex = selectedRow - firstVisibleRow
                 if newHilightIndex < -1 {
                     newHilightIndex = -1
                 }
             }
 
             if newHilightIndex != keyLabelStripView.highlightedIndex && newHilightIndex >= 0 {
-                keyLabelStripView.highlightedIndex = UInt(newHilightIndex);
+                keyLabelStripView.highlightedIndex = UInt(newHilightIndex)
                 keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
             }
 
@@ -277,7 +277,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         if selectedRow != -1 {
             // keep track of the highlighted index in the key label strip
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
-            keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow);
+            keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
 
             // fix a subtle OS X "bug" that, since we force the scroller to appear,
@@ -413,8 +413,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         var frameRect = self.window?.frame ?? NSRect.zero
         let topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
 
-        frameRect.size = NSMakeSize(windowWidth, windowHeight);
-        frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height);
+        frameRect.size = NSMakeSize(windowWidth, windowHeight)
+        frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
 
         keyLabelStripView.frame = NSRect(x: 0.0, y: 0.0, width: stripWidth, height: windowHeight)
         scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0.0, width: tableViewStartWidth, height: windowHeight)

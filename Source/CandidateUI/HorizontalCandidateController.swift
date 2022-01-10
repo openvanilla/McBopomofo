@@ -26,7 +26,6 @@ fileprivate class HorizontalCandidateView: NSView {
             result.width = elementWidths.reduce(0, +)
             result.width += CGFloat(elementWidths.count)
             result.height = keyLabelHeight + candidateTextHeight + 1.0
-
         }
         return result
     }
@@ -41,8 +40,8 @@ fileprivate class HorizontalCandidateView: NSView {
         let baseSize = NSSize(width: 10240.0, height: 10240.0)
         for index in 0..<count {
             let labelRect = (keyLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
-            let candidateRect = (displayedCandidates[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
-            let cellWidth = max(labelRect.size.width, candidateRect.size.width)
+            let candidateRect = (displayedCandidates[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict)
+            let cellWidth = max(labelRect.size.width, candidateRect.size.width) + cellPadding;
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
@@ -90,8 +89,8 @@ fileprivate class HorizontalCandidateView: NSView {
         var accuWidth: CGFloat = 0
         for index in 0..<elementWidths.count {
             let currentWidth = elementWidths[index]
-            let labelRect = NSRect(x: accuWidth, y: 0.0, width: currentWidth, height: keyLabelHeight);
-            let candidateRect = NSRect(x: accuWidth, y: keyLabelHeight + 1.0, width: currentWidth, height: candidateTextHeight);
+            let labelRect = NSRect(x: accuWidth, y: 0.0, width: currentWidth, height: keyLabelHeight)
+            let candidateRect = NSRect(x: accuWidth, y: keyLabelHeight + 1.0, width: currentWidth, height: candidateTextHeight)
             (index == highlightedIndex ? darkGray : lightGray).setFill()
             NSBezierPath.fill(labelRect)
             (keyLabels[index] as NSString).draw(in: labelRect, withAttributes: keyLabelAttrDict)
@@ -146,7 +145,7 @@ fileprivate class HorizontalCandidateView: NSView {
         if newIndex == highlightedIndex {
             triggerAction = true
         } else {
-            highlightedIndex = trackingHighlightedIndex;
+            highlightedIndex = trackingHighlightedIndex
         }
 
         trackingHighlightedIndex = 0
@@ -170,6 +169,8 @@ public class HorizontalCandidateController : CandidateController {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
         let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
+        panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel))
+        panel.hasShadow = true
 
         contentRect.origin = NSPoint.zero
         candidateView = HorizontalCandidateView(frame: contentRect)
@@ -177,7 +178,14 @@ public class HorizontalCandidateController : CandidateController {
 
         contentRect.size = NSSize(width: 36.0, height: 20.0)
         nextPageButton = NSButton(frame: contentRect)
+        nextPageButton.setButtonType(.momentaryLight)
+        nextPageButton.bezelStyle = .smallSquare
+        nextPageButton.title = "»"
+
         prevPageButton = NSButton(frame: contentRect)
+        prevPageButton.setButtonType(.momentaryLight)
+        prevPageButton.bezelStyle = .smallSquare
+        prevPageButton.title = "«"
 
         panel.contentView?.addSubview(nextPageButton)
         panel.contentView?.addSubview(prevPageButton)
@@ -187,15 +195,9 @@ public class HorizontalCandidateController : CandidateController {
         candidateView.target = self
         candidateView.action = #selector(candidateViewMouseDidClick(_:))
 
-        nextPageButton.setButtonType(.momentaryLight)
-        nextPageButton.bezelStyle = .smallSquare
-        nextPageButton.title = "»"
         nextPageButton.target = self
         nextPageButton.action = #selector(pageButtonAction(_:))
 
-        prevPageButton.setButtonType(.momentaryLight)
-        prevPageButton.bezelStyle = .smallSquare
-        prevPageButton.title = "«"
         prevPageButton.target = self
         prevPageButton.action = #selector(pageButtonAction(_:))
     }
@@ -215,14 +217,14 @@ public class HorizontalCandidateController : CandidateController {
             return false
         }
 
-        if currentPage + 1 >= self.pageCount {
+        if currentPage + 1 >= pageCount {
             return false
         }
 
         currentPage += 1
         candidateView.highlightedIndex = 0
-        layoutCandidateView();
-        return true;
+        layoutCandidateView()
+        return true
     }
 
     public override func showPreviousPage() -> Bool {
@@ -236,8 +238,8 @@ public class HorizontalCandidateController : CandidateController {
 
         currentPage -= 1
         candidateView.highlightedIndex = 0
-        layoutCandidateView();
-        return true;
+        layoutCandidateView()
+        return true
     }
 
     public override func highlightNextCandidate() -> Bool {
@@ -247,10 +249,10 @@ public class HorizontalCandidateController : CandidateController {
 
         let currentIndex = selectedCandidateIndex
         if currentIndex + 1 >= delegate.candidateCountForController(self) {
-            return false;
+            return false
         }
         selectedCandidateIndex = currentIndex + 1
-        return true;
+        return true
     }
 
     public override func highlightPreviousCandidate() -> Bool {
@@ -258,7 +260,7 @@ public class HorizontalCandidateController : CandidateController {
             return false
         }
 
-        let currentIndex = self.selectedCandidateIndex;
+        let currentIndex = selectedCandidateIndex
         if currentIndex == 0 {
             return false
         }
@@ -272,8 +274,8 @@ public class HorizontalCandidateController : CandidateController {
             return UInt.max
         }
 
-        let result = currentPage * UInt(keyLabels.count) + index;
-        return result < delegate.candidateCountForController(self) ? result : UInt.max;
+        let result = currentPage * UInt(keyLabels.count) + index
+        return result < delegate.candidateCountForController(self) ? result : UInt.max
     }
 
     @objc public override var selectedCandidateIndex: UInt {
@@ -286,8 +288,8 @@ public class HorizontalCandidateController : CandidateController {
             }
             let keyLabelCount = UInt(keyLabels.count)
             if newValue < delegate.candidateCountForController(self) {
-                currentPage = newValue / keyLabelCount;
-                candidateView.highlightedIndex = newValue % keyLabelCount;
+                currentPage = newValue / keyLabelCount
+                candidateView.highlightedIndex = newValue % keyLabelCount
                 layoutCandidateView()
             }
         }
@@ -357,7 +359,7 @@ extension HorizontalCandidateController {
 
         frameRect = window?.frame ?? NSRect.zero
 
-        let  topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
+        let topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
         frameRect.size = newSize
         frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
         self.window?.setFrame(frameRect, display: false)
@@ -380,4 +382,3 @@ extension HorizontalCandidateController {
     }
 
 }
-
