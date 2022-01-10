@@ -13,7 +13,6 @@
 		6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */; };
 		6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EC815FC0D6400ABF4B3 /* main.m */; };
 		6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */; };
-		6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */; };
 		6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */; };
 		6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDC15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m */; };
 		6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4EDE15FC0DA600ABF4B3 /* VTHorizontalCandidateView.m */; };
@@ -45,10 +44,11 @@
 		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
 		6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */; };
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
-		6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */; };
-		6AFF97F2253B299E007F1C49 /* OVNonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */; };
-		6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */; };
+		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
+		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
+		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
+		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
 /* End PBXBuildFile section */
 
@@ -83,8 +83,6 @@
 		6A0D4EC815FC0D6400ABF4B3 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVInputSourceHelper.h; sourceTree = "<group>"; };
 		6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVInputSourceHelper.m; sourceTree = "<group>"; };
-		6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
-		6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		6A0D4ED915FC0DA600ABF4B3 /* VTCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTCandidateController.h; sourceTree = "<group>"; };
 		6A0D4EDA15FC0DA600ABF4B3 /* VTCandidateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VTCandidateController.m; sourceTree = "<group>"; };
 		6A0D4EDB15FC0DA600ABF4B3 /* VTHorizontalCandidateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTHorizontalCandidateController.h; sourceTree = "<group>"; };
@@ -177,13 +175,13 @@
 		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlainBopomofo.tiff; sourceTree = "<group>"; };
 		6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "PlainBopomofo@2x.tiff"; sourceTree = "<group>"; };
-		6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
-		6AE30A481F7F40B7008735BD /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
-		6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVNonModalAlertWindowController.h; sourceTree = "<group>"; };
-		6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OVNonModalAlertWindowController.xib; sourceTree = "<group>"; };
-		6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OVNonModalAlertWindowController.m; sourceTree = "<group>"; };
+		6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NonModalAlertWindowController.xib; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
+		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
+		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
+		D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,20 +245,16 @@
 				6A0D4F4715FC0EB900ABF4B3 /* Resources */,
 				6A0D4EC315FC0D6400ABF4B3 /* AppDelegate.h */,
 				6A0D4EC415FC0D6400ABF4B3 /* AppDelegate.m */,
+				6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */,
 				6A0D4EC615FC0D6400ABF4B3 /* InputMethodController.h */,
 				6A0D4EC715FC0D6400ABF4B3 /* InputMethodController.mm */,
 				6A0D4EC815FC0D6400ABF4B3 /* main.m */,
-				6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */,
-				6AFF97EF253B299E007F1C49 /* OVNonModalAlertWindowController.h */,
-				6AFF97F1253B299E007F1C49 /* OVNonModalAlertWindowController.m */,
 				6A0D4EC915FC0D6400ABF4B3 /* OVInputSourceHelper.h */,
 				6A0D4ECA15FC0D6400ABF4B3 /* OVInputSourceHelper.m */,
-				6A0D4ECB15FC0D6400ABF4B3 /* PreferencesWindowController.h */,
-				6A0D4ECC15FC0D6400ABF4B3 /* PreferencesWindowController.m */,
+				D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */,
+				D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */,
 				D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */,
 				D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */,
-				6AE30A471F7F40B7008735BD /* UserOverrideModel.cpp */,
-				6AE30A481F7F40B7008735BD /* UserOverrideModel.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -304,6 +298,8 @@
 				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
 				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
 				6A0421A715FEF3F50061ED63 /* FastLM.h */,
+				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
+				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -377,7 +373,7 @@
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6AFF97F0253B299E007F1C49 /* OVNonModalAlertWindowController.xib */,
+				6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */,
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
 				6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */,
 				6A0D4F4815FC0EE100ABF4B3 /* InfoPlist.strings */,
@@ -525,7 +521,7 @@
 				6A0D4F5815FC0EF900ABF4B3 /* Localizable.strings in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
-				6AFF97F2253B299E007F1C49 /* OVNonModalAlertWindowController.xib in Resources */,
+				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
 				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,
@@ -578,16 +574,16 @@
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
 				6A0D4ED415FC0D6400ABF4B3 /* OVInputSourceHelper.m in Sources */,
-				6A0D4ED515FC0D6400ABF4B3 /* PreferencesWindowController.m in Sources */,
 				6A0D4EFE15FC0DA600ABF4B3 /* VTCandidateController.m in Sources */,
 				6A0D4EFF15FC0DA600ABF4B3 /* VTHorizontalCandidateController.m in Sources */,
+				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F0015FC0DA600ABF4B3 /* VTHorizontalCandidateView.m in Sources */,
-				6AFF97F3253B299E007F1C49 /* OVNonModalAlertWindowController.m in Sources */,
 				6A0D4F0115FC0DA600ABF4B3 /* VTVerticalCandidateController.m in Sources */,
-				6AE30A491F7F40B7008735BD /* UserOverrideModel.cpp in Sources */,
 				6A0D4F0215FC0DA600ABF4B3 /* VTVerticalCandidateTableView.m in Sources */,
 				6A0D4F0315FC0DA600ABF4B3 /* VTVerticalKeyLabelStripView.m in Sources */,
+				D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
+				D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 			);

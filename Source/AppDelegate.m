@@ -33,8 +33,7 @@
 //
 
 #import "AppDelegate.h"
-#import "OVNonModalAlertWindowController.h"
-#import "PreferencesWindowController.h"
+#import "McBopomofo-Swift.h"
 
 extern void LTLoadLanguageModel(void);
 extern void LTLoadUserLanguageModelFile(void);
@@ -46,7 +45,7 @@ static NSString *kUpdateInfoSiteKey = @"UpdateInfoSite";
 static const NSTimeInterval kNextCheckInterval = 86400.0;
 static const NSTimeInterval kTimeoutInterval = 60.0;
 
-@interface AppDelegate () <NSURLConnectionDataDelegate, OVNonModalAlertWindowControllerDelegate>
+@interface AppDelegate () <NSURLConnectionDataDelegate, NonModalAlertWindowControllerDelegate>
 @end
 
 @implementation AppDelegate
@@ -152,13 +151,13 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     _currentUpdateCheckIsForced = NO;
 
     if (isForcedCheck) {
-        [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Update Check Failed", nil) content:[NSString stringWithFormat:NSLocalizedString(@"There may be no internet connection or the server failed to respond.\n\nError message: %@", nil), [error localizedDescription]] confirmButtonTitle:NSLocalizedString(@"Dismiss", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+        [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Update Check Failed", nil) content:[NSString stringWithFormat:NSLocalizedString(@"There may be no internet connection or the server failed to respond.\n\nError message: %@", nil), [error localizedDescription]] confirmButtonTitle:NSLocalizedString(@"Dismiss", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
     }
 }
 
 - (void)showNoUpdateAvailableAlert
 {
-    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Check for Update Completed", nil) content:NSLocalizedString(@"You are already using the latest version of McBopomofo.", nil) confirmButtonTitle:NSLocalizedString(@"OK", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
+    [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Check for Update Completed", nil) content:NSLocalizedString(@"You are already using the latest version of McBopomofo.", nil) confirmButtonTitle:NSLocalizedString(@"OK", nil) cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -248,7 +247,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
 
     NSString *content = [NSString stringWithFormat:NSLocalizedString(@"You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", nil), [infoDict objectForKey:@"CFBundleShortVersionString"], currentVersion, [plist objectForKey:@"CFBundleShortVersionString"], remoteVersion, versionDescription];
 
-    [[OVNonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"New Version Available", nil) content:content confirmButtonTitle:NSLocalizedString(@"Visit Website", nil) cancelButtonTitle:NSLocalizedString(@"Not Now", nil) cancelAsDefault:NO delegate:self];
+    [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"New Version Available", nil) content:content confirmButtonTitle:NSLocalizedString(@"Visit Website", nil) cancelButtonTitle:NSLocalizedString(@"Not Now", nil) cancelAsDefault:NO delegate:self];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -256,7 +255,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     [_receivingData appendData:data];
 }
 
-- (void)nonModalAlertWindowControllerDidConfirm:(OVNonModalAlertWindowController *)controller
+- (void)nonModalAlertWindowControllerDidConfirm:(NonModalAlertWindowController *)controller
 {
     if (_updateNextStepURL) {
         [[NSWorkspace sharedWorkspace] openURL:_updateNextStepURL];
@@ -265,7 +264,7 @@ static const NSTimeInterval kTimeoutInterval = 60.0;
     _updateNextStepURL = nil;
 }
 
-- (void)nonModalAlertWindowControllerDidCancel:(OVNonModalAlertWindowController *)controller
+- (void)nonModalAlertWindowControllerDidCancel:(NonModalAlertWindowController *)controller
 {
     _updateNextStepURL = nil;
 }
