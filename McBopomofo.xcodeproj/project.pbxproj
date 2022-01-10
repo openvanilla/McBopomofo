@@ -38,14 +38,12 @@
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
-		D427F75F278C74B7004A2160 /* VerticalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F75E278C74B7004A2160 /* VerticalCandidateController.swift */; };
+		D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F769278C9E29004A2160 /* CandidateUI */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
 		D47F7DD5278C25A0002F9DD7 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */; };
 		D47F7DD6278C3075002F9DD7 /* InputSourceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */; };
-		D47F7DDA278C32CD002F9DD7 /* CandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD9278C32CD002F9DD7 /* CandidateController.swift */; };
-		D47F7DDC278C39EC002F9DD7 /* HorizontalCandidateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DDB278C39EC002F9DD7 /* HorizontalCandidateController.swift */; };
 		D48550A325EBE689006A204C /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D48550A225EBE689006A204C /* OpenCC */; };
 /* End PBXBuildFile section */
 
@@ -161,14 +159,12 @@
 		6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NonModalAlertWindowController.xib; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
-		D427F75E278C74B7004A2160 /* VerticalCandidateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalCandidateController.swift; sourceTree = "<group>"; };
+		D427F768278C9D0D004A2160 /* CandidateUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateUI; path = Packages/CandidateUI; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
 		D47F7DD4278C25A0002F9DD7 /* InputSourceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceHelper.swift; sourceTree = "<group>"; };
-		D47F7DD9278C32CD002F9DD7 /* CandidateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateController.swift; sourceTree = "<group>"; };
-		D47F7DDB278C39EC002F9DD7 /* HorizontalCandidateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCandidateController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +174,7 @@
 			files = (
 				6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */,
 				D48550A325EBE689006A204C /* OpenCC in Frameworks */,
+				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
 				6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -196,6 +193,7 @@
 		6A0D4E9215FC0CFA00ABF4B3 = {
 			isa = PBXGroup;
 			children = (
+				D427F766278C9CBD004A2160 /* Packages */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				6A0D4EA515FC0D2D00ABF4B3 /* Frameworks */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
@@ -225,7 +223,6 @@
 		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */,
 				6A38BBDD15FC115800A8A51F /* Data */,
 				6A0D4F1215FC0EB100ABF4B3 /* Engine */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
@@ -243,16 +240,6 @@
 				D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */,
 			);
 			path = Source;
-			sourceTree = "<group>";
-		};
-		6A0D4ED815FC0DA600ABF4B3 /* CandidateUI */ = {
-			isa = PBXGroup;
-			children = (
-				D47F7DD9278C32CD002F9DD7 /* CandidateController.swift */,
-				D47F7DDB278C39EC002F9DD7 /* HorizontalCandidateController.swift */,
-				D427F75E278C74B7004A2160 /* VerticalCandidateController.swift */,
-			);
-			path = CandidateUI;
 			sourceTree = "<group>";
 		};
 		6A0D4EEE15FC0DA600ABF4B3 /* Images */ = {
@@ -389,6 +376,14 @@
 			path = Installer;
 			sourceTree = "<group>";
 		};
+		D427F766278C9CBD004A2160 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				D427F768278C9D0D004A2160 /* CandidateUI */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
@@ -425,6 +420,7 @@
 			name = McBopomofo;
 			packageProductDependencies = (
 				D48550A225EBE689006A204C /* OpenCC */,
+				D427F769278C9E29004A2160 /* CandidateUI */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -548,16 +544,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A0D4ED015FC0D6400ABF4B3 /* AppDelegate.m in Sources */,
-				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
 				D47F7DD5278C25A0002F9DD7 /* InputSourceHelper.swift in Sources */,
-				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
-				D47F7DDC278C39EC002F9DD7 /* HorizontalCandidateController.swift in Sources */,
-				D427F75F278C74B7004A2160 /* VerticalCandidateController.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */,
-				D47F7DDA278C32CD002F9DD7 /* CandidateController.swift in Sources */,
 				D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */,
+				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
+				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 			);
@@ -1046,6 +1039,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D427F769278C9E29004A2160 /* CandidateUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CandidateUI;
+		};
 		D48550A225EBE689006A204C /* OpenCC */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D48550A125EBE689006A204C /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */;

@@ -62,7 +62,7 @@ public class CandidateController: NSWindowController {
     }
 
     @objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
-    func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+    public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
             self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
         }

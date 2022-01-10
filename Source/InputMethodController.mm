@@ -41,6 +41,9 @@
 #import "AppDelegate.h"
 #import "McBopomofo-Swift.h"
 
+@import CandidateUI;
+@import OpenCC;
+
 //@import SwiftUI;
 
 // C++ namespace usages
