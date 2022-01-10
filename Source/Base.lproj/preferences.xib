@@ -8,10 +8,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencesWindowController">
             <connections>
-                <outlet property="basisKeyboardLayoutButton" destination="124" id="135"/>
+                <outlet property="basisKeyboardLayoutButton" destination="124" id="1zl-3C-sPD"/>
                 <outlet property="fontSizePopUpButton" destination="90" id="108"/>
-                <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
-                <outlet property="window" destination="1" id="30"/>
+                <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="bcd-bW-W5Q"/>
+                <outlet property="window" destination="1" id="03n-F5-D0u"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>

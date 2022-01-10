@@ -11,3 +11,4 @@ Credits.rtf
 # that can be built by make -C Source/Data/bin/C_Version
 # C_count.occ.exe
 .idea
+.swiftpm
