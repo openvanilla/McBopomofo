@@ -1070,17 +1070,16 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
     }
 
+    // if nothing is matched, see if it's a punctuation key for current layout.
     string layout = [self currentLayout];
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
-    if (_languageModel->hasUnigramsForKey(customPunctuation)) {
-        [self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client];
+    if ([self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
-    // if nothing is matched, see if it's a punctuation key
+    // if nothing is matched, see if it's a punctuation key.
     string punctuation = string("_punctuation_") + string(1, (char)charCode);
-    if (_languageModel->hasUnigramsForKey(punctuation)) {
-        [self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client];
+    if ([self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
@@ -1096,8 +1095,46 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
-- (void)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
+- (vector<Unigram>)_collectUnigrams:(string)string
 {
+    vector<Unigram> unigrams;
+    vector<Unigram> userUnigrams;
+
+    if (_userPhrasesModel != NULL && _userPhrasesModel->hasUnigramsForKey(string)) {
+        userUnigrams = _userPhrasesModel->unigramsForKeys(string);
+    }
+
+    if (_languageModel->hasUnigramsForKey(string)) {
+        vector<Unigram> globalUnigrams = _languageModel->unigramsForKeys(string);
+        for (std::vector<Unigram>::iterator it=globalUnigrams.begin(); it!=globalUnigrams.end(); ++it) {
+            if (!_builder->checkIfUnigramExistInVector(*it, unigrams)) {
+                unigrams.push_back(*it);
+            }
+        }
+    }
+    unigrams.insert(unigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+
+    if (_excludedPhraseModel != NULL && _excludedPhraseModel->hasUnigramsForKey(string)) {
+        vector<Unigram> excludedUnigrams = _excludedPhraseModel->unigramsForKeys(string);
+        vector<Unigram> newUnigram;
+        for (std::vector<Unigram>::iterator it=unigrams.begin(); it!=unigrams.end(); ++it) {
+            if (!_builder->checkIfUnigramExistInVector(*it, excludedUnigrams)) {
+                newUnigram.push_back(*it);
+            }
+        }
+        unigrams = newUnigram;
+    }
+    return unigrams;
+}
+
+
+- (BOOL)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
+{
+    vector<Unigram> collected = [self _collectUnigrams:customPunctuation];
+    if (!collected.size()) {
+        return NO;
+    }
+
     if (_bpmfReadingBuffer->isEmpty()) {
         _builder->insertReadingAtCursor(customPunctuation);
         [self popOverflowComposingTextAndWalk:client];
@@ -1116,6 +1153,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
         }
     }
+    return YES;
 }
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
