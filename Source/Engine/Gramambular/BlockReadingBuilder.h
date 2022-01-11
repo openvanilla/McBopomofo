@@ -38,7 +38,7 @@ namespace Formosa {
         
         class BlockReadingBuilder {
         public:
-            BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM);
+            BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM, LanguageModel *inExcludedPhrasesLM);
             void clear();
             
             size_t length() const;
@@ -58,6 +58,8 @@ namespace Formosa {
             vector<string> readingsAtRange(size_t begin, size_t end) const;
 
             Grid& grid();
+
+            bool checkIfUnigramExistInVector(Unigram& unigram, vector<Unigram>vector);
                         
         protected:
             void build();
@@ -73,13 +75,17 @@ namespace Formosa {
             
             Grid m_grid;
             LanguageModel *m_LM;
-            LanguageModel *m_UserPhraseLM;
+            LanguageModel *m_userPhraseLM;
+            LanguageModel *m_excludedPhrasesLM;
             string m_joinSeparator;
         };
         
-        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM)
+        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM,
+                                                        LanguageModel *inUserPhraseLM,
+                                                        LanguageModel *inExcludedPhrasesLM)
             : m_LM(inLM)
-            , m_UserPhraseLM(inUserPhraseLM)
+            , m_userPhraseLM(inUserPhraseLM)
+            , m_excludedPhrasesLM(inExcludedPhrasesLM)
             , m_cursorIndex(0)
             , m_markerCursorIndex(SIZE_MAX)
         {
@@ -197,7 +203,17 @@ namespace Formosa {
         {
             return m_grid;
         }
-        
+
+        inline bool BlockReadingBuilder::checkIfUnigramExistInVector(Unigram& unigram, vector<Unigram>vector)
+        {
+            for (std::vector<Unigram>::iterator it=vector.begin(); it!=vector.end(); ++it) {
+                if (it->keyValue.value == unigram.keyValue.value) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         inline void BlockReadingBuilder::build()
         {
             if (!m_LM) {
@@ -223,17 +239,31 @@ namespace Formosa {
                     string combinedReading = Join(m_readings.begin() + p, m_readings.begin() + p + q, m_joinSeparator);
                     if (!m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
                         vector<Unigram> unigrams;
+                        vector<Unigram> userUnigrams;
 
-                        if (m_UserPhraseLM != NULL) {
-                            if (m_UserPhraseLM->hasUnigramsForKey(combinedReading)) {
-                                vector<Unigram> userUnigrams = m_UserPhraseLM->unigramsForKeys(combinedReading);
-                                unigrams.insert(unigrams.end(), userUnigrams.begin(), userUnigrams.end());
-                            }
+                        if (m_userPhraseLM != NULL && m_userPhraseLM->hasUnigramsForKey(combinedReading)) {
+                            userUnigrams = m_userPhraseLM->unigramsForKeys(combinedReading);
                         }
 
                         if (m_LM->hasUnigramsForKey(combinedReading)) {
                             vector<Unigram> globalUnigrams = m_LM->unigramsForKeys(combinedReading);
-                            unigrams.insert(unigrams.end(), globalUnigrams.begin(), globalUnigrams.end());
+                            for (std::vector<Unigram>::iterator it=globalUnigrams.begin(); it!=globalUnigrams.end(); ++it) {
+                                if (!checkIfUnigramExistInVector(*it, unigrams)) {
+                                    unigrams.push_back(*it);
+                                }
+                            }
+                        }
+                        unigrams.insert(unigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+
+                        if (m_excludedPhrasesLM != NULL && m_excludedPhrasesLM->hasUnigramsForKey(combinedReading)) {
+                            vector<Unigram> excludedUnigrams = m_excludedPhrasesLM->unigramsForKeys(combinedReading);
+                            vector<Unigram> newUnigram;
+                            for (std::vector<Unigram>::iterator it=unigrams.begin(); it!=unigrams.end(); ++it) {
+                                if (!checkIfUnigramExistInVector(*it, excludedUnigrams)) {
+                                    newUnigram.push_back(*it);
+                                }
+                            }
+                            unigrams = newUnigram;
                         }
 
                         if (unigrams.size() > 0) {

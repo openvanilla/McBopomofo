@@ -15,6 +15,8 @@ static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 FastLM globalLanguageModel;
 FastLM globalLanguageModelPlainBopomofo;
 FastLM globalUserPhraseLanguageModel;
+FastLM globalUserExcludedPhrasesMcBopomofo;
+FastLM globalUserExcludedPhrasesPlainBopomofo;
 McBopomofo::UserOverrideModel globalUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 @implementation LanguageModelManager
@@ -42,13 +44,27 @@ static bool LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
 + (void)loadUserPhrasesModel
 {
     globalUserPhraseLanguageModel.close();
-    bool result = globalUserPhraseLanguageModel.open([[self userPhrasesDataPath] UTF8String]);
+    globalUserExcludedPhrasesMcBopomofo.close();
+    globalUserExcludedPhrasesPlainBopomofo.close();
+
+    bool result = false;
+
+    result = globalUserPhraseLanguageModel.open([[self userPhrasesDataPathMcBopomofo] UTF8String]);
     if (!result) {
-        NSLog(@"Failed to open user phrases.");
+        NSLog(@"Failed to open user phrases. %@", [self userPhrasesDataPathMcBopomofo]);
+    }
+    result = globalUserExcludedPhrasesMcBopomofo.open([[self excludedPhrasesDataPathMcBopomofo] UTF8String]);
+    if (!result) {
+        NSLog(@"Failed to open excluded phrases McBopomofo. %@", [self excludedPhrasesDataPathMcBopomofo]);
+    }
+
+    result = globalUserExcludedPhrasesPlainBopomofo.open([[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
+    if (!result) {
+        NSLog(@"Failed to open excluded phrases Plain Bopomofo. %@", [self excludedPhrasesDataPathPlainBopomofo]);
     }
 }
 
-+ (BOOL)checkIfUserLanguageModelFileExists
++ (BOOL)checkIfUserDataFolderExists
 {
     NSString *folderPath = [self dataFolderPath];
     BOOL isFolder = NO;
@@ -70,8 +86,11 @@ static bool LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
             return NO;
         }
     }
+    return YES;
+}
 
-    NSString *filePath = [self userPhrasesDataPath];
++ (BOOL)checkIfFileExist:(NSString *)filePath
+{
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
         BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
         if (!result) {
@@ -82,15 +101,32 @@ static bool LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
     return YES;
 }
 
++ (BOOL)checkIfUserLanguageModelFilesExist
+{
+    if (![self checkIfUserDataFolderExists]) {
+        return NO;
+    }
+    if (![self checkIfFileExist:[self userPhrasesDataPathMcBopomofo]]) {
+        return NO;
+    }
+    if (![self checkIfFileExist:[self excludedPhrasesDataPathMcBopomofo]]) {
+        return NO;
+    }
+    if (![self checkIfFileExist:[self excludedPhrasesDataPathPlainBopomofo]]) {
+        return NO;
+    }
+    return YES;
+}
+
 + (BOOL)writeUserPhrase:(NSString *)userPhrase
 {
-    if (![self checkIfUserLanguageModelFileExists]) {
+    if (![self checkIfUserLanguageModelFilesExist]) {
         return NO;
     }
 
     NSString *currentMarkedPhrase = [userPhrase stringByAppendingString:@"\n"];
 
-    NSString *path = [self userPhrasesDataPath];
+    NSString *path = [self userPhrasesDataPathMcBopomofo];
     NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
     if (!file) {
         return NO;
@@ -112,24 +148,44 @@ static bool LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
     return userDictPath;
 }
 
-+ (NSString *)userPhrasesDataPath
++ (NSString *)userPhrasesDataPathMcBopomofo
 {
     return [[self dataFolderPath] stringByAppendingPathComponent:@"data.txt"];
 }
 
- + (Formosa::Gramambular::FastLM *)languageModelMcBopomofo
++ (NSString *)excludedPhrasesDataPathMcBopomofo
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases.txt"];
+}
+
++ (NSString *)excludedPhrasesDataPathPlainBopomofo
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases-plain-bpmf.txt"];
+}
+
+ + (FastLM *)languageModelMcBopomofo
 {
     return &globalLanguageModel;
 }
 
-+ (Formosa::Gramambular::FastLM *)languageModelPlainBopomofo
++ (FastLM *)languageModelPlainBopomofo
 {
     return &globalLanguageModelPlainBopomofo;
 }
 
-+ (Formosa::Gramambular::FastLM *)userPhraseLanguageModel
++ (FastLM *)userPhraseLanguageModel
 {
     return &globalUserPhraseLanguageModel;
+}
+
++ (FastLM *)excludedPhrasesLanguageModelMcBopomofo
+{
+    return &globalUserExcludedPhrasesMcBopomofo;
+}
+
++ (FastLM *)excludedPhrasesLanguageModelPlainBopomofo
+{
+    return &globalUserExcludedPhrasesPlainBopomofo;
 }
 
 + (McBopomofo::UserOverrideModel *)userOverrideModel

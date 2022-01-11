@@ -48,6 +48,7 @@
     // language model
     Formosa::Gramambular::FastLM *_languageModel;
     Formosa::Gramambular::FastLM *_userPhrasesModel;
+    Formosa::Gramambular::FastLM *_excludedPhraseModel;
 
     // user override model
     McBopomofo::UserOverrideModel *_userOverrideModel;

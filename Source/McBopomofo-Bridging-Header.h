@@ -10,5 +10,5 @@
 @interface LanguageModelManager : NSObject
 + (void)loadDataModels;
 + (void)loadUserPhrasesModel;
-+ (BOOL)checkIfUserLanguageModelFileExists;
++ (BOOL)checkIfUserLanguageModelFilesExist;
 @end

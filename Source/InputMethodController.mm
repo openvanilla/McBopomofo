@@ -178,8 +178,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
         _userPhrasesModel = [LanguageModelManager userPhraseLanguageModel];
         _userOverrideModel = [LanguageModelManager userOverrideModel];
+        _excludedPhraseModel = [LanguageModelManager excludedPhrasesLanguageModelMcBopomofo];
 
-        _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+        _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel, _excludedPhraseModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -206,18 +207,23 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
-    if (_inputMode != kPlainBopomofoModeIdentifier) {
-        [menu addItem:[NSMenuItem separatorItem]];
-        [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
-        NSMenuItem *editUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-        [editUserPheaseItem setIndentationLevel:2];
-        [menu addItem:editUserPheaseItem];
-
-        NSMenuItem *reloadUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-        [reloadUserPheaseItem setIndentationLevel:2];
-        [menu addItem:reloadUserPheaseItem];
-        [menu addItem:[NSMenuItem separatorItem]];
+    [menu addItem:[NSMenuItem separatorItem]];
+    [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
+    if (_inputMode == kPlainBopomofoModeIdentifier) {
+        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesPlainBopomofo:) keyEquivalent:@""];
+        [menu addItem:editExcludedPhrasesItem];
     }
+    else {
+        NSMenuItem *editUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+        [menu addItem:editUserPhrasesItem];
+
+        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesMcBopomofo:) keyEquivalent:@""];
+        [menu addItem:editExcludedPhrasesItem];
+    }
+
+    NSMenuItem *reloadUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+    [menu addItem:reloadUserPhrasesItem];
+    [menu addItem:[NSMenuItem separatorItem]];
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
@@ -318,18 +324,21 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
 {
     NSString *newInputMode;
-    Formosa::Gramambular::FastLM *newLanguageModel;
-    Formosa::Gramambular::FastLM *newUserPhraseModel;
+    FastLM *newLanguageModel;
+    FastLM *newUserPhrasesModel;
+    FastLM *newExcludedPhraseModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
         newInputMode = kPlainBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelPlainBopomofo];
-        newUserPhraseModel = NULL;
+        newUserPhrasesModel = NULL;
+        newExcludedPhraseModel = [LanguageModelManager excludedPhrasesLanguageModelPlainBopomofo];
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
-        newUserPhraseModel = [LanguageModelManager userPhraseLanguageModel];
+        newUserPhrasesModel = [LanguageModelManager userPhraseLanguageModel];
+        newExcludedPhraseModel = [LanguageModelManager excludedPhrasesLanguageModelMcBopomofo];
     }
 
     // Only apply the changes if the value is changed
@@ -345,7 +354,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
-        _userPhrasesModel = newUserPhraseModel;
+        _userPhrasesModel = newUserPhrasesModel;
+        _excludedPhraseModel = newExcludedPhraseModel;
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
@@ -358,7 +368,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel, _excludedPhraseModel);
             _builder->setJoinSeparator("-");
         }
     }
@@ -1489,22 +1499,42 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
 }
 
-- (void)openUserPhrases:(id)sender
+- (BOOL)_checkUserFiles
 {
-    NSLog(@"openUserPhrases called");
-    if (![LanguageModelManager checkIfUserLanguageModelFileExists] ) {
+    if (![LanguageModelManager checkIfUserLanguageModelFilesExist] ) {
         NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), [LanguageModelManager dataFolderPath]];
         [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
-        return;
+        return NO;
     }
 
-    NSString *path =  [LanguageModelManager userPhrasesDataPath];
-    NSLog(@"Open %@", path);
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+    return YES;
+}
+
+- (void)_openUserFile:(NSString *)path
+{
+    if (![self _checkUserFiles]) {
+        return;
     }
     NSURL *url = [NSURL fileURLWithPath:path];
     [[NSWorkspace sharedWorkspace] openURL:url];
+}
+
+- (void)openUserPhrases:(id)sender
+{
+    NSLog(@"openUserPhrases called");
+    [self _openUserFile:[LanguageModelManager userPhrasesDataPathMcBopomofo]];
+}
+
+- (void)openExcludedPhrasesPlainBopomofo:(id)sender
+{
+    NSLog(@"openExcludedPhrasesPlainBopomofo called");
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathPlainBopomofo]];
+}
+
+- (void)openExcludedPhrasesMcBopomofo:(id)sender
+{
+    NSLog(@"openExcludedPhrasesMcBopomofo called");
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathMcBopomofo]];
 }
 
 - (void)reloadUserPhrases:(id)sender
