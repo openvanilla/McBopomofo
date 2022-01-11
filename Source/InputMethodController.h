@@ -49,14 +49,14 @@
     Formosa::Gramambular::FastLM *_languageModel;
     Formosa::Gramambular::FastLM *_userPhrasesModel;
 
+    // user override model
+    McBopomofo::UserOverrideModel *_userOverrideModel;
+
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;
 
     // latest walked path (trellis) using the Viterbi algorithm
     std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
-
-    // user override model
-    McBopomofo::UserOverrideModel *_uom;
 
     // the latest composing buffer that is updated to the foreground app
     NSMutableString *_composingBuffer;
@@ -78,7 +78,3 @@
     BOOL _chineseConversionEnabled;
 }
 @end
-
-// the shared language model object
-extern "C" void LTLoadLanguageModel();
-extern "C" void LTLoadUserLanguageModelFile();

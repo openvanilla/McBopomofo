@@ -51,8 +51,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var updateNextStepURL: URL?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        LTLoadLanguageModel()
-        LTLoadUserLanguageModelFile()
+        LanguageModelManager.loadDataModels()
+        LanguageModelManager.loadUserPhrasesModel()
+//        LTLoadLanguageModel()
+//        LTLoadUserLanguageModelFile()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
