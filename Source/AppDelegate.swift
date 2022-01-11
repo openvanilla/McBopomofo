@@ -53,8 +53,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.loadDataModels()
         LanguageModelManager.loadUserPhrasesModel()
-//        LTLoadLanguageModel()
-//        LTLoadUserLanguageModelFile()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
