@@ -209,6 +209,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
+
     if (_inputMode == kPlainBopomofoModeIdentifier) {
         NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesPlainBopomofo:) keyEquivalent:@""];
         [menu addItem:editExcludedPhrasesItem];

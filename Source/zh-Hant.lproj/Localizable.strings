@@ -60,3 +60,6 @@
 "Unable to create the user phrase file." = "無法建立使用者詞彙檔案";
 
 "Please check the permission of at \"%@\"." = "請檢查以下路徑的寫入權限 \"%@\"。";
+
+"Edit Excluded Phrases" = "編輯要排除的詞彙";
+
