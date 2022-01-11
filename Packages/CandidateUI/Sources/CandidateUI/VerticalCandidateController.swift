@@ -62,7 +62,7 @@ fileprivate class VerticalKeyLabelStripView: NSView {
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
         paraStyle.alignment = .center
 
-        let textAttr: [NSAttributedString.Key:AnyObject] = [
+        let textAttr: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,
             .foregroundColor: black,
             .paragraphStyle: paraStyle]
@@ -97,7 +97,7 @@ private let kCandidateTextPaddingWithMandatedTableViewPadding = 18.0
 private let kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0
 
 
-@objc(VTVerticalCandidateController)
+@objc (VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
     private var keyLabelStripView: VerticalKeyLabelStripView
     private var scrollView: NSScrollView
@@ -172,7 +172,7 @@ public class VerticalCandidateController: CandidateController {
     public override func reloadData() {
         maxCandidateAttrStringWidth = ceil(candidateFont.pointSize * 2.0 + candidateTextPadding)
         tableView.reloadData()
-        self.layoutCandidateView()
+        layoutCandidateView()
         if delegate?.candidateCountForController(self) ?? 0 > 0 {
             selectedCandidateIndex = 0
         }
@@ -210,7 +210,7 @@ public class VerticalCandidateController: CandidateController {
         return UInt.max
     }
 
-    @objc public override var selectedCandidateIndex: UInt {
+    public override var selectedCandidateIndex: UInt {
         get {
             let selectedRow = tableView.selectedRow
             return selectedRow == -1 ? UInt.max : UInt(selectedRow)
@@ -272,7 +272,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         // we do more work than what this method is expected to; normally not a good practice, but for the amount of data (9 to 10 rows max), we can afford the overhead
 
         // expand the window width if text overflows
-        let boundingRect = attrString.boundingRect(with: NSSize(width: 10240.0, height: 10240.0) , options: .usesLineFragmentOrigin)
+        let boundingRect = attrString.boundingRect(with: NSSize(width: 10240.0, height: 10240.0), options: .usesLineFragmentOrigin)
         let textWidth = boundingRect.size.width + candidateTextPadding
         if textWidth > maxCandidateAttrStringWidth {
             maxCandidateAttrStringWidth = textWidth
@@ -287,7 +287,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             var newHilightIndex = 0
 
             if keyLabelStripView.highlightedIndex != -1 &&
-                (row >= selectedRow + Int(count) || (selectedRow > count && row <= selectedRow - Int(count))) {
+                       (row >= selectedRow + Int(count) || (selectedRow > count && row <= selectedRow - Int(count))) {
                 newHilightIndex = -1
             } else {
                 let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
@@ -390,11 +390,11 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
 
     private func layoutCandidateView() {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) { [self] in
-            self.doLayoutCanaditeView()
+            doLayoutCandidateView()
         }
     }
 
-    private func doLayoutCanaditeView() {
+    private func doLayoutCandidateView() {
         guard let delegate = delegate else {
             return
         }
@@ -430,7 +430,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         tableView.rowHeight = rowHeight
 
         var maxKeyLabelWidth = keyLabelFontSize
-        let textAttr: [NSAttributedString.Key:AnyObject] = [.font: keyLabelFont]
+        let textAttr: [NSAttributedString.Key: AnyObject] = [.font: keyLabelFont]
         let boundingBox = NSSize(width: 1600.0, height: 1600.0)
 
         for label in keyLabels {

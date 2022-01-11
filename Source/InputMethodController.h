@@ -68,7 +68,7 @@
     // a special deferred client for Terminal.app fix
     id _currentDeferredClient;
     
-    // currently available candidates
+    // current available candidates
     NSMutableArray *_candidates;
 
     // current input mode

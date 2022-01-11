@@ -1140,50 +1140,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     string layout = [self currentLayout];
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
     if (_languageModel->hasUnigramsForKey(customPunctuation)) {
-        if (_bpmfReadingBuffer->isEmpty()) {
-            _builder->insertReadingAtCursor(customPunctuation);
-            [self popOverflowComposingTextAndWalk:client];
-        }
-        else { // If there is still unfinished bpmf reading, ignore the punctuation
-            [self beep];
-        }
-        [self updateClientComposingBuffer:client];
-
-        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
-            [self collectCandidates];
-            if ([_candidates count] == 1) {
-                [self commitComposition:client];
-            }
-            else {
-                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-            }
-        }
-
+        [self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client];
         return YES;
     }
 
     // if nothing is matched, see if it's a punctuation key
     string punctuation = string("_punctuation_") + string(1, (char)charCode);
     if (_languageModel->hasUnigramsForKey(punctuation)) {
-        if (_bpmfReadingBuffer->isEmpty()) {
-            _builder->insertReadingAtCursor(punctuation);
-            [self popOverflowComposingTextAndWalk:client];
-        }
-        else { // If there is still unfinished bpmf reading, ignore the punctuation
-            [self beep];
-        }
-        [self updateClientComposingBuffer:client];
-
-        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
-            [self collectCandidates];
-            if ([_candidates count] == 1) {
-                [self commitComposition:client];
-            }
-            else {
-                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-            }
-        }
-
+        [self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client];
         return YES;
     }
 
@@ -1197,6 +1161,28 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     return NO;
+}
+
+- (void)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
+{
+    if (_bpmfReadingBuffer->isEmpty()) {
+        _builder->insertReadingAtCursor(customPunctuation);
+        [self popOverflowComposingTextAndWalk:client];
+    }
+    else { // If there is still unfinished bpmf reading, ignore the punctuation
+        [self beep];
+    }
+    [self updateClientComposingBuffer:client];
+
+    if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
+        [self collectCandidates];
+        if ([_candidates count] == 1) {
+            [self commitComposition:client];
+        }
+        else {
+            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        }
+    }
 }
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
