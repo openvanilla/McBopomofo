@@ -36,7 +36,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "Mandarin.h"
 #import "Gramambular.h"
-#import "FastLM.h"
+#import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
 
 @interface McBopomofoInputMethodController : IMKInputController
@@ -46,9 +46,7 @@
     Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
 
     // language model
-    Formosa::Gramambular::FastLM *_languageModel;
-    Formosa::Gramambular::FastLM *_userPhrasesModel;
-    Formosa::Gramambular::FastLM *_excludedPhraseModel;
+    McBopomofo::McBopomofoLM *_languageModel;
 
     // user override model
     McBopomofo::UserOverrideModel *_userOverrideModel;

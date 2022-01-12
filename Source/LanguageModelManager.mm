@@ -7,61 +7,35 @@
 
 using namespace std;
 using namespace Formosa::Gramambular;
+using namespace McBopomofo;
 using namespace OpenVanilla;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 
-FastLM globalLanguageModel;
-FastLM globalLanguageModelPlainBopomofo;
-FastLM globalUserPhraseLanguageModel;
-FastLM globalUserExcludedPhrasesMcBopomofo;
-FastLM globalUserExcludedPhrasesPlainBopomofo;
-McBopomofo::UserOverrideModel globalUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+McBopomofoLM gLanguageModelMcBopomofo;
+McBopomofoLM gLanguageModelPlainBopomofo;
+UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 @implementation LanguageModelManager
 
-static bool LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomofoLM &lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
-    bool result = lm.open([dataPath UTF8String]);
-    return (BOOL)result;
+    lm.loadLanguageModel([dataPath UTF8String]);
 }
 
 + (void)loadDataModels
 {
-    bool dataOpenResult = LTLoadLanguageModelFile(@"data", globalLanguageModel);
-    if (!dataOpenResult) {
-        NSLog(@"Failed to open language model.");
-    }
-    bool plainBpmfOpenResult = LTLoadLanguageModelFile(@"data-plain-bpmf", globalLanguageModelPlainBopomofo);
-    if (!plainBpmfOpenResult) {
-        NSLog(@"Failed to open language model for plain bpmf.");
-    }
+    LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
 }
 
 + (void)loadUserPhrasesModel
 {
-    globalUserPhraseLanguageModel.close();
-    globalUserExcludedPhrasesMcBopomofo.close();
-    globalUserExcludedPhrasesPlainBopomofo.close();
-
-    bool result = false;
-
-    result = globalUserPhraseLanguageModel.open([[self userPhrasesDataPathMcBopomofo] UTF8String]);
-    if (!result) {
-        NSLog(@"Failed to open user phrases. %@", [self userPhrasesDataPathMcBopomofo]);
-    }
-    result = globalUserExcludedPhrasesMcBopomofo.open([[self excludedPhrasesDataPathMcBopomofo] UTF8String]);
-    if (!result) {
-        NSLog(@"Failed to open excluded phrases McBopomofo. %@", [self excludedPhrasesDataPathMcBopomofo]);
-    }
-
-    result = globalUserExcludedPhrasesPlainBopomofo.open([[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
-    if (!result) {
-        NSLog(@"Failed to open excluded phrases Plain Bopomofo. %@", [self excludedPhrasesDataPathPlainBopomofo]);
-    }
+    gLanguageModelMcBopomofo.loadUserPhrases([[self userPhrasesDataPathMcBopomofo] UTF8String], [[self excludedPhrasesDataPathMcBopomofo] UTF8String]);
+    gLanguageModelPlainBopomofo.loadUserPhrases("", [[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
 }
 
 + (BOOL)checkIfUserDataFolderExists
@@ -163,34 +137,19 @@ static bool LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &
     return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases-plain-bpmf.txt"];
 }
 
- + (FastLM *)languageModelMcBopomofo
+ + (McBopomofoLM *)languageModelMcBopomofo
 {
-    return &globalLanguageModel;
+    return &gLanguageModelMcBopomofo;
 }
 
-+ (FastLM *)languageModelPlainBopomofo
++ (McBopomofoLM *)languageModelPlainBopomofo
 {
-    return &globalLanguageModelPlainBopomofo;
-}
-
-+ (FastLM *)userPhraseLanguageModel
-{
-    return &globalUserPhraseLanguageModel;
-}
-
-+ (FastLM *)excludedPhrasesLanguageModelMcBopomofo
-{
-    return &globalUserExcludedPhrasesMcBopomofo;
-}
-
-+ (FastLM *)excludedPhrasesLanguageModelPlainBopomofo
-{
-    return &globalUserExcludedPhrasesPlainBopomofo;
+    return &gLanguageModelPlainBopomofo;
 }
 
 + (McBopomofo::UserOverrideModel *)userOverrideModel
 {
-    return &globalUserOverrideModel;
+    return &gUserOverrideModel;
 }
 
 @end

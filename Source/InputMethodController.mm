@@ -48,6 +48,7 @@
 using namespace std;
 using namespace Formosa::Mandarin;
 using namespace Formosa::Gramambular;
+using namespace McBopomofo;
 using namespace OpenVanilla;
 
 // default, min and max candidate list text size
@@ -176,11 +177,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
-        _userPhrasesModel = [LanguageModelManager userPhraseLanguageModel];
         _userOverrideModel = [LanguageModelManager userOverrideModel];
-        _excludedPhraseModel = [LanguageModelManager excludedPhrasesLanguageModelMcBopomofo];
 
-        _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel, _excludedPhraseModel);
+        _builder = new BlockReadingBuilder(_languageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -325,21 +324,15 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
 {
     NSString *newInputMode;
-    FastLM *newLanguageModel;
-    FastLM *newUserPhrasesModel;
-    FastLM *newExcludedPhraseModel;
+    McBopomofoLM *newLanguageModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
         newInputMode = kPlainBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelPlainBopomofo];
-        newUserPhrasesModel = NULL;
-        newExcludedPhraseModel = [LanguageModelManager excludedPhrasesLanguageModelPlainBopomofo];
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
-        newUserPhrasesModel = [LanguageModelManager userPhraseLanguageModel];
-        newExcludedPhraseModel = [LanguageModelManager excludedPhrasesLanguageModelMcBopomofo];
     }
 
     // Only apply the changes if the value is changed
@@ -355,8 +348,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
-        _userPhrasesModel = newUserPhrasesModel;
-        _excludedPhraseModel = newExcludedPhraseModel;
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
@@ -369,7 +360,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel, _excludedPhraseModel);
+            _builder = new BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
     }
@@ -1096,65 +1087,30 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
-- (vector<Unigram>)_collectUnigrams:(string)string
-{
-    vector<Unigram> unigrams;
-    vector<Unigram> userUnigrams;
-
-    if (_userPhrasesModel != NULL && _userPhrasesModel->hasUnigramsForKey(string)) {
-        userUnigrams = _userPhrasesModel->unigramsForKeys(string);
-    }
-
-    if (_languageModel->hasUnigramsForKey(string)) {
-        vector<Unigram> globalUnigrams = _languageModel->unigramsForKeys(string);
-        for (std::vector<Unigram>::iterator it=globalUnigrams.begin(); it!=globalUnigrams.end(); ++it) {
-            if (!_builder->checkIfUnigramExistInVector(*it, unigrams)) {
-                unigrams.push_back(*it);
-            }
-        }
-    }
-    unigrams.insert(unigrams.begin(), userUnigrams.begin(), userUnigrams.end());
-
-    if (_excludedPhraseModel != NULL && _excludedPhraseModel->hasUnigramsForKey(string)) {
-        vector<Unigram> excludedUnigrams = _excludedPhraseModel->unigramsForKeys(string);
-        vector<Unigram> newUnigram;
-        for (std::vector<Unigram>::iterator it=unigrams.begin(); it!=unigrams.end(); ++it) {
-            if (!_builder->checkIfUnigramExistInVector(*it, excludedUnigrams)) {
-                newUnigram.push_back(*it);
-            }
-        }
-        unigrams = newUnigram;
-    }
-    return unigrams;
-}
-
-
 - (BOOL)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
 {
-    vector<Unigram> collected = [self _collectUnigrams:customPunctuation];
-    if (!collected.size()) {
-        return NO;
-    }
-
-    if (_bpmfReadingBuffer->isEmpty()) {
-        _builder->insertReadingAtCursor(customPunctuation);
-        [self popOverflowComposingTextAndWalk:client];
-    }
-    else { // If there is still unfinished bpmf reading, ignore the punctuation
-        [self beep];
-    }
-    [self updateClientComposingBuffer:client];
-
-    if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
-        [self collectCandidates];
-        if ([_candidates count] == 1) {
-            [self commitComposition:client];
+    if (_languageModel->hasUnigramsForKey(customPunctuation)) {
+        if (_bpmfReadingBuffer->isEmpty()) {
+            _builder->insertReadingAtCursor(customPunctuation);
+            [self popOverflowComposingTextAndWalk:client];
         }
-        else {
-            [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+        else { // If there is still unfinished bpmf reading, ignore the punctuation
+            [self beep];
         }
+        [self updateClientComposingBuffer:client];
+
+        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
+            [self collectCandidates];
+            if ([_candidates count] == 1) {
+                [self commitComposition:client];
+            }
+            else {
+                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
+            }
+        }
+        return YES;
     }
-    return YES;
+    return NO;
 }
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
