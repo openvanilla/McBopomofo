@@ -38,6 +38,7 @@
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* LanguageModelManager.mm */; };
 		D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */; };
+		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F769278C9E29004A2160 /* CandidateUI */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
@@ -161,6 +162,8 @@
 		D41355D7278D7409005E5CBD /* LanguageModelManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LanguageModelManager.mm; sourceTree = "<group>"; };
 		D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = McBopomofoLM.cpp; sourceTree = "<group>"; };
 		D41355DA278E6D17005E5CBD /* McBopomofoLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = McBopomofoLM.h; sourceTree = "<group>"; };
+		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UserPhrasesLM.cpp; sourceTree = "<group>"; };
+		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
 		D427F768278C9D0D004A2160 /* CandidateUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateUI; path = Packages/CandidateUI; sourceTree = "<group>"; };
@@ -268,10 +271,12 @@
 				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
 				6A0421A615FEF3F50061ED63 /* FastLM.cpp */,
 				6A0421A715FEF3F50061ED63 /* FastLM.h */,
-				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
-				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
+				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
+				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
 				D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */,
 				D41355DA278E6D17005E5CBD /* McBopomofoLM.h */,
+				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
+				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -561,6 +566,7 @@
 				D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
+				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				6A0421A815FEF3F50061ED63 /* FastLM.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */,
 			);

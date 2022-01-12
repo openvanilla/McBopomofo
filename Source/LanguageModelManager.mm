@@ -98,17 +98,42 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
         return NO;
     }
 
-    NSString *currentMarkedPhrase = [userPhrase stringByAppendingString:@"\n"];
-
+    BOOL shuoldAddLineBreakAtFront = NO;
     NSString *path = [self userPhrasesDataPathMcBopomofo];
-    NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-    if (!file) {
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSError *error = nil;
+        NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
+        unsigned long long fileSize = [attr fileSize];
+        if (!error && fileSize) {
+            NSFileHandle *readFile = [NSFileHandle fileHandleForReadingAtPath:path];
+            if (readFile) {
+                [readFile seekToFileOffset:fileSize - 1];
+                NSData *data = [readFile readDataToEndOfFile];
+                const void *bytes = [data bytes];
+                if (*(char *)bytes != '\n') {
+                    shuoldAddLineBreakAtFront = YES;
+                }
+                [readFile closeFile];
+            }
+        }
+    }
+
+    NSMutableString *currentMarkedPhrase = [NSMutableString string];
+    if (shuoldAddLineBreakAtFront) {
+        [currentMarkedPhrase appendString:@"\n"];
+    }
+    [currentMarkedPhrase appendString:userPhrase];
+    [currentMarkedPhrase appendString:@"\n"];
+
+    NSFileHandle *writeFile = [NSFileHandle fileHandleForUpdatingAtPath:path];
+    if (!writeFile) {
         return NO;
     }
-    [file seekToEndOfFile];
+    [writeFile seekToEndOfFile];
     NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-    [file writeData:data];
-    [file closeFile];
+    [writeFile writeData:data];
+    [writeFile closeFile];
 
     [self loadUserPhrasesModel];
     return YES;
