@@ -140,9 +140,14 @@ public class VerticalCandidateController: CandidateController {
         tableView.allowsMultipleSelection = false
         tableView.allowsEmptySelection = false
 
+        if #available(macOS 10.16, *) {
+            tableView.style = .fullWidth
+            candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding
+            candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding
+        }
+
         scrollView.documentView = tableView
         panel.contentView?.addSubview(scrollView)
-
 
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -150,13 +155,6 @@ public class VerticalCandidateController: CandidateController {
         paraStyle.lineBreakMode = .byClipping
 
         candidateTextParagraphStyle = paraStyle
-
-
-        if #available(macOS 10.16, *) {
-            tableView.style = .fullWidth
-            candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding
-            candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding
-        }
 
         super.init(window: panel)
         tableView.dataSource = self
