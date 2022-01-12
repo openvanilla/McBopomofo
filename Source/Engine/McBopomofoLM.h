@@ -24,7 +24,7 @@ public:
 protected:
     FastLM m_languageModel;
     FastLM m_userPhrases;
-    FastLM m_excluddePhrases;
+    FastLM m_excludedPhrases;
 };
 };
 

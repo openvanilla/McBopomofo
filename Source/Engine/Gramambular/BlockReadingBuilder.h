@@ -58,8 +58,6 @@ namespace Formosa {
             vector<string> readingsAtRange(size_t begin, size_t end) const;
 
             Grid& grid();
-
-            bool checkIfUnigramExistInVector(Unigram& unigram, vector<Unigram>vector);
                         
         protected:
             void build();
@@ -196,16 +194,6 @@ namespace Formosa {
         inline Grid& BlockReadingBuilder::grid()
         {
             return m_grid;
-        }
-
-        inline bool BlockReadingBuilder::checkIfUnigramExistInVector(Unigram& unigram, vector<Unigram>vector)
-        {
-            for (std::vector<Unigram>::iterator it=vector.begin(); it!=vector.end(); ++it) {
-                if (it->keyValue.value == unigram.keyValue.value) {
-                    return true;
-                }
-            }
-            return false;
         }
 
         inline void BlockReadingBuilder::build()
