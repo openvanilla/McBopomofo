@@ -610,13 +610,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [string appendString:reading];
     [string appendString:@" "];
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    vector<std::string> v = _builder->readingsAtRange(begin,end);
+    vector<std::string> v = _builder->readingsAtRange(begin, end);
     for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
     [string appendString:[readingsArray componentsJoinedByString:@"-"]];
-    [string appendString:@" "];
-    [string appendString:@"-1.0"];
     return string;
 }
 

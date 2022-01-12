@@ -7,5 +7,4 @@
 @interface LanguageModelManager : NSObject
 + (void)loadDataModels;
 + (void)loadUserPhrasesModel;
-+ (BOOL)checkIfUserLanguageModelFilesExist;
 @end

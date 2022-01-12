@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "FastLM.h"
+#include "UserPhrasesLM.h"
 
 namespace McBopomofo {
 
@@ -23,8 +24,8 @@ public:
 
 protected:
     FastLM m_languageModel;
-    FastLM m_userPhrases;
-    FastLM m_excludedPhrases;
+    UserPhrasesLM m_userPhrases;
+    UserPhrasesLM m_excludedPhrases;
 };
 };
 
