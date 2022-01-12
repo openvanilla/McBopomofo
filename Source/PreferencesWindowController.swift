@@ -42,7 +42,7 @@ private let kDefaultKeys = "123456789"
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc(PreferencesWindowController) class PreferencesWindowController: NSWindowController {
+@objc (PreferencesWindowController) class PreferencesWindowController: NSWindowController {
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
@@ -85,8 +85,8 @@ private let kDefaultKeys = "123456789"
 
             guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
                   let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName) else {
-                      continue
-                  }
+                continue
+            }
 
             let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
             let localizedName = String(Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
@@ -109,7 +109,7 @@ private let kDefaultKeys = "123456789"
         selectionKeyComboBox.addItems(withObjectValues: [kDefaultKeys, "asdfghjkl", "asdfzxcvb"])
 
         var candidateSelectionKeys = (UserDefaults.standard.string(forKey: kCandidateKeys) ?? kDefaultKeys)
-            .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         if candidateSelectionKeys.isEmpty {
             candidateSelectionKeys = kDefaultKeys
         }
@@ -117,7 +117,7 @@ private let kDefaultKeys = "123456789"
         selectionKeyComboBox.stringValue = candidateSelectionKeys
     }
 
-    @IBAction func updateBasisKeyboardLayoutAction(_ sender:Any) {
+    @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
         if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject {
             UserDefaults.standard.set(sourceID, forKey: kBasisKeyboardLayoutPreferenceKey)
         }

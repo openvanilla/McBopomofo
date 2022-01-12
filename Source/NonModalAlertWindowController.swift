@@ -40,45 +40,46 @@ import Cocoa
 }
 
 class NonModalAlertWindowController: NSWindowController {
-    @objc(sharedInstance) static let shared = NonModalAlertWindowController(windowNibName: "NonModalAlertWindowController")
-    
+    @objc (sharedInstance)
+    static let shared = NonModalAlertWindowController(windowNibName: "NonModalAlertWindowController")
+
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var contentTextField: NSTextField!
     @IBOutlet weak var confirmButton: NSButton!
     @IBOutlet weak var cancelButton: NSButton!
     weak var delegate: NonModalAlertWindowControllerDelegate?
-    
+
     @objc func show(title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?, cancelAsDefault: Bool, delegate: NonModalAlertWindowControllerDelegate?) {
         if window?.isVisible == true {
             self.delegate?.nonModalAlertWindowControllerDidCancel(self)
         }
-        
+
         self.delegate = delegate
-        
+
         var oldFrame = confirmButton.frame
         confirmButton.title = confirmButtonTitle
         confirmButton.sizeToFit()
-        
+
         var newFrame = confirmButton.frame
         newFrame.size.width = max(90, newFrame.size.width + 10)
         newFrame.origin.x += oldFrame.size.width - newFrame.size.width
-        self.confirmButton.frame = newFrame
-        
+        confirmButton.frame = newFrame
+
         if let cancelButtonTitle = cancelButtonTitle {
             cancelButton.title = cancelButtonTitle
             cancelButton.sizeToFit()
             var adjustFrame = cancelButton.frame
             adjustFrame.size.width = max(90, adjustFrame.size.width + 10)
             adjustFrame.origin.x = newFrame.origin.x - adjustFrame.size.width
-            self.confirmButton.frame = adjustFrame
-            self.cancelButton.isHidden = false
+            confirmButton.frame = adjustFrame
+            cancelButton.isHidden = false
         } else {
-            self.cancelButton.isHidden = true
+            cancelButton.isHidden = true
         }
-        
+
         cancelButton.nextKeyView = confirmButton
         confirmButton.nextKeyView = cancelButton
-        
+
         if cancelButtonTitle != nil {
             if cancelAsDefault {
                 window?.defaultButtonCell = cancelButton.cell as? NSButtonCell
@@ -89,12 +90,12 @@ class NonModalAlertWindowController: NSWindowController {
         } else {
             window?.defaultButtonCell = confirmButton.cell as? NSButtonCell
         }
-        
+
         titleTextField.stringValue = title
-        
+
         oldFrame = contentTextField.frame
         contentTextField.stringValue = content
-        
+
         var infiniteHeightFrame = oldFrame
         infiniteHeightFrame.size.width -= 4.0
         infiniteHeightFrame.size.height = 10240
@@ -104,7 +105,7 @@ class NonModalAlertWindowController: NSWindowController {
         newFrame.origin = oldFrame.origin
         newFrame.origin.y -= (newFrame.size.height - oldFrame.size.height)
         contentTextField.frame = newFrame
-        
+
         var windowFrame = window?.frame ?? NSRect.zero
         windowFrame.size.height += (newFrame.size.height - oldFrame.size.height)
         window?.level = NSWindow.Level(Int(CGShieldingWindowLevel()) + 1)
@@ -113,20 +114,20 @@ class NonModalAlertWindowController: NSWindowController {
         window?.makeKeyAndOrderFront(self)
         NSApp.activate(ignoringOtherApps: true)
     }
-    
+
     @IBAction func confirmButtonAction(_ sender: Any) {
         delegate?.nonModalAlertWindowControllerDidConfirm(self)
         window?.orderOut(self)
     }
-    
+
     @IBAction func cancelButtonAction(_ sender: Any) {
         cancel(sender)
     }
-    
+
     func cancel(_ sender: Any) {
         delegate?.nonModalAlertWindowControllerDidCancel(self)
         delegate = nil
         window?.orderOut(self)
     }
-    
+
 }

@@ -38,17 +38,17 @@
 #import <set>
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
+#import "LanguageModelManager.h"
 #import "McBopomofo-Swift.h"
 
 @import CandidateUI;
 @import OpenCC;
 
-//@import SwiftUI;
-
 // C++ namespace usages
 using namespace std;
 using namespace Formosa::Mandarin;
 using namespace Formosa::Gramambular;
+using namespace McBopomofo;
 using namespace OpenVanilla;
 
 // default, min and max candidate list text size
@@ -111,62 +111,6 @@ VTCandidateController *gCurrentCandidateController = nil;
 static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot";
 #endif
 
-// shared language model object that stores our phrase-term probability database
-FastLM gLanguageModel;
-FastLM gLanguageModelPlainBopomofo;
-FastLM gUserPhraseLanguageModel;
-
-static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
-McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
-
-static NSString *LTUserDataFolderPath()
-{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = [paths objectAtIndex:0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
-    return userDictPath;
-}
-
-static NSString *LTUserPhrasesDataPath()
-{
-    return [LTUserDataFolderPath() stringByAppendingPathComponent:@"data.txt"];
-}
-
-static BOOL LTCheckIfUserLanguageModelFileExists() {
-
-    NSString *folderPath = LTUserDataFolderPath();
-    BOOL isFolder = NO;
-    BOOL folderExist = [[NSFileManager defaultManager] fileExistsAtPath:folderPath isDirectory:&isFolder];
-    if (folderExist && !isFolder) {
-        NSError *error = nil;
-        [[NSFileManager defaultManager] removeItemAtPath:folderPath error:&error];
-        if (error) {
-            NSLog(@"Failed to remove folder %@", error);
-            return NO;
-        }
-        folderExist = NO;
-    }
-    if (!folderExist) {
-        NSError *error = nil;
-        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:&error];
-        if (error) {
-            NSLog(@"Failed to create folder %@", error);
-            return NO;
-        }
-    }
-
-    NSString *filePath = LTUserPhrasesDataPath();
-    if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
-        if (!result) {
-            NSLog(@"Failed to write file");
-            return NO;
-        }
-    }
-    return YES;
-}
-
 // https://clang-analyzer.llvm.org/faq.html
 __attribute__((annotate("returns_localized_nsstring")))
 static inline NSString *LocalizationNotNeeded(NSString *s) {
@@ -174,17 +118,12 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 }
 
 // private methods
-@interface McBopomofoInputMethodController () <VTCandidateControllerDelegate>
+@interface McBopomofoInputMethodController ()
 + (VTHorizontalCandidateController *)horizontalCandidateController;
 + (VTVerticalCandidateController *)verticalCandidateController;
+@end
 
-- (void)collectCandidates;
-- (size_t)actualCandidateCursorIndex;
-- (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client;
-
-- (void)beep;
-- (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client;
-- (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode;
+@interface McBopomofoInputMethodController (VTCandidateController) <VTCandidateControllerDelegate>
 @end
 
 // sort helper
@@ -237,10 +176,10 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
-        _languageModel = &gLanguageModel;
-        _userPhrasesModel = &gUserPhraseLanguageModel;
-        _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
-        _uom = &gUserOverrideModel;
+        _languageModel = [LanguageModelManager languageModelMcBopomofo];
+        _userOverrideModel = [LanguageModelManager userOverrideModel];
+
+        _builder = new BlockReadingBuilder(_languageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -267,18 +206,24 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
-    if (_inputMode != kPlainBopomofoModeIdentifier) {
-        [menu addItem:[NSMenuItem separatorItem]];
-        [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
-        NSMenuItem *editUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-        [editUserPheaseItem setIndentationLevel:2];
-        [menu addItem:editUserPheaseItem];
+    [menu addItem:[NSMenuItem separatorItem]];
+    [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
 
-        NSMenuItem *reloadUserPheaseItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-        [reloadUserPheaseItem setIndentationLevel:2];
-        [menu addItem:reloadUserPheaseItem];
-        [menu addItem:[NSMenuItem separatorItem]];
+    if (_inputMode == kPlainBopomofoModeIdentifier) {
+        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesPlainBopomofo:) keyEquivalent:@""];
+        [menu addItem:editExcludedPhrasesItem];
     }
+    else {
+        NSMenuItem *editUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+        [menu addItem:editUserPhrasesItem];
+
+        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesMcBopomofo:) keyEquivalent:@""];
+        [menu addItem:editExcludedPhrasesItem];
+    }
+
+    NSMenuItem *reloadUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
+    [menu addItem:reloadUserPhrasesItem];
+    [menu addItem:[NSMenuItem separatorItem]];
 
     NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
     [menu addItem:updateCheckItem];
@@ -379,18 +324,15 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
 {
     NSString *newInputMode;
-    Formosa::Gramambular::FastLM *newLanguageModel;
-    Formosa::Gramambular::FastLM *userPhraseModel;
+    McBopomofoLM *newLanguageModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
         newInputMode = kPlainBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModelPlainBopomofo;
-        userPhraseModel = NULL;
+        newLanguageModel = [LanguageModelManager languageModelPlainBopomofo];
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
-        newLanguageModel = &gLanguageModel;
-        userPhraseModel = &gUserPhraseLanguageModel;
+        newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
     }
 
     // Only apply the changes if the value is changed
@@ -406,7 +348,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
-        _userPhrasesModel = userPhraseModel;
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
@@ -419,7 +360,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel, _userPhrasesModel);
+            _builder = new BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
     }
@@ -432,8 +373,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
     // then we defer the update in the next runloop round -- so that the composing buffer is not
     // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
-    if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && ![NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"])
-    {
+    if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && ![NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         if (_currentDeferredClient) {
             [self performSelector:@selector(updateClientComposingBuffer:) withObject:_currentDeferredClient afterDelay:0.0];
         }
@@ -532,7 +472,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange((NSInteger)_builder->markerCursorIndex(), 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = (NSInteger)_builder->markerCursorIndex();
-    } else {
+    }
+    else {
         // we must use NSAttributedString so that the cursor is visible --
         // can't just use NSString
         NSDictionary *attrDict = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
@@ -560,13 +501,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     reverse(_walkedNodes.begin(), _walkedNodes.end());
 
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
-    #if DEBUG
+#if DEBUG
     string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
 
     BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
-    #endif
+#endif
 }
 
 - (void)popOverflowComposingTextAndWalk:(id)client
@@ -681,29 +622,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (BOOL)_writeUserPhrase
 {
-    if (!LTCheckIfUserLanguageModelFileExists()) {
-        return NO;
-    }
-
     NSString *currentMarkedPhrase = [self _currentMarkedText];
     if (![currentMarkedPhrase length]) {
         return NO;
     }
 
-    currentMarkedPhrase = [currentMarkedPhrase stringByAppendingString:@"\n"];
-
-    NSString *path = LTUserPhrasesDataPath();
-    NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:path];
-    if (!file) {
-        return NO;
-    }
-    [file seekToEndOfFile];
-    NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
-    [file writeData:data];
-    [file closeFile];
-
-    LTLoadUserLanguageModelFile();
-    return YES;
+    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
 }
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
@@ -801,7 +725,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         if (charCode == 13) {
             if ([self _writeUserPhrase]) {
                 _builder->setMarkerCursorIndex(SIZE_MAX);
-            } else {
+            }
+            else {
                 [self beep];
             }
             [self updateClientComposingBuffer:client];
@@ -868,9 +793,9 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self popOverflowComposingTextAndWalk:client];
 
         // get user override model suggestion
-        string overrideValue =
-            (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
-                _uom->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        string overrideValue = (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
+            _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self actualCandidateCursorIndex];
             vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
@@ -1137,8 +1062,33 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
     }
 
+    // if nothing is matched, see if it's a punctuation key for current layout.
     string layout = [self currentLayout];
     string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
+    if ([self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
+        return YES;
+    }
+
+    // if nothing is matched, see if it's a punctuation key.
+    string punctuation = string("_punctuation_") + string(1, (char)charCode);
+    if ([self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
+        return YES;
+    }
+
+    // still nothing, then we update the composing buffer (some app has
+    // strange behavior if we don't do this, "thinking" the key is not
+    // actually consumed)
+    if ([_composingBuffer length] || !_bpmfReadingBuffer->isEmpty()) {
+        [self beep];
+        [self updateClientComposingBuffer:client];
+        return YES;
+    }
+
+    return NO;
+}
+
+- (BOOL)handlePunctuation:(string)customPunctuation usingVerticalMode:(BOOL)useVerticalMode client:(id)client
+{
     if (_languageModel->hasUnigramsForKey(customPunctuation)) {
         if (_bpmfReadingBuffer->isEmpty()) {
             _builder->insertReadingAtCursor(customPunctuation);
@@ -1158,53 +1108,17 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
                 [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
             }
         }
-
         return YES;
     }
-
-    // if nothing is matched, see if it's a punctuation key
-    string punctuation = string("_punctuation_") + string(1, (char)charCode);
-    if (_languageModel->hasUnigramsForKey(punctuation)) {
-        if (_bpmfReadingBuffer->isEmpty()) {
-            _builder->insertReadingAtCursor(punctuation);
-            [self popOverflowComposingTextAndWalk:client];
-        }
-        else { // If there is still unfinished bpmf reading, ignore the punctuation
-            [self beep];
-        }
-        [self updateClientComposingBuffer:client];
-
-        if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
-            [self collectCandidates];
-            if ([_candidates count] == 1) {
-                [self commitComposition:client];
-            }
-            else {
-                [self _showCandidateWindowUsingVerticalMode:useVerticalMode client:client];
-            }
-        }
-
-        return YES;
-    }
-
-    // still nothing, then we update the composing buffer (some app has
-    // strange behavior if we don't do this, "thinking" the key is not
-    // actually consumed)
-    if ([_composingBuffer length] || !_bpmfReadingBuffer->isEmpty()) {
-        [self beep];
-        [self updateClientComposingBuffer:client];
-        return YES;
-    }
-
     return NO;
 }
 
 - (BOOL)handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode
 {
     BOOL cancelCandidateKey =
-        (charCode == 27) ||
-        ((_inputMode == kPlainBopomofoModeIdentifier) &&
-         (charCode == 8 || keyCode == kDeleteKeyCode));
+    (charCode == 27) ||
+    ((_inputMode == kPlainBopomofoModeIdentifier) &&
+     (charCode == 8 || keyCode == kDeleteKeyCode));
 
     if (cancelCandidateKey) {
         gCurrentCandidateController.visible = NO;
@@ -1357,7 +1271,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             string punctuation = string("_punctuation_") + string(1, (char)charCode);
 
             BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
-                _languageModel->hasUnigramsForKey(punctuation);
+            _languageModel->hasUnigramsForKey(punctuation);
 
             if (shouldAutoSelectCandidate) {
                 NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
@@ -1580,28 +1494,48 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
 }
 
-- (void)openUserPhrases:(id)sender
+- (BOOL)_checkUserFiles
 {
-    NSLog(@"openUserPhrases called");
-    if (!LTCheckIfUserLanguageModelFileExists()) {
-        NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), LTUserDataFolderPath()];
+    if (![LanguageModelManager checkIfUserLanguageModelFilesExist] ) {
+        NSString *content = [NSString stringWithFormat:NSLocalizedString(@"Please check the permission of at \"%@\".", @""), [LanguageModelManager dataFolderPath]];
         [[NonModalAlertWindowController sharedInstance] showWithTitle:NSLocalizedString(@"Unable to create the user phrase file.", @"") content:content confirmButtonTitle:NSLocalizedString(@"OK", @"") cancelButtonTitle:nil cancelAsDefault:NO delegate:nil];
-        return;
+        return NO;
     }
 
-    NSString *path = LTUserPhrasesDataPath();
-    NSLog(@"Open %@", path);
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:path atomically:YES];
+    return YES;
+}
+
+- (void)_openUserFile:(NSString *)path
+{
+    if (![self _checkUserFiles]) {
+        return;
     }
     NSURL *url = [NSURL fileURLWithPath:path];
     [[NSWorkspace sharedWorkspace] openURL:url];
 }
 
+- (void)openUserPhrases:(id)sender
+{
+    NSLog(@"openUserPhrases called");
+    [self _openUserFile:[LanguageModelManager userPhrasesDataPathMcBopomofo]];
+}
+
+- (void)openExcludedPhrasesPlainBopomofo:(id)sender
+{
+    NSLog(@"openExcludedPhrasesPlainBopomofo called");
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathPlainBopomofo]];
+}
+
+- (void)openExcludedPhrasesMcBopomofo:(id)sender
+{
+    NSLog(@"openExcludedPhrasesMcBopomofo called");
+    [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathMcBopomofo]];
+}
+
 - (void)reloadUserPhrases:(id)sender
 {
     NSLog(@"reloadUserPhrases called");
-    LTLoadUserLanguageModelFile();
+    [LanguageModelManager loadUserPhrasesModel];
 }
 
 - (void)showAbout:(id)sender
@@ -1615,6 +1549,12 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
 }
+
+@end
+
+#pragma mark -
+
+@implementation McBopomofoInputMethodController (VTCandidateController)
 
 - (NSUInteger)candidateCountForController:(VTCandidateController *)controller
 {
@@ -1636,7 +1576,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     size_t cursorIndex = [self actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, selectedValue);
     if (_inputMode != kPlainBopomofoModeIdentifier) {
-        _uom->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
+        _userOverrideModel->observe(_walkedNodes, cursorIndex, selectedValue, [[NSDate date] timeIntervalSince1970]);
     }
 
     [_candidates removeAllObjects];
@@ -1651,28 +1591,3 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 }
 
 @end
-
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, FastLM &lm)
-{
-    NSString *dataPath = [[NSBundle bundleForClass:[McBopomofoInputMethodController class]] pathForResource:filenameWithoutExtension ofType:@"txt"];
-    bool result = lm.open([dataPath UTF8String]);
-    if (!result) {
-        NSLog(@"Failed opening language model: %@", dataPath);
-    }
-}
-
-void LTLoadLanguageModel()
-{
-    LTLoadLanguageModelFile(@"data", gLanguageModel);
-    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
-}
-
-
-void LTLoadUserLanguageModelFile()
-{
-    gUserPhraseLanguageModel.close();
-    bool result = gUserPhraseLanguageModel.open([LTUserPhrasesDataPath() UTF8String]);
-    if (!result) {
-        NSLog(@"Failed opening language model for user phrases.");
-    }
-}

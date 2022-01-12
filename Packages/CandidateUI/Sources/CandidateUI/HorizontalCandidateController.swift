@@ -44,8 +44,8 @@ fileprivate class HorizontalCandidateView: NSView {
     private var keyLabelHeight: CGFloat = 0
     private var candidateTextHeight: CGFloat = 0
     private var cellPadding: CGFloat = 0
-    private var keyLabelAttrDict: [NSAttributedString.Key:AnyObject] = [:]
-    private var candidateAttrDict: [NSAttributedString.Key:AnyObject] = [:]
+    private var keyLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
+    private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
     private var elementWidths: [CGFloat] = []
     private var trackingHighlightedIndex: UInt = UInt.max
 
@@ -64,7 +64,7 @@ fileprivate class HorizontalCandidateView: NSView {
         return result
     }
 
-    @objc(setKeyLabels:displayedCandidates:)
+    @objc (setKeyLabels:displayedCandidates:)
     func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0..<count])
@@ -81,7 +81,7 @@ fileprivate class HorizontalCandidateView: NSView {
         elementWidths = newWidths
     }
 
-    @objc(setKeyLabelFont:candidateFont:)
+    @objc (setKeyLabelFont:candidateFont:)
     func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -192,8 +192,8 @@ fileprivate class HorizontalCandidateView: NSView {
     }
 }
 
-@objc(VTHorizontalCandidateController)
-public class HorizontalCandidateController : CandidateController {
+@objc (VTHorizontalCandidateController)
+public class HorizontalCandidateController: CandidateController {
     private var candidateView: HorizontalCandidateView
     private var prevPageButton: NSButton
     private var nextPageButton: NSButton
@@ -312,9 +312,9 @@ public class HorizontalCandidateController : CandidateController {
         return result < delegate.candidateCountForController(self) ? result : UInt.max
     }
 
-    @objc public override var selectedCandidateIndex: UInt {
+    public override var selectedCandidateIndex: UInt {
         get {
-            return currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
+            currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
         }
         set {
             guard let delegate = delegate else {
@@ -362,7 +362,7 @@ extension HorizontalCandidateController {
         frameRect.size = newSize
         candidateView.frame = frameRect
 
-        if self.pageCount > 1 {
+        if pageCount > 1 {
             var buttonRect = nextPageButton.frame
             var spacing = 0.0
 
@@ -397,7 +397,7 @@ extension HorizontalCandidateController {
         frameRect.size = newSize
         frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
         self.window?.setFrame(frameRect, display: false)
-        self.candidateView.setNeedsDisplay(candidateView.bounds)
+        candidateView.setNeedsDisplay(candidateView.bounds)
     }
 
     @objc fileprivate func pageButtonAction(_ sender: Any) {
@@ -407,12 +407,12 @@ extension HorizontalCandidateController {
         if sender == nextPageButton {
             _ = showNextPage()
         } else if sender == prevPageButton {
-            _ =  showPreviousPage()
+            _ = showPreviousPage()
         }
     }
 
     @objc fileprivate func candidateViewMouseDidClick(_ sender: Any) {
-        delegate?.candidateController(self, didSelectCandidateAtIndex: self.selectedCandidateIndex)
+        delegate?.candidateController(self, didSelectCandidateAtIndex: selectedCandidateIndex)
     }
 
 }

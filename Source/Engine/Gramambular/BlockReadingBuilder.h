@@ -38,7 +38,7 @@ namespace Formosa {
         
         class BlockReadingBuilder {
         public:
-            BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM);
+            BlockReadingBuilder(LanguageModel *inLM);
             void clear();
             
             size_t length() const;
@@ -73,13 +73,11 @@ namespace Formosa {
             
             Grid m_grid;
             LanguageModel *m_LM;
-            LanguageModel *m_UserPhraseLM;
             string m_joinSeparator;
         };
         
-        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM, LanguageModel *inUserPhraseLM)
+        inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM)
             : m_LM(inLM)
-            , m_UserPhraseLM(inUserPhraseLM)
             , m_cursorIndex(0)
             , m_markerCursorIndex(SIZE_MAX)
         {
@@ -197,7 +195,7 @@ namespace Formosa {
         {
             return m_grid;
         }
-        
+
         inline void BlockReadingBuilder::build()
         {
             if (!m_LM) {
@@ -222,19 +220,7 @@ namespace Formosa {
                 for (size_t q = 1 ; q <= MaximumBuildSpanLength && p+q <= end ; q++) {
                     string combinedReading = Join(m_readings.begin() + p, m_readings.begin() + p + q, m_joinSeparator);
                     if (!m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q, combinedReading)) {
-                        vector<Unigram> unigrams;
-
-                        if (m_UserPhraseLM != NULL) {
-                            if (m_UserPhraseLM->hasUnigramsForKey(combinedReading)) {
-                                vector<Unigram> userUnigrams = m_UserPhraseLM->unigramsForKeys(combinedReading);
-                                unigrams.insert(unigrams.end(), userUnigrams.begin(), userUnigrams.end());
-                            }
-                        }
-
-                        if (m_LM->hasUnigramsForKey(combinedReading)) {
-                            vector<Unigram> globalUnigrams = m_LM->unigramsForKeys(combinedReading);
-                            unigrams.insert(unigrams.end(), globalUnigrams.begin(), globalUnigrams.end());
-                        }
+                        vector<Unigram> unigrams = m_LM->unigramsForKey(combinedReading);
 
                         if (unigrams.size() > 0) {
                             Node n(combinedReading, unigrams, vector<Bigram>());

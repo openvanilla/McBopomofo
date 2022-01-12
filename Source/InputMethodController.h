@@ -36,7 +36,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "Mandarin.h"
 #import "Gramambular.h"
-#import "FastLM.h"
+#import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
 
 @interface McBopomofoInputMethodController : IMKInputController
@@ -46,17 +46,16 @@
     Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
 
     // language model
-    Formosa::Gramambular::FastLM *_languageModel;
-    Formosa::Gramambular::FastLM *_userPhrasesModel;
+    McBopomofo::McBopomofoLM *_languageModel;
+
+    // user override model
+    McBopomofo::UserOverrideModel *_userOverrideModel;
 
     // the grid (lattice) builder for the unigrams (and bigrams)
     Formosa::Gramambular::BlockReadingBuilder* _builder;
 
     // latest walked path (trellis) using the Viterbi algorithm
     std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
-
-    // user override model
-    McBopomofo::UserOverrideModel *_uom;
 
     // the latest composing buffer that is updated to the foreground app
     NSMutableString *_composingBuffer;
@@ -68,7 +67,7 @@
     // a special deferred client for Terminal.app fix
     id _currentDeferredClient;
     
-    // currently available candidates
+    // current available candidates
     NSMutableArray *_candidates;
 
     // current input mode
@@ -78,7 +77,3 @@
     BOOL _chineseConversionEnabled;
 }
 @end
-
-// the shared language model object
-extern "C" void LTLoadLanguageModel();
-extern "C" void LTLoadUserLanguageModelFile();

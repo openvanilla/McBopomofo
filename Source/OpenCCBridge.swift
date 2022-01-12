@@ -12,11 +12,11 @@ class OpenCCBridge: NSObject {
         super.init()
     }
 
-    @objc static func convert(_ string:String) -> String? {
-        return shared.converter?.convert(string)
+    @objc static func convert(_ string: String) -> String? {
+        shared.converter?.convert(string)
     }
 
-    private func convert(_ string:String) -> String? {
-        return converter?.convert(string)
+    private func convert(_ string: String) -> String? {
+        converter?.convert(string)
     }
 }

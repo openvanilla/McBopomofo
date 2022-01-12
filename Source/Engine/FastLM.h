@@ -50,7 +50,7 @@ namespace Formosa {
             void dump();
 
             virtual const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-            virtual const vector<Unigram> unigramsForKeys(const string& key);
+            virtual const vector<Unigram> unigramsForKey(const string& key);
             virtual bool hasUnigramsForKey(const string& key);
 
         protected:

@@ -42,7 +42,7 @@ private let kUpdateInfoSiteKey = "UpdateInfoSite"
 private let kNextCheckInterval: TimeInterval = 86400.0
 private let kTimeoutInterval: TimeInterval = 60.0
 
-@objc(AppDelegate)
+@objc (AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
 
     @IBOutlet weak var window: NSWindow?
@@ -51,8 +51,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var updateNextStepURL: URL?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        LTLoadLanguageModel()
-        LTLoadUserLanguageModelFile()
+        LanguageModelManager.loadDataModels()
+        LanguageModelManager.loadUserPhrasesModel()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
@@ -69,12 +69,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         preferencesWindowController?.window?.orderFront(self)
     }
 
-    @objc(checkForUpdate)
+    @objc (checkForUpdate)
     func checkForUpdate() {
         checkForUpdate(forced: false)
     }
 
-    @objc(checkForUpdateForced:)
+    @objc (checkForUpdateForced:)
     func checkForUpdate(forced: Bool) {
 
         if checkTask != nil {
@@ -98,15 +98,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         UserDefaults.standard.set(nextUpdateDate, forKey: kNextUpdateCheckDateKey)
 
         guard let infoDict = Bundle.main.infoDictionary,
-            let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
-            let updateInfoURL = URL(string: updateInfoURLString) else {
+              let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
+              let updateInfoURL = URL(string: updateInfoURLString) else {
             return
         }
 
         let request = URLRequest(url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: kTimeoutInterval)
 
         func showNoUpdateAvailableAlert() {
-            NonModalAlertWindowController.shared.show(title: NSLocalizedString("Check for Update Completed", comment: ""), content: NSLocalizedString("You are already using the latest version of McBopomofo.", comment: ""), confirmButtonTitle: NSLocalizedString("OK", comment: "") , cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+            NonModalAlertWindowController.shared.show(title: NSLocalizedString("Check for Update Completed", comment: ""), content: NSLocalizedString("You are already using the latest version of McBopomofo.", comment: ""), confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -121,7 +121,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
 
                     DispatchQueue.main.async {
-                        NonModalAlertWindowController.shared.show(title:title , content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                        NonModalAlertWindowController.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                     }
                 }
                 return
@@ -131,7 +131,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                 guard let plist = try PropertyListSerialization.propertyList(from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
                       let remoteVersion = plist[kCFBundleVersionKey] as? String,
                       let infoDict = Bundle.main.infoDictionary
-                else {
+                        else {
                     if forced {
                         DispatchQueue.main.async {
                             showNoUpdateAvailableAlert()
@@ -156,7 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                 }
 
                 guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
-                    let siteInfoURL = URL(string: siteInfoURLString) else {
+                      let siteInfoURL = URL(string: siteInfoURLString) else {
                     if forced {
                         DispatchQueue.main.async {
                             showNoUpdateAvailableAlert()
@@ -189,7 +189,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                                      remoteVersion,
                                      versionDescription)
                 DispatchQueue.main.async {
-                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: "") , content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                 }
 
             } catch {
