@@ -35,7 +35,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 + (void)loadUserPhrasesModel
 {
     gLanguageModelMcBopomofo.loadUserPhrases([[self userPhrasesDataPathMcBopomofo] UTF8String], [[self excludedPhrasesDataPathMcBopomofo] UTF8String]);
-    gLanguageModelPlainBopomofo.loadUserPhrases("", [[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
+    gLanguageModelPlainBopomofo.loadUserPhrases(NULL, [[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
 }
 
 + (BOOL)checkIfUserDataFolderExists

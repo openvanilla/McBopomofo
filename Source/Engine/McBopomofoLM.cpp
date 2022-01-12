@@ -18,17 +18,23 @@ McBopomofoLM::~McBopomofoLM()
 
 void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath)
 {
-    m_languageModel.close();
-    m_languageModel.open(languageModelDataPath);
+    if (languageModelDataPath) {
+        m_languageModel.close();
+        m_languageModel.open(languageModelDataPath);
+    }
 }
 
 void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
                                    const char* excludedPhrasesDataPath)
 {
-    m_userPhrases.close();
-    m_userPhrases.open(userPhrasesDataPath);
-    m_excludedPhrases.close();
-    m_excludedPhrases.open(excludedPhrasesDataPath);
+    if (userPhrasesDataPath) {
+        m_userPhrases.close();
+        m_userPhrases.open(userPhrasesDataPath);
+    }
+    if (excludedPhrasesDataPath) {
+        m_excludedPhrases.close();
+        m_excludedPhrases.open(excludedPhrasesDataPath);
+    }
 }
 
 const vector<Bigram> McBopomofoLM::bigramsForKeys(const string& preceedingKey, const string& key)
