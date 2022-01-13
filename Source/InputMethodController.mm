@@ -336,6 +336,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     gCurrentCandidateController.delegate = nil;
     gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
+
+    [self _hideTooltip];
 }
 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
@@ -411,6 +413,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [_composingBuffer setString:@""];
     gCurrentCandidateController.visible = NO;
     [_candidates removeAllObjects];
+    [self _hideTooltip];
 }
 
 NS_INLINE size_t min(size_t a, size_t b) { return a < b ? a : b; }
