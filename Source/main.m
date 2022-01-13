@@ -34,7 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <InputMethodKit/InputMethodKit.h>
-#import "McBopomofo-Swift.h"
+@import InputSourceHelper;
 
 static NSString *const kConnectionName = @"McBopomofo_1_Connection";
 

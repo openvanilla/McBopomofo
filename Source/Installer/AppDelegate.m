@@ -27,7 +27,8 @@
 
 #import "AppDelegate.h"
 #import <sys/mount.h>
-#import "McBopomofoInstaller-Swift.h"
+//#import "McBopomofoInstaller-Swift.h"
+@import InputSourceHelper;
 
 static NSString *const kTargetBin = @"McBopomofo";
 static NSString *const kTargetType = @"app";
