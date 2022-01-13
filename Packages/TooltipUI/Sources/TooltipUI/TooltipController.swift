@@ -1,9 +1,9 @@
 import Cocoa
 
 public class TooltipController: NSWindowController {
-    let backgroundColor =  NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
-    var messageTextField: NSTextField
-    var tooltip: String  = "" {
+    private let backgroundColor =  NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
+    private var messageTextField: NSTextField
+    private var tooltip: String  = "" {
         didSet {
             messageTextField.stringValue = tooltip
             adjustSize()

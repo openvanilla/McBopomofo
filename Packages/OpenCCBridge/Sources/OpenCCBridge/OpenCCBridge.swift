@@ -7,7 +7,7 @@ public class OpenCCBridge: NSObject {
     private static let shared = OpenCCBridge()
     private var converter: ChineseConverter?
 
-    override init() {
+    private override init() {
         try? converter = ChineseConverter(options: .simplify)
         super.init()
     }

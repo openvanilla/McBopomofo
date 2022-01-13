@@ -1,10 +1,10 @@
 import Cocoa
 
-protocol NotifierWindowDelegate: AnyObject {
+private protocol NotifierWindowDelegate: AnyObject {
     func windowDidBecomeClicked(_ window: NotifierWindow)
 }
 
-class NotifierWindow: NSWindow {
+private class NotifierWindow: NSWindow {
     weak var clickDelegate: NotifierWindowDelegate?
 
     override func mouseDown(with event: NSEvent) {
@@ -12,8 +12,8 @@ class NotifierWindow: NSWindow {
     }
 }
 
-let kWindowWidth: CGFloat = 160.0
-let kWindowHeight: CGFloat = 80.0
+private let kWindowWidth: CGFloat = 160.0
+private let kWindowHeight: CGFloat = 80.0
 
 public class NotifierController: NSWindowController, NotifierWindowDelegate {
     private var messageTextField: NSTextField
@@ -64,18 +64,18 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         controller.show()
     }
 
-    static func increaseInstanceCount() {
+    private static func increaseInstanceCount() {
         instanceCount += 1
     }
 
-    static func decreaseInstanceCount() {
+    private static func decreaseInstanceCount() {
         instanceCount -= 1
         if instanceCount < 0 {
             instanceCount = 0
         }
     }
 
-    public init() {
+    private init() {
         let screenRect = NSScreen.main?.visibleFrame ?? NSRect.zero
         let contentRect = NSRect(x: 0, y: 0, width: kWindowWidth, height: kWindowHeight)
         var windowRect = contentRect
@@ -107,41 +107,41 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setStartLocation() {
-        if NotifierController.instanceCount == 0 {
-            return
+    private func show() {
+        func setStartLocation() {
+            if NotifierController.instanceCount == 0 {
+                return
+            }
+            let lastLocation = NotifierController.lastLocation
+            let screenRect = NSScreen.main?.visibleFrame ?? NSRect.zero
+            var windowRect = self.window?.frame ?? NSRect.zero
+            windowRect.origin.x = lastLocation.x
+            windowRect.origin.y = lastLocation.y - 10 - windowRect.height
+
+            if windowRect.origin.y < screenRect.minY {
+                return
+            }
+
+            self.window?.setFrame(windowRect, display: true)
         }
-        let lastLocation = NotifierController.lastLocation
-        let screenRect = NSScreen.main?.visibleFrame ?? NSRect.zero
-        var windowRect = self.window?.frame ?? NSRect.zero
-        windowRect.origin.x = lastLocation.x
-        windowRect.origin.y = lastLocation.y - 10 - windowRect.height
 
-        if windowRect.origin.y < screenRect.minY {
-            return
+        func moveIn() {
+            let afterRect = self.window?.frame ?? NSRect.zero
+            NotifierController.lastLocation = afterRect.origin
+            var beforeRect = afterRect
+            beforeRect.origin.y += 10
+            window?.setFrame(beforeRect, display: true)
+            window?.orderFront(self)
+            window?.setFrame(afterRect, display: true, animate: true)
         }
 
-        self.window?.setFrame(windowRect, display: true)
-    }
-
-    func moveIn() {
-        let afterRect = self.window?.frame ?? NSRect.zero
-        NotifierController.lastLocation = afterRect.origin
-        var beforeRect = afterRect
-        beforeRect.origin.y += 10
-        window?.setFrame(beforeRect, display: true)
-        window?.orderFront(self)
-        window?.setFrame(afterRect, display: true, animate: true)
-    }
-
-    func show() {
         setStartLocation()
         moveIn()
         NotifierController.increaseInstanceCount()
         waitTimer = Timer.scheduledTimer(timeInterval: shouldStay ? 5 : 1, target: self, selector: #selector(fadeOut), userInfo: nil, repeats: false)
     }
 
-    @objc func doFadeOut(_ timer: Timer) {
+    @objc private func doFadeOut(_ timer: Timer) {
         let opacity = self.window?.alphaValue ?? 0
         if opacity <= 0 {
             self.close()
@@ -150,7 +150,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         }
     }
 
-    @objc func fadeOut() {
+    @objc private func fadeOut() {
         waitTimer?.invalidate()
         waitTimer = nil
         NotifierController.decreaseInstanceCount()
@@ -165,7 +165,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         super.close()
     }
 
-    func windowDidBecomeClicked(_ window: NotifierWindow) {
+    fileprivate func windowDidBecomeClicked(_ window: NotifierWindow) {
         self.fadeOut()
     }
 }
