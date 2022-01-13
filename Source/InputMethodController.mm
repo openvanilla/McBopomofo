@@ -42,6 +42,7 @@
 #import "McBopomofo-Swift.h"
 
 @import CandidateUI;
+@import NotifierUI;
 @import TooltipUI;
 @import OpenCC;
 
@@ -1692,6 +1693,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
+
+    [NotifierController notifyWithMessage:
+     _chineseConversionEnabled ?
+        NSLocalizedString(@"Chinese conversion on", @"") :
+        NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
 }
 
 - (void)toggleHalfWidthPunctuation:(id)sender
