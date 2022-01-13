@@ -78,6 +78,7 @@ static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizonta
 static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
 static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
 static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
+static NSString *const kHalfSizePunctuationEnabledKey = @"HalfSizePunctuationEnabledKey";
 static NSString *const kEscToCleanInputBufferKey = @"EscToCleanInputBufferKey";
 
 // advanced (usually optional) settings
@@ -189,6 +190,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         _inputMode = kBopomofoModeIdentifier;
         _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
+        _halfSizePunctuationEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kHalfSizePunctuationEnabledKey];
     }
 
     return self;
@@ -201,10 +203,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
     [menu addItem:preferenceMenuItem];
 
-    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"G"];
+    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"g"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
+
+    NSMenuItem *halfSizePunctuationMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Use Half-Size Punctuations", @"") action:@selector(toggleHalfSizePunctuation:) keyEquivalent:@""];
+    halfSizePunctuationMenuItem.state = _halfSizePunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    [menu addItem:halfSizePunctuationMenuItem];
 
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
@@ -382,7 +388,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     // Chinese conversion.
     NSString *buffer = _composingBuffer;
-    if (_chineseConversionEnabled) {
+    BOOL chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
+    if (chineseConversionEnabled) {
         buffer = [OpenCCBridge convert:_composingBuffer];
     }
 
@@ -542,7 +549,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             NodeAnchor &anchor = _walkedNodes[0];
             NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             // Chinese conversion.
-            if (_chineseConversionEnabled) {
+            BOOL chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
+            if (chineseConversionEnabled) {
                 popedText = [OpenCCBridge convert:popedText];
             }
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
@@ -1062,13 +1070,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // if nothing is matched, see if it's a punctuation key for current layout.
     string layout = [self currentLayout];
-    string customPunctuation = string("_punctuation_") + layout + string(1, (char)charCode);
+    string punctuationNamePrefix = (_halfSizePunctuationEnabled ? string("_half_punctuation_"): string("_punctuation_"));
+    string customPunctuation = punctuationNamePrefix + layout + string(1, (char)charCode);
     if ([self handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
 
     // if nothing is matched, see if it's a punctuation key.
-    string punctuation = string("_punctuation_") + string(1, (char)charCode);
+    string punctuation = punctuationNamePrefix + string(1, (char)charCode);
     if ([self handlePunctuation:punctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
     }
@@ -1547,6 +1556,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     _chineseConversionEnabled = !_chineseConversionEnabled;
     [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
 }
+
+- (void)toggleHalfSizePunctuation:(id)sender
+{
+    _halfSizePunctuationEnabled = !_halfSizePunctuationEnabled;
+    [[NSUserDefaults standardUserDefaults] setBool:_halfSizePunctuationEnabled forKey:kHalfSizePunctuationEnabledKey];
+}
+
 
 @end
 
