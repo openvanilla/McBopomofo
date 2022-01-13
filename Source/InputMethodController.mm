@@ -42,6 +42,7 @@
 #import "McBopomofo-Swift.h"
 
 @import CandidateUI;
+@import TooltipUI;
 @import OpenCC;
 
 // C++ namespace usages
@@ -489,6 +490,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange((NSInteger)_builder->markerCursorIndex(), 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = (NSInteger)_builder->markerCursorIndex();
+        [self _showCurrentMarkedTextTooltipWithClient:client];
     }
     else {
         // we must use NSAttributedString so that the cursor is visible --
@@ -501,6 +503,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // i.e. the client app needs to take care of where to put ths composing buffer
         [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         _latestReadingCursor = cursorIndex;
+        [self _hideTooltip];
     }
 }
 
@@ -606,47 +609,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return layout;
 }
 
-- (NSString *)_currentMarkedText
-{
-    if (_builder->markerCursorIndex() < 0) {
-        return @"";
-    }
-    if (!_bpmfReadingBuffer->isEmpty()) {
-        return @"";
-    }
-
-    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
-    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
-    // A phrase should contian at least two characters.
-    if (end - begin < 2) {
-        return @"";
-    }
-
-    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
-    NSString *reading = [_composingBuffer substringWithRange:range];
-    NSMutableString *string = [[NSMutableString alloc] init];
-    [string appendString:reading];
-    [string appendString:@" "];
-    NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    vector<std::string> v = _builder->readingsAtRange(begin, end);
-    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
-        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
-    }
-    [string appendString:[readingsArray componentsJoinedByString:@"-"]];
-    return string;
-}
-
-- (BOOL)_writeUserPhrase
-{
-    NSString *currentMarkedPhrase = [self _currentMarkedText];
-    if (![currentMarkedPhrase length]) {
-        return NO;
-    }
-
-    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
-}
-
-- (McBpomofoEmacsKey)detectEmacsKeyFromCharCode:(UniChar)charCode modifiers:(NSUInteger)flags
+- (McBpomofoEmacsKey)_detectEmacsKeyFromCharCode:(UniChar)charCode modifiers:(NSUInteger)flags
 {
     if (flags & NSControlKeyMask) {
         char c = charCode + 'a' - 1;
@@ -698,7 +661,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
 
-    McBpomofoEmacsKey emacsKey = [self detectEmacsKeyFromCharCode:charCode modifiers:flags];
+    McBpomofoEmacsKey emacsKey = [self _detectEmacsKeyFromCharCode:charCode modifiers:flags];
 
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         // special handling for com.apple.Terminal
@@ -1400,24 +1363,30 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 + (VTHorizontalCandidateController *)horizontalCandidateController
 {
     static VTHorizontalCandidateController *instance = nil;
-    @synchronized(self) {
-        if (!instance) {
-            instance = [[VTHorizontalCandidateController alloc] init];
-        }
-    }
-
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[VTHorizontalCandidateController alloc] init];
+    });
     return instance;
 }
 
 + (VTVerticalCandidateController *)verticalCandidateController
 {
     static VTVerticalCandidateController *instance = nil;
-    @synchronized(self) {
-        if (!instance) {
-            instance = [[VTVerticalCandidateController alloc] init];
-        }
-    }
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[VTVerticalCandidateController alloc] init];
+    });
+    return instance;
+}
 
++ (TooltipController *)tooltipController
+{
+    static TooltipController *instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[TooltipController alloc] init];
+    });
     return instance;
 }
 
@@ -1539,6 +1508,113 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     gCurrentCandidateController.visible = YES;
+}
+
+#pragma mark - User phrases
+
+- (NSString *)_currentMarkedText
+{
+    if (_builder->markerCursorIndex() < 0) {
+        return @"";
+    }
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        return @"";
+    }
+
+    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
+    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+    // A phrase should contian at least two characters.
+    if (end - begin < 1) {
+        return @"";
+    }
+
+    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
+    NSString *selectedText = [_composingBuffer substringWithRange:range];
+    return selectedText;
+}
+
+- (NSString *)_currentMarkedTextAndReadings
+{
+    if (_builder->markerCursorIndex() < 0) {
+        return @"";
+    }
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        return @"";
+    }
+
+    size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
+    size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
+    // A phrase should contian at least two characters.
+    if (end - begin < 2) {
+        return @"";
+    }
+
+    NSRange range = NSMakeRange((NSInteger)begin, (NSInteger)(end - begin));
+    NSString *selectedText = [_composingBuffer substringWithRange:range];
+    NSMutableString *string = [[NSMutableString alloc] init];
+    [string appendString:selectedText];
+    [string appendString:@" "];
+    NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
+    vector<std::string> v = _builder->readingsAtRange(begin, end);
+    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
+        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
+    }
+    [string appendString:[readingsArray componentsJoinedByString:@"-"]];
+    return string;
+}
+
+- (BOOL)_writeUserPhrase
+{
+    NSString *currentMarkedPhrase = [self _currentMarkedTextAndReadings];
+    if (![currentMarkedPhrase length]) {
+        return NO;
+    }
+
+    return [LanguageModelManager writeUserPhrase:currentMarkedPhrase];
+}
+
+- (void)_showCurrentMarkedTextTooltipWithClient:(id)client
+{
+    NSString *text = [self _currentMarkedText];
+    NSInteger length = text.length;
+    if (!length) {
+        [self _hideTooltip];
+    }
+    else if (length == 1) {
+        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
+        [self _showTooltip:messsage client:client];
+    }
+    else {
+        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". Press enter to add a new phrase.", @""), text];
+        [self _showTooltip:messsage client:client];
+    }
+}
+
+- (void)_showTooltip:(NSString *)tooltip client:(id)client
+{
+    NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
+
+    NSInteger cursor = _latestReadingCursor;
+    if (cursor == [_composingBuffer length] && cursor != 0) {
+        cursor--;
+    }
+
+    // some apps (e.g. Twitter for Mac's search bar) handle this call incorrectly, hence the try-catch
+    @try {
+        [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception);
+    }
+
+    [[McBopomofoInputMethodController tooltipController] showTooltip:tooltip atPoint:lineHeightRect.origin];
+}
+
+- (void)_hideTooltip
+{
+    if ([McBopomofoInputMethodController tooltipController].window.isVisible) {
+        [[McBopomofoInputMethodController tooltipController] hide];
+    }
 }
 
 #pragma mark - Misc menu items

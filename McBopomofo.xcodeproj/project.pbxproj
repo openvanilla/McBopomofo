@@ -42,6 +42,7 @@
 		D427A9C125ED28CC005D43E0 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */; };
 		D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F769278C9E29004A2160 /* CandidateUI */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
+		D427F7A927905E90004A2160 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7A827905E90004A2160 /* TooltipUI */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
@@ -168,6 +169,7 @@
 		D427A9C025ED28CC005D43E0 /* OpenCCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
 		D427F768278C9D0D004A2160 /* CandidateUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateUI; path = Packages/CandidateUI; sourceTree = "<group>"; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D427F7A727905E43004A2160 /* TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TooltipUI; path = Packages/TooltipUI; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 			files = (
 				6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */,
 				D48550A325EBE689006A204C /* OpenCC in Frameworks */,
+				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
 				6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */,
 			);
@@ -393,6 +396,7 @@
 			isa = PBXGroup;
 			children = (
 				D427F768278C9D0D004A2160 /* CandidateUI */,
+				D427F7A727905E43004A2160 /* TooltipUI */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -434,6 +438,7 @@
 			packageProductDependencies = (
 				D48550A225EBE689006A204C /* OpenCC */,
 				D427F769278C9E29004A2160 /* CandidateUI */,
+				D427F7A827905E90004A2160 /* TooltipUI */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1058,6 +1063,10 @@
 		D427F769278C9E29004A2160 /* CandidateUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CandidateUI;
+		};
+		D427F7A827905E90004A2160 /* TooltipUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TooltipUI;
 		};
 		D48550A225EBE689006A204C /* OpenCC */ = {
 			isa = XCSwiftPackageProductDependency;
