@@ -44,6 +44,7 @@
 @import CandidateUI;
 @import NotifierUI;
 @import TooltipUI;
+@import OpenCCBridge;
 
 // C++ namespace usages
 using namespace std;

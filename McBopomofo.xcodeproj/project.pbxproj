@@ -45,8 +45,7 @@
 		D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7AD27907B8A004A2160 /* NotifierUI */; };
 		D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7B3279086DC004A2160 /* InputSourceHelper */; };
 		D427F7B6279086F6004A2160 /* InputSourceHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7B5279086F6004A2160 /* InputSourceHelper */; };
-		D427F7BB27908D78004A2160 /* OpenCCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F7BA27908D78004A2160 /* OpenCCBridge.swift */; };
-		D427F7BE27908DD7004A2160 /* OpenCC in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7BD27908DD7004A2160 /* OpenCC */; };
+		D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7C027908EFC004A2160 /* OpenCCBridge */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
@@ -172,7 +171,7 @@
 		D427F7A727905E43004A2160 /* TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TooltipUI; path = Packages/TooltipUI; sourceTree = "<group>"; };
 		D427F7AC27907B7E004A2160 /* NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = NotifierUI; path = Packages/NotifierUI; sourceTree = "<group>"; };
 		D427F7B2279086B5004A2160 /* InputSourceHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InputSourceHelper; path = Packages/InputSourceHelper; sourceTree = "<group>"; };
-		D427F7BA27908D78004A2160 /* OpenCCBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenCCBridge.swift; sourceTree = "<group>"; };
+		D427F7BF27908EAC004A2160 /* OpenCCBridge */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenCCBridge; path = Packages/OpenCCBridge; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
@@ -185,11 +184,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */,
+				D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */,
 				6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */,
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
 				D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */,
-				D427F7BE27908DD7004A2160 /* OpenCC in Frameworks */,
 				6A0D4EA715FC0D2D00ABF4B3 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,7 +250,6 @@
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
 				D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */,
 				D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */,
-				D427F7BA27908D78004A2160 /* OpenCCBridge.swift */,
 				6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */,
 				D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */,
 			);
@@ -403,6 +401,7 @@
 				D427F7A727905E43004A2160 /* TooltipUI */,
 				D427F7AC27907B7E004A2160 /* NotifierUI */,
 				D427F7B2279086B5004A2160 /* InputSourceHelper */,
+				D427F7BF27908EAC004A2160 /* OpenCCBridge */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -446,7 +445,7 @@
 				D427F7A827905E90004A2160 /* TooltipUI */,
 				D427F7AD27907B8A004A2160 /* NotifierUI */,
 				D427F7B3279086DC004A2160 /* InputSourceHelper */,
-				D427F7BD27908DD7004A2160 /* OpenCC */,
+				D427F7C027908EFC004A2160 /* OpenCCBridge */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -498,7 +497,6 @@
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
-				D427F7BC27908DD7004A2160 /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */,
 			);
 			productRefGroup = 6A0D4EA315FC0D2D00ABF4B3 /* Products */;
 			projectDirPath = "";
@@ -578,7 +576,6 @@
 				D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */,
 				6A0D4ED215FC0D6400ABF4B3 /* InputMethodController.mm in Sources */,
 				D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */,
-				D427F7BB27908D78004A2160 /* OpenCCBridge.swift in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
@@ -1057,17 +1054,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		D427F7BC27908DD7004A2160 /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ddddxxx/SwiftyOpenCC.git";
-			requirement = {
-				kind = revision;
-				revision = a802c02cbf1c6fcd529575f11a9876d94fc813f4;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
 		D427F769278C9E29004A2160 /* CandidateUI */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1089,10 +1075,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = InputSourceHelper;
 		};
-		D427F7BD27908DD7004A2160 /* OpenCC */ = {
+		D427F7C027908EFC004A2160 /* OpenCCBridge */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D427F7BC27908DD7004A2160 /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */;
-			productName = OpenCC;
+			productName = OpenCCBridge;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
