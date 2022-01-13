@@ -75,6 +75,6 @@
 
     // if Chinese conversion is enabled
     BOOL _chineseConversionEnabled;
-    BOOL _halfSizePunctuationEnabled;
+    BOOL _halfWidthPunctuationEnabled;
 }
 @end
