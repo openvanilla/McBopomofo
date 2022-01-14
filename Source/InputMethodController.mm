@@ -73,16 +73,6 @@ enum {
     kDeleteKeyCode = 117
 };
 
-typedef NS_ENUM(NSUInteger, McBpomofoEmacsKey) {
-    McBpomofoEmacsKeyNone,
-    McBpomofoEmacsKeyForward,
-    McBpomofoEmacsKeyBackward,
-    McBpomofoEmacsKeyHome,
-    McBpomofoEmacsKeyEnd,
-    McBpomofoEmacsKeyDelete,
-    McBpomofoEmacsKeyNextPage,
-};
-
 VTCandidateController *gCurrentCandidateController = nil;
 
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
@@ -499,32 +489,6 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return layout;
 }
 
-- (McBpomofoEmacsKey)_detectEmacsKeyFromCharCode:(UniChar)charCode modifiers:(NSUInteger)flags
-{
-    if (flags & NSControlKeyMask) {
-        char c = charCode + 'a' - 1;
-        if (c == 'a') {
-            return McBpomofoEmacsKeyHome;
-        }
-        else if (c == 'e') {
-            return McBpomofoEmacsKeyEnd;
-        }
-        else if (c == 'f') {
-            return McBpomofoEmacsKeyForward;
-        }
-        else if (c == 'b') {
-            return McBpomofoEmacsKeyBackward;
-        }
-        else if (c == 'd') {
-            return McBpomofoEmacsKeyDelete;
-        }
-        else if (c == 'v') {
-            return McBpomofoEmacsKeyNextPage;
-        }
-    }
-    return McBpomofoEmacsKeyNone;
-}
-
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
     NSRect textFrame = NSZeroRect;
@@ -550,7 +514,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
 
-    McBpomofoEmacsKey emacsKey = [self _detectEmacsKeyFromCharCode:charCode modifiers:flags];
+    McBopomofoEmacsKey emacsKey = [EmacsKeyHelper detectWithCharCode:charCode flags:flags];
 
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         // special handling for com.apple.Terminal
@@ -609,7 +573,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // if we have candidate, it means we need to pass the event to the candidate handler
     if ([_candidates count]) {
-        return [self _handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode emacsKey:(McBpomofoEmacsKey)emacsKey];
+        return [self _handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode emacsKey:(McBopomofoEmacsKey)emacsKey];
     }
 
     // If we have marker index.
@@ -632,7 +596,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
         // Shift + left
-        if ((keyCode == cursorBackwardKey || emacsKey == McBpomofoEmacsKeyBackward)
+        if ((keyCode == cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward)
             && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() > 0) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
@@ -644,7 +608,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
         // Shift + Right
-        if ((keyCode == cursorForwardKey || emacsKey == McBpomofoEmacsKeyForward)
+        if ((keyCode == cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward)
              && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() < _builder->length()) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
@@ -778,7 +742,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // handle cursor backward
-    if (keyCode == cursorBackwardKey || emacsKey == McBpomofoEmacsKeyBackward) {
+    if (keyCode == cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -810,7 +774,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // handle cursor forward
-    if (keyCode == cursorForwardKey || emacsKey == McBpomofoEmacsKeyForward) {
+    if (keyCode == cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -840,7 +804,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (keyCode == kHomeKeyCode || emacsKey == McBpomofoEmacsKeyHome) {
+    if (keyCode == kHomeKeyCode || emacsKey == McBopomofoEmacsKeyHome) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -861,7 +825,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (keyCode == kEndKeyCode || emacsKey == McBpomofoEmacsKeyEnd) {
+    if (keyCode == kEndKeyCode || emacsKey == McBopomofoEmacsKeyEnd) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -914,7 +878,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // Delete
-    if (keyCode == kDeleteKeyCode || emacsKey == McBpomofoEmacsKeyDelete) {
+    if (keyCode == kDeleteKeyCode || emacsKey == McBopomofoEmacsKeyDelete) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
@@ -1014,7 +978,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
-- (BOOL)_handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode emacsKey:(McBpomofoEmacsKey)emacsKey
+- (BOOL)_handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode emacsKey:(McBopomofoEmacsKey)emacsKey
 {
     BOOL cancelCandidateKey =
     (charCode == 27) ||
@@ -1037,7 +1001,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
         return YES;
     }
-    else if (charCode == 32 || keyCode == kPageDownKeyCode || emacsKey == McBpomofoEmacsKeyNextPage) {
+    else if (charCode == 32 || keyCode == kPageDownKeyCode || emacsKey == McBopomofoEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             [self beep];
@@ -1071,7 +1035,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (emacsKey == McBpomofoEmacsKeyBackward) {
+    else if (emacsKey == McBopomofoEmacsKeyBackward) {
         BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
         if (!updated) {
             [self beep];
@@ -1097,7 +1061,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (emacsKey == McBpomofoEmacsKeyForward) {
+    else if (emacsKey == McBopomofoEmacsKeyForward) {
         BOOL updated = [gCurrentCandidateController highlightNextCandidate];
         if (!updated) {
             [self beep];
@@ -1141,7 +1105,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (keyCode == kHomeKeyCode || emacsKey == McBpomofoEmacsKeyHome) {
+    else if (keyCode == kHomeKeyCode || emacsKey == McBopomofoEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             [self beep];
 
@@ -1153,7 +1117,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
-    else if ((keyCode == kEndKeyCode || emacsKey == McBpomofoEmacsKeyEnd) && [_candidates count] > 0) {
+    else if ((keyCode == kEndKeyCode || emacsKey == McBopomofoEmacsKeyEnd) && [_candidates count] > 0) {
         if (gCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
             [self beep];
         }
