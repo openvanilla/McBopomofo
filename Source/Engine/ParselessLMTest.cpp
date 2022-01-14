@@ -21,42 +21,39 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef MCBOPOMOFOLM_H
-#define MCBOPOMOFOLM_H
+#include <filesystem>
+#include <iostream>
 
-#include <stdio.h>
-#include "UserPhrasesLM.h"
 #include "ParselessLM.h"
-#include "PhraseReplacementMap.h"
+#include "gtest/gtest.h"
 
 namespace McBopomofo {
 
-using namespace Formosa::Gramambular;
+TEST(ParselessLMTest, SanityCheckTest)
+{
+    constexpr const char* data_path = "data.txt";
+    if (!std::filesystem::exists(data_path)) {
+        GTEST_SKIP();
+    }
 
-class McBopomofoLM : public LanguageModel {
-public:
-    McBopomofoLM();
-    ~McBopomofoLM();
+    ParselessLM lm;
+    bool status = lm.open(data_path);
+    ASSERT_TRUE(status);
 
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* userPhrasesDataPath,
-                         const char* excludedPhrasesDataPath);
-    void loadPhraseReplacementMap(const char* phraseReplacementPath);
+    ASSERT_TRUE(lm.hasUnigramsForKey("ㄕ"));
+    ASSERT_TRUE(lm.hasUnigramsForKey("ㄕˋ-ㄕˊ"));
+    ASSERT_TRUE(lm.hasUnigramsForKey("_punctuation_list"));
 
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    const vector<Unigram> unigramsForKey(const string& key);
-    bool hasUnigramsForKey(const string& key);
+    auto unigrams = lm.unigramsForKey("ㄕ");
+    ASSERT_GT(unigrams.size(), 0);
 
-    void setPhraseReplacementEnabled(bool enabled);
-    bool phraseReplacementEnabled();
+    unigrams = lm.unigramsForKey("ㄕˋ-ㄕˊ");
+    ASSERT_GT(unigrams.size(), 0);
 
-protected:
-    ParselessLM m_languageModel;
-    UserPhrasesLM m_userPhrases;
-    UserPhrasesLM m_excludedPhrases;
-    PhraseReplacementMap m_phraseReplacement;
-    bool m_phraseReplacementEnabled;
-};
-};
+    unigrams = lm.unigramsForKey("_punctuation_list");
+    ASSERT_GT(unigrams.size(), 0);
 
-#endif
+    lm.close();
+}
+
+}; // namespace McBopomofo

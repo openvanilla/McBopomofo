@@ -21,42 +21,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef MCBOPOMOFOLM_H
-#define MCBOPOMOFOLM_H
+#ifndef SOURCE_ENGINE_PARSELESSPHRASEDB_H_
+#define SOURCE_ENGINE_PARSELESSPHRASEDB_H_
 
-#include <stdio.h>
-#include "UserPhrasesLM.h"
-#include "ParselessLM.h"
-#include "PhraseReplacementMap.h"
+#include <cstddef>
+#include <string>
+#include <vector>
 
 namespace McBopomofo {
 
-using namespace Formosa::Gramambular;
+constexpr std::string_view SORTED_PRAGMA_HEADER
+    = "# format org.openvanilla.mcbopomofo.sorted\n";
 
-class McBopomofoLM : public LanguageModel {
+// Defines phrase database that consists of (key, value, score) rows that are
+// pre-sorted by the byte value of the keys. It is way faster than FastLM
+// because it does not need to parse anything. Instead, it relies on the fact
+// that the database is already sorted, and binary search is used to find the
+// rows.
+class ParselessPhraseDB {
 public:
-    McBopomofoLM();
-    ~McBopomofoLM();
+    ParselessPhraseDB(
+        const char* buf, size_t length, bool validate_pragma = false);
 
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* userPhrasesDataPath,
-                         const char* excludedPhrasesDataPath);
-    void loadPhraseReplacementMap(const char* phraseReplacementPath);
+    // Find the rows that match the key. Note that prefix match is used. If you
+    // need exact match, the key will need to have a delimiter (usually a space)
+    // at the end.
+    std::vector<std::string_view> findRows(const std::string_view& key);
 
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    const vector<Unigram> unigramsForKey(const string& key);
-    bool hasUnigramsForKey(const string& key);
+    const char* findFirstMatchingLine(const std::string_view& key);
 
-    void setPhraseReplacementEnabled(bool enabled);
-    bool phraseReplacementEnabled();
-
-protected:
-    ParselessLM m_languageModel;
-    UserPhrasesLM m_userPhrases;
-    UserPhrasesLM m_excludedPhrases;
-    PhraseReplacementMap m_phraseReplacement;
-    bool m_phraseReplacementEnabled;
-};
+private:
+    const char* begin_;
+    const char* end_;
 };
 
-#endif
+}; // namespace McBopomofo
+
+#endif // SOURCE_ENGINE_PARSELESSPHRASEDB_H_

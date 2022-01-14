@@ -21,42 +21,38 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef MCBOPOMOFOLM_H
-#define MCBOPOMOFOLM_H
+#ifndef SOURCE_ENGINE_PARSELESSLM_H_
+#define SOURCE_ENGINE_PARSELESSLM_H_
 
-#include <stdio.h>
-#include "UserPhrasesLM.h"
-#include "ParselessLM.h"
-#include "PhraseReplacementMap.h"
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "LanguageModel.h"
+#include "ParselessPhraseDB.h"
 
 namespace McBopomofo {
 
-using namespace Formosa::Gramambular;
-
-class McBopomofoLM : public LanguageModel {
+class ParselessLM : public Formosa::Gramambular::LanguageModel {
 public:
-    McBopomofoLM();
-    ~McBopomofoLM();
+    ~ParselessLM() override;
 
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* userPhrasesDataPath,
-                         const char* excludedPhrasesDataPath);
-    void loadPhraseReplacementMap(const char* phraseReplacementPath);
+    bool open(const std::string_view& path);
+    void close();
 
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
-    const vector<Unigram> unigramsForKey(const string& key);
-    bool hasUnigramsForKey(const string& key);
+    const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(
+        const std::string& preceedingKey, const std::string& key) override;
+    const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(
+        const std::string& key) override;
+    bool hasUnigramsForKey(const std::string& key) override;
 
-    void setPhraseReplacementEnabled(bool enabled);
-    bool phraseReplacementEnabled();
-
-protected:
-    ParselessLM m_languageModel;
-    UserPhrasesLM m_userPhrases;
-    UserPhrasesLM m_excludedPhrases;
-    PhraseReplacementMap m_phraseReplacement;
-    bool m_phraseReplacementEnabled;
-};
+private:
+    int fd_ = -1;
+    void* data_ = nullptr;
+    size_t length_ = 0;
+    std::unique_ptr<ParselessPhraseDB> db_;
 };
 
-#endif
+}; // namespace McBopomofo
+
+#endif // SOURCE_ENGINE_PARSELESSLM_H_
