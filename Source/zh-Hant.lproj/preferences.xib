@@ -227,7 +227,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBufferKey" id="DyT-0S-5XE"/>
+                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="Van-yb-Rvz"/>
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="113">

@@ -121,7 +121,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBufferKey" id="atP-oI-qLL"/>
+                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="tD5-7J-qTF"/>
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="13">

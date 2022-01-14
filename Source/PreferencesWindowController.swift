@@ -125,6 +125,7 @@ import Carbon
 
         basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
+        selectionKeyComboBox.removeAllItems()
         selectionKeyComboBox.addItems(withObjectValues: [Preferences.defaultKeys, "asdfghjkl", "asdfzxcvb"])
 
         var candidateSelectionKeys = Preferences.candidateKeys ?? Preferences.defaultKeys

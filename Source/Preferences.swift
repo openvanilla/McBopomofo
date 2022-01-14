@@ -204,11 +204,11 @@ struct ComposingKeys {
 // MARK: -
 
 class Preferences: NSObject {
-    @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: KeyboardLayout.standard)
-    @objc static var keyboardLayout: KeyboardLayout
+    @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
+    @objc static var keyboardLayout: Int
 
     @objc static var keyboardLayoutName: String {
-        self.keyboardLayout.name
+        (KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.standard).name
     }
 
     @UserDefault(key: kBasisKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
@@ -235,7 +235,7 @@ class Preferences: NSObject {
     @UserDefault(key: kChooseCandidateUsingSpaceKey, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
 
-    @UserDefault(key: kChineseConversionEnabledKey, defaultValue: true)
+    @UserDefault(key: kChineseConversionEnabledKey, defaultValue: false)
     @objc static var chineseConversionEnabled: Bool
 
     @objc static func toggleChineseConversionEnabled() -> Bool {
@@ -243,7 +243,7 @@ class Preferences: NSObject {
         return chineseConversionEnabled
     }
 
-    @UserDefault(key: kHalfWidthPunctuationEnabledKey, defaultValue: true)
+    @UserDefault(key: kHalfWidthPunctuationEnabledKey, defaultValue: false)
     @objc static var halfWidthPunctuationEnabled: Bool
 
     @objc static func toogleHalfWidthPunctuationEnabled() -> Bool {
@@ -251,7 +251,7 @@ class Preferences: NSObject {
         return halfWidthPunctuationEnabled;
     }
 
-    @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: true)
+    @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: false)
     @objc static var escToCleanInputBuffer: Bool
 
     // MARK: Optional settings
