@@ -4,6 +4,7 @@
 // Voltaire IME Candidate Controller Module
 //
 // Copyright (c) 2011-2022 The OpenVanilla Project.
+// Beautified by Aiden Pearce.
 //
 // Contributors:
 //     Lukhnos Liu (@lukhnos)
@@ -138,6 +139,8 @@ public class VerticalCandidateController: CandidateController {
         scrollView = NSScrollView(frame: scrollViewRect)
 
         scrollView.autohidesScrollers = true // Our aesthetics of UI design has to stay close to Apple.
+        scrollView.drawsBackground = true // Allow scrollView to draw background.
+		scrollView.backgroundColor = NSColor.clear // Draw a tramsparent background.
         scrollView.verticalScrollElasticity = .none
                 // scrollView.drawsBackground = true 
                 // NOTE: You may set it to false. However, the background color of the panelView 

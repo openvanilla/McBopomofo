@@ -4,6 +4,7 @@
 // Voltaire IME Candidate Controller Module
 //
 // Copyright (c) 2011-2022 The OpenVanilla Project.
+// Beautified by Aiden Pearce.
 //
 // Contributors:
 //     Lukhnos Liu (@lukhnos)
