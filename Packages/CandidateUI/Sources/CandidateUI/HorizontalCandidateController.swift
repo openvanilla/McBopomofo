@@ -97,7 +97,7 @@ fileprivate class HorizontalCandidateView: NSView {
         
         candidateWithLabelAttrDict = [.font: candidateFont,
                              .paragraphStyle: paraStyle,
-                             .foregroundColor: NSColor.labelColor] // 統合候選字文字配色
+                             .foregroundColor: NSColor.labelColor] // We still need this dummy section to make sure the space occupations of the candidates are correct.
         
         keyLabelAttrDict = [.font: labelFont,
                             .paragraphStyle: paraStyle,
