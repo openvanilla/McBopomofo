@@ -437,8 +437,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             scrollView.hasVerticalScroller = true
             let verticalScroller = scrollView.verticalScroller
             verticalScroller?.controlSize = controlSize
-            verticalScroller?.scrollerStyle = .overlay // 嗯……
-            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: .overlay) // 嗯……
+            verticalScroller?.scrollerStyle = .overlay // Aesthetics
+            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: .overlay) // Aesthetics
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
