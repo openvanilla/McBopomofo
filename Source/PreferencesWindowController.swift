@@ -52,44 +52,67 @@ import Carbon
 
         let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
         for source in list {
-            if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
-                let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
-                if category != kTISCategoryKeyboardInputSource {
+
+            func getString(_ key: CFString) -> String? {
+                if let ptr = TISGetInputSourceProperty(source, key) {
+                    return String(Unmanaged<CFString>.fromOpaque(ptr).takeUnretainedValue())
+                }
+                return nil
+            }
+
+            func getBool(_ key: CFString) -> Bool? {
+                if let ptr = TISGetInputSourceProperty(source, key) {
+                    return Unmanaged<CFBoolean>.fromOpaque(ptr).takeUnretainedValue() == kCFBooleanTrue
+                }
+                return nil
+            }
+
+            if let category = getString(kTISPropertyInputSourceCategory) {
+                if category != String(kTISCategoryKeyboardInputSource) {
                     continue
                 }
             } else {
                 continue
             }
 
-            if let asciiCapablePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsASCIICapable) {
-                let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr).takeUnretainedValue()
-                if asciiCapable != kCFBooleanTrue {
+            if let asciiCapable = getBool(kTISPropertyInputSourceIsASCIICapable) {
+                if !asciiCapable {
                     continue
                 }
             } else {
                 continue
             }
 
-            if let sourceTypePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
-                let sourceType = Unmanaged<CFString>.fromOpaque(sourceTypePtr).takeUnretainedValue()
-                if sourceType != kTISTypeKeyboardLayout {
+            if let sourceType = getString(kTISPropertyInputSourceType) {
+                if sourceType != String(kTISTypeKeyboardLayout) {
                     continue
                 }
             } else {
                 continue
             }
 
-            guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-                  let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName) else {
+            guard let sourceID = getString(kTISPropertyInputSourceID),
+                  let localizedName = getString(kTISPropertyLocalizedName) else {
                 continue
             }
-
-            let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
-            let localizedName = String(Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
 
             let menuItem = NSMenuItem()
             menuItem.title = localizedName
             menuItem.representedObject = sourceID
+
+            if let iconPtr = TISGetInputSourceProperty(source, kTISPropertyIconRef) {
+                let icon = IconRef(iconPtr)
+                let image = NSImage(iconRef: icon)
+
+                func resize( _ image: NSImage) -> NSImage {
+                    let newImage = NSImage(size: NSSize(width: 16, height: 16))
+                    newImage.lockFocus()
+                    image.draw(in: NSRect(x: 0, y: 0, width: 16, height: 16))
+                    newImage.unlockFocus()
+                    return newImage
+                }
+                menuItem.image = resize(image)
+            }
 
             if sourceID == "com.apple.keylayout.US" {
                 usKeyboardLayoutItem = menuItem
