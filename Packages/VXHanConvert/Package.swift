@@ -4,29 +4,25 @@
 import PackageDescription
 
 let package = Package(
-    name: "OpenCCBridge",
+    name: "VXHanConvert",
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "OpenCCBridge",
-            targets: ["OpenCCBridge"]),
+            name: "VXHanConvert",
+            targets: ["VXHanConvert"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(name: "SwiftyOpenCC", url: "https://github.com/ddddxxx/SwiftyOpenCC.git", revision: "a802c02cbf1c6fcd529575f11a9876d94fc813f4")
-        
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "OpenCCBridge",
-            dependencies: [
-                .product(name: "OpenCC", package: "SwiftyOpenCC")
-            ]),
+            name: "VXHanConvert",
+            dependencies: []),
         .testTarget(
-            name: "OpenCCBridgeTests",
-            dependencies: ["OpenCCBridge"]),
+            name: "VXHanConvertTests",
+            dependencies: ["VXHanConvert"]),
     ]
 )

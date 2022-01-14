@@ -49,6 +49,7 @@
 		D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7C027908EFC004A2160 /* OpenCCBridge */; };
 		D44FB74527915565003C80A6 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
 		D44FB74727919D35003C80A6 /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74627919C83003C80A6 /* EmacsKeyHelper.swift */; };
+		D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */ = {isa = PBXBuildFile; productRef = D44FB7492791B829003C80A6 /* VXHanConvert */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
@@ -179,6 +180,7 @@
 		D427F7BF27908EAC004A2160 /* OpenCCBridge */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenCCBridge; path = Packages/OpenCCBridge; sourceTree = "<group>"; };
 		D44FB74427915555003C80A6 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		D44FB74627919C83003C80A6 /* EmacsKeyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsKeyHelper.swift; sourceTree = "<group>"; };
+		D44FB7482791B346003C80A6 /* VXHanConvert */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = VXHanConvert; path = Packages/VXHanConvert; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 			files = (
 				D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */,
 				D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */,
+				D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */,
 				6A38BC2815FC158A00A8A51F /* InputMethodKit.framework in Frameworks */,
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
@@ -413,6 +416,7 @@
 				D427F7AC27907B7E004A2160 /* NotifierUI */,
 				D427F7B2279086B5004A2160 /* InputSourceHelper */,
 				D427F7BF27908EAC004A2160 /* OpenCCBridge */,
+				D44FB7482791B346003C80A6 /* VXHanConvert */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -457,6 +461,7 @@
 				D427F7AD27907B8A004A2160 /* NotifierUI */,
 				D427F7B3279086DC004A2160 /* InputSourceHelper */,
 				D427F7C027908EFC004A2160 /* OpenCCBridge */,
+				D44FB7492791B829003C80A6 /* VXHanConvert */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1092,6 +1097,10 @@
 		D427F7C027908EFC004A2160 /* OpenCCBridge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OpenCCBridge;
+		};
+		D44FB7492791B829003C80A6 /* VXHanConvert */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VXHanConvert;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

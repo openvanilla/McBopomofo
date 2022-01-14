@@ -50,6 +50,7 @@ private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
+private let kChineseConversionEngineKey = "ChineseConversionEngine"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinKeyLabelSize: CGFloat = 10
@@ -201,6 +202,20 @@ struct ComposingKeys {
     }
 }
 
+@objc enum ChineseConversionEngine: Int {
+    case openCC
+    case vxHanConvert
+
+    var name: String {
+        switch (self) {
+        case .openCC:
+            return "OpenCC"
+        case .vxHanConvert:
+            return "VXHanConvert"
+        }
+    }
+}
+
 // MARK: -
 
 class Preferences: NSObject {
@@ -267,6 +282,13 @@ class Preferences: NSObject {
 
     @objc static var defaultKeys: String {
         kDefaultKeys
+    }
+
+    @UserDefault(key: kChineseConversionEngineKey, defaultValue: 0)
+    @objc static var chineneConversionEngine: Int
+
+    @objc static var chineneConversionEngineName: String? {
+        return ChineseConversionEngine(rawValue: chineneConversionEngine)?.name
     }
 
 }

@@ -45,6 +45,7 @@
 @import NotifierUI;
 @import TooltipUI;
 @import OpenCCBridge;
+@import VXHanConvert;
 
 // C++ namespace usages
 using namespace std;
@@ -301,6 +302,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 #pragma mark - IMKServerInput protocol methods
 
+- (NSString *)_convertToSimplifiedChinese:(NSString *)text
+{
+    if (Preferences.chineneConversionEngine == 1) {
+        return [VXHanConvert convertToSimplifiedFrom:text];
+    }
+    return [OpenCCBridge convert:text];
+}
+
 - (void)commitComposition:(id)client
 {
     // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
@@ -317,7 +326,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     NSString *buffer = _composingBuffer;
 
     if (Preferences.chineseConversionEnabled) {
-        buffer = [OpenCCBridge convert:_composingBuffer];
+        buffer = [self _convertToSimplifiedChinese:_composingBuffer];
     }
 
     // commit the text, clear the state
@@ -466,7 +475,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             // Chinese conversion.
             BOOL chineseConversionEnabled = Preferences.chineseConversionEnabled;
             if (chineseConversionEnabled) {
-                popedText = [OpenCCBridge convert:popedText];
+                popedText = [self _convertToSimplifiedChinese:popedText];
             }
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _builder->removeHeadReadings(anchor.spanningLength);
