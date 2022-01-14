@@ -142,12 +142,6 @@ public class VerticalCandidateController: CandidateController {
         scrollView.drawsBackground = true // Allow scrollView to draw background.
 		scrollView.backgroundColor = NSColor.clear // Draw a tramsparent background.
         scrollView.verticalScrollElasticity = .none
-                // scrollView.drawsBackground = true 
-                // NOTE: You may set it to false. However, the background color of the panelView 
-                // has to be a cgColor which cannot be a dynamic color.
-                // If you have changed your macOS Appearance settings, you have to kill the IME process 
-                // to make the changed cgColor affective.
-                // At this moment I surrender to its default background color: NSColor.controlBackgroundColor.
 
         tableView = NSTableView(frame: contentRect)
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "candidate"))
