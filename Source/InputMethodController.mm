@@ -307,7 +307,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     if (Preferences.chineneConversionEngine == 1) {
         return [VXHanConvert convertToSimplifiedFrom:text];
     }
-    return [OpenCCBridge convert:text];
+    return [OpenCCBridge convertToSimplified:text];
 }
 
 - (void)commitComposition:(id)client
