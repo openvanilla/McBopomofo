@@ -35,10 +35,6 @@
 import Cocoa
 import Carbon
 
-private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"
-private let kCandidateKeys = "CandidateKeys"
-private let kDefaultKeys = "123456789"
-
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
@@ -54,7 +50,7 @@ private let kDefaultKeys = "123456789"
 
         basisKeyboardLayoutButton.menu?.removeAllItems()
 
-        let basisKeyboardLayoutID = UserDefaults.standard.string(forKey: kBasisKeyboardLayoutPreferenceKey)
+        let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
         for source in list {
             if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
                 let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
@@ -106,37 +102,36 @@ private let kDefaultKeys = "123456789"
 
         basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
-        selectionKeyComboBox.addItems(withObjectValues: [kDefaultKeys, "asdfghjkl", "asdfzxcvb"])
+        selectionKeyComboBox.addItems(withObjectValues: [Preferences.defaultKeys, "asdfghjkl", "asdfzxcvb"])
 
-        var candidateSelectionKeys = (UserDefaults.standard.string(forKey: kCandidateKeys) ?? kDefaultKeys)
-                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        var candidateSelectionKeys = Preferences.candidateKeys ?? Preferences.defaultKeys
         if candidateSelectionKeys.isEmpty {
-            candidateSelectionKeys = kDefaultKeys
+            candidateSelectionKeys = Preferences.defaultKeys
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
-        if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject {
-            UserDefaults.standard.set(sourceID, forKey: kBasisKeyboardLayoutPreferenceKey)
+        if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject as? String {
+            Preferences.basisKeyboardLayout = sourceID
         }
     }
 
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
         let keys = (sender as AnyObject).stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         if keys.count != 9 || !keys.canBeConverted(to: .ascii) {
-            selectionKeyComboBox.stringValue = kDefaultKeys
-            UserDefaults.standard.removeObject(forKey: kCandidateKeys)
+            selectionKeyComboBox.stringValue = Preferences.defaultKeys
+            Preferences.candidateKeys = nil
             NSSound.beep()
             return
         }
 
         selectionKeyComboBox.stringValue = keys
-        if keys == kDefaultKeys {
-            UserDefaults.standard.removeObject(forKey: kCandidateKeys)
+        if keys == Preferences.defaultKeys {
+            Preferences.candidateKeys = nil
         } else {
-            UserDefaults.standard.set(keys, forKey: kCandidateKeys)
+            Preferences.candidateKeys = keys
         }
     }
 
