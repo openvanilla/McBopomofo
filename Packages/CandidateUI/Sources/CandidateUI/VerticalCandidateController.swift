@@ -1,10 +1,13 @@
 //
 // VerticalCandidateController.swift
 //
-// Copyright (c) 2011 The McBopomofo Project.
+// Voltaire IME Candidate Controller Module
+//
+// Copyright (c) 2011-2022 The OpenVanilla Project.
+// Beautified by Aiden Pearce.
 //
 // Contributors:
-//     Mengjuei Hsieh (@mjhsieh)
+//     Lukhnos Liu (@lukhnos)
 //     Weizhong Yang (@zonble)
 //
 // Based on the Syrup Project and the Formosana Library
@@ -46,17 +49,15 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 
     override func draw(_ dirtyRect: NSRect) {
         let bounds = self.bounds
-        NSColor.white.setFill()
+        NSColor.clear.setFill() // Disable white base color, just in case.
         NSBezierPath.fill(bounds)
 
         let count = UInt(keyLabels.count)
         if count == 0 {
             return
         }
+
         let cellHeight: CGFloat = bounds.size.height / CGFloat(count)
-        let black = NSColor.black
-        let darkGray = NSColor(deviceWhite: 0.7, alpha: 1.0)
-        let lightGray = NSColor(deviceWhite: 0.8, alpha: 1.0)
 
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -64,20 +65,24 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 
         let textAttr: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,
-            .foregroundColor: black,
+            .foregroundColor: NSColor.secondaryLabelColor, // The index text color of the non-highlightened candidate
+            .paragraphStyle: paraStyle]
+        let textAttrHighlight: [NSAttributedString.Key: AnyObject] = [
+            .font: keyLabelFont,
+            .foregroundColor: NSColor.selectedMenuItemTextColor.withAlphaComponent(0.84), // The index text color of the highlightened candidate
             .paragraphStyle: paraStyle]
         for index in 0..<count {
             let textRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight + labelOffsetY, width: bounds.size.width, height: cellHeight - labelOffsetY)
-            var cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight - 1)
+            var cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight - 0.0) // Remove the splitting line between the candidate text label
 
             if index + 1 >= count {
                 cellRect.size.height += 1.0
             }
 
-            (index == highlightedIndex ? darkGray : lightGray).setFill()
+            (index == highlightedIndex ? NSColor.alternateSelectedControlColor : NSColor.controlBackgroundColor).setFill() // The background color of the candidate (highlightened : non-highlightened)
             NSBezierPath.fill(cellRect)
             let text = keyLabels[Int(index)]
-            (text as NSString).draw(in: textRect, withAttributes: textAttr)
+            (text as NSString).draw(in: textRect, withAttributes: (index == highlightedIndex ? textAttrHighlight : textAttr))
         }
     }
 }
@@ -93,8 +98,6 @@ fileprivate class VerticalCandidateTableView: NSTableView {
 
 private let kCandidateTextPadding = 24.0
 private let kCandidateTextLeftMargin = 8.0
-private let kCandidateTextPaddingWithMandatedTableViewPadding = 18.0
-private let kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0
 
 
 @objc (VTVerticalCandidateController)
@@ -110,9 +113,19 @@ public class VerticalCandidateController: CandidateController {
     public init() {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
         let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
+        let panelView = NSView(frame: contentRect) // We need an NSView as a round-cornered container for the candidate panel.
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
+        panel.contentView = panelView; // Specify the NSView to the panel as its content view.
         panel.hasShadow = true
+        panel.isOpaque = false // Again transparentify the panel. Otherwise, the cornerRadius below will be meaningless.
+        panel.backgroundColor = NSColor.clear // One more insurance to transparentify the panel.
+        
+        // Rounded panelView container.
+        panelView.wantsLayer = true
+        panelView.layer?.borderColor = NSColor.selectedMenuItemTextColor.withAlphaComponent(0.30).cgColor
+        panelView.layer?.borderWidth = 1
+        panelView.layer?.cornerRadius = 6.0
 
         contentRect.origin = NSPoint.zero
         var stripRect = contentRect
@@ -124,11 +137,18 @@ public class VerticalCandidateController: CandidateController {
         scrollViewRect.origin.x = stripRect.size.width
         scrollViewRect.size.width -= stripRect.size.width
         scrollView = NSScrollView(frame: scrollViewRect)
+
+        scrollView.autohidesScrollers = true // Our aesthetics of UI design has to stay close to Apple.
+        scrollView.drawsBackground = true // Allow scrollView to draw background.
+		scrollView.backgroundColor = NSColor.clear // Draw a tramsparent background.
         scrollView.verticalScrollElasticity = .none
 
         tableView = NSTableView(frame: contentRect)
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "candidate"))
         column.dataCell = NSTextFieldCell()
+        if let dataCell = column.dataCell as? NSTextFieldCell {
+            dataCell.textColor = NSColor.labelColor // candidate phrase text color for conveniences of customization.
+        }
         column.isEditable = false
 
         candidateTextPadding = kCandidateTextPadding
@@ -139,11 +159,12 @@ public class VerticalCandidateController: CandidateController {
         tableView.headerView = nil
         tableView.allowsMultipleSelection = false
         tableView.allowsEmptySelection = false
+        tableView.backgroundColor = NSColor.clear
+        tableView.gridColor = NSColor.clear
 
-        if #available(macOS 10.16, *) {
-            tableView.style = .fullWidth
-            candidateTextPadding = kCandidateTextPaddingWithMandatedTableViewPadding
-            candidateTextLeftMargin = kCandidateTextLeftMarginWithMandatedTableViewPadding
+        if #available(macOS 11.0, *) {
+            tableView.style = .plain
+            tableView.enclosingScrollView?.borderType = .noBorder
         }
 
         scrollView.documentView = tableView
@@ -416,8 +437,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             scrollView.hasVerticalScroller = true
             let verticalScroller = scrollView.verticalScroller
             verticalScroller?.controlSize = controlSize
-            verticalScroller?.scrollerStyle = .legacy
-            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: .legacy)
+            verticalScroller?.scrollerStyle = .overlay // Aesthetics
+            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: .overlay) // Aesthetics
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
@@ -439,7 +460,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         let rowSpacing = tableView.intercellSpacing.height
         let stripWidth = ceil(maxKeyLabelWidth * 1.20)
         let tableViewStartWidth = ceil(maxCandidateAttrStringWidth + scrollerWidth)
-        let windowWidth = stripWidth + 1.0 + tableViewStartWidth
+        let windowWidth = stripWidth + 0.0 + tableViewStartWidth // Compensation to the removal of the border line between the index labels and the candidate phrase list
         let windowHeight = CGFloat(keyLabelCount) * (rowHeight + rowSpacing)
 
         var frameRect = self.window?.frame ?? NSRect.zero
@@ -449,7 +470,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
 
         keyLabelStripView.frame = NSRect(x: 0.0, y: 0.0, width: stripWidth, height: windowHeight)
-        scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0.0, width: tableViewStartWidth, height: windowHeight)
+        scrollView.frame = NSRect(x: stripWidth + 0.0, y: 0.0, width: tableViewStartWidth, height: windowHeight) // Remove the border line between the index labels and the candidate phrase list
         self.window?.setFrame(frameRect, display: false)
     }
 }
