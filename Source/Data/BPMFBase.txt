@@ -2752,6 +2752,7 @@
 敯 ㄇㄧㄣˇ min3 aup3 big5
 潣 ㄇㄧㄣˇ min3 aup3 big5
 民 ㄇㄧㄣˊ min2 aup6 big5
+珉 ㄇㄧㄣˊ min2 aup6 big5e
 岷 ㄇㄧㄣˊ min2 aup6 big5
 玟 ㄇㄧㄣˊ min2 aup6 big5
 緡 ㄇㄧㄣˊ min2 aup6 big5
