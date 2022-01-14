@@ -63,3 +63,12 @@
 
 "Edit Excluded Phrases" = "編輯要排除的詞彙";
 
+"Use Half-Width Punctuations" = "使用半型標點符號";
+
+"You are now selecting \"%@\". You can add a phrase with two or more characters." = "您目前選擇了 \"%@\"。請選擇兩個字以上，才能加入使用者詞彙。";
+
+"You are now selecting \"%@\". Press enter to add a new phrase." = "您目前選擇了 \"%@\"。按下 Enter 就可以加入到使用者詞彙中。";
+
+"Chinese conversion on" = "已經切換到簡體中文模式";
+
+"Chinese conversion off" = "已經切換到繁體中文模式";

@@ -2,6 +2,8 @@
 
 ## 系統需求
 
+小麥注音輸入法可以在 macOS 10.10 以上版本運作。如果您要自行編譯小麥注音輸入法，或參與開發，您需要：
+
 - macOS 10.15 Catalina 以上版本
 - Xcode 12.0 以上版本
 
@@ -18,4 +20,3 @@
 ## 軟體授權
 
 本專案採用 MIT License 釋出，使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權（[詳全文](https://github.com/openvanilla/McBopomofo/blob/master/LICENSE.txt)）。
-
