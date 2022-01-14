@@ -228,29 +228,28 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [_composingBuffer setString:@""];
 
     // checks and populates the default settings
-    NSInteger keyboardLayout = Preferences.keyboardLayout;
-    switch (keyboardLayout) {
-        case 0:
+    switch (Preferences.keyboardLayout) {
+        case KeyboardLayoutStandard:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             break;
-        case 1:
+        case KeyboardLayoutEten:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETenLayout());
             break;
-        case 2:
+        case KeyboardLayoutHsu:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HsuLayout());
             break;
-        case 3:
+        case KeyboardLayoutEten26:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETen26Layout());
             break;
-        case 4:
+        case KeyboardLayoutHanyuPinyin:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
-        case 5:
+        case KeyboardLayoutIBM:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::IBMLayout());
             break;
         default:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
-            Preferences.keyboardLayout = 0;
+            Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
 
     [(AppDelegate *)[NSApp delegate] checkForUpdate];

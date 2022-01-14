@@ -173,30 +173,42 @@ struct ComposingKeys {
     }
 }
 
+// MARK: -
+
+@objc enum KeyboardLayout: Int {
+    case standard
+    case eten
+    case eten26
+    case hsu
+    case hanyuPinyin
+    case IBM
+
+    var name: String {
+        switch (self) {
+        case .standard:
+            return "Standard"
+        case .eten:
+            return "ETen"
+        case .eten26:
+            return "ETen26"
+        case .hsu:
+            return "Hsu"
+        case .hanyuPinyin:
+            return "HanyuPinyin"
+        case .IBM:
+            return "IBM"
+        }
+    }
+}
 
 // MARK: -
 
 class Preferences: NSObject {
-    @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
-    @objc static var keyboardLayout: Int
+    @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: KeyboardLayout.standard)
+    @objc static var keyboardLayout: KeyboardLayout
 
     @objc static var keyboardLayoutName: String {
-        switch self.keyboardLayout {
-        case 0:
-            return "Standard"
-        case 1:
-            return "ETen"
-        case 2:
-            return "ETen26"
-        case 3:
-            return "Hsu"
-        case 4:
-            return "HanyuPinyin"
-        case 5:
-            return "IBM"
-        default:
-            return "Standard"
-        }
+        self.keyboardLayout.name
     }
 
     @UserDefault(key: kBasisKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
