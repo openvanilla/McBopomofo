@@ -50,6 +50,7 @@
 		D44FB74527915565003C80A6 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
 		D44FB74727919D35003C80A6 /* EmacsKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74627919C83003C80A6 /* EmacsKeyHelper.swift */; };
 		D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */ = {isa = PBXBuildFile; productRef = D44FB7492791B829003C80A6 /* VXHanConvert */; };
+		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
@@ -181,6 +182,8 @@
 		D44FB74427915555003C80A6 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		D44FB74627919C83003C80A6 /* EmacsKeyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsKeyHelper.swift; sourceTree = "<group>"; };
 		D44FB7482791B346003C80A6 /* VXHanConvert */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = VXHanConvert; path = Packages/VXHanConvert; sourceTree = "<group>"; };
+		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
+		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
@@ -292,6 +295,8 @@
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
 				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
+				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */,
+				D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */,
 				D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */,
 				D41355DA278E6D17005E5CBD /* McBopomofoLM.h */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
@@ -589,6 +594,7 @@
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
 				D44FB74727919D35003C80A6 /* EmacsKeyHelper.swift in Sources */,
 				6A0D4ED315FC0D6400ABF4B3 /* main.m in Sources */,
+				D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */,
 				D44FB74527915565003C80A6 /* Preferences.swift in Sources */,
 				D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */,

@@ -142,6 +142,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
+        _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
         _builder = new BlockReadingBuilder(_languageModel);
@@ -165,14 +166,19 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     [menu addItemWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
 
-    NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"g"];
+    NSMenuItem *chineseConversionMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"g"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
     chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    [menu addItem:chineseConversionMenuItem];
 
-    NSMenuItem *halfWidthPunctuationMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
+    NSMenuItem *halfWidthPunctuationMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
     halfWidthPunctuationMenuItem.state = Preferences.halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    [menu addItem:halfWidthPunctuationMenuItem];
+
+    BOOL optionKeyPressed = [[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask);
+
+    if (_inputMode == kBopomofoModeIdentifier && optionKeyPressed) {
+        NSMenuItem *phaseReplacementMenuItem = [menu addItemWithTitle:NSLocalizedString(@"Use Phrase Replacement", @"") action:@selector(togglePhraseReplacementEnabled:) keyEquivalent:@""];
+        phaseReplacementMenuItem.state = Preferences.phraseReplacementEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    }
 
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
@@ -183,6 +189,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     else {
         [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
         [menu addItemWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesMcBopomofo:) keyEquivalent:@""];
+        if (optionKeyPressed) {
+            [menu addItemWithTitle:NSLocalizedString(@"Edit Phrase Replacement Table", @"") action:@selector(openPhraseReplacementMcBopomofo:) keyEquivalent:@""];
+        }
     }
     [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
     [menu addItem:[NSMenuItem separatorItem]];
@@ -270,6 +279,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
+        newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
 
     // Only apply the changes if the value is changed
@@ -1481,6 +1491,30 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
+- (void)toggleChineseConverter:(id)sender
+{
+    BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
+    [NotifierController notifyWithMessage:
+     chineseConversionEnabled ?
+     NSLocalizedString(@"Chinese conversion on", @"") :
+     NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
+}
+
+- (void)toggleHalfWidthPunctuation:(id)sender
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+    [Preferences tooglePhraseReplacementEnabled];
+#pragma GCC diagnostic pop
+}
+
+- (void)togglePhraseReplacementEnabled:(id)sender
+{
+    BOOL enabled = [Preferences tooglePhraseReplacementEnabled];
+    McBopomofoLM *lm = [LanguageModelManager languageModelMcBopomofo];
+    lm->setPhraseReplacementEnabled(enabled);
+}
+
 - (void)checkForUpdate:(id)sender
 {
     [(AppDelegate *)[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
@@ -1521,9 +1555,15 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathMcBopomofo]];
 }
 
+- (void)openPhraseReplacementMcBopomofo:(id)sender
+{
+    [self _openUserFile:[LanguageModelManager phraseReplacementDataPathMcBopomofo]];
+}
+
 - (void)reloadUserPhrases:(id)sender
 {
-    [LanguageModelManager loadUserPhrasesModel];
+    [LanguageModelManager loadUserPhrases];
+    [LanguageModelManager loadUserPhraseReplacement];
 }
 
 - (void)showAbout:(id)sender
@@ -1532,22 +1572,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
 
-- (void)toggleChineseConverter:(id)sender
-{
-    BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
-    [NotifierController notifyWithMessage:
-     chineseConversionEnabled ?
-        NSLocalizedString(@"Chinese conversion on", @"") :
-        NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
-}
 
-- (void)toggleHalfWidthPunctuation:(id)sender
-{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences toogleHalfWidthPunctuationEnabled];
-#pragma GCC diagnostic pop
-}
 
 @end
 

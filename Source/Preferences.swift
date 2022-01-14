@@ -51,6 +51,7 @@ private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
+private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinKeyLabelSize: CGFloat = 10
@@ -289,6 +290,14 @@ class Preferences: NSObject {
 
     @objc static var chineneConversionEngineName: String? {
         return ChineseConversionEngine(rawValue: chineneConversionEngine)?.name
+    }
+
+    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
+    @objc static var phraseReplacementEnabled: Bool
+
+    @objc static func tooglePhraseReplacementEnabled() -> Bool {
+        phraseReplacementEnabled = !phraseReplacementEnabled
+        return phraseReplacementEnabled;
     }
 
 }
