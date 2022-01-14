@@ -45,6 +45,7 @@
 @import NotifierUI;
 @import TooltipUI;
 @import OpenCCBridge;
+@import VXHanConvert;
 
 // C++ namespace usages
 using namespace std;
@@ -53,40 +54,7 @@ using namespace Formosa::Gramambular;
 using namespace McBopomofo;
 using namespace OpenVanilla;
 
-// default, min and max candidate list text size
-static const NSInteger kDefaultCandidateListTextSize = 16;
 static const NSInteger kMinKeyLabelSize = 10;
-static const NSInteger kMinCandidateListTextSize = 12;
-static const NSInteger kMaxCandidateListTextSize = 196;
-
-// default, min and max composing buffer size (in codepoints)
-// modern Macs can usually work up to 16 codepoints when the builder still
-// walks the grid with good performance; slower Macs (like old PowerBooks)
-// will start to sputter beyond 12; such is the algorithmatic complexity
-// of the Viterbi algorithm used in the builder library (at O(N^2))
-static const NSInteger kDefaultComposingBufferSize = 10;
-static const NSInteger kMinComposingBufferSize = 4;
-static const NSInteger kMaxComposingBufferSize = 20;
-
-// user defaults (app perferences) key names; in this project we use
-// NSUserDefaults throughout and do not wrap them in another config object
-static NSString *const kKeyboardLayoutPreferenceKey = @"KeyboardLayout";
-static NSString *const kBasisKeyboardLayoutPreferenceKey = @"BasisKeyboardLayout";  // alphanumeric ("ASCII") input basis
-static NSString *const kFunctionKeyKeyboardLayoutPreferenceKey = @"FunctionKeyKeyboardLayout";  // alphanumeric ("ASCII") input basis
-static NSString *const kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = @"FunctionKeyKeyboardLayoutOverrideIncludeShift"; // whether include shift
-static NSString *const kCandidateListTextSizeKey = @"CandidateListTextSize";
-static NSString *const kSelectPhraseAfterCursorAsCandidatePreferenceKey = @"SelectPhraseAfterCursorAsCandidate";
-static NSString *const kUseHorizontalCandidateListPreferenceKey = @"UseHorizontalCandidateList";
-static NSString *const kComposingBufferSizePreferenceKey = @"ComposingBufferSize";
-static NSString *const kChooseCandidateUsingSpaceKey = @"ChooseCandidateUsingSpaceKey";
-static NSString *const kChineseConversionEnabledKey = @"ChineseConversionEnabledKey";
-static NSString *const kHalfWidthPunctuationEnabledKey = @"HalfWidthPunctuationEnabledKey";
-static NSString *const kEscToCleanInputBufferKey = @"EscToCleanInputBufferKey";
-
-// advanced (usually optional) settings
-static NSString *const kCandidateTextFontName = @"CandidateTextFontName";
-static NSString *const kCandidateKeyLabelFontName = @"CandidateKeyLabelFontName";
-static NSString *const kCandidateKeys = @"CandidateKeys";
 
 // input modes
 static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
@@ -106,16 +74,6 @@ enum {
     kDeleteKeyCode = 117
 };
 
-typedef NS_ENUM(NSUInteger, McBpomofoEmacsKey) {
-    McBpomofoEmacsKeyNone,
-    McBpomofoEmacsKeyForward,
-    McBpomofoEmacsKeyBackward,
-    McBpomofoEmacsKeyHome,
-    McBpomofoEmacsKeyEnd,
-    McBpomofoEmacsKeyDelete,
-    McBpomofoEmacsKeyNextPage,
-};
-
 VTCandidateController *gCurrentCandidateController = nil;
 
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
@@ -129,12 +87,6 @@ __attribute__((annotate("returns_localized_nsstring")))
 static inline NSString *LocalizationNotNeeded(NSString *s) {
     return s;
 }
-
-// private methods
-@interface McBopomofoInputMethodController ()
-+ (VTHorizontalCandidateController *)horizontalCandidateController;
-+ (VTVerticalCandidateController *)verticalCandidateController;
-@end
 
 @interface McBopomofoInputMethodController (VTCandidateController) <VTCandidateControllerDelegate>
 @end
@@ -201,8 +153,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         _composingBuffer = [[NSMutableString alloc] init];
 
         _inputMode = kBopomofoModeIdentifier;
-        _chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
-        _halfWidthPunctuationEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kHalfWidthPunctuationEnabledKey];
     }
 
     return self;
@@ -212,42 +162,33 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
-    NSMenuItem *preferenceMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
-    [menu addItem:preferenceMenuItem];
+
+    [menu addItemWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
 
     NSMenuItem *chineseConversionMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Chinese Conversion", @"") action:@selector(toggleChineseConverter:) keyEquivalent:@"g"];
     chineseConversionMenuItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagControl;
-    chineseConversionMenuItem.state = _chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    chineseConversionMenuItem.state = Preferences.chineseConversionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:chineseConversionMenuItem];
 
     NSMenuItem *halfWidthPunctuationMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Use Half-Width Punctuations", @"") action:@selector(toggleHalfWidthPunctuation:) keyEquivalent:@""];
-    halfWidthPunctuationMenuItem.state = _halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    halfWidthPunctuationMenuItem.state = Preferences.halfWidthPunctuationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     [menu addItem:halfWidthPunctuationMenuItem];
 
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:NSLocalizedString(@"User Phrases", @"") action:NULL keyEquivalent:@""];
-
     if (_inputMode == kPlainBopomofoModeIdentifier) {
         NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesPlainBopomofo:) keyEquivalent:@""];
         [menu addItem:editExcludedPhrasesItem];
     }
     else {
-        NSMenuItem *editUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
-        [menu addItem:editUserPhrasesItem];
-
-        NSMenuItem *editExcludedPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesMcBopomofo:) keyEquivalent:@""];
-        [menu addItem:editExcludedPhrasesItem];
+        [menu addItemWithTitle:NSLocalizedString(@"Edit User Phrases", @"") action:@selector(openUserPhrases:) keyEquivalent:@""];
+        [menu addItemWithTitle:NSLocalizedString(@"Edit Excluded Phrases", @"") action:@selector(openExcludedPhrasesMcBopomofo:) keyEquivalent:@""];
     }
-
-    NSMenuItem *reloadUserPhrasesItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
-    [menu addItem:reloadUserPhrasesItem];
+    [menu addItemWithTitle:NSLocalizedString(@"Reload User Phrases", @"") action:@selector(reloadUserPhrases:) keyEquivalent:@""];
     [menu addItem:[NSMenuItem separatorItem]];
 
-    NSMenuItem *updateCheckItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
-    [menu addItem:updateCheckItem];
-
-    NSMenuItem *aboutMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
-    [menu addItem:aboutMenuItem];
+    [menu addItemWithTitle:NSLocalizedString(@"Check for Updates…", @"") action:@selector(checkForUpdate:) keyEquivalent:@""];
+    [menu addItemWithTitle:NSLocalizedString(@"About McBopomofo…", @"") action:@selector(showAbout:) keyEquivalent:@""];
     return menu;
 }
 
@@ -258,10 +199,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     // Override the keyboard layout. Use US if not set.
-    NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-    if (!basisKeyboardLayoutID) {
-        basisKeyboardLayoutID = @"com.apple.keylayout.US";
-    }
+    NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
     [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
 
     // reset the state
@@ -272,49 +210,28 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     [_composingBuffer setString:@""];
 
     // checks and populates the default settings
-    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
-    switch (keyboardLayout) {
-        case 0:
+    switch (Preferences.keyboardLayout) {
+        case KeyboardLayoutStandard:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
             break;
-        case 1:
+        case KeyboardLayoutEten:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETenLayout());
             break;
-        case 2:
+        case KeyboardLayoutHsu:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HsuLayout());
             break;
-        case 3:
+        case KeyboardLayoutEten26:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETen26Layout());
             break;
-        case 4:
+        case KeyboardLayoutHanyuPinyin:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
             break;
-        case 5:
+        case KeyboardLayoutIBM:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::IBMLayout());
             break;
         default:
             _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
-            [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:kKeyboardLayoutPreferenceKey];
-    }
-
-    // set the size
-    NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
-    NSInteger previousTextSize = textSize;
-    if (textSize == 0) {
-        textSize = kDefaultCandidateListTextSize;
-    }
-    else if (textSize < kMinCandidateListTextSize) {
-        textSize = kMinCandidateListTextSize;
-    }
-    else if (textSize > kMaxCandidateListTextSize) {
-        textSize = kMaxCandidateListTextSize;
-    }
-
-    if (textSize != previousTextSize) {
-        [[NSUserDefaults standardUserDefaults] setInteger:textSize forKey:kCandidateListTextSizeKey];
-    }
-    if (![[NSUserDefaults standardUserDefaults] objectForKey:kChooseCandidateUsingSpaceKey]) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kChooseCandidateUsingSpaceKey];
+            Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
 
     [(AppDelegate *)[NSApp delegate] checkForUpdate];
@@ -360,10 +277,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         [[NSUserDefaults standardUserDefaults] synchronize];
 
         // Remember to override the keyboard layout again -- treat this as an activate eventy
-        NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-        if (!basisKeyboardLayoutID) {
-            basisKeyboardLayoutID = @"com.apple.keylayout.US";
-        }
+        NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
         [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
 
         _inputMode = newInputMode;
@@ -388,6 +302,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 #pragma mark - IMKServerInput protocol methods
 
+- (NSString *)_convertToSimplifiedChinese:(NSString *)text
+{
+    if (Preferences.chineneConversionEngine == 1) {
+        return [VXHanConvert convertToSimplifiedFrom:text];
+    }
+    return [OpenCCBridge convertToSimplified:text];
+}
+
 - (void)commitComposition:(id)client
 {
     // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
@@ -402,9 +324,9 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
     // Chinese conversion.
     NSString *buffer = _composingBuffer;
-    BOOL chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
-    if (chineseConversionEnabled) {
-        buffer = [OpenCCBridge convert:_composingBuffer];
+
+    if (Preferences.chineseConversionEnabled) {
+        buffer = [self _convertToSimplifiedChinese:_composingBuffer];
     }
 
     // commit the text, clear the state
@@ -544,31 +466,16 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     // the user type along, the already composed text at front will
     // be popped out
 
-    NSInteger _composingBufferSize = [[NSUserDefaults standardUserDefaults] integerForKey:kComposingBufferSizePreferenceKey];
-    NSInteger previousComposingBufferSize = _composingBufferSize;
+    NSInteger composingBufferSize = Preferences.composingBufferSize;
 
-    if (_composingBufferSize == 0) {
-        _composingBufferSize = kDefaultComposingBufferSize;
-    }
-    else if (_composingBufferSize < kMinComposingBufferSize) {
-        _composingBufferSize = kMinComposingBufferSize;
-    }
-    else if (_composingBufferSize > kMaxComposingBufferSize) {
-        _composingBufferSize = kMaxComposingBufferSize;
-    }
-
-    if (_composingBufferSize != previousComposingBufferSize) {
-        [[NSUserDefaults standardUserDefaults] setInteger:_composingBufferSize forKey:kComposingBufferSizePreferenceKey];
-    }
-
-    if (_builder->grid().width() > (size_t)_composingBufferSize) {
+    if (_builder->grid().width() > (size_t)composingBufferSize) {
         if (_walkedNodes.size() > 0) {
             NodeAnchor &anchor = _walkedNodes[0];
             NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             // Chinese conversion.
-            BOOL chineseConversionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kChineseConversionEnabledKey];
+            BOOL chineseConversionEnabled = Preferences.chineseConversionEnabled;
             if (chineseConversionEnabled) {
-                popedText = [OpenCCBridge convert:popedText];
+                popedText = [self _convertToSimplifiedChinese:popedText];
             }
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _builder->removeHeadReadings(anchor.spanningLength);
@@ -586,59 +493,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (string)_currentLayout
 {
-    string layout = string("Standard_");;
-    NSInteger keyboardLayout = [[NSUserDefaults standardUserDefaults] integerForKey:kKeyboardLayoutPreferenceKey];
-    switch (keyboardLayout) {
-        case 0:
-            layout = string("Standard_");
-            break;
-        case 1:
-            layout = string("ETen_");
-            break;
-        case 2:
-            layout = string("ETen26_");
-            break;
-        case 3:
-            layout = string("Hsu_");
-            break;
-        case 4:
-            layout = string("HanyuPinyin_");
-            break;
-        case 5:
-            layout = string("IBM_");
-            break;
-        default:
-            break;
-    }
+    NSString *keyboardLayoutName = Preferences.keyboardLayoutName;
+    string layout = string(keyboardLayoutName.UTF8String) + string("_");
     return layout;
 }
-
-- (McBpomofoEmacsKey)_detectEmacsKeyFromCharCode:(UniChar)charCode modifiers:(NSUInteger)flags
-{
-    if (flags & NSControlKeyMask) {
-        char c = charCode + 'a' - 1;
-        if (c == 'a') {
-            return McBpomofoEmacsKeyHome;
-        }
-        else if (c == 'e') {
-            return McBpomofoEmacsKeyEnd;
-        }
-        else if (c == 'f') {
-            return McBpomofoEmacsKeyForward;
-        }
-        else if (c == 'b') {
-            return McBpomofoEmacsKeyBackward;
-        }
-        else if (c == 'd') {
-            return McBpomofoEmacsKeyDelete;
-        }
-        else if (c == 'v') {
-            return McBpomofoEmacsKeyNextPage;
-        }
-    }
-    return McBpomofoEmacsKeyNone;
-}
-
 
 - (BOOL)handleInputText:(NSString*)inputText key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)client
 {
@@ -665,7 +523,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     // get the unicode character code
     UniChar charCode = [inputText length] ? [inputText characterAtIndex:0] : 0;
 
-    McBpomofoEmacsKey emacsKey = [self _detectEmacsKeyFromCharCode:charCode modifiers:flags];
+    McBopomofoEmacsKey emacsKey = [EmacsKeyHelper detectWithCharCode:charCode flags:flags];
 
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && [NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         // special handling for com.apple.Terminal
@@ -724,7 +582,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // if we have candidate, it means we need to pass the event to the candidate handler
     if ([_candidates count]) {
-        return [self _handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode emacsKey:(McBpomofoEmacsKey)emacsKey];
+        return [self _handleCandidateEventWithInputText:inputText charCode:charCode keyCode:keyCode emacsKey:(McBopomofoEmacsKey)emacsKey];
     }
 
     // If we have marker index.
@@ -747,7 +605,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
         // Shift + left
-        if ((keyCode == cursorBackwardKey || emacsKey == McBpomofoEmacsKeyBackward)
+        if ((keyCode == cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward)
             && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() > 0) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() - 1);
@@ -759,7 +617,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
         // Shift + Right
-        if ((keyCode == cursorForwardKey || emacsKey == McBpomofoEmacsKeyForward)
+        if ((keyCode == cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward)
              && (flags & NSShiftKeyMask)) {
             if (_builder->markerCursorIndex() < _builder->length()) {
                 _builder->setMarkerCursorIndex(_builder->markerCursorIndex() + 1);
@@ -835,7 +693,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (_bpmfReadingBuffer->isEmpty() && [_composingBuffer length] > 0 && (keyCode == extraChooseCandidateKey || charCode == 32 || (useVerticalMode && (keyCode == verticalModeOnlyChooseCandidateKey)))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
-            if (![[NSUserDefaults standardUserDefaults] boolForKey:kChooseCandidateUsingSpaceKey]) {
+            if (!Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
                     [_composingBuffer appendString:@" "];
                     [self commitComposition:client];
@@ -856,7 +714,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // Esc
     if (charCode == 27) {
-        BOOL escToClearInputBufferEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kEscToCleanInputBufferKey];
+        BOOL escToClearInputBufferEnabled = Preferences.escToCleanInputBuffer;
 
         if (escToClearInputBufferEnabled) {
             // if the optioon is enabled, we clear everythiong including the composing
@@ -893,7 +751,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // handle cursor backward
-    if (keyCode == cursorBackwardKey || emacsKey == McBpomofoEmacsKeyBackward) {
+    if (keyCode == cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -925,7 +783,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // handle cursor forward
-    if (keyCode == cursorForwardKey || emacsKey == McBpomofoEmacsKeyForward) {
+    if (keyCode == cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -955,7 +813,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (keyCode == kHomeKeyCode || emacsKey == McBpomofoEmacsKeyHome) {
+    if (keyCode == kHomeKeyCode || emacsKey == McBopomofoEmacsKeyHome) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -976,7 +834,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         return YES;
     }
 
-    if (keyCode == kEndKeyCode || emacsKey == McBpomofoEmacsKeyEnd) {
+    if (keyCode == kEndKeyCode || emacsKey == McBopomofoEmacsKeyEnd) {
         if (!_bpmfReadingBuffer->isEmpty()) {
             [self beep];
         }
@@ -1029,7 +887,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // Delete
-    if (keyCode == kDeleteKeyCode || emacsKey == McBpomofoEmacsKeyDelete) {
+    if (keyCode == kDeleteKeyCode || emacsKey == McBopomofoEmacsKeyDelete) {
         if (_bpmfReadingBuffer->isEmpty()) {
             if (![_composingBuffer length]) {
                 return NO;
@@ -1079,7 +937,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
     // if nothing is matched, see if it's a punctuation key for current layout.
     string layout = [self _currentLayout];
-    string punctuationNamePrefix = (_halfWidthPunctuationEnabled ? string("_half_punctuation_"): string("_punctuation_"));
+    string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_"): string("_punctuation_");
     string customPunctuation = punctuationNamePrefix + layout + string(1, (char)charCode);
     if ([self _handlePunctuation:customPunctuation usingVerticalMode:useVerticalMode client:client]) {
         return YES;
@@ -1129,7 +987,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     return NO;
 }
 
-- (BOOL)_handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode emacsKey:(McBpomofoEmacsKey)emacsKey
+- (BOOL)_handleCandidateEventWithInputText:(NSString *)inputText charCode:(UniChar)charCode keyCode:(NSUInteger)keyCode emacsKey:(McBopomofoEmacsKey)emacsKey
 {
     BOOL cancelCandidateKey =
     (charCode == 27) ||
@@ -1152,7 +1010,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
         return YES;
     }
-    else if (charCode == 32 || keyCode == kPageDownKeyCode || emacsKey == McBpomofoEmacsKeyNextPage) {
+    else if (charCode == 32 || keyCode == kPageDownKeyCode || emacsKey == McBopomofoEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             [self beep];
@@ -1186,7 +1044,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (emacsKey == McBpomofoEmacsKeyBackward) {
+    else if (emacsKey == McBopomofoEmacsKeyBackward) {
         BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
         if (!updated) {
             [self beep];
@@ -1212,7 +1070,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (emacsKey == McBpomofoEmacsKeyForward) {
+    else if (emacsKey == McBopomofoEmacsKeyForward) {
         BOOL updated = [gCurrentCandidateController highlightNextCandidate];
         if (!updated) {
             [self beep];
@@ -1256,7 +1114,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             return YES;
         }
     }
-    else if (keyCode == kHomeKeyCode || emacsKey == McBpomofoEmacsKeyHome) {
+    else if (keyCode == kHomeKeyCode || emacsKey == McBopomofoEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             [self beep];
 
@@ -1268,7 +1126,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [self updateClientComposingBuffer:_currentCandidateClient];
         return YES;
     }
-    else if ((keyCode == kEndKeyCode || emacsKey == McBpomofoEmacsKeyEnd) && [_candidates count] > 0) {
+    else if ((keyCode == kEndKeyCode || emacsKey == McBopomofoEmacsKeyEnd) && [_candidates count] > 0) {
         if (gCurrentCandidateController.selectedCandidateIndex == [_candidates count] - 1) {
             [self beep];
         }
@@ -1328,15 +1186,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (BOOL)handleEvent:(NSEvent *)event client:(id)client
 {
     if ([event type] == NSFlagsChanged) {
-        NSString *functionKeyKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kFunctionKeyKeyboardLayoutPreferenceKey];
-        if (!functionKeyKeyboardLayoutID) {
-            functionKeyKeyboardLayoutID = @"com.apple.keylayout.US";
-        }
-
-        NSString *basisKeyboardLayoutID = [[NSUserDefaults standardUserDefaults] stringForKey:kBasisKeyboardLayoutPreferenceKey];
-        if (!basisKeyboardLayoutID) {
-            basisKeyboardLayoutID = @"com.apple.keylayout.US";
-        }
+        NSString *functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout;
+        NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
 
         // If no override is needed, just return NO.
         if ([functionKeyKeyboardLayoutID isEqualToString:basisKeyboardLayoutID]) {
@@ -1344,7 +1195,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         }
 
         // Function key pressed.
-        BOOL includeShift = [[NSUserDefaults standardUserDefaults] boolForKey:kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey];
+        BOOL includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey;
         if (([event modifierFlags] & ~NSShiftKeyMask) || (([event modifierFlags] & NSShiftKeyMask) && includeShift)) {
             // Override the keyboard layout and let the OS do its thing
             [client overrideKeyboardWithKeyboardNamed:functionKeyKeyboardLayoutID];
@@ -1417,10 +1268,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (size_t)actualCandidateCursorIndex
 {
     size_t cursorIndex = _builder->cursorIndex();
-
-    BOOL candidatePhraseLocatedAfterCursor = [[NSUserDefaults standardUserDefaults] boolForKey:kSelectPhraseAfterCursorAsCandidatePreferenceKey];
-
-    if (candidatePhraseLocatedAfterCursor) {
+    if (Preferences.selectPhraseAfterCursorAsCandidate) {
         // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
         if (cursorIndex < _builder->length()) {
             ++cursorIndex;
@@ -1438,12 +1286,11 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 - (void)_showCandidateWindowUsingVerticalMode:(BOOL)useVerticalMode client:(id)client
 {
     // set the candidate panel style
-    BOOL useHorizontalCandidateList = [[NSUserDefaults standardUserDefaults] boolForKey:kUseHorizontalCandidateListPreferenceKey];
 
     if (useVerticalMode) {
         gCurrentCandidateController = [McBopomofoInputMethodController verticalCandidateController];
     }
-    else if (useHorizontalCandidateList) {
+    else if (Preferences.useHorizontalCandidateList) {
         gCurrentCandidateController = [McBopomofoInputMethodController horizontalCandidateController];
     }
     else {
@@ -1451,16 +1298,16 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     // set the attributes for the candidate panel (which uses NSAttributedString)
-    NSInteger textSize = [[NSUserDefaults standardUserDefaults] integerForKey:kCandidateListTextSizeKey];
+    NSInteger textSize = Preferences.candidateListTextSize;
 
     NSInteger keyLabelSize = textSize / 2;
     if (keyLabelSize < kMinKeyLabelSize) {
         keyLabelSize = kMinKeyLabelSize;
     }
 
-    NSString *ctFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateTextFontName];
-    NSString *klFontName = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeyLabelFontName];
-    NSString *ckeys = [[NSUserDefaults standardUserDefaults] stringForKey:kCandidateKeys];
+    NSString *ctFontName = Preferences.candidateTextFontName;
+    NSString *klFontName = Preferences.candidateKeyLabelFontName;
+    NSString *ckeys = Preferences.candidateKeys;
 
     gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
     gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
@@ -1661,25 +1508,21 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)openUserPhrases:(id)sender
 {
-    NSLog(@"openUserPhrases called");
     [self _openUserFile:[LanguageModelManager userPhrasesDataPathMcBopomofo]];
 }
 
 - (void)openExcludedPhrasesPlainBopomofo:(id)sender
 {
-    NSLog(@"openExcludedPhrasesPlainBopomofo called");
     [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathPlainBopomofo]];
 }
 
 - (void)openExcludedPhrasesMcBopomofo:(id)sender
 {
-    NSLog(@"openExcludedPhrasesMcBopomofo called");
     [self _openUserFile:[LanguageModelManager excludedPhrasesDataPathMcBopomofo]];
 }
 
 - (void)reloadUserPhrases:(id)sender
 {
-    NSLog(@"reloadUserPhrases called");
     [LanguageModelManager loadUserPhrasesModel];
 }
 
@@ -1691,21 +1534,20 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 
 - (void)toggleChineseConverter:(id)sender
 {
-    _chineseConversionEnabled = !_chineseConversionEnabled;
-    [[NSUserDefaults standardUserDefaults] setBool:_chineseConversionEnabled forKey:kChineseConversionEnabledKey];
-
+    BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
     [NotifierController notifyWithMessage:
-     _chineseConversionEnabled ?
+     chineseConversionEnabled ?
         NSLocalizedString(@"Chinese conversion on", @"") :
         NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
 }
 
 - (void)toggleHalfWidthPunctuation:(id)sender
 {
-    _halfWidthPunctuationEnabled = !_halfWidthPunctuationEnabled;
-    [[NSUserDefaults standardUserDefaults] setBool:_halfWidthPunctuationEnabled forKey:kHalfWidthPunctuationEnabledKey];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+    [Preferences toogleHalfWidthPunctuationEnabled];
+#pragma GCC diagnostic pop
 }
-
 
 @end
 

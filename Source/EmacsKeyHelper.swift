@@ -1,5 +1,5 @@
 //
-// InputMethodController.h
+// EmacsKeyHelper.swift
 //
 // Copyright (c) 2011 The McBopomofo Project.
 //
@@ -9,7 +9,7 @@
 //
 // Based on the Syrup Project and the Formosana Library
 // by Lukhnos Liu (@lukhnos).
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -32,46 +32,23 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <Cocoa/Cocoa.h>
-#import <InputMethodKit/InputMethodKit.h>
-#import "Mandarin.h"
-#import "Gramambular.h"
-#import "McBopomofoLM.h"
-#import "UserOverrideModel.h"
+import Cocoa
 
-@interface McBopomofoInputMethodController : IMKInputController
-{
-@private
-    // the reading buffer that takes user input
-    Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
-
-    // language model
-    McBopomofo::McBopomofoLM *_languageModel;
-
-    // user override model
-    McBopomofo::UserOverrideModel *_userOverrideModel;
-
-    // the grid (lattice) builder for the unigrams (and bigrams)
-    Formosa::Gramambular::BlockReadingBuilder* _builder;
-
-    // latest walked path (trellis) using the Viterbi algorithm
-    std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
-
-    // the latest composing buffer that is updated to the foreground app
-    NSMutableString *_composingBuffer;
-    NSInteger _latestReadingCursor;
-
-    // the current text input client; we need to keep this when candidate panel is on
-    id _currentCandidateClient;
-
-    // a special deferred client for Terminal.app fix
-    id _currentDeferredClient;
-    
-    // current available candidates
-    NSMutableArray *_candidates;
-
-    // current input mode
-    NSString *_inputMode;
+@objc enum McBopomofoEmacsKey: UInt16 {
+    case none = 0
+    case forward = 6 // F
+    case backward = 2 // B
+    case home = 1 // A
+    case end = 5 // E
+    case delete = 4 // D
+    case nextPage = 22 // V
 }
 
-@end
+class EmacsKeyHelper: NSObject {
+    @objc static func detect(charCode: UniChar, flags: NSEvent.ModifierFlags) -> McBopomofoEmacsKey {
+        if flags.contains(.control) {
+            return McBopomofoEmacsKey(rawValue: charCode) ?? .none
+        }
+        return .none;
+    }
+}
