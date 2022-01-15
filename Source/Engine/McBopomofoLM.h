@@ -28,6 +28,7 @@
 #include "UserPhrasesLM.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
+#include <unordered_set>
 
 namespace McBopomofo {
 
@@ -38,9 +39,8 @@ public:
     McBopomofoLM();
     ~McBopomofoLM();
 
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* userPhrasesDataPath,
-                         const char* excludedPhrasesDataPath);
+    void loadLanguageModel(const char* languageModelPath);
+    void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
@@ -51,6 +51,10 @@ public:
     bool phraseReplacementEnabled();
 
 protected:
+    const vector<Unigram> filterAndTransformUnigrams(vector<Unigram> unigrams,
+        const std::unordered_set<string>& excludedValues,
+        std::unordered_set<string>& insertedValues);
+
     ParselessLM m_languageModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
