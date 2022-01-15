@@ -1509,7 +1509,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences tooglePhraseReplacementEnabled];
+    [Preferences toogleHalfWidthPunctuationEnabled];
 #pragma GCC diagnostic pop
 }
 
