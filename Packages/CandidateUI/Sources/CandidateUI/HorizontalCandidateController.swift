@@ -217,7 +217,7 @@ public class HorizontalCandidateController: CandidateController {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
         let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
-        panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel))
+        panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
         panel.isOpaque = false
         panel.backgroundColor = NSColor.clear // Transparentify everything outside of the candidate list panel
