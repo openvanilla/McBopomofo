@@ -32,10 +32,15 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
 }
 
-+ (void)loadUserPhrasesModel
++ (void)loadUserPhrases
 {
     gLanguageModelMcBopomofo.loadUserPhrases([[self userPhrasesDataPathMcBopomofo] UTF8String], [[self excludedPhrasesDataPathMcBopomofo] UTF8String]);
     gLanguageModelPlainBopomofo.loadUserPhrases(NULL, [[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
+}
+
++ (void)loadUserPhraseReplacement
+{
+    gLanguageModelMcBopomofo.loadPhraseReplacementMap([[self phraseReplacementDataPathMcBopomofo] UTF8String]);
 }
 
 + (BOOL)checkIfUserDataFolderExists
@@ -89,6 +94,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     if (![self checkIfFileExist:[self excludedPhrasesDataPathPlainBopomofo]]) {
         return NO;
     }
+    if (![self checkIfFileExist:[self phraseReplacementDataPathMcBopomofo]]) {
+        return NO;
+    }
     return YES;
 }
 
@@ -135,7 +143,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     [writeFile writeData:data];
     [writeFile closeFile];
 
-    [self loadUserPhrasesModel];
+    [self loadUserPhrases];
     return YES;
 }
 
@@ -160,6 +168,11 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 + (NSString *)excludedPhrasesDataPathPlainBopomofo
 {
     return [[self dataFolderPath] stringByAppendingPathComponent:@"exclude-phrases-plain-bpmf.txt"];
+}
+
++ (NSString *)phraseReplacementDataPathMcBopomofo
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
 }
 
  + (McBopomofoLM *)languageModelMcBopomofo

@@ -37,6 +37,7 @@ McBopomofoLM::~McBopomofoLM()
     m_languageModel.close();
     m_userPhrases.close();
     m_excludedPhrases.close();
+    m_phraseReplacement.close();
 }
 
 void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath)
@@ -57,6 +58,13 @@ void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
     if (excludedPhrasesDataPath) {
         m_excludedPhrases.close();
         m_excludedPhrases.open(excludedPhrasesDataPath);
+    }
+}
+
+void McBopomofoLM::loadPhraseReplacementMap(const char* phraseReplacementPath) {
+    if (phraseReplacementPath) {
+        m_phraseReplacement.close();
+        m_phraseReplacement.open(phraseReplacementPath);
     }
 }
 
@@ -83,24 +91,45 @@ const vector<Unigram> McBopomofoLM::unigramsForKey(const string& key)
 
     if (m_userPhrases.hasUnigramsForKey(key)) {
         vector<Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
+        vector<Unigram> filterredUserUnigrams = m_userPhrases.unigramsForKey(key);
 
         for (auto&& unigram : rawUserUnigrams) {
             if (excludedValues.find(unigram.keyValue.value) == excludedValues.end()) {
-                userUnigrams.push_back(unigram);
+                filterredUserUnigrams.push_back(unigram);
             }
         }
 
-        transform(userUnigrams.begin(), userUnigrams.end(),
+        transform(filterredUserUnigrams.begin(), filterredUserUnigrams.end(),
                   inserter(userValues, userValues.end()),
                   [](const Unigram &u) { return u.keyValue.value; });
+
+        if (m_phraseReplacementEnabled) {
+            for (auto&& unigram : filterredUserUnigrams) {
+                string value = unigram.keyValue.value;
+                string replacement = m_phraseReplacement.valueForKey(value);
+                if (replacement != "") {
+                    unigram.keyValue.value = replacement;
+                }
+                unigrams.push_back(unigram);
+            }
+        } else {
+            unigrams = filterredUserUnigrams;
+        }
     }
 
     if (m_languageModel.hasUnigramsForKey(key)) {
         vector<Unigram> globalUnigrams = m_languageModel.unigramsForKey(key);
 
         for (auto&& unigram : globalUnigrams) {
-            if (excludedValues.find(unigram.keyValue.value) == excludedValues.end() &&
-                userValues.find(unigram.keyValue.value) == userValues.end()) {
+            string value = unigram.keyValue.value;
+            if (excludedValues.find(value) == excludedValues.end() &&
+                userValues.find(value) == userValues.end()) {
+                if (m_phraseReplacementEnabled) {
+                    string replacement = m_phraseReplacement.valueForKey(value);
+                    if (replacement != "") {
+                        unigram.keyValue.value = replacement;
+                    }
+                }
                 unigrams.push_back(unigram);
             }
         }
@@ -119,3 +148,14 @@ bool McBopomofoLM::hasUnigramsForKey(const string& key)
 
     return unigramsForKey(key).size() > 0;
 }
+
+void McBopomofoLM::setPhraseReplacementEnabled(bool enabled)
+{
+    m_phraseReplacementEnabled = enabled;
+}
+
+bool McBopomofoLM::phraseReplacementEnabled()
+{
+    return m_phraseReplacementEnabled;
+}
+
