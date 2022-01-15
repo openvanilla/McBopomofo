@@ -24,10 +24,10 @@
 #ifndef MCBOPOMOFOLM_H
 #define MCBOPOMOFOLM_H
 
-#include <stdio.h>
 #include "FastLM.h"
-#include "UserPhrasesLM.h"
 #include "PhraseReplacementMap.h"
+#include "UserPhrasesLM.h"
+#include <unordered_set>
 
 namespace McBopomofo {
 
@@ -38,9 +38,8 @@ public:
     McBopomofoLM();
     ~McBopomofoLM();
 
-    void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* userPhrasesDataPath,
-                         const char* excludedPhrasesDataPath);
+    void loadLanguageModel(const char* languageModelPath);
+    void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
@@ -51,6 +50,10 @@ public:
     bool phraseReplacementEnabled();
 
 protected:
+    const vector<Unigram> filterAndTransformUnigrams(vector<Unigram> unigrams,
+        const std::unordered_set<string>& excludedValues,
+        std::unordered_set<string>& insertedValues);
+
     FastLM m_languageModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
