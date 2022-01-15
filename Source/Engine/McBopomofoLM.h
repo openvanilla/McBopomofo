@@ -55,7 +55,7 @@ public:
     void setExternalConvrter(std::function<string(string)> externalConverter);
 
 protected:
-    const vector<Unigram> filterAndTransformUnigrams(vector<Unigram> unigrams,
+    const vector<Unigram> filterAndTransformUnigrams(const vector<Unigram> unigrams,
         const std::unordered_set<string>& excludedValues,
         std::unordered_set<string>& insertedValues);
 

@@ -136,7 +136,7 @@ void McBopomofoLM::setExternalConvrter(std::function<string(string)> externalCon
     m_externalConverter = externalConverter;
 }
 
-const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
+const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(const vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
 {
     vector<Unigram> results;
 
@@ -159,9 +159,12 @@ const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(vector<Unigram> u
             string replacement = m_externalConverter(value);
             value = replacement;
         }
-        unigram.keyValue.value = value;
         if (insertedValues.find(value) == insertedValues.end()) {
-            results.push_back(unigram);
+            Unigram g;
+            g.keyValue.value = value;
+            g.keyValue.key = unigram.keyValue.key;
+            g.score = unigram.score;
+            results.push_back(g);
             insertedValues.insert(value);
         }
     }
