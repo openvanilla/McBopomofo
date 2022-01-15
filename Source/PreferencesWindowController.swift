@@ -35,10 +35,6 @@
 import Cocoa
 import Carbon
 
-private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"
-private let kCandidateKeys = "CandidateKeys"
-private let kDefaultKeys = "123456789"
-
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
@@ -54,46 +50,69 @@ private let kDefaultKeys = "123456789"
 
         basisKeyboardLayoutButton.menu?.removeAllItems()
 
-        let basisKeyboardLayoutID = UserDefaults.standard.string(forKey: kBasisKeyboardLayoutPreferenceKey)
+        let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
         for source in list {
-            if let categoryPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceCategory) {
-                let category = Unmanaged<CFString>.fromOpaque(categoryPtr).takeUnretainedValue()
-                if category != kTISCategoryKeyboardInputSource {
+
+            func getString(_ key: CFString) -> String? {
+                if let ptr = TISGetInputSourceProperty(source, key) {
+                    return String(Unmanaged<CFString>.fromOpaque(ptr).takeUnretainedValue())
+                }
+                return nil
+            }
+
+            func getBool(_ key: CFString) -> Bool? {
+                if let ptr = TISGetInputSourceProperty(source, key) {
+                    return Unmanaged<CFBoolean>.fromOpaque(ptr).takeUnretainedValue() == kCFBooleanTrue
+                }
+                return nil
+            }
+
+            if let category = getString(kTISPropertyInputSourceCategory) {
+                if category != String(kTISCategoryKeyboardInputSource) {
                     continue
                 }
             } else {
                 continue
             }
 
-            if let asciiCapablePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsASCIICapable) {
-                let asciiCapable = Unmanaged<CFBoolean>.fromOpaque(asciiCapablePtr).takeUnretainedValue()
-                if asciiCapable != kCFBooleanTrue {
+            if let asciiCapable = getBool(kTISPropertyInputSourceIsASCIICapable) {
+                if !asciiCapable {
                     continue
                 }
             } else {
                 continue
             }
 
-            if let sourceTypePtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceType) {
-                let sourceType = Unmanaged<CFString>.fromOpaque(sourceTypePtr).takeUnretainedValue()
-                if sourceType != kTISTypeKeyboardLayout {
+            if let sourceType = getString(kTISPropertyInputSourceType) {
+                if sourceType != String(kTISTypeKeyboardLayout) {
                     continue
                 }
             } else {
                 continue
             }
 
-            guard let sourceIDPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-                  let localizedNamePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName) else {
+            guard let sourceID = getString(kTISPropertyInputSourceID),
+                  let localizedName = getString(kTISPropertyLocalizedName) else {
                 continue
             }
-
-            let sourceID = String(Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue())
-            let localizedName = String(Unmanaged<CFString>.fromOpaque(localizedNamePtr).takeUnretainedValue())
 
             let menuItem = NSMenuItem()
             menuItem.title = localizedName
             menuItem.representedObject = sourceID
+
+            if let iconPtr = TISGetInputSourceProperty(source, kTISPropertyIconRef) {
+                let icon = IconRef(iconPtr)
+                let image = NSImage(iconRef: icon)
+
+                func resize( _ image: NSImage) -> NSImage {
+                    let newImage = NSImage(size: NSSize(width: 16, height: 16))
+                    newImage.lockFocus()
+                    image.draw(in: NSRect(x: 0, y: 0, width: 16, height: 16))
+                    newImage.unlockFocus()
+                    return newImage
+                }
+                menuItem.image = resize(image)
+            }
 
             if sourceID == "com.apple.keylayout.US" {
                 usKeyboardLayoutItem = menuItem
@@ -106,37 +125,37 @@ private let kDefaultKeys = "123456789"
 
         basisKeyboardLayoutButton.select(chosenItem ?? usKeyboardLayoutItem)
         selectionKeyComboBox.usesDataSource = false
-        selectionKeyComboBox.addItems(withObjectValues: [kDefaultKeys, "asdfghjkl", "asdfzxcvb"])
+        selectionKeyComboBox.removeAllItems()
+        selectionKeyComboBox.addItems(withObjectValues: [Preferences.defaultKeys, "asdfghjkl", "asdfzxcvb"])
 
-        var candidateSelectionKeys = (UserDefaults.standard.string(forKey: kCandidateKeys) ?? kDefaultKeys)
-                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        var candidateSelectionKeys = Preferences.candidateKeys ?? Preferences.defaultKeys
         if candidateSelectionKeys.isEmpty {
-            candidateSelectionKeys = kDefaultKeys
+            candidateSelectionKeys = Preferences.defaultKeys
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
-        if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject {
-            UserDefaults.standard.set(sourceID, forKey: kBasisKeyboardLayoutPreferenceKey)
+        if let sourceID = basisKeyboardLayoutButton.selectedItem?.representedObject as? String {
+            Preferences.basisKeyboardLayout = sourceID
         }
     }
 
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
         let keys = (sender as AnyObject).stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         if keys.count != 9 || !keys.canBeConverted(to: .ascii) {
-            selectionKeyComboBox.stringValue = kDefaultKeys
-            UserDefaults.standard.removeObject(forKey: kCandidateKeys)
+            selectionKeyComboBox.stringValue = Preferences.defaultKeys
+            Preferences.candidateKeys = nil
             NSSound.beep()
             return
         }
 
         selectionKeyComboBox.stringValue = keys
-        if keys == kDefaultKeys {
-            UserDefaults.standard.removeObject(forKey: kCandidateKeys)
+        if keys == Preferences.defaultKeys {
+            Preferences.candidateKeys = nil
         } else {
-            UserDefaults.standard.set(keys, forKey: kCandidateKeys)
+            Preferences.candidateKeys = keys
         }
     }
 

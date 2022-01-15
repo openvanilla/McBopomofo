@@ -25,5 +25,8 @@ let package = Package(
             dependencies: [
                 .product(name: "OpenCC", package: "SwiftyOpenCC")
             ]),
+        .testTarget(
+            name: "OpenCCBridgeTests",
+            dependencies: ["OpenCCBridge"]),
     ]
 )

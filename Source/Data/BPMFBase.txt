@@ -2752,6 +2752,7 @@
 敯 ㄇㄧㄣˇ min3 aup3 big5
 潣 ㄇㄧㄣˇ min3 aup3 big5
 民 ㄇㄧㄣˊ min2 aup6 big5
+珉 ㄇㄧㄣˊ min2 aup6 big5e
 岷 ㄇㄧㄣˊ min2 aup6 big5
 玟 ㄇㄧㄣˊ min2 aup6 big5
 緡 ㄇㄧㄣˊ min2 aup6 big5
@@ -3389,7 +3390,6 @@
 壞 ㄏㄨㄞˋ huai4 cj94 big5
 坏 ㄏㄨㄞˋ huai4 cj94 big5
 諙 ㄏㄨㄞˋ huai4 cj94 big5
-孬 ㄏㄨㄞˋ huai4 cj94 big5
 咶 ㄏㄨㄞˋ huai4 cj94 big5
 蘹 ㄏㄨㄞˋ huai4 cj94 big5
 蘾 ㄏㄨㄞˋ huai4 cj94 big5
@@ -9233,6 +9233,7 @@
 呢 ㄋㄜ ne sk big5
 呢 ㄋㄜ˙ ne5 sk7 big5
 訥 ㄋㄜˋ ne4 sk4 big5
+孬 ㄋㄠ nao sl big5
 峱 ㄋㄠ nao sl big5
 腦 ㄋㄠˇ nao3 sl3 big5
 惱 ㄋㄠˇ nao3 sl3 big5

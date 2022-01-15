@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include "FastLM.h"
 #include "UserPhrasesLM.h"
+#include "PhraseReplacementMap.h"
 
 namespace McBopomofo {
 
@@ -38,17 +39,23 @@ public:
     ~McBopomofoLM();
 
     void loadLanguageModel(const char* languageModelDataPath);
-    void loadUserPhrases(const char* m_userPhrasesDataPath,
-                         const char* m_excludedPhrasesDataPath);
+    void loadUserPhrases(const char* userPhrasesDataPath,
+                         const char* excludedPhrasesDataPath);
+    void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
     const vector<Unigram> unigramsForKey(const string& key);
     bool hasUnigramsForKey(const string& key);
 
+    void setPhraseReplacementEnabled(bool enabled);
+    bool phraseReplacementEnabled();
+
 protected:
     FastLM m_languageModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
+    PhraseReplacementMap m_phraseReplacement;
+    bool m_phraseReplacementEnabled;
 };
 };
 

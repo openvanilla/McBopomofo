@@ -72,9 +72,6 @@
 
     // current input mode
     NSString *_inputMode;
-
-    // if Chinese conversion is enabled
-    BOOL _chineseConversionEnabled;
-    BOOL _halfWidthPunctuationEnabled;
 }
+
 @end
