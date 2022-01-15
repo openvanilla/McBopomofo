@@ -50,6 +50,10 @@ public:
     void setPhraseReplacementEnabled(bool enabled);
     bool phraseReplacementEnabled();
 
+    void setExternalConverterEnabled(bool enabled);
+    bool externalConverterEnabled();
+    void setExternalConvrter(std::function<string(string)> externalConverter);
+
 protected:
     const vector<Unigram> filterAndTransformUnigrams(vector<Unigram> unigrams,
         const std::unordered_set<string>& excludedValues,
@@ -60,6 +64,8 @@ protected:
     UserPhrasesLM m_excludedPhrases;
     PhraseReplacementMap m_phraseReplacement;
     bool m_phraseReplacementEnabled;
+    bool m_externalConverterEnabled;
+    std::function<string(string)> m_externalConverter;
 };
 };
 

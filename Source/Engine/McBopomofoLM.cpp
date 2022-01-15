@@ -121,20 +121,46 @@ bool McBopomofoLM::phraseReplacementEnabled()
     return m_phraseReplacementEnabled;
 }
 
+void McBopomofoLM::setExternalConverterEnabled(bool enabled)
+{
+    m_externalConverterEnabled = enabled;
+}
+
+bool McBopomofoLM::externalConverterEnabled()
+{
+    return m_externalConverterEnabled;
+}
+
+void McBopomofoLM::setExternalConvrter(std::function<string(string)> externalConverter)
+{
+    m_externalConverter = externalConverter;
+}
+
 const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
 {
     vector<Unigram> results;
 
     for (auto&& unigram : unigrams) {
-        string value = unigram.keyValue.value;
+        // excludedValues filters out the unigrams with the original value.
+        // insertedValues filters out the ones with the converted value
+        string originalValue = unigram.keyValue.value;
+        if (excludedValues.find(originalValue) != excludedValues.end()) {
+            continue;
+        }
+
+        string value = originalValue;
         if (m_phraseReplacementEnabled) {
             string replacement = m_phraseReplacement.valueForKey(value);
             if (replacement != "") {
                 value = replacement;
-                unigram.keyValue.value = value;
             }
         }
-        if (excludedValues.find(value) == excludedValues.end() && insertedValues.find(value) == insertedValues.end()) {
+        if (m_externalConverterEnabled && m_externalConverter) {
+            string replacement = m_externalConverter(value);
+            value = replacement;
+        }
+        unigram.keyValue.value = value;
+        if (insertedValues.find(value) == insertedValues.end()) {
             results.push_back(unigram);
             insertedValues.insert(value);
         }
