@@ -68,8 +68,8 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
         return string(text.UTF8String);
     };
 
-    gLanguageModelMcBopomofo.setExternalConvrter(converter);
-    gLanguageModelPlainBopomofo.setExternalConvrter(converter);
+    gLanguageModelMcBopomofo.setExternalConverter(converter);
+    gLanguageModelPlainBopomofo.setExternalConverter(converter);
 }
 
 + (BOOL)checkIfUserDataFolderExists
