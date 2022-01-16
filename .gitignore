@@ -13,3 +13,5 @@ Credits.rtf
 # C_count.occ.exe
 .idea
 .swiftpm
+.vscode
+__pycache__
