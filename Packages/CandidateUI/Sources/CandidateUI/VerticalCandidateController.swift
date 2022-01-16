@@ -91,10 +91,10 @@ fileprivate class VerticalCandidateTableView: NSTableView {
     }
 }
 
-private let kCandidateTextPadding = 24.0
-private let kCandidateTextLeftMargin = 8.0
-private let kCandidateTextPaddingWithMandatedTableViewPadding = 18.0
-private let kCandidateTextLeftMarginWithMandatedTableViewPadding = 0.0
+private let kCandidateTextPadding:CGFloat = 24.0
+private let kCandidateTextLeftMargin:CGFloat = 8.0
+private let kCandidateTextPaddingWithMandatedTableViewPadding:CGFloat = 18.0
+private let kCandidateTextLeftMarginWithMandatedTableViewPadding:CGFloat = 0.0
 
 
 @objc (VTVerticalCandidateController)

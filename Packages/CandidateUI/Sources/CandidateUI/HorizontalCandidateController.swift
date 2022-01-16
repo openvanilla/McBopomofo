@@ -364,7 +364,7 @@ extension HorizontalCandidateController {
 
         if pageCount > 1 {
             var buttonRect = nextPageButton.frame
-            var spacing = 0.0
+            var spacing:CGFloat = 0.0
 
             if newSize.height < 40.0 {
                 buttonRect.size.height = floor(newSize.height / 2)

@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -14,7 +14,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(name: "SwiftyOpenCC", url: "https://github.com/ddddxxx/SwiftyOpenCC.git", revision: "a802c02cbf1c6fcd529575f11a9876d94fc813f4")
+        .package(name: "SwiftyOpenCC", url: "https://github.com/ddddxxx/SwiftyOpenCC.git", from: "2.0.0-beta")
         
     ],
     targets: [
