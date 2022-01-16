@@ -8,4 +8,5 @@
 + (void)loadDataModels;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
++ (void)setupDataModelValueConverter;
 @end

@@ -4,6 +4,10 @@
 #import <set>
 #import "OVStringHelper.h"
 #import "OVUTF8Helper.h"
+#import "McBopomofo-Swift.h"
+
+@import VXHanConvert;
+@import OpenCCBridge;
 
 using namespace std;
 using namespace Formosa::Gramambular;
@@ -41,6 +45,31 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 + (void)loadUserPhraseReplacement
 {
     gLanguageModelMcBopomofo.loadPhraseReplacementMap([[self phraseReplacementDataPathMcBopomofo] UTF8String]);
+}
+
++ (void)setupDataModelValueConverter
+{
+    auto converter = [] (string input) {
+        if (!Preferences.chineseConversionEnabled) {
+            return input;
+        }
+
+        if (Preferences.chineseConversionStyle == 0) {
+            return input;
+        }
+
+        NSString *text = [NSString stringWithUTF8String:input.c_str()];
+        if (Preferences.chineneConversionEngine == 1) {
+            text = [VXHanConvert convertToSimplifiedFrom:text];
+        }
+        else {
+            text = [OpenCCBridge convertToSimplified:text];
+        }
+        return string(text.UTF8String);
+    };
+
+    gLanguageModelMcBopomofo.setExternalConverter(converter);
+    gLanguageModelPlainBopomofo.setExternalConverter(converter);
 }
 
 + (BOOL)checkIfUserDataFolderExists

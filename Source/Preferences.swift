@@ -50,8 +50,9 @@ private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
-private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
+private let kChineseConversionEngineKey = "ChineseConversionEngine"
+private let kChineseConversionStyle = "ChineseConversionStyle"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinKeyLabelSize: CGFloat = 10
@@ -217,6 +218,20 @@ struct ComposingKeys {
     }
 }
 
+@objc enum ChineseConversionStyle: Int {
+    case output
+    case model
+
+    var name: String {
+        switch (self) {
+        case .output:
+            return "output"
+        case .model:
+            return "model"
+        }
+    }
+}
+
 // MARK: -
 
 class Preferences: NSObject {
@@ -285,6 +300,18 @@ class Preferences: NSObject {
         kDefaultKeys
     }
 
+    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
+    @objc static var phraseReplacementEnabled: Bool
+
+    @objc static func tooglePhraseReplacementEnabled() -> Bool {
+        phraseReplacementEnabled = !phraseReplacementEnabled
+        return phraseReplacementEnabled;
+    }
+
+    /// The conversion engine.
+    ///
+    /// - 0: OpenCC
+    /// - 1: VXHanConvert
     @UserDefault(key: kChineseConversionEngineKey, defaultValue: 0)
     @objc static var chineneConversionEngine: Int
 
@@ -292,12 +319,15 @@ class Preferences: NSObject {
         return ChineseConversionEngine(rawValue: chineneConversionEngine)?.name
     }
 
-    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
-    @objc static var phraseReplacementEnabled: Bool
+    /// The conversion style.
+    ///
+    /// - 0: convert the output
+    /// - 1: convert the phrase models.
+    @UserDefault(key: kChineseConversionStyle, defaultValue: 0)
+    @objc static var chineseConversionStyle: Int
 
-    @objc static func tooglePhraseReplacementEnabled() -> Bool {
-        phraseReplacementEnabled = !phraseReplacementEnabled
-        return phraseReplacementEnabled;
+    @objc static var chineseConversionStyleName: String? {
+        return ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
     }
 
 }

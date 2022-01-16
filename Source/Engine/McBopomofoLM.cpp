@@ -24,7 +24,6 @@
 #include "McBopomofoLM.h"
 #include <algorithm>
 #include <iterator>
-#include <unordered_set>
 
 using namespace McBopomofo;
 
@@ -49,7 +48,7 @@ void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath)
 }
 
 void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
-                                   const char* excludedPhrasesDataPath)
+    const char* excludedPhrasesDataPath)
 {
     if (userPhrasesDataPath) {
         m_userPhrases.close();
@@ -61,7 +60,8 @@ void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
     }
 }
 
-void McBopomofoLM::loadPhraseReplacementMap(const char* phraseReplacementPath) {
+void McBopomofoLM::loadPhraseReplacementMap(const char* phraseReplacementPath)
+{
     if (phraseReplacementPath) {
         m_phraseReplacement.close();
         m_phraseReplacement.open(phraseReplacementPath);
@@ -75,75 +75,37 @@ const vector<Bigram> McBopomofoLM::bigramsForKeys(const string& preceedingKey, c
 
 const vector<Unigram> McBopomofoLM::unigramsForKey(const string& key)
 {
-    vector<Unigram> unigrams;
+    vector<Unigram> allUnigrams;
     vector<Unigram> userUnigrams;
 
-    // Use unordered_set so that you don't have to do O(n*m)
     unordered_set<string> excludedValues;
-    unordered_set<string> userValues;
+    unordered_set<string> insertedValues;
 
     if (m_excludedPhrases.hasUnigramsForKey(key)) {
         vector<Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
         transform(excludedUnigrams.begin(), excludedUnigrams.end(),
-                  inserter(excludedValues, excludedValues.end()),
-                  [](const Unigram &u) { return u.keyValue.value; });
+            inserter(excludedValues, excludedValues.end()),
+            [](const Unigram& u) { return u.keyValue.value; });
     }
 
     if (m_userPhrases.hasUnigramsForKey(key)) {
         vector<Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
-        vector<Unigram> filterredUserUnigrams = m_userPhrases.unigramsForKey(key);
-
-        for (auto&& unigram : rawUserUnigrams) {
-            if (excludedValues.find(unigram.keyValue.value) == excludedValues.end()) {
-                filterredUserUnigrams.push_back(unigram);
-            }
-        }
-
-        transform(filterredUserUnigrams.begin(), filterredUserUnigrams.end(),
-                  inserter(userValues, userValues.end()),
-                  [](const Unigram &u) { return u.keyValue.value; });
-
-        if (m_phraseReplacementEnabled) {
-            for (auto&& unigram : filterredUserUnigrams) {
-                string value = unigram.keyValue.value;
-                string replacement = m_phraseReplacement.valueForKey(value);
-                if (replacement != "") {
-                    unigram.keyValue.value = replacement;
-                }
-                unigrams.push_back(unigram);
-            }
-        } else {
-            unigrams = filterredUserUnigrams;
-        }
+        userUnigrams = filterAndTransformUnigrams(rawUserUnigrams, excludedValues, insertedValues);
     }
 
     if (m_languageModel.hasUnigramsForKey(key)) {
-        vector<Unigram> globalUnigrams = m_languageModel.unigramsForKey(key);
-
-        for (auto&& unigram : globalUnigrams) {
-            string value = unigram.keyValue.value;
-            if (excludedValues.find(value) == excludedValues.end() &&
-                userValues.find(value) == userValues.end()) {
-                if (m_phraseReplacementEnabled) {
-                    string replacement = m_phraseReplacement.valueForKey(value);
-                    if (replacement != "") {
-                        unigram.keyValue.value = replacement;
-                    }
-                }
-                unigrams.push_back(unigram);
-            }
-        }
+        vector<Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
+        allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
-    unigrams.insert(unigrams.begin(), userUnigrams.begin(), userUnigrams.end());
-    return unigrams;
+    allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+    return allUnigrams;
 }
 
 bool McBopomofoLM::hasUnigramsForKey(const string& key)
 {
     if (!m_excludedPhrases.hasUnigramsForKey(key)) {
-        return m_userPhrases.hasUnigramsForKey(key) ||
-        m_languageModel.hasUnigramsForKey(key);
+        return m_userPhrases.hasUnigramsForKey(key) || m_languageModel.hasUnigramsForKey(key);
     }
 
     return unigramsForKey(key).size() > 0;
@@ -159,3 +121,52 @@ bool McBopomofoLM::phraseReplacementEnabled()
     return m_phraseReplacementEnabled;
 }
 
+void McBopomofoLM::setExternalConverterEnabled(bool enabled)
+{
+    m_externalConverterEnabled = enabled;
+}
+
+bool McBopomofoLM::externalConverterEnabled()
+{
+    return m_externalConverterEnabled;
+}
+
+void McBopomofoLM::setExternalConverter(std::function<string(string)> externalConverter)
+{
+    m_externalConverter = externalConverter;
+}
+
+const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(const vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
+{
+    vector<Unigram> results;
+
+    for (auto&& unigram : unigrams) {
+        // excludedValues filters out the unigrams with the original value.
+        // insertedValues filters out the ones with the converted value
+        string originalValue = unigram.keyValue.value;
+        if (excludedValues.find(originalValue) != excludedValues.end()) {
+            continue;
+        }
+
+        string value = originalValue;
+        if (m_phraseReplacementEnabled) {
+            string replacement = m_phraseReplacement.valueForKey(value);
+            if (replacement != "") {
+                value = replacement;
+            }
+        }
+        if (m_externalConverterEnabled && m_externalConverter) {
+            string replacement = m_externalConverter(value);
+            value = replacement;
+        }
+        if (insertedValues.find(value) == insertedValues.end()) {
+            Unigram g;
+            g.keyValue.value = value;
+            g.keyValue.key = unigram.keyValue.key;
+            g.score = unigram.score;
+            results.push_back(g);
+            insertedValues.insert(value);
+        }
+    }
+    return results;
+}
