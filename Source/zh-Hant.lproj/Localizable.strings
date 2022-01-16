@@ -76,3 +76,15 @@
 "Edit Phrase Replacement Table" = "編輯詞彙替換表格";
 
 "Use Phrase Replacement" = "使用詞彙替換";
+
+"Candidates keys cannot be empty." = "選字鍵不可為空。";
+
+"Candidate keys can only contain latin characters and numbers." = "選字鍵只可包含英數與半型標點。";
+
+"Candidate keys cannot contain space." = "選字鍵不可包含空白。";
+
+"There should not be duplicated keys." = "選字鍵中不可包含重複的字元。";
+
+"The length of your candidate keys can not be less than 4 characters." = "選字按鍵數量不可小於 4。";
+
+"The length of your candidate keys can not be larger than 15 characters." = "選字按鍵數量不可大於 15。";
