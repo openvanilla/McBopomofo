@@ -152,11 +152,7 @@ import Carbon
         }
 
         selectionKeyComboBox.stringValue = keys
-        if keys == Preferences.defaultKeys {
-            Preferences.candidateKeys = nil
-        } else {
-            Preferences.candidateKeys = keys
-        }
+        Preferences.candidateKeys = keys
     }
 
 }
