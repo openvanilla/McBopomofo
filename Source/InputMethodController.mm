@@ -243,6 +243,8 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
             Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
 
+    _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
+
     [(AppDelegate *)[NSApp delegate] checkForUpdate];
 }
 
@@ -275,12 +277,14 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
         newInputMode = kPlainBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelPlainBopomofo];
+        newLanguageModel->setPhraseReplacementEnabled(false);
     }
     else {
         newInputMode = kBopomofoModeIdentifier;
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
         newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
+    newLanguageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
@@ -312,8 +316,16 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
 
 #pragma mark - IMKServerInput protocol methods
 
-- (NSString *)_convertToSimplifiedChinese:(NSString *)text
+- (NSString *)_convertToSimplifiedChineseIfRequired:(NSString *)text
 {
+    if (!Preferences.chineseConversionEnabled) {
+        return text;
+    }
+
+    if (Preferences.chineseConversionStyle == 1) {
+        return text;
+    }
+
     if (Preferences.chineneConversionEngine == 1) {
         return [VXHanConvert convertToSimplifiedFrom:text];
     }
@@ -333,11 +345,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     }
 
     // Chinese conversion.
-    NSString *buffer = _composingBuffer;
-
-    if (Preferences.chineseConversionEnabled) {
-        buffer = [self _convertToSimplifiedChinese:_composingBuffer];
-    }
+    NSString *buffer = [self _convertToSimplifiedChineseIfRequired:_composingBuffer];
 
     // commit the text, clear the state
     [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
@@ -483,10 +491,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             NodeAnchor &anchor = _walkedNodes[0];
             NSString *popedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             // Chinese conversion.
-            BOOL chineseConversionEnabled = Preferences.chineseConversionEnabled;
-            if (chineseConversionEnabled) {
-                popedText = [self _convertToSimplifiedChinese:popedText];
-            }
+            popedText = [self _convertToSimplifiedChineseIfRequired:popedText];
             [client insertText:popedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
@@ -1504,7 +1509,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences tooglePhraseReplacementEnabled];
+    [Preferences toogleHalfWidthPunctuationEnabled];
 #pragma GCC diagnostic pop
 }
 

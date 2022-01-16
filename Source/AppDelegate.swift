@@ -51,6 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var updateNextStepURL: URL?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        LanguageModelManager.setupDataModelValueConverter()
         LanguageModelManager.loadDataModels()
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()

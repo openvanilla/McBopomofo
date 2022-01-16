@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import "FastLM.h"
 #import "UserOverrideModel.h"
 #import "McBopomofoLM.h"
 
@@ -10,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadDataModels;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
++ (void)setupDataModelValueConverter;
 + (BOOL)checkIfUserLanguageModelFilesExist;
 + (BOOL)writeUserPhrase:(NSString *)userPhrase;
 
