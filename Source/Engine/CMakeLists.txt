@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 3.17)
-project(KeyValueBlobReader)
+project(McBopomofoLMLib)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(KeyValueBlobReader KeyValueBlobReader.cpp KeyValueBlobReader.h)
+include_directories("Gramambular")
+add_library(McBopomofoLMLib
+        KeyValueBlobReader.cpp
+        KeyValueBlobReader.h
+        ParselessPhraseDB.cpp
+        ParselessPhraseDB.h
+        ParselessLM.cpp
+        ParselessLM.h)
 
 # Let CMake fetch Google Test for us.
 # https://github.com/google/googletest/tree/main/googletest#incorporating-into-an-existing-cmake-project
@@ -19,6 +26,17 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Test target declarations.
-add_executable(KeyValueBlobReadTest KeyValueBlobReaderTest.cpp)
-target_link_libraries(KeyValueBlobReadTest gtest_main KeyValueBlobReader)
-add_test(NAME KeyValueBlobReadTest COMMAND KeyValueBlobReadTest)
+add_executable(McBopomofoLMLibTest
+        KeyValueBlobReaderTest.cpp
+        ParselessLMTest.cpp
+        ParselessPhraseDBTest.cpp)
+target_link_libraries(McBopomofoLMLibTest gtest_main McBopomofoLMLib)
+include(GoogleTest)
+gtest_discover_tests(McBopomofoLMLibTest)
+
+# Benchmark target.
+find_package(benchmark REQUIRED)
+add_executable(ParselessLMBenchmark
+        FastLM.cpp
+        ParselessLMBenchmark.cpp)
+target_link_libraries(ParselessLMBenchmark McBopomofoLMLib benchmark::benchmark)

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from cook_util import HEADER, convert_vks_rows_to_sorted_kvs_rows
 import sys
 
 __author__ = 'Mengjuei Hsieh et al.'
@@ -17,8 +18,8 @@ bpmf_hetero = {}
 
 if __name__ == '__main__':
     """bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt data.txt"""
-    if len(sys.argv) < 5:
-        sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base output')
+    if len(sys.argv) < 7:
+        sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base punctuations symbols output')
     #  Read a list of heterophonic singulars and its estimated frequency
     #  not active yet
     # try:
@@ -117,7 +118,9 @@ if __name__ == '__main__':
     handle.close()
     # phrase-freqs
     handle = open(sys.argv[1], "r")
-    fout = open(sys.argv[4], "w")
+
+    output = []
+
     while True:
         line = handle.readline()
         if not line: break
@@ -135,43 +138,43 @@ if __name__ == '__main__':
             # 剛好一個中文字字的長度目前還是 3 (標點、聲調好像都是2)
             if len(mykey) > 3:
                 for r in readings:
-                    fout.write("%s %s %s\n" % (mykey, r, myvalue))
+                    output.append((mykey, r, myvalue))
                     pass
                 continue
             else:
                 # lookup the table from canonical list
                 for r in readings:
                     if mykey not in bpmf_phon1:
-                        fout.write("%s %s %s\n" % (mykey, r, myvalue))
+                        output.append((mykey, r, myvalue))
                         continue
                     elif str(bpmf_phon1[mykey]) == r:
-                        fout.write("%s %s %s\n" % (mykey, r, myvalue))
+                        output.append((mykey, r, myvalue))
                         continue
                     elif mykey not in bpmf_phon2:
-                        fout.write("%s %s %f\n" % (mykey, r, H_DEFLT_FREQ))
+                        output.append((mykey, r, H_DEFLT_FREQ))
                         continue
                     elif str(bpmf_phon2[mykey]) == r:
                         # l(3/4) = -0.28768207245178 / 頻率打七五折之意
                         # l(1/2) = -0.69314718055994 / 頻率打五折之意
                         if float(myvalue)-0.69314718055994 > H_DEFLT_FREQ:
-                            fout.write("%s %s %f\n" % (mykey, r, float(myvalue)-0.69314718055994))
+                            output.append((mykey, r, float(myvalue)-0.69314718055994))
                             continue
                         else:
-                            fout.write("%s %s %f\n" % (mykey, r, H_DEFLT_FREQ))
+                            output.append((mykey, r, H_DEFLT_FREQ))
                             continue
                     elif mykey not in bpmf_phon3:
-                        fout.write("%s %s %f\n" % (mykey, r, H_DEFLT_FREQ))
+                        output.append((mykey, r, H_DEFLT_FREQ))
                         continue
                     elif str(bpmf_phon3[mykey]) == r:
                         # l(3/4*3/4) = -0.28768207245178*2
                         # l(1/2*1/2) = -0.69314718055994*2
                         if float(myvalue)-0.69314718055994*2 > H_DEFLT_FREQ:
-                            fout.write("%s %s %f\n" % (mykey, r, float(myvalue)-0.69314718055994*2))
+                            output.append((mykey, r, float(myvalue)-0.69314718055994*2))
                             continue
                         else:
-                            fout.write("%s %s %f\n" % (mykey, r, H_DEFLT_FREQ))
+                            output.append((mykey, r, H_DEFLT_FREQ))
                             continue
-                    fout.write("%s %s %f\n" % (mykey, r, H_DEFLT_FREQ))
+                    output.append((mykey, r, H_DEFLT_FREQ))
                     # 如果是破音字, set it to default.
                     # 很罕用的注音建議不要列入 heterophony?.list，這樣的話
                     # 就可以直接進來這個 condition
@@ -179,6 +182,27 @@ if __name__ == '__main__':
     for k in bpmf_chars:
         if k not in phrases:
             for v in bpmf_chars[k]:
-                fout.write("%s %s %f\n" % (k, v, UNK_LOG_FREQ))
+                output.append((k, v, UNK_LOG_FREQ))
                 pass
-    fout.close()
+
+    with open(sys.argv[4]) as punctuations_file:
+        for line in punctuations_file:
+            row = line.rstrip().split(" ")
+            assert len(row) == 3
+            output.append(tuple(row))
+
+
+    with open(sys.argv[5]) as symbols_file:
+        for line in symbols_file:
+            row = line.rstrip().split(" ")
+            assert len(row) == 3
+            output.append(tuple(row))
+
+    output = convert_vks_rows_to_sorted_kvs_rows(output)
+    with open(sys.argv[-1], "w") as fout:
+        fout.write(HEADER)
+        for row in output:
+            if type(row[-1]) is float:
+                fout.write('%s %s %f\n' % row)
+            else:
+                fout.write('%s %s %s\n' % row)
