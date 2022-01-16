@@ -76,3 +76,16 @@
 "Edit Phrase Replacement Table" = "Edit Phrase Replacement Table";
 
 "Use Phrase Replacement" = "Use Phrase Replacement";
+
+"Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
+
+"Candidate keys can only contain latin characters and numbers." = "Candidate keys can only contain latin characters and numbers.";
+
+"Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
+
+"There should not be duplicated keys." = "There should not be duplicated keys.";
+
+"The length of your candidate keys can not be less than 4 characters." = "The length of your candidate keys can not be less than 4 characters.";
+
+"The length of your candidate keys can not be larger than 15 characters." = "The length of your candidate keys can not be larger than 15 characters.";
+

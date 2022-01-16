@@ -146,36 +146,6 @@ struct ComposingBufferSize {
     }
 }
 
-@propertyWrapper
-struct ComposingKeys {
-    let key: String
-    let defaultValue: String? = kCandidateKeys
-    lazy var container: UserDefault = {
-        UserDefault(key: key, defaultValue: defaultValue) }()
-
-    var wrappedValue: String? {
-        mutating get {
-            let value = container.wrappedValue
-            if let value = value {
-                if value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    return nil
-                }
-            }
-            return value
-        }
-        set {
-            let value = newValue
-            if let value = value {
-                if value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    container.wrappedValue = nil
-                    return
-                }
-            }
-            container.wrappedValue = value
-        }
-    }
-}
-
 // MARK: -
 
 @objc enum KeyboardLayout: Int {
@@ -293,11 +263,64 @@ class Preferences: NSObject {
     @UserDefault(key: kCandidateKeyLabelFontName, defaultValue: nil)
     @objc static var candidateKeyLabelFontName: String?
 
-    @ComposingKeys(key: kCandidateKeys)
-    @objc static var candidateKeys: String?
+    @UserDefault(key: kCandidateKeys, defaultValue: kDefaultKeys)
+    @objc static var candidateKeys: String
 
-    @objc static var defaultKeys: String {
+    @objc static var defaultCandidateKeys: String {
         kDefaultKeys
+    }
+    @objc static var suggestedCandidateKeys: [String] {
+        [kDefaultKeys, "asdfghjkl", "asdfzxcvb"]
+    }
+
+    static func validate(candidateKeys: String) throws {
+        let trimmed = candidateKeys.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            throw CandidateKeyError.empty
+        }
+        if !trimmed.canBeConverted(to: .ascii) {
+            throw CandidateKeyError.invalidCharacters
+        }
+        if trimmed.contains(" ") {
+            throw CandidateKeyError.containSpace
+        }
+        if trimmed.count < 4 {
+            throw CandidateKeyError.tooShort
+        }
+        if trimmed.count > 15 {
+            throw CandidateKeyError.tooLong
+        }
+        let set = Set(Array(trimmed))
+        if set.count != trimmed.count {
+            throw CandidateKeyError.duplicatedCharacters
+        }
+    }
+
+    enum CandidateKeyError: Error, LocalizedError {
+        case empty
+        case invalidCharacters
+        case containSpace
+        case duplicatedCharacters
+        case tooShort
+        case tooLong
+
+        var errorDescription: String? {
+            switch self {
+            case .empty:
+                return NSLocalizedString("Candidates keys cannot be empty.", comment: "")
+            case .invalidCharacters:
+                return NSLocalizedString("Candidate keys can only contain latin characters and numbers.", comment: "")
+            case .containSpace:
+                return NSLocalizedString("Candidate keys cannot contain space.", comment: "")
+            case .duplicatedCharacters:
+                return NSLocalizedString("There should not be duplicated keys.", comment: "")
+            case .tooShort:
+                return NSLocalizedString("The length of your candidate keys can not be less than 4 characters.", comment: "")
+            case .tooLong:
+                return NSLocalizedString("The length of your candidate keys can not be larger than 15 characters.", comment: "")
+            }
+        }
+
     }
 
     @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
