@@ -26,7 +26,7 @@ _deploy: _install
 	@rsync -avx data.txt data-plain-bpmf.txt $(RHOST):"Library/Input\ Methods/McBopomofo.app/Contents/Resources/"
 	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
-sort: 
+sort:
 	@sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
 	@mv tmp phrase.occ
 	@sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
@@ -76,5 +76,5 @@ _mydebuginstall:
 	@pgrep McBopomofo && killall -HUP McBopomofo || echo -n
 _mycodecheck:
 	@for myfile in bin/*.py; do \
-            pep8-2.7 --ignore=E221,E226,E501,E701 $$myfile; \
+            pycodestyle --ignore=E501,E722,E701,E221,W605 $$myfile; \
         done

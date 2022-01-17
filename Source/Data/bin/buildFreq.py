@@ -51,12 +51,12 @@ if __name__ == '__main__':
     for k in exclusion:
         for v in exclusion[k]:
             if k in phrases and v in phrases:
-                phrases[k] = phrases[k]-phrases[v]
+                phrases[k] = phrases[k] - phrases[v]
 
     # Getting a hint from algorithm of Max-match segmentation
     # norm = sum ( fscale^(len(phrase)-1) * count(phrase) )
     for k in phrases:
-        norm += fscale**(len(k)/3-1)*phrases[k]
+        norm += fscale ** (len(k) / 3 - 1) * phrases[k]
 
     try:
         handle = open('PhraseFreq.txt', "w")
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     for k in phrases:
         # if it's zero count, we treat it as a 0.5 count.
         if phrases[k] < 1:
-            handle.write('%s %.8f\n' % (k, math.log(fscale**(len(k)/3-1)*0.5/norm, 10)))
+            handle.write('%s %.8f\n' % (k, math.log(fscale ** (len(k) / 3 - 1) * 0.5 / norm, 10)))
         else:
-            handle.write('%s %.8f\n' % (k, math.log(fscale**(len(k)/3-1)*phrases[k]/norm, 10)))
+            handle.write('%s %.8f\n' % (k, math.log(fscale ** (len(k) / 3 - 1) * phrases[k] / norm, 10)))
     handle.close()

@@ -270,31 +270,32 @@ def sixCharWalk(bpmf2walk):
 
 
 def chkBPMFoutput(phrases, bpmf2chk):
-        if len(bpmf2chk.split('-')) is 2:
-            (a, b) = twoCharWalk(bpmf2chk)
-            (c, d) = phrases[bpmf2chk][0]
-            if (a, b) != (c, d):
-                print '%s %f %s %f' % (c, d, a, b)
-        if len(bpmf2chk.split('-')) is 3:
-            (a, b) = threeCharWalk(bpmf2chk)
-            (c, d) = phrases[bpmf2chk][0]
-            if (a, b) != (c, d):
-                print '%s %f %s %f' % (c, d, a, b)
-        if len(bpmf2chk.split('-')) is 4:
-            (a, b) = fourCharWalk(bpmf2chk)
-            (c, d) = phrases[bpmf2chk][0]
-            if (a, b) != (c, d):
-                print '%s %f %s %f' % (c, d, a, b)
-        if len(bpmf2chk.split('-')) is 5:
-            (a, b) = fiveCharWalk(bpmf2chk)
-            (c, d) = phrases[bpmf2chk][0]
-            if (a, b) != (c, d):
-                print '%s %f %s %f' % (c, d, a, b)
-        if len(bpmf2chk.split('-')) is 6:
-            (a, b) = sixCharWalk(bpmf2chk)
-            (c, d) = phrases[bpmf2chk][0]
-            if (a, b) != (c, d):
-                print '%s %f %s %f' % (c, d, a, b)
+    if len(bpmf2chk.split('-')) is 2:
+        (a, b) = twoCharWalk(bpmf2chk)
+        (c, d) = phrases[bpmf2chk][0]
+        if (a, b) != (c, d):
+            print '%s %f %s %f' % (c, d, a, b)
+    if len(bpmf2chk.split('-')) is 3:
+        (a, b) = threeCharWalk(bpmf2chk)
+        (c, d) = phrases[bpmf2chk][0]
+        if (a, b) != (c, d):
+            print '%s %f %s %f' % (c, d, a, b)
+    if len(bpmf2chk.split('-')) is 4:
+        (a, b) = fourCharWalk(bpmf2chk)
+        (c, d) = phrases[bpmf2chk][0]
+        if (a, b) != (c, d):
+            print '%s %f %s %f' % (c, d, a, b)
+    if len(bpmf2chk.split('-')) is 5:
+        (a, b) = fiveCharWalk(bpmf2chk)
+        (c, d) = phrases[bpmf2chk][0]
+        if (a, b) != (c, d):
+            print '%s %f %s %f' % (c, d, a, b)
+    if len(bpmf2chk.split('-')) is 6:
+        (a, b) = sixCharWalk(bpmf2chk)
+        (c, d) = phrases[bpmf2chk][0]
+        if (a, b) != (c, d):
+            print '%s %f %s %f' % (c, d, a, b)
+
 
 if __name__ == '__main__':
     phrases = {}

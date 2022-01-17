@@ -13,7 +13,7 @@ __doc__ = """
    in a text pool file, given a list of phrases."""
 
 config = ConfigParser.ConfigParser()
-config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1])+'/textpool.rc')
+config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1]) + '/textpool.rc')
 corpus_path = config.get('data', 'corpus_path')
 if corpus_path[0] == '~':
     corpus_path = os.path.expanduser(corpus_path)
@@ -36,12 +36,13 @@ def count_string(substring):
         return substring, bigstring.count(substring), True
     return '', 0, False
 
+
 if __name__ == '__main__':
     """
     bin/count.occurrence.py phrase.list > phrase.occ
     """
     import argparse
-    max_cores  = multiprocessing.cpu_count()
+    max_cores = multiprocessing.cpu_count()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-j", metavar='<nproc>', type=int, help="specify number of simutaneous search thread")
