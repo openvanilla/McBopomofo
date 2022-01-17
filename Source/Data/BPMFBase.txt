@@ -129,6 +129,7 @@
 跰 ㄅㄥˋ beng4 1/4 big5
 泵 ㄅㄥˋ beng4 1/4 big5
 甭 ㄅㄥˊ beng2 1/6 big5
+甮 ㄅㄥˊ beng2 1/6 big5
 班 ㄅㄢ ban 10 big5
 般 ㄅㄢ ban 10 big5
 搬 ㄅㄢ ban 10 big5
@@ -13842,6 +13843,7 @@
 縫 ㄈㄥˋ feng4 z/4 big5
 賵 ㄈㄥˋ feng4 z/4 big5
 焨 ㄈㄥˋ feng4 z/4 big5
+甮 ㄈㄥˋ feng4 z/4 big5
 逢 ㄈㄥˊ feng2 z/6 big5
 縫 ㄈㄥˊ feng2 z/6 big5
 馮 ㄈㄥˊ feng2 z/6 big5
@@ -13984,7 +13986,6 @@
 糐 ㄈㄨ fu zj big5
 璷 ㄈㄨ fu zj big5
 紨 ㄈㄨ fu zj big5
-甮 ㄈㄨㄥˋ fong4 zj/4 big5
 府 ㄈㄨˇ fu3 zj3 big5
 腐 ㄈㄨˇ fu3 zj3 big5
 撫 ㄈㄨˇ fu3 zj3 big5
