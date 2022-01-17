@@ -75,6 +75,16 @@ const vector<Bigram> McBopomofoLM::bigramsForKeys(const string& preceedingKey, c
 
 const vector<Unigram> McBopomofoLM::unigramsForKey(const string& key)
 {
+    if (key == " ") {
+        vector<Unigram> spaceUnigrams;
+        Unigram g;
+        g.keyValue.key = " ";
+        g.keyValue.value= " ";
+        g.score = 0;
+        spaceUnigrams.push_back(g);
+        return spaceUnigrams;
+    }
+
     vector<Unigram> allUnigrams;
     vector<Unigram> userUnigrams;
 
@@ -104,6 +114,10 @@ const vector<Unigram> McBopomofoLM::unigramsForKey(const string& key)
 
 bool McBopomofoLM::hasUnigramsForKey(const string& key)
 {
+    if (key == " ") {
+        return true;
+    }
+
     if (!m_excludedPhrases.hasUnigramsForKey(key)) {
         return m_userPhrases.hasUnigramsForKey(key) || m_languageModel.hasUnigramsForKey(key);
     }
