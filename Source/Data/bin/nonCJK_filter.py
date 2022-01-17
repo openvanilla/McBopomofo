@@ -44,14 +44,20 @@ def build_re():
             except:
                 pass
 
-    RE = '[%s]+' % ''.join(L)
+    RE = re.escape('[%s]+' % ''.join(L))
     return re.compile(RE, re.UNICODE)
+
 
 RE = build_re()
 
 while True:
     line = sys.stdin.readline()
-    if not line: break
-    line = line.decode('utf-8', 'ignore')
-    lineout = u' '.join(re.findall(RE, line.rstrip()))
-    print lineout.encode('utf-8')
+    if not line:
+        break
+    if sys.version_info[0] < 3:
+        line = line.decode('utf-8', 'ignore')
+        lineout = u' '.join(re.findall(RE, line.rstrip()))
+        print(lineout.encode('utf-8'))
+    else:
+        lineout = ' '.join(re.findall(RE, line.rstrip()))
+        print(lineout)
