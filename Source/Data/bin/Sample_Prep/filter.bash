@@ -36,6 +36,6 @@ OVTrainingSetFilter(){
     /^ *$/d
     /^頁$/d
 ' \
-| python2.7 filter.py \
-| env LANG=C sort -u
+| python3 nonCJK_filter.py \
+| sort -u
 }

@@ -7,6 +7,5 @@ find * -type f -print \
                -e AcademiaSinicaBakeoff2005.lm \
     | xargs cat \
     | OVTrainingSetFilter \
-    | python2.7 ${scriptPATH}/../nonCJK_filter.py \
     | perl -pe 's/(.{0,80})\s/$1\n/g' \
-    | env LANG=C sort -u
+    | sort -u

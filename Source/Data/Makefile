@@ -27,17 +27,17 @@ _deploy: _install
 	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
 sort: 
-	@env LANG=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
+	@sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
 	@mv tmp phrase.occ
-	@env LANG=C sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
+	@sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
 	@mv tmp BPMFMappings.txt
-	@env LANG=C sort -k1 heterophony1.list|uniq>tmp
+	@sort -k1 heterophony1.list|uniq>tmp
 	@mv tmp heterophony1.list
-	@env LANG=C sort -k1 heterophony2.list|uniq>tmp
+	@sort -k1 heterophony2.list|uniq>tmp
 	@mv tmp heterophony2.list
-	@env LANG=C sort -k1 heterophony3.list|uniq>tmp
+	@sort -k1 heterophony3.list|uniq>tmp
 	@mv tmp heterophony3.list
-	@env LANG=C sort -k1 exclusion.txt|uniq>tmp
+	@sort -k1 exclusion.txt|uniq>tmp
 	@mv tmp exclusion.txt
 
 check:
@@ -59,7 +59,7 @@ _phrase.occ: phrase.list
 phrase.list: BPMFBase.txt BPMFMappings.txt
 	awk 'length($$1)<4{print $$1}' BPMFBase.txt > tmp
 	awk '{print $$1}'         BPMFMappings.txt >> tmp
-	env LANG=C sort -u tmp | uniq > phrase.list
+	sort -u tmp | uniq > phrase.list
 _myinstall:
 	cd ../.. && \
          xcodebuild -target McBopomofo -configuration Release && \
