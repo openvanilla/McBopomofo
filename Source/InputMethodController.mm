@@ -55,6 +55,8 @@ using namespace McBopomofo;
 using namespace OpenVanilla;
 
 static const NSInteger kMinKeyLabelSize = 10;
+static const NSInteger kMinMarkRangeLength = 2;
+static const NSInteger kMaxMarkRangeLength = 6;
 
 // input modes
 static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
@@ -1421,7 +1423,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
     size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
     // A phrase should contian at least two characters.
-    if (end - begin < 2) {
+    if (end - begin < kMinMarkRangeLength) {
+        return @"";
+    }
+    if (end - begin > kMaxMarkRangeLength) {
         return @"";
     }
 
@@ -1443,6 +1448,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     NSString *currentMarkedPhrase = [self _currentMarkedTextAndReadings];
     if (![currentMarkedPhrase length]) {
+        [self beep];
         return NO;
     }
 
@@ -1464,9 +1470,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         NSString *message = NSLocalizedString(@"Model based Chinese conversion is on. Not suggested to add phrase in the mode.", @"");
         [self _showTooltip:message client:client];
     }
-    else if (length == 1) {
-        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
-        [self _showTooltip:messsage client:client];
+    else if (length < kMinMarkRangeLength) {
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
+        [self _showTooltip:message client:client];
+    }
+    else if (length > kMaxMarkRangeLength) {
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". A phrase cannot be longer than 6 characters.", @""), text];
+        [self _showTooltip:message client:client];
     }
     else {
         NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". Press enter to add a new phrase.", @""), text];

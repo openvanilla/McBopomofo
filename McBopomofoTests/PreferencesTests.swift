@@ -143,7 +143,7 @@ class PreferencesTests: XCTestCase {
         XCTAssert(Preferences.phraseReplacementEnabled == true)
     }
 
-    func testChineneConversionEngine() {
+    func testChineseConversionEngine() {
         XCTAssert(Preferences.chineseConversionEngine == 0)
         Preferences.chineseConversionEngine = 1
         XCTAssert(Preferences.chineseConversionEngine == 1)

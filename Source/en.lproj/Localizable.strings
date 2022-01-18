@@ -69,6 +69,8 @@
 
 "You are now selecting \"%@\". Press enter to add a new phrase." = "You are now selecting \"%@\". Press enter to add a new phrase.";
 
+"You are now selecting \"%@\". A phrase cannot be longer than 6 characters." = "You are now selecting \"%@\". A phrase cannot be longer than 6 characters.";
+
 "Chinese conversion on" = "Chinese conversion on";
 
 "Chinese conversion off" = "Chinese conversion off";

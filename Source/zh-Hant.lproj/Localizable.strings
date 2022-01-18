@@ -69,6 +69,8 @@
 
 "You are now selecting \"%@\". Press enter to add a new phrase." = "您目前選擇了 \"%@\"。按下 Enter 就可以加入到使用者詞彙中。";
 
+"You are now selecting \"%@\". A phrase cannot be longer than 6 characters." = "您目前選擇了 \"%@\"。自訂詞彙不能超過六個字元。";
+
 "Chinese conversion on" = "已經切換到簡體中文模式";
 
 "Chinese conversion off" = "已經切換到繁體中文模式";
