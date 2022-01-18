@@ -20,9 +20,6 @@ jobs:
       - name: Test CandidateUI
         run: swift test
         working-directory: Packages/CandidateUI
-      - name: Test CandidateUI
-        run: swift test
-        working-directory: Packages/CandidateUI
       - name: Test OpenCCBridge
         run: swift test
         working-directory: Packages/OpenCCBridge
