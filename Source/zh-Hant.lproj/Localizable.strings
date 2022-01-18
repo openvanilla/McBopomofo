@@ -88,3 +88,7 @@
 "The length of your candidate keys can not be less than 4 characters." = "選字按鍵數量不可小於 4。";
 
 "The length of your candidate keys can not be larger than 15 characters." = "選字按鍵數量不可大於 15。";
+
+"Phrase replacement mode is on. Not suggested to add phrase in the mode." = "詞彙轉換已開啟，不建議在此模式下加詞。";
+
+"Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";

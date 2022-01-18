@@ -1456,6 +1456,14 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (!length) {
         [self _hideTooltip];
     }
+    else if (Preferences.phraseReplacementEnabled) {
+        NSString *message = NSLocalizedString(@"Phrase replacement mode is on. Not suggested to add phrase in the mode.", @"");
+        [self _showTooltip:message client:client];
+    }
+    else if (Preferences.chineseConversionStyle == 1 && Preferences.chineseConversionEnabled) {
+        NSString *message = NSLocalizedString(@"Model based Chinese conversion is on. Not suggested to add phrase in the mode.", @"");
+        [self _showTooltip:message client:client];
+    }
     else if (length == 1) {
         NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
         [self _showTooltip:messsage client:client];
