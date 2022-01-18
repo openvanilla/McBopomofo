@@ -19,6 +19,35 @@ class HorizontalCandidateControllerTests: XCTestCase {
         }
     }
 
+    func testPositioning1() {
+        let controller = HorizontalCandidateController()
+        let mock = Mock()
+        controller.delegate = mock
+        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.reloadData()
+        controller.visible = true
+        controller.set(windowTopLeftPoint: NSPoint(x: -100, y: -100), bottomOutOfScreenAdjustmentHeight: 10)
+        let exp = expectation(description: "wait")
+        _ = XCTWaiter.wait(for: [exp], timeout: 0.2)
+        XCTAssert (controller.window?.frame.minX ?? -1 >= 0)
+        XCTAssert (controller.window?.frame.minY ?? -1 >= 0)
+    }
+
+    func testPositioning2() {
+        let controller = HorizontalCandidateController()
+        let mock = Mock()
+        controller.delegate = mock
+        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.reloadData()
+        controller.visible = true
+        let screenRect = NSScreen.main?.frame ?? NSRect.zero
+        controller.set(windowTopLeftPoint: NSPoint(x: screenRect.maxX + 100, y: screenRect.maxY + 100), bottomOutOfScreenAdjustmentHeight: 10)
+        let exp = expectation(description: "wait")
+        _ = XCTWaiter.wait(for: [exp], timeout: 0.2)
+        XCTAssert (controller.window?.frame.maxX ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxX)
+        XCTAssert (controller.window?.frame.maxY ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxY )
+    }
+
     func testReloadData() {
         let controller = HorizontalCandidateController()
         let mock = Mock()

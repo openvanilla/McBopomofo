@@ -156,3 +156,102 @@ class PreferencesTests: XCTestCase {
     }
 
 }
+
+class CandidateKeyValidationTests: XCTestCase {
+    func testEmpty() {
+        do {
+            try Preferences.validate(candidateKeys: "")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.empty)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testSpaces() {
+        do {
+            try Preferences.validate(candidateKeys: "    ")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.empty)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testInvalidKeys() {
+        do {
+            try Preferences.validate(candidateKeys: "中文字元")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.invalidCharacters)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testInvalidLatinLetters() {
+        do {
+            try Preferences.validate(candidateKeys: "üåçøöacpo")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.invalidCharacters)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testSpaceInBetween() {
+        do {
+            try Preferences.validate(candidateKeys: "1 2 3 4")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.containSpace)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testDuplicatedKeys() {
+        do {
+            try Preferences.validate(candidateKeys: "aabbccdd")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.duplicatedCharacters)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testTooShort1() {
+        do {
+            try Preferences.validate(candidateKeys: "abc")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.tooShort)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testTooShort2() {
+        do {
+            try Preferences.validate(candidateKeys: "abcd")
+        } catch {
+            XCTFail("Should be safe")
+        }
+    }
+
+    func testTooLong1() {
+        do {
+            try Preferences.validate(candidateKeys: "qwertyuiopasdfgh")
+            XCTFail("exception not thrown")
+        } catch(Preferences.CandidateKeyError.tooLong)  {
+        } catch {
+            XCTFail("exception not thrown")
+        }
+    }
+
+    func testTooLong2() {
+        do {
+            try Preferences.validate(candidateKeys: "qwertyuiopasdfg")
+        }
+        catch {
+            XCTFail("Should be safe")
+        }
+    }
+}

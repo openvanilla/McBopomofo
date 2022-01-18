@@ -130,7 +130,7 @@ public class CandidateController: NSWindowController {
 
         // bottom beneath the screen?
         if adjustedPoint.y - windowSize.height < screenFrame.minY {
-            adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
+            adjustedPoint.y = screenFrame.minY + adjustedHeight + windowSize.height
         }
 
         // top over the screen?
