@@ -42,6 +42,119 @@ private let kUpdateInfoSiteKey = "UpdateInfoSite"
 private let kNextCheckInterval: TimeInterval = 86400.0
 private let kTimeoutInterval: TimeInterval = 60.0
 
+struct VersionUpdateReport {
+    var siteUrl: URL?
+    var currentShortVersion: String = ""
+    var currentVersion: String = ""
+    var remoteShortVersion: String = ""
+    var remoteVersion: String = ""
+    var versionDescription: String = ""
+}
+
+enum VersionUpdateApiResult
+{
+    case shouldUpdate(report: VersionUpdateReport)
+    case noNeedToUpdate
+    case ignored
+}
+
+enum VersionUpdateApiError: Error, LocalizedError {
+    case connectionError(message:String)
+
+    var errorDescription: String? {
+        switch self {
+        case .connectionError(let message):
+            return String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
+        }
+    }
+}
+
+struct VersionUpdateApi {
+    static func check(forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>)->()) -> URLSessionTask? {
+        guard let infoDict = Bundle.main.infoDictionary,
+              let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
+              let updateInfoURL = URL(string: updateInfoURLString) else {
+                  return nil
+        }
+
+        let request = URLRequest(url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: kTimeoutInterval)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    forced ?
+                        callback(.failure(VersionUpdateApiError.connectionError(message: error.localizedDescription))) :
+                        callback(.success(.ignored))
+                }
+                return
+            }
+
+            do {
+                guard let plist = try PropertyListSerialization.propertyList(from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
+                      let remoteVersion = plist[kCFBundleVersionKey] as? String,
+                      let infoDict = Bundle.main.infoDictionary
+                else {
+                    DispatchQueue.main.async {
+                        forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                    }
+                    return
+                }
+
+                // TODO: Validate info (e.g. bundle identifier)
+                // TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
+
+                let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
+                let result = currentVersion.compare(remoteVersion, options: .numeric, range: nil, locale: nil)
+
+                if result != .orderedAscending {
+                    DispatchQueue.main.async {
+                        forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                    }
+                    return
+                }
+
+                guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
+                      let siteInfoURL = URL(string: siteInfoURLString)
+                else {
+                    DispatchQueue.main.async {
+                        forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                    }
+                    return
+                }
+
+                var report = VersionUpdateReport(siteUrl:siteInfoURL)
+                var versionDescription = ""
+                let versionDescriptions = plist["Description"] as? [AnyHashable: Any]
+                if let versionDescriptions = versionDescriptions {
+                    var locale = "en"
+                    let supportedLocales = ["en", "zh-Hant", "zh-Hans"]
+                    let preferredTags = Bundle.preferredLocalizations(from: supportedLocales)
+                    if let first = preferredTags.first {
+                        locale = first
+                    }
+                    versionDescription = versionDescriptions[locale] as? String ?? versionDescriptions["en"] as? String ?? ""
+                    if !versionDescription.isEmpty {
+                        versionDescription = "\n\n" + versionDescription
+                    }
+                }
+                report.currentShortVersion = infoDict["CFBundleShortVersionString"] as? String ?? ""
+                report.currentVersion = currentVersion
+                report.remoteShortVersion = plist["CFBundleShortVersionString"] as? String ?? ""
+                report.remoteVersion = remoteVersion
+                report.versionDescription = versionDescription
+                DispatchQueue.main.async {
+                    callback(.success(.shouldUpdate(report: report)))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                }
+            }
+        }
+        task.resume()
+        return task
+    }
+}
+
 @objc (AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
 
@@ -99,111 +212,37 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         let nextUpdateDate = Date(timeInterval: kNextCheckInterval, since: Date())
         UserDefaults.standard.set(nextUpdateDate, forKey: kNextUpdateCheckDateKey)
 
-        guard let infoDict = Bundle.main.infoDictionary,
-              let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
-              let updateInfoURL = URL(string: updateInfoURLString) else {
-            return
-        }
-
-        let request = URLRequest(url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: kTimeoutInterval)
-
-        func showNoUpdateAvailableAlert() {
-            NonModalAlertWindowController.shared.show(title: NSLocalizedString("Check for Update Completed", comment: ""), content: NSLocalizedString("You are already using the latest version of McBopomofo.", comment: ""), confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
-        }
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        checkTask = VersionUpdateApi.check(forced: forced) { result in
             defer {
                 self.checkTask = nil
             }
-
-            if let error = error {
-                if forced {
-                    let title = NSLocalizedString("Update Check Failed", comment: "")
-                    let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), error.localizedDescription)
-                    let buttonTitle = NSLocalizedString("Dismiss", comment: "")
-
-                    DispatchQueue.main.async {
-                        NonModalAlertWindowController.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
-                    }
-                }
-                return
-            }
-
-            do {
-                guard let plist = try PropertyListSerialization.propertyList(from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
-                      let remoteVersion = plist[kCFBundleVersionKey] as? String,
-                      let infoDict = Bundle.main.infoDictionary
-                        else {
-                    if forced {
-                        DispatchQueue.main.async {
-                            showNoUpdateAvailableAlert()
-                        }
-                    }
-                    return
-                }
-
-                // TODO: Validate info (e.g. bundle identifier)
-                // TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
-
-                let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
-                let result = currentVersion.compare(remoteVersion, options: .numeric, range: nil, locale: nil)
-
-                if result != .orderedAscending {
-                    if forced {
-                        DispatchQueue.main.async {
-                            showNoUpdateAvailableAlert()
-                        }
-                    }
-                    return
-                }
-
-                guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
-                      let siteInfoURL = URL(string: siteInfoURLString) else {
-                    if forced {
-                        DispatchQueue.main.async {
-                            showNoUpdateAvailableAlert()
-                        }
-                    }
-                    return
-                }
-
-                self.updateNextStepURL = siteInfoURL
-
-                var versionDescription = ""
-                let versionDescriptions = plist["Description"] as? [AnyHashable: Any]
-                if let versionDescriptions = versionDescriptions {
-                    var locale = "en"
-                    let supportedLocales = ["en", "zh-Hant", "zh-Hans"]
-                    let preferredTags = Bundle.preferredLocalizations(from: supportedLocales)
-                    if let first = preferredTags.first {
-                        locale = first
-                    }
-                    versionDescription = versionDescriptions[locale] as? String ?? versionDescriptions["en"] as? String ?? ""
-                    if !versionDescription.isEmpty {
-                        versionDescription = "\n\n" + versionDescription
-                    }
-                }
-
-                let content = String(format: NSLocalizedString("You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", comment: ""),
-                                     infoDict["CFBundleShortVersionString"] as? String ?? "",
-                                     currentVersion,
-                                     plist["CFBundleShortVersionString"] as? String ?? "",
-                                     remoteVersion,
-                                     versionDescription)
-                DispatchQueue.main.async {
+            switch result {
+            case .success(let apiResult):
+                switch apiResult {
+                case .shouldUpdate(let report):
+                    self.updateNextStepURL = report.siteUrl
+                    let content = String(format: NSLocalizedString("You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", comment: ""),
+                                         report.currentShortVersion,
+                                         report.currentVersion,
+                                         report.remoteShortVersion,
+                                         report.remoteVersion,
+                                         report.versionDescription)
                     NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+                case .noNeedToUpdate, .ignored:
+                    break
                 }
-
-            } catch {
-                if forced {
-                    DispatchQueue.main.async {
-                        showNoUpdateAvailableAlert()
-                    }
+            case .failure(let error):
+                switch error {
+                case VersionUpdateApiError.connectionError(let message):
+                    let title = NSLocalizedString("Update Check Failed", comment: "")
+                    let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
+                    let buttonTitle = NSLocalizedString("Dismiss", comment: "")
+                    NonModalAlertWindowController.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                default:
+                    break
                 }
             }
         }
-        checkTask = task
-        task.resume()
     }
 
     func nonModalAlertWindowControllerDidConfirm(_ controller: NonModalAlertWindowController) {
