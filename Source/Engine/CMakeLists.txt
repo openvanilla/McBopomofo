@@ -10,7 +10,9 @@ add_library(McBopomofoLMLib
         ParselessPhraseDB.cpp
         ParselessPhraseDB.h
         ParselessLM.cpp
-        ParselessLM.h)
+        ParselessLM.h
+        UserPhrasesLM.h
+        UserPhrasesLM.cpp)
 
 # Let CMake fetch Google Test for us.
 # https://github.com/google/googletest/tree/main/googletest#incorporating-into-an-existing-cmake-project
@@ -29,14 +31,21 @@ FetchContent_MakeAvailable(googletest)
 add_executable(McBopomofoLMLibTest
         KeyValueBlobReaderTest.cpp
         ParselessLMTest.cpp
-        ParselessPhraseDBTest.cpp)
+        ParselessPhraseDBTest.cpp
+        UserPhrasesLMTest.cpp)
 target_link_libraries(McBopomofoLMLibTest gtest_main McBopomofoLMLib)
 include(GoogleTest)
 gtest_discover_tests(McBopomofoLMLibTest)
 
-# Benchmark target.
-find_package(benchmark REQUIRED)
-add_executable(ParselessLMBenchmark
-        FastLM.cpp
-        ParselessLMBenchmark.cpp)
-target_link_libraries(ParselessLMBenchmark McBopomofoLMLib benchmark::benchmark)
+add_custom_target(
+        runTest
+        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/McBopomofoLMLibTest
+)
+add_dependencies(runTest McBopomofoLMLibTest)
+
+# Benchmark target; to run, manually uncomment the lines below.
+#
+# find_package(benchmark)
+# add_executable(ParselessLMBenchmark
+#         ParselessLMBenchmark.cpp)
+# target_link_libraries(ParselessLMBenchmark McBopomofoLMLib benchmark::benchmark)

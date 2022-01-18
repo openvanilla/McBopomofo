@@ -21,43 +21,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <benchmark/benchmark.h>
-
-#include <cassert>
+#include <cstdio>
 #include <filesystem>
+#include <string>
 
-#include "ParselessLM.h"
+#include "UserPhrasesLM.h"
+#include "gtest/gtest.h"
 
-namespace {
+namespace McBopomofo {
 
-using ParselessLM = McBopomofo::ParselessLM;
-
-static const char* kDataPath = "data.txt";
-static const char* kUnigramSearchKey = "ㄕˋ-ㄕˊ";
-
-static void BM_ParselessLMOpenClose(benchmark::State& state)
+TEST(UserPhreasesLMTest, LenientReading)
 {
-    assert(std::filesystem::exists(kDataPath));
-    for (auto _ : state) {
-        ParselessLM lm;
-        lm.open(kDataPath);
-        lm.close();
-    }
+    std::string tmp_name
+        = std::string(std::filesystem::temp_directory_path()) + "test.txt";
+
+    FILE* f = fopen(tmp_name.c_str(), "w");
+    ASSERT_NE(f, nullptr);
+
+    fprintf(f, "bar foo\n");
+    fprintf(f, "bar \n"); // error line
+    fprintf(f, "argh baz\n");
+    int r = fclose(f);
+    ASSERT_EQ(r, 0);
+
+    UserPhrasesLM lm;
+    lm.open(tmp_name.c_str());
+    ASSERT_TRUE(lm.hasUnigramsForKey("foo"));
+    ASSERT_FALSE(lm.hasUnigramsForKey("bar"));
+    ASSERT_FALSE(lm.hasUnigramsForKey("baz"));
+
+    r = remove(tmp_name.c_str());
+    ASSERT_EQ(r, 0);
 }
-BENCHMARK(BM_ParselessLMOpenClose);
 
-static void BM_ParselessLMFindUnigrams(benchmark::State& state)
-{
-    assert(std::filesystem::exists(kDataPath));
-    ParselessLM lm;
-    lm.open(kDataPath);
-    for (auto _ : state) {
-        lm.unigramsForKey(kUnigramSearchKey);
-    }
-    lm.close();
-}
-BENCHMARK(BM_ParselessLMFindUnigrams);
-
-}; // namespace
-
-BENCHMARK_MAIN();
+} // namespace McBopomofo
