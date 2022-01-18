@@ -51,15 +51,14 @@ struct VersionUpdateReport {
     var versionDescription: String = ""
 }
 
-enum VersionUpdateApiResult
-{
+enum VersionUpdateApiResult {
     case shouldUpdate(report: VersionUpdateReport)
     case noNeedToUpdate
     case ignored
 }
 
 enum VersionUpdateApiError: Error, LocalizedError {
-    case connectionError(message:String)
+    case connectionError(message: String)
 
     var errorDescription: String? {
         switch self {
@@ -70,11 +69,11 @@ enum VersionUpdateApiError: Error, LocalizedError {
 }
 
 struct VersionUpdateApi {
-    static func check(forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>)->()) -> URLSessionTask? {
+    static func check(forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>) -> ()) -> URLSessionTask? {
         guard let infoDict = Bundle.main.infoDictionary,
               let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
               let updateInfoURL = URL(string: updateInfoURLString) else {
-                  return nil
+            return nil
         }
 
         let request = URLRequest(url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: kTimeoutInterval)
@@ -82,8 +81,8 @@ struct VersionUpdateApi {
             if let error = error {
                 DispatchQueue.main.async {
                     forced ?
-                        callback(.failure(VersionUpdateApiError.connectionError(message: error.localizedDescription))) :
-                        callback(.success(.ignored))
+                            callback(.failure(VersionUpdateApiError.connectionError(message: error.localizedDescription))) :
+                            callback(.success(.ignored))
                 }
                 return
             }
@@ -92,9 +91,9 @@ struct VersionUpdateApi {
                 guard let plist = try PropertyListSerialization.propertyList(from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
                       let remoteVersion = plist[kCFBundleVersionKey] as? String,
                       let infoDict = Bundle.main.infoDictionary
-                else {
+                        else {
                     DispatchQueue.main.async {
-                        forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                        forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
                     return
                 }
@@ -107,21 +106,21 @@ struct VersionUpdateApi {
 
                 if result != .orderedAscending {
                     DispatchQueue.main.async {
-                        forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                        forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
                     return
                 }
 
                 guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
                       let siteInfoURL = URL(string: siteInfoURLString)
-                else {
+                        else {
                     DispatchQueue.main.async {
-                        forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                        forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
                     return
                 }
 
-                var report = VersionUpdateReport(siteUrl:siteInfoURL)
+                var report = VersionUpdateReport(siteUrl: siteInfoURL)
                 var versionDescription = ""
                 let versionDescriptions = plist["Description"] as? [AnyHashable: Any]
                 if let versionDescriptions = versionDescriptions {
@@ -146,7 +145,7 @@ struct VersionUpdateApi {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    forced ? callback(.success(.noNeedToUpdate)): callback(.success(.ignored))
+                    forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                 }
             }
         }
@@ -155,7 +154,7 @@ struct VersionUpdateApi {
     }
 }
 
-@objc (AppDelegate)
+@objc(AppDelegate)
 class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
 
     @IBOutlet weak var window: NSWindow?
@@ -184,12 +183,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         preferencesWindowController?.window?.orderFront(self)
     }
 
-    @objc (checkForUpdate)
+    @objc(checkForUpdate)
     func checkForUpdate() {
         checkForUpdate(forced: false)
     }
 
-    @objc (checkForUpdateForced:)
+    @objc(checkForUpdateForced:)
     func checkForUpdate(forced: Bool) {
 
         if checkTask != nil {
@@ -222,11 +221,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                 case .shouldUpdate(let report):
                     self.updateNextStepURL = report.siteUrl
                     let content = String(format: NSLocalizedString("You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", comment: ""),
-                                         report.currentShortVersion,
-                                         report.currentVersion,
-                                         report.remoteShortVersion,
-                                         report.remoteVersion,
-                                         report.versionDescription)
+                            report.currentShortVersion,
+                            report.currentVersion,
+                            report.remoteShortVersion,
+                            report.remoteVersion,
+                            report.versionDescription)
                     NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                 case .noNeedToUpdate, .ignored:
                     break

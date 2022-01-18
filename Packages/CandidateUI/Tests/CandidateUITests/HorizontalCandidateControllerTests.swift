@@ -6,6 +6,7 @@ class HorizontalCandidateControllerTests: XCTestCase {
     class Mock: CandidateControllerDelegate {
         let candidates = ["A", "B", "C", "D", "E", "F", "G", "H"]
         var selected: String?
+
         func candidateCountForController(_ controller: CandidateController) -> UInt {
             UInt(candidates.count)
         }
@@ -29,8 +30,8 @@ class HorizontalCandidateControllerTests: XCTestCase {
         controller.set(windowTopLeftPoint: NSPoint(x: -100, y: -100), bottomOutOfScreenAdjustmentHeight: 10)
         let exp = expectation(description: "wait")
         _ = XCTWaiter.wait(for: [exp], timeout: 0.2)
-        XCTAssert (controller.window?.frame.minX ?? -1 >= 0)
-        XCTAssert (controller.window?.frame.minY ?? -1 >= 0)
+        XCTAssert(controller.window?.frame.minX ?? -1 >= 0)
+        XCTAssert(controller.window?.frame.minY ?? -1 >= 0)
     }
 
     func testPositioning2() {
@@ -44,8 +45,8 @@ class HorizontalCandidateControllerTests: XCTestCase {
         controller.set(windowTopLeftPoint: NSPoint(x: screenRect.maxX + 100, y: screenRect.maxY + 100), bottomOutOfScreenAdjustmentHeight: 10)
         let exp = expectation(description: "wait")
         _ = XCTWaiter.wait(for: [exp], timeout: 0.2)
-        XCTAssert (controller.window?.frame.maxX ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxX)
-        XCTAssert (controller.window?.frame.maxY ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxY )
+        XCTAssert(controller.window?.frame.maxX ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxX)
+        XCTAssert(controller.window?.frame.maxY ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxY)
     }
 
     func testReloadData() {

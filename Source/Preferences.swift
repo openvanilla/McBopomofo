@@ -35,9 +35,9 @@
 import Cocoa
 
 private let kKeyboardLayoutPreferenceKey = "KeyboardLayout"
-private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout";  // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout";  // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift"; // whether include shif
+private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout" // alphanumeric ("ASCII") input basi
+private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout" // alphanumeric ("ASCII") input basi
+private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift" // whether include shif
 private let kCandidateListTextSizeKey = "CandidateListTextSize"
 private let kSelectPhraseAfterCursorAsCandidatePreferenceKey = "SelectPhraseAfterCursorAsCandidate"
 private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
@@ -79,7 +79,7 @@ struct UserDefault<Value> {
 
     var wrappedValue: Value {
         get {
-            return container.object(forKey: key) as? Value ?? defaultValue
+            container.object(forKey: key) as? Value ?? defaultValue
         }
         set {
             container.set(newValue, forKey: key)
@@ -92,7 +92,8 @@ struct CandidateListTextSize {
     let key: String
     let defaultValue: CGFloat = kDefaultCandidateListTextSize
     lazy var container: UserDefault = {
-        UserDefault(key: key, defaultValue: defaultValue) }()
+        UserDefault(key: key, defaultValue: defaultValue)
+    }()
 
     var wrappedValue: CGFloat {
         mutating get {
@@ -121,7 +122,8 @@ struct ComposingBufferSize {
     let key: String
     let defaultValue: Int = kDefaultComposingBufferSize
     lazy var container: UserDefault = {
-        UserDefault(key: key, defaultValue: defaultValue) }()
+        UserDefault(key: key, defaultValue: defaultValue)
+    }()
 
     var wrappedValue: Int {
         mutating get {
@@ -230,7 +232,7 @@ class Preferences: NSObject {
     @objc static var keyboardLayout: Int
 
     @objc static var keyboardLayoutName: String {
-        (KeyboardLayout(rawValue: self.keyboardLayout) ?? KeyboardLayout.standard).name
+        (KeyboardLayout(rawValue: keyboardLayout) ?? KeyboardLayout.standard).name
     }
 
     @UserDefault(key: kBasisKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
@@ -270,7 +272,7 @@ class Preferences: NSObject {
 
     @objc static func toggleHalfWidthPunctuationEnabled() -> Bool {
         halfWidthPunctuationEnabled = !halfWidthPunctuationEnabled
-        return halfWidthPunctuationEnabled;
+        return halfWidthPunctuationEnabled
     }
 
     @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: false)
@@ -349,7 +351,7 @@ class Preferences: NSObject {
 
     @objc static func togglePhraseReplacementEnabled() -> Bool {
         phraseReplacementEnabled = !phraseReplacementEnabled
-        return phraseReplacementEnabled;
+        return phraseReplacementEnabled
     }
 
     /// The conversion engine.
@@ -357,10 +359,10 @@ class Preferences: NSObject {
     /// - 0: OpenCC
     /// - 1: VXHanConvert
     @UserDefault(key: kChineseConversionEngineKey, defaultValue: 0)
-    @objc static var chineneConversionEngine: Int
+    @objc static var chineseConversionEngine: Int
 
-    @objc static var chineneConversionEngineName: String? {
-        return ChineseConversionEngine(rawValue: chineneConversionEngine)?.name
+    @objc static var chineseConversionEngineName: String? {
+        ChineseConversionEngine(rawValue: chineseConversionEngine)?.name
     }
 
     /// The conversion style.
@@ -371,7 +373,7 @@ class Preferences: NSObject {
     @objc static var chineseConversionStyle: Int
 
     @objc static var chineseConversionStyleName: String? {
-        return ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
+        ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
     }
 
 }

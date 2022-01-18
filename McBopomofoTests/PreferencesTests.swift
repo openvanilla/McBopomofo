@@ -144,9 +144,9 @@ class PreferencesTests: XCTestCase {
     }
 
     func testChineneConversionEngine() {
-        XCTAssert(Preferences.chineneConversionEngine == 0)
-        Preferences.chineneConversionEngine = 1
-        XCTAssert(Preferences.chineneConversionEngine == 1)
+        XCTAssert(Preferences.chineseConversionEngine == 0)
+        Preferences.chineseConversionEngine = 1
+        XCTAssert(Preferences.chineseConversionEngine == 1)
     }
 
     func testChineseConversionStyle() {

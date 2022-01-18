@@ -34,14 +34,14 @@
 
 import Cocoa
 
-@objc (VTCandidateControllerDelegate)
+@objc(VTCandidateControllerDelegate)
 public protocol CandidateControllerDelegate: AnyObject {
     func candidateCountForController(_ controller: CandidateController) -> UInt
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt)
 }
 
-@objc (VTCandidateController)
+@objc(VTCandidateController)
 public class CandidateController: NSWindowController {
     @objc public weak var delegate: CandidateControllerDelegate? {
         didSet {
@@ -99,7 +99,7 @@ public class CandidateController: NSWindowController {
         UInt.max
     }
 
-    @objc (setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
+    @objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
     public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
             self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)

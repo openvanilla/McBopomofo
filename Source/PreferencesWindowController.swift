@@ -38,7 +38,7 @@ import Carbon
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
-@objc (PreferencesWindowController) class PreferencesWindowController: NSWindowController {
+@objc(PreferencesWindowController) class PreferencesWindowController: NSWindowController {
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
@@ -104,13 +104,14 @@ import Carbon
                 let icon = IconRef(iconPtr)
                 let image = NSImage(iconRef: icon)
 
-                func resize( _ image: NSImage) -> NSImage {
+                func resize(_ image: NSImage) -> NSImage {
                     let newImage = NSImage(size: NSSize(width: 16, height: 16))
                     newImage.lockFocus()
                     image.draw(in: NSRect(x: 0, y: 0, width: 16, height: 16))
                     newImage.unlockFocus()
                     return newImage
                 }
+
                 menuItem.image = resize(image)
             }
 
@@ -149,11 +150,9 @@ import Carbon
         do {
             try Preferences.validate(candidateKeys: keys)
             Preferences.candidateKeys = keys
-        }
-        catch Preferences.CandidateKeyError.empty {
+        } catch Preferences.CandidateKeyError.empty {
             selectionKeyComboBox.stringValue = Preferences.candidateKeys
-        }
-        catch {
+        } catch {
             if let window = window {
                 let alert = NSAlert(error: error)
                 alert.beginSheetModal(for: window) { response in

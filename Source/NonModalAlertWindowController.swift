@@ -40,7 +40,7 @@ import Cocoa
 }
 
 class NonModalAlertWindowController: NSWindowController {
-    @objc (sharedInstance)
+    @objc(sharedInstance)
     static let shared = NonModalAlertWindowController(windowNibName: "NonModalAlertWindowController")
 
     @IBOutlet weak var titleTextField: NSTextField!
