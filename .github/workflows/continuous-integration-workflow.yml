@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   build:
-    name: Build
+    name: Build and Test
     runs-on: macOS-latest
     env:
         DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
@@ -17,6 +17,8 @@ jobs:
         run: xcodebuild -scheme McBopomofo -configuration Release build
       - name: Build
         run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
+      - name: Test
+        run: xcodebuild -scheme McBopomofo -configuration Debug test
       - name: Test CandidateUI
         run: swift test
         working-directory: Packages/CandidateUI
