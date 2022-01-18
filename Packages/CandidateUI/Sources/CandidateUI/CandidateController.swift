@@ -99,6 +99,16 @@ public class CandidateController: NSWindowController {
         UInt.max
     }
 
+    /// Sets the location of the candidate window.
+    ///
+    /// Please note that the method has side effects that modifies
+    /// `windowTopLeftPoint` to make the candidate window to stay in at least
+    /// in a screen.
+    ///
+    /// - Parameters:
+    ///   - windowTopLeftPoint: The given location.
+    ///   - height: The height that helps the window not to be out of the bottom
+    ///     of a screen.
     @objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
     public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
@@ -130,7 +140,7 @@ public class CandidateController: NSWindowController {
 
         // bottom beneath the screen?
         if adjustedPoint.y - windowSize.height < screenFrame.minY {
-            adjustedPoint.y = screenFrame.minY + adjustedHeight + windowSize.height
+            adjustedPoint.y = windowTopLeftPoint.y + adjustedHeight + windowSize.height
         }
 
         // top over the screen?

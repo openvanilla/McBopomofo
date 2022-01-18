@@ -1372,7 +1372,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@", exception);
+        NSLog(@"lineHeightRectangle %@", exception);
     }
 
     if (useVerticalMode) {
@@ -1383,6 +1383,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     gCurrentCandidateController.visible = YES;
+
 }
 
 #pragma mark - User phrases

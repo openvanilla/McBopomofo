@@ -27,11 +27,10 @@ class HorizontalCandidateControllerTests: XCTestCase {
         controller.keyLabels = ["1", "2", "3", "4"]
         controller.reloadData()
         controller.visible = true
-        controller.set(windowTopLeftPoint: NSPoint(x: -100, y: -100), bottomOutOfScreenAdjustmentHeight: 10)
+        controller.set(windowTopLeftPoint: NSPoint(x: -100, y: 0), bottomOutOfScreenAdjustmentHeight: 10)
         let exp = expectation(description: "wait")
         _ = XCTWaiter.wait(for: [exp], timeout: 0.2)
         XCTAssert(controller.window?.frame.minX ?? -1 >= 0)
-        XCTAssert(controller.window?.frame.minY ?? -1 >= 0)
     }
 
     func testPositioning2() {
