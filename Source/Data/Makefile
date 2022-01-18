@@ -60,20 +60,22 @@ phrase.list: BPMFBase.txt BPMFMappings.txt
 	awk 'length($$1)<4{print $$1}' BPMFBase.txt > tmp
 	awk '{print $$1}'         BPMFMappings.txt >> tmp
 	sort -u tmp | uniq > phrase.list
-_myinstall:
-	cd ../.. && \
-         xcodebuild -target McBopomofo -configuration Release && \
-         rsync -avx --delete build/Release/McBopomofo.app/ \
-            ~/Library/Input\ Methods/McBopomofo.app/
-	@pgrep McBopomofo && killall -HUP McBopomofo || echo -n
 _myclean:
-	cd ../.. && xcodebuild clean
-_mydebuginstall:
+	cd ../.. && xcodebuild -derivedDataPath build clean
+_myprodbuild:
 	cd ../.. && \
-         xcodebuild -target McBopomofo -configuration Debug && \
-         rsync -avx --delete build/Debug/McBopomofo.app/ \
-            ~/Library/Input\ Methods/McBopomofo.app/
-	@pgrep McBopomofo && killall -HUP McBopomofo || echo -n
+        xcodebuild \
+          -scheme McBopomofo \
+          -configuration Release \
+          -derivedDataPath build \
+          build
+_mydebugbuild:
+	cd ../.. && \
+        xcodebuild \
+          -scheme McBopomofo \
+          -configuration Debug \
+          -derivedDataPath build \
+          build
 _mycodecheck:
 	@for myfile in bin/*.py; do \
             pycodestyle --ignore=E501,E722,E701,E221,W605 $$myfile; \
