@@ -13,7 +13,7 @@ class VersionUpdateApiTests: XCTestCase {
                 XCTFail(error.localizedDescription)
             }
         }
-        self.wait(for: [exp], timeout: 3.0)
+        self.wait(for: [exp], timeout: 20.0)
     }
 }
 
