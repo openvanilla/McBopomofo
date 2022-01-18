@@ -43,7 +43,11 @@ public protocol CandidateControllerDelegate: AnyObject {
 
 @objc (VTCandidateController)
 public class CandidateController: NSWindowController {
-    @objc public weak var delegate: CandidateControllerDelegate?
+    @objc public weak var delegate: CandidateControllerDelegate? {
+        didSet {
+            reloadData()
+        }
+    }
     @objc public var selectedCandidateIndex: UInt = UInt.max
     @objc public var visible: Bool = false {
         didSet {

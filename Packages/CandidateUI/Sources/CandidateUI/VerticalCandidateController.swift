@@ -309,6 +309,10 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         if selectedRow != -1 {
             // keep track of the highlighted index in the key label strip
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
+            // firstVisibleRow cannot be larger than selectedRow.
+            if firstVisibleRow > selectedRow {
+                return
+            }
             keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
 
@@ -343,7 +347,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
 
         var newIndex = selectedCandidateIndex
         if forward {
-            if newIndex == itemCount - 1 {
+            if newIndex >= itemCount - 1 {
                 return false
             }
             newIndex = min(newIndex + labelCount, itemCount - 1)
@@ -371,8 +375,12 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             return false
         }
         var newIndex = selectedCandidateIndex
+        if newIndex == UInt.max {
+            return false
+        }
+
         if forward {
-            if newIndex == itemCount - 1 {
+            if newIndex >= itemCount - 1 {
                 return false
             }
             newIndex += 1

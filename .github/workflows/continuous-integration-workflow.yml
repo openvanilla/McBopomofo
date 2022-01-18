@@ -17,4 +17,15 @@ jobs:
         run: xcodebuild -scheme McBopomofo -configuration Release build
       - name: Build
         run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
-
+      - name: Test CandidateUI
+        run: swift test
+        working-directory: Packages/CandidateUI
+      - name: Test CandidateUI
+        run: swift test
+        working-directory: Packages/CandidateUI
+      - name: Test OpenCCBridge
+        run: swift test
+        working-directory: Packages/OpenCCBridge
+      - name: Test VXHanConvert
+        run: swift test
+        working-directory: Packages/VXHanConvert
