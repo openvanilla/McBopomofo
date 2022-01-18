@@ -1,0 +1,11 @@
+# 手動刪詞資料檔（傳統注音）
+#
+# 使用方式請參考 https://github.com/openvanilla/McBopomofo/wiki/使用手冊#手動刪詞
+#
+# 以下範例刪除輸入 < 時在選字窗出現的 〈 及 《 兩個標點符號：
+#
+#   〈 _punctuation_Standard_<
+#   《 _punctuation_Standard_<
+#
+# 如果任何一行以 "#" 開頭，該行將被當作註解忽略。
+

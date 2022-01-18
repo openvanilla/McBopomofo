@@ -1,0 +1,12 @@
+# Custom Replacements File.
+#
+# See https://github.com/openvanilla/McBopomofo/wiki/使用手冊#手動換詞 for usage.
+#
+# This is an advanced feature. For example, if you add this line:
+#
+#   這個 呢個
+#
+# All instances of 這個 will be replaced with 呢個.
+#
+# Any line that starts with "#" is treated as comment.
+

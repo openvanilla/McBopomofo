@@ -1,0 +1,12 @@
+# Custom Exculded Characters or Symbols (for Plain Bopomofo).
+#
+# See https://github.com/openvanilla/McBopomofo/wiki/使用手冊#手動刪詞 for usage.
+#
+# For example, the two lines below will remove the punctuations 〈 and 《 whenever
+# you type the character <:
+#
+#   〈 _punctuation_Standard_<
+#   《 _punctuation_Standard_<
+#
+# Any line that starts with "#" is treated as comment.
+
