@@ -26,18 +26,18 @@ _deploy: _install
 	@rsync -avx data.txt data-plain-bpmf.txt $(RHOST):"Library/Input\ Methods/McBopomofo.app/Contents/Resources/"
 	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
-sort: 
-	@env LANG=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
+sort:
+	@sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
 	@mv tmp phrase.occ
-	@env LANG=C sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
+	@sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
 	@mv tmp BPMFMappings.txt
-	@env LANG=C sort -k1 heterophony1.list|uniq>tmp
+	@sort -k1 heterophony1.list|uniq>tmp
 	@mv tmp heterophony1.list
-	@env LANG=C sort -k1 heterophony2.list|uniq>tmp
+	@sort -k1 heterophony2.list|uniq>tmp
 	@mv tmp heterophony2.list
-	@env LANG=C sort -k1 heterophony3.list|uniq>tmp
+	@sort -k1 heterophony3.list|uniq>tmp
 	@mv tmp heterophony3.list
-	@env LANG=C sort -k1 exclusion.txt|uniq>tmp
+	@sort -k1 exclusion.txt|uniq>tmp
 	@mv tmp exclusion.txt
 
 check:
@@ -59,22 +59,24 @@ _phrase.occ: phrase.list
 phrase.list: BPMFBase.txt BPMFMappings.txt
 	awk 'length($$1)<4{print $$1}' BPMFBase.txt > tmp
 	awk '{print $$1}'         BPMFMappings.txt >> tmp
-	env LANG=C sort -u tmp | uniq > phrase.list
-_myinstall:
-	cd ../.. && \
-         xcodebuild -target McBopomofo -configuration Release && \
-         rsync -avx --delete build/Release/McBopomofo.app/ \
-            ~/Library/Input\ Methods/McBopomofo.app/
-	@pgrep McBopomofo && killall -HUP McBopomofo || echo -n
+	sort -u tmp | uniq > phrase.list
 _myclean:
-	cd ../.. && xcodebuild clean
-_mydebuginstall:
+	cd ../.. && xcodebuild -derivedDataPath build clean
+_myprodbuild:
 	cd ../.. && \
-         xcodebuild -target McBopomofo -configuration Debug && \
-         rsync -avx --delete build/Debug/McBopomofo.app/ \
-            ~/Library/Input\ Methods/McBopomofo.app/
-	@pgrep McBopomofo && killall -HUP McBopomofo || echo -n
+        xcodebuild \
+          -scheme McBopomofo \
+          -configuration Release \
+          -derivedDataPath build \
+          build
+_mydebugbuild:
+	cd ../.. && \
+        xcodebuild \
+          -scheme McBopomofo \
+          -configuration Debug \
+          -derivedDataPath build \
+          build
 _mycodecheck:
 	@for myfile in bin/*.py; do \
-            pep8-2.7 --ignore=E221,E226,E501,E701 $$myfile; \
+            pycodestyle --ignore=E501,E722,E701,E221,W605 $$myfile; \
         done

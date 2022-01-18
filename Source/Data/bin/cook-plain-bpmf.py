@@ -6,7 +6,7 @@ import sys
 
 skip = re.compile("．\s+_punctuation.*_>")
 
-insert = ["．",  "_punctuation_\"", "0.0"]
+insert = ["．", "_punctuation_\"", "0.0"]
 
 if len(sys.argv) < 4:
     sys.exit('Usage: cook-plain-bpmf.py bpmf-base punctuation-list output')

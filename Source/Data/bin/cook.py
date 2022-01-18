@@ -16,6 +16,7 @@ bpmf_phon2 = {}
 bpmf_phon3 = {}
 bpmf_hetero = {}
 
+
 if __name__ == '__main__':
     """bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt data.txt"""
     if len(sys.argv) < 7:
@@ -156,8 +157,8 @@ if __name__ == '__main__':
                     elif str(bpmf_phon2[mykey]) == r:
                         # l(3/4) = -0.28768207245178 / 頻率打七五折之意
                         # l(1/2) = -0.69314718055994 / 頻率打五折之意
-                        if float(myvalue)-0.69314718055994 > H_DEFLT_FREQ:
-                            output.append((mykey, r, float(myvalue)-0.69314718055994))
+                        if float(myvalue) - 0.69314718055994 > H_DEFLT_FREQ:
+                            output.append((mykey, r, float(myvalue) - 0.69314718055994))
                             continue
                         else:
                             output.append((mykey, r, H_DEFLT_FREQ))
@@ -168,8 +169,8 @@ if __name__ == '__main__':
                     elif str(bpmf_phon3[mykey]) == r:
                         # l(3/4*3/4) = -0.28768207245178*2
                         # l(1/2*1/2) = -0.69314718055994*2
-                        if float(myvalue)-0.69314718055994*2 > H_DEFLT_FREQ:
-                            output.append((mykey, r, float(myvalue)-0.69314718055994*2))
+                        if float(myvalue) - 0.69314718055994 * 2 > H_DEFLT_FREQ:
+                            output.append((mykey, r, float(myvalue) - 0.69314718055994 * 2))
                             continue
                         else:
                             output.append((mykey, r, H_DEFLT_FREQ))
@@ -190,7 +191,6 @@ if __name__ == '__main__':
             row = line.rstrip().split(" ")
             assert len(row) == 3
             output.append(tuple(row))
-
 
     with open(sys.argv[5]) as symbols_file:
         for line in symbols_file:
