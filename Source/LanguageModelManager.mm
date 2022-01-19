@@ -44,6 +44,13 @@ McBopomofoLM gLanguageModelMcBopomofo;
 McBopomofoLM gLanguageModelPlainBopomofo;
 UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
+NSString *const kUserDataTemplateName = @"template-data";
+NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
+NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
+NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
+NSString *const kTemplateExtension = @".txt";
+
+
 @implementation LanguageModelManager
 
 static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomofoLM &lm)
@@ -120,10 +127,19 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     return YES;
 }
 
-+ (BOOL)checkIfFileExist:(NSString *)filePath
++ (BOOL)ensureFileExists:(NSString *)filePath populateWithTemplate:(NSString *)templateBasename extension:(NSString *)ext
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
+
+        NSURL *templateURL = [[NSBundle mainBundle] URLForResource:templateBasename withExtension:ext];
+        NSData *templateData;
+        if (templateURL) {
+            templateData = [NSData dataWithContentsOfURL:templateURL];
+        } else {
+            templateData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+        }
+
+        BOOL result = [templateData writeToFile:filePath atomically:YES];
         if (!result) {
             NSLog(@"Failed to write file");
             return NO;
@@ -137,16 +153,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     if (![self checkIfUserDataFolderExists]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self userPhrasesDataPathMcBopomofo]]) {
+    if (![self ensureFileExists:[self userPhrasesDataPathMcBopomofo] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self excludedPhrasesDataPathMcBopomofo]]) {
+    if (![self ensureFileExists:[self excludedPhrasesDataPathMcBopomofo] populateWithTemplate:kExcludedPhrasesMcBopomofoTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self excludedPhrasesDataPathPlainBopomofo]]) {
+    if (![self ensureFileExists:[self excludedPhrasesDataPathPlainBopomofo] populateWithTemplate:kExcludedPhrasesPlainBopomofoTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self phraseReplacementDataPathMcBopomofo]]) {
+    if (![self ensureFileExists:[self phraseReplacementDataPathMcBopomofo] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) {
         return NO;
     }
     return YES;
