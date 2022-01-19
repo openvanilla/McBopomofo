@@ -64,7 +64,7 @@ fileprivate class HorizontalCandidateView: NSView {
         return result
     }
 
-    @objc (setKeyLabels:displayedCandidates:)
+    @objc(setKeyLabels:displayedCandidates:)
     func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0..<count])
@@ -81,7 +81,7 @@ fileprivate class HorizontalCandidateView: NSView {
         elementWidths = newWidths
     }
 
-    @objc (setKeyLabelFont:candidateFont:)
+    @objc(setKeyLabelFont:candidateFont:)
     func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -192,7 +192,7 @@ fileprivate class HorizontalCandidateView: NSView {
     }
 }
 
-@objc (VTHorizontalCandidateController)
+@objc(VTHorizontalCandidateController)
 public class HorizontalCandidateController: CandidateController {
     private var candidateView: HorizontalCandidateView
     private var prevPageButton: NSButton
@@ -364,7 +364,7 @@ extension HorizontalCandidateController {
 
         if pageCount > 1 {
             var buttonRect = nextPageButton.frame
-            var spacing:CGFloat = 0.0
+            var spacing: CGFloat = 0.0
 
             if newSize.height < 40.0 {
                 buttonRect.size.height = floor(newSize.height / 2)

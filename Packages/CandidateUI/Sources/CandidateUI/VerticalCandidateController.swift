@@ -91,13 +91,13 @@ fileprivate class VerticalCandidateTableView: NSTableView {
     }
 }
 
-private let kCandidateTextPadding:CGFloat = 24.0
-private let kCandidateTextLeftMargin:CGFloat = 8.0
-private let kCandidateTextPaddingWithMandatedTableViewPadding:CGFloat = 18.0
-private let kCandidateTextLeftMarginWithMandatedTableViewPadding:CGFloat = 0.0
+private let kCandidateTextPadding: CGFloat = 24.0
+private let kCandidateTextLeftMargin: CGFloat = 8.0
+private let kCandidateTextPaddingWithMandatedTableViewPadding: CGFloat = 18.0
+private let kCandidateTextLeftMarginWithMandatedTableViewPadding: CGFloat = 0.0
 
 
-@objc (VTVerticalCandidateController)
+@objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
     private var keyLabelStripView: VerticalKeyLabelStripView
     private var scrollView: NSScrollView
@@ -309,7 +309,13 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         if selectedRow != -1 {
             // keep track of the highlighted index in the key label strip
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
-            keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+            // firstVisibleRow cannot be larger than selectedRow.
+            if selectedRow >= firstVisibleRow {
+                keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+            } else {
+                keyLabelStripView.highlightedIndex = UInt.max
+            }
+
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
 
             // fix a subtle OS X "bug" that, since we force the scroller to appear,
@@ -343,7 +349,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
 
         var newIndex = selectedCandidateIndex
         if forward {
-            if newIndex == itemCount - 1 {
+            if newIndex >= itemCount - 1 {
                 return false
             }
             newIndex = min(newIndex + labelCount, itemCount - 1)
@@ -371,8 +377,12 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             return false
         }
         var newIndex = selectedCandidateIndex
+        if newIndex == UInt.max {
+            return false
+        }
+
         if forward {
-            if newIndex == itemCount - 1 {
+            if newIndex >= itemCount - 1 {
                 return false
             }
             newIndex += 1

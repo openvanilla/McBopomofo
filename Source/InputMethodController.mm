@@ -55,6 +55,8 @@ using namespace McBopomofo;
 using namespace OpenVanilla;
 
 static const NSInteger kMinKeyLabelSize = 10;
+static const NSInteger kMinMarkRangeLength = 2;
+static const NSInteger kMaxMarkRangeLength = 6;
 
 // input modes
 static NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
@@ -326,7 +328,7 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
         return text;
     }
 
-    if (Preferences.chineneConversionEngine == 1) {
+    if (Preferences.chineseConversionEngine == 1) {
         return [VXHanConvert convertToSimplifiedFrom:text];
     }
     return [OpenCCBridge convertToSimplified:text];
@@ -1372,7 +1374,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         [client attributesForCharacterIndex:cursor lineHeightRectangle:&lineHeightRect];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@", exception);
+        NSLog(@"lineHeightRectangle %@", exception);
     }
 
     if (useVerticalMode) {
@@ -1383,6 +1385,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     }
 
     gCurrentCandidateController.visible = YES;
+
 }
 
 #pragma mark - User phrases
@@ -1420,7 +1423,10 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     size_t begin = min(_builder->markerCursorIndex(), _builder->cursorIndex());
     size_t end = max(_builder->markerCursorIndex(), _builder->cursorIndex());
     // A phrase should contian at least two characters.
-    if (end - begin < 2) {
+    if (end - begin < kMinMarkRangeLength) {
+        return @"";
+    }
+    if (end - begin > kMaxMarkRangeLength) {
         return @"";
     }
 
@@ -1442,6 +1448,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
     NSString *currentMarkedPhrase = [self _currentMarkedTextAndReadings];
     if (![currentMarkedPhrase length]) {
+        [self beep];
         return NO;
     }
 
@@ -1455,9 +1462,21 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
     if (!length) {
         [self _hideTooltip];
     }
-    else if (length == 1) {
-        NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
-        [self _showTooltip:messsage client:client];
+    else if (Preferences.phraseReplacementEnabled) {
+        NSString *message = NSLocalizedString(@"Phrase replacement mode is on. Not suggested to add phrase in the mode.", @"");
+        [self _showTooltip:message client:client];
+    }
+    else if (Preferences.chineseConversionStyle == 1 && Preferences.chineseConversionEnabled) {
+        NSString *message = NSLocalizedString(@"Model based Chinese conversion is on. Not suggested to add phrase in the mode.", @"");
+        [self _showTooltip:message client:client];
+    }
+    else if (length < kMinMarkRangeLength) {
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". You can add a phrase with two or more characters.", @""), text];
+        [self _showTooltip:message client:client];
+    }
+    else if (length > kMaxMarkRangeLength) {
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". A phrase cannot be longer than 6 characters.", @""), text];
+        [self _showTooltip:message client:client];
     }
     else {
         NSString *messsage = [NSString stringWithFormat:NSLocalizedString(@"You are now selecting \"%@\". Press enter to add a new phrase.", @""), text];
@@ -1518,13 +1537,13 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences toogleHalfWidthPunctuationEnabled];
+    [Preferences toggleHalfWidthPunctuationEnabled];
 #pragma GCC diagnostic pop
 }
 
 - (void)togglePhraseReplacementEnabled:(id)sender
 {
-    BOOL enabled = [Preferences tooglePhraseReplacementEnabled];
+    BOOL enabled = [Preferences togglePhraseReplacementEnabled];
     McBopomofoLM *lm = [LanguageModelManager languageModelMcBopomofo];
     lm->setPhraseReplacementEnabled(enabled);
 }

@@ -1,9 +1,9 @@
 import Cocoa
 
 public class TooltipController: NSWindowController {
-    private let backgroundColor =  NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
+    private let backgroundColor = NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
     private var messageTextField: NSTextField
-    private var tooltip: String  = "" {
+    private var tooltip: String = "" {
         didSet {
             messageTextField.stringValue = tooltip
             adjustSize()
@@ -46,12 +46,47 @@ public class TooltipController: NSWindowController {
         window?.orderOut(nil)
     }
 
-    private func set(windowLocation location: NSPoint) {
-        var newPoint = location
-        if location.y > 5 {
-            newPoint.y -= 5
+    private func set(windowLocation windowTopLeftPoint: NSPoint) {
+
+        var adjustedPoint = windowTopLeftPoint
+        adjustedPoint.y -= 5
+
+        var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+        for screen in NSScreen.screens {
+            let frame = screen.visibleFrame
+            if windowTopLeftPoint.x >= frame.minX &&
+                windowTopLeftPoint.x <= frame.maxX &&
+                windowTopLeftPoint.y >= frame.minY &&
+                windowTopLeftPoint.y <= frame.maxY {
+                screenFrame = frame
+                break
+            }
         }
-        window?.setFrameTopLeftPoint(newPoint)
+
+        let windowSize = window?.frame.size ?? NSSize.zero
+
+        // bottom beneath the screen?
+        if adjustedPoint.y - windowSize.height < screenFrame.minY {
+            adjustedPoint.y = screenFrame.minY + windowSize.height
+        }
+
+        // top over the screen?
+        if adjustedPoint.y >= screenFrame.maxY {
+            adjustedPoint.y = screenFrame.maxY - 1.0
+        }
+
+        // right
+        if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
+            adjustedPoint.x = screenFrame.maxX - windowSize.width
+        }
+
+        // left
+        if adjustedPoint.x < screenFrame.minX {
+            adjustedPoint.x = screenFrame.minX
+        }
+
+        window?.setFrameTopLeftPoint(adjustedPoint)
+
     }
 
     private func adjustSize() {

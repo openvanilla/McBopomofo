@@ -59,7 +59,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
         }
 
         NSString *text = [NSString stringWithUTF8String:input.c_str()];
-        if (Preferences.chineneConversionEngine == 1) {
+        if (Preferences.chineseConversionEngine == 1) {
             text = [VXHanConvert convertToSimplifiedFrom:text];
         }
         else {
