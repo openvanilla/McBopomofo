@@ -21,43 +21,39 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <benchmark/benchmark.h>
-
-#include <cassert>
+#include <cstdio>
 #include <filesystem>
+#include <string>
 
-#include "ParselessLM.h"
+#include "PhraseReplacementMap.h"
+#include "gtest/gtest.h"
 
-namespace {
+namespace McBopomofo {
 
-using ParselessLM = McBopomofo::ParselessLM;
-
-static const char* kDataPath = "data.txt";
-static const char* kUnigramSearchKey = "ㄕˋ-ㄕˊ";
-
-static void BM_ParselessLMOpenClose(benchmark::State& state)
+TEST(PhraseReplacementMapTest, LenientReading)
 {
-    assert(std::filesystem::exists(kDataPath));
-    for (auto _ : state) {
-        ParselessLM lm;
-        lm.open(kDataPath);
-        lm.close();
-    }
+    std::string tmp_name
+        = std::string(std::filesystem::temp_directory_path()) + "test.txt";
+
+    FILE* f = fopen(tmp_name.c_str(), "w");
+    ASSERT_NE(f, nullptr);
+
+    fprintf(f, "key value\n");
+    fprintf(f, "key2\n"); // error line
+    fprintf(f, "key3 value2\n");
+    int r = fclose(f);
+    ASSERT_EQ(r, 0);
+
+    PhraseReplacementMap map;
+    map.open(tmp_name.c_str());
+    ASSERT_EQ(map.valueForKey("key"), "value");
+    ASSERT_EQ(map.valueForKey("key2"), "");
+
+    // key2 causes parsing error, and the line that has key3 won't be parsed.
+    ASSERT_EQ(map.valueForKey("key3"), "");
+
+    r = remove(tmp_name.c_str());
+    ASSERT_EQ(r, 0);
 }
-BENCHMARK(BM_ParselessLMOpenClose);
 
-static void BM_ParselessLMFindUnigrams(benchmark::State& state)
-{
-    assert(std::filesystem::exists(kDataPath));
-    ParselessLM lm;
-    lm.open(kDataPath);
-    for (auto _ : state) {
-        lm.unigramsForKey(kUnigramSearchKey);
-    }
-    lm.close();
-}
-BENCHMARK(BM_ParselessLMFindUnigrams);
-
-}; // namespace
-
-BENCHMARK_MAIN();
+} // namespace McBopomofo
