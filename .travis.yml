@@ -1,8 +1,0 @@
-language: objective-c
-
-before_script: travis/before_script.sh
-script: travis/script.sh
-
-sudo: false
-git:
-  depth: 1
