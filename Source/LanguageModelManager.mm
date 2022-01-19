@@ -1,3 +1,26 @@
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 #import "LanguageModelManager.h"
 #import <fstream>
 #import <iostream>
@@ -20,6 +43,13 @@ static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 McBopomofoLM gLanguageModelMcBopomofo;
 McBopomofoLM gLanguageModelPlainBopomofo;
 UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+
+NSString *const kUserDataTemplateName = @"template-data";
+NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
+NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
+NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
+NSString *const kTemplateExtension = @".txt";
+
 
 @implementation LanguageModelManager
 
@@ -59,7 +89,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
         }
 
         NSString *text = [NSString stringWithUTF8String:input.c_str()];
-        if (Preferences.chineneConversionEngine == 1) {
+        if (Preferences.chineseConversionEngine == 1) {
             text = [VXHanConvert convertToSimplifiedFrom:text];
         }
         else {
@@ -97,10 +127,19 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     return YES;
 }
 
-+ (BOOL)checkIfFileExist:(NSString *)filePath
++ (BOOL)ensureFileExists:(NSString *)filePath populateWithTemplate:(NSString *)templateBasename extension:(NSString *)ext
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-        BOOL result = [[@"" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:filePath atomically:YES];
+
+        NSURL *templateURL = [[NSBundle mainBundle] URLForResource:templateBasename withExtension:ext];
+        NSData *templateData;
+        if (templateURL) {
+            templateData = [NSData dataWithContentsOfURL:templateURL];
+        } else {
+            templateData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+        }
+
+        BOOL result = [templateData writeToFile:filePath atomically:YES];
         if (!result) {
             NSLog(@"Failed to write file");
             return NO;
@@ -114,16 +153,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     if (![self checkIfUserDataFolderExists]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self userPhrasesDataPathMcBopomofo]]) {
+    if (![self ensureFileExists:[self userPhrasesDataPathMcBopomofo] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self excludedPhrasesDataPathMcBopomofo]]) {
+    if (![self ensureFileExists:[self excludedPhrasesDataPathMcBopomofo] populateWithTemplate:kExcludedPhrasesMcBopomofoTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self excludedPhrasesDataPathPlainBopomofo]]) {
+    if (![self ensureFileExists:[self excludedPhrasesDataPathPlainBopomofo] populateWithTemplate:kExcludedPhrasesPlainBopomofoTemplateName extension:kTemplateExtension]) {
         return NO;
     }
-    if (![self checkIfFileExist:[self phraseReplacementDataPathMcBopomofo]]) {
+    if (![self ensureFileExists:[self phraseReplacementDataPathMcBopomofo] populateWithTemplate:kPhraseReplacementTemplateName extension:kTemplateExtension]) {
         return NO;
     }
     return YES;

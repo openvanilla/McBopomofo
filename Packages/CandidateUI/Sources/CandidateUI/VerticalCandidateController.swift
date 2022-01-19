@@ -1,14 +1,4 @@
-//
-// VerticalCandidateController.swift
-//
-// Copyright (c) 2011 The McBopomofo Project.
-//
-// Contributors:
-//     Mengjuei Hsieh (@mjhsieh)
-//     Weizhong Yang (@zonble)
-//
-// Based on the Syrup Project and the Formosana Library
-// by Lukhnos Liu (@lukhnos).
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -30,7 +20,6 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-//
 
 import Cocoa
 
@@ -91,13 +80,13 @@ fileprivate class VerticalCandidateTableView: NSTableView {
     }
 }
 
-private let kCandidateTextPadding:CGFloat = 24.0
-private let kCandidateTextLeftMargin:CGFloat = 8.0
-private let kCandidateTextPaddingWithMandatedTableViewPadding:CGFloat = 18.0
-private let kCandidateTextLeftMarginWithMandatedTableViewPadding:CGFloat = 0.0
+private let kCandidateTextPadding: CGFloat = 24.0
+private let kCandidateTextLeftMargin: CGFloat = 8.0
+private let kCandidateTextPaddingWithMandatedTableViewPadding: CGFloat = 18.0
+private let kCandidateTextLeftMarginWithMandatedTableViewPadding: CGFloat = 0.0
 
 
-@objc (VTVerticalCandidateController)
+@objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
     private var keyLabelStripView: VerticalKeyLabelStripView
     private var scrollView: NSScrollView
@@ -309,7 +298,13 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         if selectedRow != -1 {
             // keep track of the highlighted index in the key label strip
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
-            keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+            // firstVisibleRow cannot be larger than selectedRow.
+            if selectedRow >= firstVisibleRow {
+                keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+            } else {
+                keyLabelStripView.highlightedIndex = UInt.max
+            }
+
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
 
             // fix a subtle OS X "bug" that, since we force the scroller to appear,
@@ -343,7 +338,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
 
         var newIndex = selectedCandidateIndex
         if forward {
-            if newIndex == itemCount - 1 {
+            if newIndex >= itemCount - 1 {
                 return false
             }
             newIndex = min(newIndex + labelCount, itemCount - 1)
@@ -371,8 +366,12 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             return false
         }
         var newIndex = selectedCandidateIndex
+        if newIndex == UInt.max {
+            return false
+        }
+
         if forward {
-            if newIndex == itemCount - 1 {
+            if newIndex >= itemCount - 1 {
                 return false
             }
             newIndex += 1

@@ -69,6 +69,8 @@
 
 "You are now selecting \"%@\". Press enter to add a new phrase." = "You are now selecting \"%@\". Press enter to add a new phrase.";
 
+"You are now selecting \"%@\". A phrase cannot be longer than 6 characters." = "You are now selecting \"%@\". A phrase cannot be longer than 6 characters.";
+
 "Chinese conversion on" = "Chinese conversion on";
 
 "Chinese conversion off" = "Chinese conversion off";
@@ -89,3 +91,6 @@
 
 "The length of your candidate keys can not be larger than 15 characters." = "The length of your candidate keys can not be larger than 15 characters.";
 
+"Phrase replacement mode is on. Not suggested to add phrase in the mode." = "Phrase replacement mode is on. Not suggested to add phrase in the mode.";
+
+"Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "Model based Chinese conversion is on. Not suggested to add phrase in the mode.";

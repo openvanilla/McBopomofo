@@ -1,14 +1,4 @@
-//
-// OVInputSourceHelper.swift
-//
-// Copyright (c) 2011 The McBopomofo Project.
-//
-// Contributors:
-//     Mengjuei Hsieh (@mjhsieh)
-//     Weizhong Yang (@zonble)
-//
-// Based on the Syrup Project and the Formosana Library
-// by Lukhnos Liu (@lukhnos).
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -30,7 +20,6 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-//
 
 import Cocoa
 import Carbon
@@ -46,7 +35,7 @@ public class InputSourceHelper: NSObject {
         TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
     }
 
-    @objc (inputSourceForProperty:stringValue:)
+    @objc(inputSourceForProperty:stringValue:)
     public static func inputSource(for propertyKey: CFString, stringValue: String) -> TISInputSource? {
         let stringID = CFStringGetTypeID()
         for source in allInstalledInputSources() {
@@ -64,12 +53,12 @@ public class InputSourceHelper: NSObject {
         return nil
     }
 
-    @objc (inputSourceForInputSourceID:)
+    @objc(inputSourceForInputSourceID:)
     public static func inputSource(for sourceID: String) -> TISInputSource? {
         inputSource(for: kTISPropertyInputSourceID, stringValue: sourceID)
     }
 
-    @objc (inputSourceEnabled:)
+    @objc(inputSourceEnabled:)
     public static func inputSourceEnabled(for source: TISInputSource) -> Bool {
         if let valuePts = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsEnabled) {
             let value = Unmanaged<CFBoolean>.fromOpaque(valuePts).takeUnretainedValue()
@@ -78,13 +67,13 @@ public class InputSourceHelper: NSObject {
         return false
     }
 
-    @objc (enableInputSource:)
+    @objc(enableInputSource:)
     public static func enable(inputSource: TISInputSource) -> Bool {
         let status = TISEnableInputSource(inputSource)
         return status == noErr
     }
 
-    @objc (enableAllInputModesForInputSourceBundleID:)
+    @objc(enableAllInputModesForInputSourceBundleID:)
     public static func enableAllInputMode(for inputSourceBundleD: String) -> Bool {
         var enabled = false
         for source in allInstalledInputSources() {
@@ -105,7 +94,7 @@ public class InputSourceHelper: NSObject {
         return enabled
     }
 
-    @objc (enableInputMode:forInputSourceBundleID:)
+    @objc(enableInputMode:forInputSourceBundleID:)
     public static func enable(inputMode modeID: String, for bundleID: String) -> Bool {
         for source in allInstalledInputSources() {
             guard let bundleIDPtr = TISGetInputSourceProperty(source, kTISPropertyBundleID),
@@ -126,13 +115,13 @@ public class InputSourceHelper: NSObject {
 
     }
 
-    @objc (disableInputSource:)
+    @objc(disableInputSource:)
     public static func disable(inputSource: TISInputSource) -> Bool {
         let status = TISDisableInputSource(inputSource)
         return status == noErr
     }
 
-    @objc (registerInputSource:)
+    @objc(registerInputSource:)
     public static func registerTnputSource(at url: URL) -> Bool {
         let status = TISRegisterInputSource(url as CFURL)
         return status == noErr

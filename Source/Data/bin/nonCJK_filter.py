@@ -4,6 +4,10 @@ import re
 import codecs
 import sys
 
+__author__ = "@mjhsieh and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
+
 LHan = [[0x2E80, 0x2E99],    # Han # So  [26] CJK RADICAL REPEAT, CJK RADICAL RAP
         [0x2E9B, 0x2EF3],    # Han # So  [89] CJK RADICAL CHOKE, CJK RADICAL C-SIMPLIFIED TURTLE
         [0x2F00, 0x2FD5],    # Han # So [214] KANGXI RADICAL ONE, KANGXI RADICAL FLUTE

@@ -1,3 +1,8 @@
+__author__ = "Lukhnos Liu and The McBopomofo Authors"
+__copyright__ = "Copyright 2022 and onwards The McBopomofo Authors"
+__license__ = "MIT"
+
+
 HEADER = '# format org.openvanilla.mcbopomofo.sorted\n'
 
 

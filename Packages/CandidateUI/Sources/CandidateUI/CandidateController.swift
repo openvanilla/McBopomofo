@@ -1,14 +1,4 @@
-//
-// CandidateController.swift
-//
-// Copyright (c) 2011 The McBopomofo Project.
-//
-// Contributors:
-//     Mengjuei Hsieh (@mjhsieh)
-//     Weizhong Yang (@zonble)
-//
-// Based on the Syrup Project and the Formosana Library
-// by Lukhnos Liu (@lukhnos).
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -30,20 +20,23 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-//
 
 import Cocoa
 
-@objc (VTCandidateControllerDelegate)
+@objc(VTCandidateControllerDelegate)
 public protocol CandidateControllerDelegate: AnyObject {
     func candidateCountForController(_ controller: CandidateController) -> UInt
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt)
 }
 
-@objc (VTCandidateController)
+@objc(VTCandidateController)
 public class CandidateController: NSWindowController {
-    @objc public weak var delegate: CandidateControllerDelegate?
+    @objc public weak var delegate: CandidateControllerDelegate? {
+        didSet {
+            reloadData()
+        }
+    }
     @objc public var selectedCandidateIndex: UInt = UInt.max
     @objc public var visible: Bool = false {
         didSet {
@@ -95,7 +88,17 @@ public class CandidateController: NSWindowController {
         UInt.max
     }
 
-    @objc (setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
+    /// Sets the location of the candidate window.
+    ///
+    /// Please note that the method has side effects that modifies
+    /// `windowTopLeftPoint` to make the candidate window to stay in at least
+    /// in a screen.
+    ///
+    /// - Parameters:
+    ///   - windowTopLeftPoint: The given location.
+    ///   - height: The height that helps the window not to be out of the bottom
+    ///     of a screen.
+    @objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
     public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
             self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)

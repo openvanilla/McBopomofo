@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   build:
-    name: Build
+    name: Build and Test
     runs-on: macOS-latest
     env:
         DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
@@ -15,11 +15,23 @@ jobs:
       - name: Run McBopomofoLMLibTest
         run: make runTest
         working-directory: Source/Engine/build
-      - name: Clean
+      - name: Test McBopomofo App Bundle
+        run: xcodebuild -scheme McBopomofo -configuration Debug test
+      - name: Test CandidateUI
+        run: swift test
+        working-directory: Packages/CandidateUI
+      - name: Test OpenCCBridge
+        run: swift test
+        working-directory: Packages/OpenCCBridge
+      - name: Test VXHanConvert
+        run: swift test
+        working-directory: Packages/VXHanConvert
+      - name: Clean McBopomofo
         run: xcodebuild -scheme McBopomofo -configuration Release clean
-      - name: Clean
+      - name: Clean McBopomofoInstaller
         run: xcodebuild -scheme McBopomofoInstaller -configuration Release clean
-      - name: Build
+      - name: Build McBopomofo
         run: xcodebuild -scheme McBopomofo -configuration Release build
-      - name: Build
+      - name: Build McBopomofoInstaller
         run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
+

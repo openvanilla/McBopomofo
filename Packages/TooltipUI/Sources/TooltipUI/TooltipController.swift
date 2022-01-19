@@ -1,9 +1,32 @@
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 import Cocoa
 
 public class TooltipController: NSWindowController {
-    private let backgroundColor =  NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
+    private let backgroundColor = NSColor(calibratedHue: 0.16, saturation: 0.22, brightness: 0.97, alpha: 1.0)
     private var messageTextField: NSTextField
-    private var tooltip: String  = "" {
+    private var tooltip: String = "" {
         didSet {
             messageTextField.stringValue = tooltip
             adjustSize()
@@ -46,12 +69,47 @@ public class TooltipController: NSWindowController {
         window?.orderOut(nil)
     }
 
-    private func set(windowLocation location: NSPoint) {
-        var newPoint = location
-        if location.y > 5 {
-            newPoint.y -= 5
+    private func set(windowLocation windowTopLeftPoint: NSPoint) {
+
+        var adjustedPoint = windowTopLeftPoint
+        adjustedPoint.y -= 5
+
+        var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
+        for screen in NSScreen.screens {
+            let frame = screen.visibleFrame
+            if windowTopLeftPoint.x >= frame.minX &&
+                windowTopLeftPoint.x <= frame.maxX &&
+                windowTopLeftPoint.y >= frame.minY &&
+                windowTopLeftPoint.y <= frame.maxY {
+                screenFrame = frame
+                break
+            }
         }
-        window?.setFrameTopLeftPoint(newPoint)
+
+        let windowSize = window?.frame.size ?? NSSize.zero
+
+        // bottom beneath the screen?
+        if adjustedPoint.y - windowSize.height < screenFrame.minY {
+            adjustedPoint.y = screenFrame.minY + windowSize.height
+        }
+
+        // top over the screen?
+        if adjustedPoint.y >= screenFrame.maxY {
+            adjustedPoint.y = screenFrame.maxY - 1.0
+        }
+
+        // right
+        if adjustedPoint.x + windowSize.width >= screenFrame.maxX {
+            adjustedPoint.x = screenFrame.maxX - windowSize.width
+        }
+
+        // left
+        if adjustedPoint.x < screenFrame.minX {
+            adjustedPoint.x = screenFrame.minX
+        }
+
+        window?.setFrameTopLeftPoint(adjustedPoint)
+
     }
 
     private func adjustSize() {

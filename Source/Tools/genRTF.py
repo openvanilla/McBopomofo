@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 import sys, os
 import platform
+
+__author__ = "@zonble and The McBopomofo Authors"
+__copyright__ = "Copyright 2011 and onwards The McBopomofo Authors"
+__license__ = "MIT"
+
 myversion, _, _ = platform.mac_ver()
 myversion = float('.'.join(myversion.split('.')[:2]))
 

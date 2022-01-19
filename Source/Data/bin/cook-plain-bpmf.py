@@ -4,6 +4,10 @@ from cook_util import HEADER, convert_vks_rows_to_sorted_kvs_rows
 import re
 import sys
 
+__author__ = "Lukhnos Liu and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
+
 skip = re.compile("．\s+_punctuation.*_>")
 
 insert = ["．", "_punctuation_\"", "0.0"]

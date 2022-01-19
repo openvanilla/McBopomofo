@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 import sys
 
-__author__ = 'Mengjuei Hsieh'
+__author__ = "Mengjuei Hsieh and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
 
 bpmf = {}
 

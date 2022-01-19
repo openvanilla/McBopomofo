@@ -1,0 +1,11 @@
+# Custom Phrases or Characters.
+#
+# See https://github.com/openvanilla/McBopomofo/wiki/使用手冊#手動加詞 for usage.
+#
+# Add your phrases and their respective Bopomofo reading below. Use hyphen ("-")
+# to connect the Bopomofo syllables.
+#
+#   小麥注音 ㄒㄧㄠˇ-ㄇㄞˋ-ㄓㄨˋ-ㄧㄣ
+#
+# Any line that starts with "#" is treated as comment.
+

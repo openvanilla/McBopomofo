@@ -2,6 +2,11 @@
 #encoding:UTF-8
 import locale
 import termios, fcntl, sys, os
+
+__author__ = "Mengjuei Hsieh and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
+
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 fd = sys.stdin.fileno()
