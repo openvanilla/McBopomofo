@@ -25,12 +25,12 @@
 #include <filesystem>
 #include <string>
 
-#include "UserPhrasesLM.h"
+#include "PhraseReplacementMap.h"
 #include "gtest/gtest.h"
 
 namespace McBopomofo {
 
-TEST(UserPhreasesLMTest, LenientReading)
+TEST(PhraseReplacementMapTest, LenientReading)
 {
     std::string tmp_name
         = std::string(std::filesystem::temp_directory_path()) + "test.txt";
@@ -38,19 +38,19 @@ TEST(UserPhreasesLMTest, LenientReading)
     FILE* f = fopen(tmp_name.c_str(), "w");
     ASSERT_NE(f, nullptr);
 
-    fprintf(f, "value1 reading1\n");
-    fprintf(f, "value2 \n"); // error line
-    fprintf(f, "value3 reading2\n");
+    fprintf(f, "key value\n");
+    fprintf(f, "key2\n"); // error line
+    fprintf(f, "key3 value2\n");
     int r = fclose(f);
     ASSERT_EQ(r, 0);
 
-    UserPhrasesLM lm;
-    lm.open(tmp_name.c_str());
-    ASSERT_TRUE(lm.hasUnigramsForKey("reading1"));
-    ASSERT_FALSE(lm.hasUnigramsForKey("value2"));
+    PhraseReplacementMap map;
+    map.open(tmp_name.c_str());
+    ASSERT_EQ(map.valueForKey("key"), "value");
+    ASSERT_EQ(map.valueForKey("key2"), "");
 
-    // Anything after the error won't be parsed, so reading2 won't be found.
-    ASSERT_FALSE(lm.hasUnigramsForKey("reading2"));
+    // key2 causes parsing error, and the line that has key3 won't be parsed.
+    ASSERT_EQ(map.valueForKey("key3"), "");
 
     r = remove(tmp_name.c_str());
     ASSERT_EQ(r, 0);

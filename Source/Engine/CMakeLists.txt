@@ -11,6 +11,8 @@ add_library(McBopomofoLMLib
         ParselessPhraseDB.h
         ParselessLM.cpp
         ParselessLM.h
+        PhraseReplacementMap.h
+        PhraseReplacementMap.cpp
         UserPhrasesLM.h
         UserPhrasesLM.cpp)
 
@@ -32,6 +34,7 @@ add_executable(McBopomofoLMLibTest
         KeyValueBlobReaderTest.cpp
         ParselessLMTest.cpp
         ParselessPhraseDBTest.cpp
+        PhraseReplacementMapTest.cpp
         UserPhrasesLMTest.cpp)
 target_link_libraries(McBopomofoLMLibTest gtest_main McBopomofoLMLib)
 include(GoogleTest)

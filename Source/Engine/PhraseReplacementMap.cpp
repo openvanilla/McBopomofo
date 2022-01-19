@@ -58,11 +58,6 @@ bool PhraseReplacementMap::open(const char *path)
     while ((state = reader.Next(&keyValue)) == KeyValueBlobReader::State::HAS_PAIR) {
         keyValueMap[keyValue.key] = keyValue.value;
     }
-
-    if (state == KeyValueBlobReader::State::ERROR) {
-        close();
-        return false;
-    }
     return true;
 }
 
