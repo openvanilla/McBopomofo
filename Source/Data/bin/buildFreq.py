@@ -3,7 +3,9 @@
 import sys
 import math
 
-__author__ = 'Mengjuei Hsieh'
+__author__ = "Mengjuei Hsieh and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
 
 norm      = 0.0
 fscale    = 2.7

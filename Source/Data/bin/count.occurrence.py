@@ -6,7 +6,9 @@ import codecs
 import ConfigParser
 import multiprocessing
 
-__author__ = 'Mengjuei Hsieh'
+__author__ = "Mengjuei Hsieh and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
 
 __doc__ = """
    A facility to print a list of counts for substrings / phrases

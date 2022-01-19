@@ -1,7 +1,4 @@
-//
-// main.m
-//
-// Copyright (c) 2011-2012 The McBopomofo Project.
+// Copyright (c) 2012 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -23,7 +20,6 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-//
 
 #import <Cocoa/Cocoa.h>
 

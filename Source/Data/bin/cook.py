@@ -3,7 +3,9 @@
 from cook_util import HEADER, convert_vks_rows_to_sorted_kvs_rows
 import sys
 
-__author__ = 'Mengjuei Hsieh et al.'
+__author__ = "Mengjuei Hsieh and The McBopomofo Authors"
+__copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
+__license__ = "MIT"
 
 UNK_LOG_FREQ = -99.0
 H_DEFLT_FREQ = -6.8
