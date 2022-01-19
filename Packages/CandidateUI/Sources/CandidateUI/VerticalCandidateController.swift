@@ -310,10 +310,12 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             // keep track of the highlighted index in the key label strip
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
             // firstVisibleRow cannot be larger than selectedRow.
-            if firstVisibleRow > selectedRow {
-                return
+            if selectedRow >= firstVisibleRow {
+                keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+            } else {
+                keyLabelStripView.highlightedIndex = UInt.max
             }
-            keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
 
             // fix a subtle OS X "bug" that, since we force the scroller to appear,
