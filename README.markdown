@@ -4,9 +4,9 @@
 
 小麥注音輸入法可以在 macOS 10.10 以上版本運作。如果您要自行編譯小麥注音輸入法，或參與開發，您需要：
 
-- macOS 10.15 Catalina 以上版本
-- Xcode 12.0 以上版本
-- Python 3 (您可以使用 homebrew 等方式安裝)
+- macOS 10.15.4 Catalina 以上版本
+- Xcode 12.4 以上版本
+- Python 3.8 (可使用 macOS 內附的，或是使用 homebrew 等方式安裝)
 
 由於小麥注音輸入法開始使用 SPM（Swift Package Manager）管理相依套件，因此必須使用 Xcode 12 開發。
 
