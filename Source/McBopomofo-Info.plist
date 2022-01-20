@@ -28,6 +28,8 @@
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
+				<key>TISIntendedLanguage</key>
+				<string>zh-Hant</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
 				<string>Bopomofo.tiff</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
@@ -49,20 +51,13 @@
 				<true/>
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
-                <key>TISIntendedLanguage</key>
-                <string>zh-Hant</string>
-                <key>tsInputModeCharacterRepertoireKey</key>
-                <array>
-                    <string>Hant</string>
-                    <string>Han</string>
-                </array>
-                <key>tsInputModeKeyEquivalentModifiersKey</key>
-                <integer>4608</integer>
 			</dict>
 			<key>org.openvanilla.inputmethod.McBopomofo.PlainBopomofo</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>。</string>
+				<key>TISIntendedLanguage</key>
+				<string>zh-Hant</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
 				<string>PlainBopomofo.tiff</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
@@ -84,15 +79,6 @@
 				<true/>
 				<key>tsInputModeScriptKey</key>
 				<string>smTradChinese</string>
-                <key>TISIntendedLanguage</key>
-                <string>zh-Hant</string>
-                <key>tsInputModeCharacterRepertoireKey</key>
-                <array>
-                    <string>Hant</string>
-                    <string>Han</string>
-                </array>
-                <key>tsInputModeKeyEquivalentModifiersKey</key>
-                <integer>4608</integer>
 			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
