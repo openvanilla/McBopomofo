@@ -139,12 +139,12 @@ struct ComposingBufferSize {
 // MARK: -
 
 @objc enum KeyboardLayout: Int {
-    case standard
-    case eten
-    case eten26
-    case hsu
-    case hanyuPinyin
-    case IBM
+    case standard = 0
+    case eten = 1
+    case hsu = 2
+    case eten26 = 3
+    case hanyuPinyin = 4
+    case IBM = 5
 
     var name: String {
         switch (self) {
@@ -152,10 +152,10 @@ struct ComposingBufferSize {
             return "Standard"
         case .eten:
             return "ETen"
-        case .eten26:
-            return "ETen26"
         case .hsu:
             return "Hsu"
+        case .eten26:
+            return "ETen26"
         case .hanyuPinyin:
             return "HanyuPinyin"
         case .IBM:
