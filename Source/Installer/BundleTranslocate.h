@@ -1,4 +1,4 @@
-// Copyright (c) 2012 and onwards The McBopomofo Authors.
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -21,29 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
-#import "ArchiveUtil.h"
+@import Cocoa;
 
-@interface AppDelegate : NSWindowController <NSApplicationDelegate>
-{
-@protected
-    ArchiveUtil *_archiveUtil;
-    NSString *_installingVersion;
-    BOOL _upgrading;
-    NSButton *__weak _installButton;
-    NSButton *__weak _cancelButton;
-    NSTextView *__unsafe_unretained _textView;
-    NSWindow *__weak _progressSheet;
-    NSProgressIndicator *__weak _progressIndicator;
-    NSDate *_translocationRemovalStartTime;
-    NSInteger _currentVersionNumber;
-}
-- (IBAction)agreeAndInstallAction:(id)sender;
-- (IBAction)cancelAction:(id)sender;
+NS_ASSUME_NONNULL_BEGIN
 
-@property (weak) IBOutlet NSButton *installButton;
-@property (weak) IBOutlet NSButton *cancelButton;    
-@property (unsafe_unretained) IBOutlet NSTextView *textView;
-@property (weak) IBOutlet NSWindow *progressSheet;
-@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
-@end
+// Determines if an app is translocated by Gatekeeper to a randomized path
+// See https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/
+BOOL appBundleTranslocatedToARandomizedPath(NSString *bundle);
+
+NS_ASSUME_NONNULL_END
