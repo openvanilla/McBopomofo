@@ -61,6 +61,7 @@
 		D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */; };
 		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 		D4F0BBE4279B08900071253C /* BundleTranslocate.m in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE3279B08900071253C /* BundleTranslocate.m */; };
+		D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D4F0BBE9279B14C20071253C /* Credits.rtf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -215,6 +216,9 @@
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D4F0BBE2279B08900071253C /* BundleTranslocate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BundleTranslocate.h; sourceTree = "<group>"; };
 		D4F0BBE3279B08900071253C /* BundleTranslocate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BundleTranslocate.m; sourceTree = "<group>"; };
+		D4F0BBE8279B14C20071253C /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Base; path = Base.lproj/Credits.rtf; sourceTree = "<group>"; };
+		D4F0BBEA279B14CB0071253C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		D4F0BBEB279B14D00071253C /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/Credits.rtf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -412,6 +416,7 @@
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D4F0BBE9279B14C20071253C /* Credits.rtf */,
 				6A6ED162279764CD0012872E /* Custom Phrase Templates */,
 				6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */,
 				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
@@ -633,6 +638,7 @@
 				6A6ED16B2797650A0012872E /* template-phrases-replacement.txt in Resources */,
 				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
+				D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */,
 				6A6ED16C2797650A0012872E /* template-data.txt in Resources */,
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
 				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,
@@ -861,6 +867,16 @@
 			name = MainMenu.xib;
 			path = Source/Installer;
 			sourceTree = SOURCE_ROOT;
+		};
+		D4F0BBE9279B14C20071253C /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D4F0BBE8279B14C20071253C /* Base */,
+				D4F0BBEA279B14CB0071253C /* en */,
+				D4F0BBEB279B14D00071253C /* zh-Hant */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
 
