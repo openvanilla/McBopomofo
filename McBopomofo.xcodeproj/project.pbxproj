@@ -30,7 +30,6 @@
 		6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EC15FC1D9000935EF6 /* License.rtf */; };
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
 		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
-		6ACA41FF15FC1D9000935EF6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACA41F415FC1D9000935EF6 /* main.m */; };
 		6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */; };
 		6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */; };
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
@@ -172,7 +171,6 @@
 		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Source/Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Installer-Prefix.pch"; path = "Source/Installer/Installer-Prefix.pch"; sourceTree = SOURCE_ROOT; };
-		6ACA41F415FC1D9000935EF6 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Source/Installer/main.m; sourceTree = SOURCE_ROOT; };
 		6ACA41F515FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		6ACA41F615FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/License.rtf"; sourceTree = "<group>"; };
 		6ACA41F715FC1D9000935EF6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -458,7 +456,6 @@
 				6ACA41F015FC1D9000935EF6 /* MainMenu.xib */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
 				6ACA41F315FC1D9000935EF6 /* Installer-Prefix.pch */,
-				6ACA41F415FC1D9000935EF6 /* main.m */,
 				6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */,
 				D4F0BBE2279B08900071253C /* BundleTranslocate.h */,
 				D4F0BBE3279B08900071253C /* BundleTranslocate.m */,
@@ -715,7 +712,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */,
-				6ACA41FF15FC1D9000935EF6 /* main.m in Sources */,
 				D4F0BBE4279B08900071253C /* BundleTranslocate.m in Sources */,
 				D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */,
 			);

@@ -34,6 +34,7 @@ private let kTargetFullBinPartialPath = "~/Library/Input Methods/McBopomofo.app/
 private let kTranslocationRemovalTickInterval: TimeInterval = 0.5
 private let kTranslocationRemovalDeadline: TimeInterval = 60.0
 
+@NSApplicationMain
 @objc (AppDelegate)
 class AppDelegate: NSWindowController, NSApplicationDelegate {
     @IBOutlet weak private var installButton: NSButton!
@@ -157,6 +158,8 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
             translocationRemovalStartTime = Date()
             Timer.scheduledTimer(timeInterval: kTranslocationRemovalTickInterval, target: self, selector: #selector(timerTick(_:)), userInfo: nil, repeats: true)
+        } else {
+            self.installInputMethod(previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
         }
     }
 
