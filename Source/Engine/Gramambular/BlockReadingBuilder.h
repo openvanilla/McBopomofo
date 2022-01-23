@@ -53,8 +53,11 @@ namespace Formosa {
             void setJoinSeparator(const string& separator);
             const string joinSeparator() const;
 
+            // TODO: Remove these later.
             size_t markerCursorIndex() const;
+            // TODO: Remove these later.
             void setMarkerCursorIndex(size_t inNewIndex);
+
             vector<string> readingsAtRange(size_t begin, size_t end) const;
 
             Grid& grid();
