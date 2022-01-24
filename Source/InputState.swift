@@ -1,4 +1,4 @@
-import Foundation
+import Cocoa
 
 class InputState: NSObject {
 }
@@ -27,6 +27,15 @@ class InputStateInputting: InputState {
         self.composingBuffer = composingBuffer
         self.cursorIndex = cursorIndex
     }
+
+    @objc var attributedSting: NSAttributedString {
+        let attrs: [NSAttributedString.Key : Any] = [
+            .underlineStyle: NSUnderlineStyle.single,
+            .markedClauseSegment: 0
+        ]
+        let attributedSting = NSAttributedString(string: composingBuffer, attributes: attrs)
+        return attributedSting
+    }
 }
 
 class InputStateMarking: InputStateInputting {
@@ -41,7 +50,25 @@ class InputStateMarking: InputStateInputting {
         self.markerIndex = markerIndex
         let begin = min(cursorIndex, markerIndex)
         let end = max(cursorIndex, markerIndex)
-        self.markedRange = NSMakeRange(Int(begin), Int( end - begin))
+        self.markedRange = NSMakeRange(Int(begin), Int(end - begin))
+    }
+
+    @objc override var attributedSting: NSAttributedString {
+        let attributedSting = NSMutableAttributedString(string: composingBuffer)
+        attributedSting.setAttributes([
+            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single,
+            NSAttributedString.Key.markedClauseSegment: 0
+        ], range: NSRange(location: 0, length: markedRange.location))
+        attributedSting.setAttributes([
+            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single,
+            NSAttributedString.Key.markedClauseSegment: 1
+        ], range: markedRange)
+        attributedSting.setAttributes([
+            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single,
+            NSAttributedString.Key.markedClauseSegment: 2
+        ], range: NSRange(location: markedRange.location + markedRange.length,
+                          length: composingBuffer.count - (markedRange.location + markedRange.length)  ))
+        return attributedSting
     }
 }
 

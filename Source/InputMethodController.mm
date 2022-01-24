@@ -241,7 +241,6 @@ static double FindHighestScore(const vector<NodeAnchor>& nodes, double epsilon) 
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 
     [(AppDelegate *)[NSApp delegate] checkForUpdate];
-
 }
 
 - (void)deactivateServer:(id)client
@@ -669,7 +668,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
             [self beep];
-            [self handleState:_state client:client];
+            InputStateInputting *inputting = [self buildInputingState];
+            [self handleState:inputting client:client];
             return YES;
         }
 
