@@ -631,7 +631,7 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
             && (flags & NSEventModifierFlagShift)) {
             NSUInteger index = currentState.markerIndex;
             if (index < currentState.composingBuffer.length) {
-                index -= 1;
+                index += 1;
                 InputStateMarking *state = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:index];
                 [self handleState:state client:client];
             }
@@ -653,7 +653,8 @@ NS_INLINE size_t max(size_t a, size_t b) { return a > b ? a : b; }
         // update the composing buffer
         composeReading = _bpmfReadingBuffer->hasToneMarker();
         if (!composeReading) {
-            [self handleState:_state client:client];
+            InputStateInputting *inputting = [self buildInputingState];
+            [self handleState:inputting client:client];
             return YES;
         }
     }
