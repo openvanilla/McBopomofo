@@ -70,7 +70,6 @@ class InputStateInputting: InputStateNotEmpty {
 private let kMinMarkRangeLength = 2
 private let kMaxMarkRangeLength = 6
 
-
 /// Represents that the user is marking a range in the composing buffer.
 class InputStateMarking: InputStateNotEmpty {
     @objc private(set) var markerIndex: UInt = 0
@@ -108,19 +107,21 @@ class InputStateMarking: InputStateNotEmpty {
 
     @objc var attributedString: NSAttributedString {
         let attributedSting = NSMutableAttributedString(string: composingBuffer)
+        let end = markedRange.location + markedRange.length
+
         attributedSting.setAttributes([
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 0
         ], range: NSRange(location: 0, length: markedRange.location))
         attributedSting.setAttributes([
-            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .underlineStyle: NSUnderlineStyle.thick.rawValue,
             .markedClauseSegment: 1
         ], range: markedRange)
         attributedSting.setAttributes([
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 2
-        ], range: NSRange(location: markedRange.location + markedRange.length,
-                          length: composingBuffer.count - (markedRange.location + markedRange.length)  ))
+        ], range: NSRange(location: end,
+                          length: composingBuffer.count - end))
         return attributedSting
     }
 

@@ -87,7 +87,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 + (VTHorizontalCandidateController *)horizontalCandidateController;
 + (VTVerticalCandidateController *)verticalCandidateController;
 + (TooltipController *)tooltipController;
-- (void)_showTooltip:(NSString *)tooltip composingBuffer:(NSString *)composingBuffer client:(id)client;
+- (void)_showTooltip:(NSString *)tooltip composingBuffer:(NSString *)composingBuffer cursorIndex:(NSInteger)cursorIndex client:(id)client;
 - (void)_hideTooltip;
 @end
 
@@ -246,8 +246,11 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
 - (void)deactivateServer:(id)client
 {
-    InputStateDeactive *newState = [[InputStateDeactive alloc] init];
-    [self handleState:newState client:client];
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    [self handleState:empty client:client];
+
+    InputStateDeactive *deactive = [[InputStateDeactive alloc] init];
+    [self handleState:deactive client:client];
 }
 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
@@ -366,11 +369,13 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+        NSLog(@"Handle Candidates");
         return [self _handleCandidateState:(InputStateChoosingCandidate *) state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
+        NSLog(@"Handle Marking");
         if ([self _handleMarkingState:(InputStateMarking *)state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
             return YES;
         }
@@ -637,6 +642,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     InputStateInputting *currentState = (InputStateInputting *) state;
+
     if (flags & NSEventModifierFlagShift) {
         // Shift + Right
         if (_builder->cursorIndex() < _builder->length()) {
@@ -650,6 +656,8 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     } else {
         if (_builder->cursorIndex() < _builder->length()) {
             _builder->setCursorIndex(_builder->cursorIndex() + 1);
+            InputStateInputting *inputting = [self _buildInputtingState];
+            stateCallback(inputting);
         } else {
             errorCallback();
             stateCallback(state);
@@ -844,6 +852,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
             index -= 1;
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
             marking.readings = state.readings;
+            NSLog(@"cursorBackwardKey %@", marking);
             stateCallback(marking);
         } else {
             stateCallback(state);
@@ -859,6 +868,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
             index += 1;
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
             marking.readings = state.readings;
+            NSLog(@"cursorForwardKey %@", marking);
             stateCallback(marking);
         } else {
             stateCallback(state);
@@ -1302,7 +1312,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 - (void)handleState:(InputState *)newState client:(id)client
 {
     NSLog(@"current state: %@ new state: %@", _state, newState );
-    
+
     if ([newState isKindOfClass:[InputStateDeactive class]]) {
         [self _handleInputStateDeactive:(InputStateDeactive *) newState previous:_state client:client];
     }
@@ -1326,7 +1336,6 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     if ([newState isKindOfClass:[InputStateChoosingCandidate class]]) {
         [self _handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)newState previous:_state client:client];
     }
-
     _state = newState;
 }
 
@@ -1405,26 +1414,31 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 
     gCurrentCandidateController.visible = NO;
-    [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer client:client];
+    [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer cursorIndex:state.cursorIndex client:client];
 }
 
 - (void)_handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)state previous:(InputState *)previous client:(id)client
 {
     NSUInteger cursorIndex = [state cursorIndex];
     NSAttributedString *attrString = [state attributedString];
+    NSLog(@"_handleInputStateChoosingCandidate 1");
+    NSLog(@"isMainThread :%d", [NSThread isMainThread]);
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 
+    NSLog(@"_handleInputStateChoosingCandidate 2");
     if (_inputMode == kPlainBopomofoModeIdentifier && [state.candidates count] == 1) {
         NSString *buffer = [self _convertToSimplifiedChineseIfRequired:state.candidates.firstObject];
         [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
         [self handleState:empty client:client];
-        return;
+        NSLog(@"_handleInputStateChoosingCandidate 31");
     } else {
-        if (![_state isKindOfClass:[InputStateChoosingCandidate class]]) {
+        NSLog(@"_handleInputStateChoosingCandidate 32");
+        if (![previous isKindOfClass:[InputStateChoosingCandidate class]]) {
+            NSLog(@"_handleInputStateChoosingCandidate 33");
             [self _showCandidateWindowWithState:state client:client];
         }
     }
@@ -1475,17 +1489,12 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     // update the composing text, set the client
     NSInteger cursor = 0;
 
-    //    NSInteger cursor = _latestReadingCursor;
-    if ([state respondsToSelector:@selector(cursorIndex)]) {
-        cursor = [[state performSelector:@selector(cursorIndex)] integerValue];
-    }
-
     NSAttributedString *attrString = [state attributedString];
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursor, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _currentCandidateClient = client;
 
     NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
-
+    cursor = state.cursorIndex;
     if (cursor == [state.composingBuffer length] && cursor != 0) {
         cursor--;
     }
@@ -1497,6 +1506,8 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     @catch (NSException *exception) {
         NSLog(@"lineHeightRectangle %@", exception);
     }
+
+    NSLog(@"lineHeightRectangle %@", NSStringFromRect(lineHeightRect));
 
     if (useVerticalMode) {
         [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
@@ -1711,15 +1722,11 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     return instance;
 }
 
-- (void)_showTooltip:(NSString *)tooltip composingBuffer:(NSString *)composingBuffer client:(id)client
+- (void)_showTooltip:(NSString *)tooltip composingBuffer:(NSString *)composingBuffer cursorIndex:(NSInteger)cursorIndex client:(id)client
 {
     NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
 
-    NSInteger cursor = 0;
-    if ([_state respondsToSelector:@selector(cursorIndex)]) {
-        cursor = [[_state performSelector:@selector(cursorIndex)] integerValue];
-    }
-
+    NSInteger cursor = cursorIndex;
     if (cursor == [composingBuffer length] && cursor != 0) {
         cursor--;
     }

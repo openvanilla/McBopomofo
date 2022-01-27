@@ -51,7 +51,7 @@ import Cocoa
 
         self.charCode = charCode
         self.emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: event.modifierFlags)
-        self.cursorForwardKey = useVerticalMode ? .up : .left
+        self.cursorForwardKey = useVerticalMode ? .down : .right
         self.cursorBackwardKey = useVerticalMode ? .up : .left
         self.extraChooseCandidateKey = useVerticalMode ? .left : .down
         self.absorbedArrowKey = useVerticalMode ? .right : .up
