@@ -1311,32 +1311,26 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
 - (void)handleState:(InputState *)newState client:(id)client
 {
-    NSLog(@"current state: %@ new state: %@", _state, newState );
+//    NSLog(@"current state: %@ new state: %@", _state, newState );
+
+    // We need to set the state to the member varible since the candidate
+    // window need to read the candidates from it.
+    InputState *previous = _state;
+    _state = newState;
 
     if ([newState isKindOfClass:[InputStateDeactive class]]) {
-        [self _handleInputStateDeactive:(InputStateDeactive *) newState previous:_state client:client];
+        [self _handleInputStateDeactive:(InputStateDeactive *) newState previous:previous client:client];
+    } else if ([newState isKindOfClass:[InputStateEmpty class]]) {
+        [self _handleInputStateEmpty:(InputStateEmpty *) newState previous:previous client:client];
+    } else if ([newState isKindOfClass:[InputStateCommitting class]]) {
+        [self _handleInputStateCommitting:(InputStateCommitting *) newState previous:previous client:client];
+    } else if ([newState isKindOfClass:[InputStateInputting class]]) {
+        [self _handleInputStateInputting:(InputStateInputting *) newState previous:previous client:client];
+    } else if ([newState isKindOfClass:[InputStateMarking class]]) {
+        [self _handleInputStateMarking:(InputStateMarking *) newState previous:previous client:client];
+    } else if ([newState isKindOfClass:[InputStateChoosingCandidate class]]) {
+        [self _handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)newState previous:previous client:client];
     }
-
-    if ([newState isKindOfClass:[InputStateEmpty class]]) {
-        [self _handleInputStateEmpty:(InputStateEmpty *) newState previous:_state client:client];
-    }
-
-    if ([newState isKindOfClass:[InputStateCommitting class]]) {
-        [self _handleInputStateCommitting:(InputStateCommitting *) newState previous:_state client:client];
-    }
-
-    if ([newState isKindOfClass:[InputStateInputting class]]) {
-        [self _handleInputStateInputting:(InputStateInputting *) newState previous:_state client:client];
-    }
-
-    if ([newState isKindOfClass:[InputStateMarking class]]) {
-        [self _handleInputStateMarking:(InputStateMarking *) newState previous:_state client:client];
-    }
-
-    if ([newState isKindOfClass:[InputStateChoosingCandidate class]]) {
-        [self _handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)newState previous:_state client:client];
-    }
-    _state = newState;
 }
 
 - (void)_handleInputStateDeactive:(InputStateDeactive *)state previous:(InputState *)previous client:(id)client
@@ -1421,24 +1415,18 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 {
     NSUInteger cursorIndex = [state cursorIndex];
     NSAttributedString *attrString = [state attributedString];
-    NSLog(@"_handleInputStateChoosingCandidate 1");
-    NSLog(@"isMainThread :%d", [NSThread isMainThread]);
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 
-    NSLog(@"_handleInputStateChoosingCandidate 2");
     if (_inputMode == kPlainBopomofoModeIdentifier && [state.candidates count] == 1) {
         NSString *buffer = [self _convertToSimplifiedChineseIfRequired:state.candidates.firstObject];
         [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
         [self handleState:empty client:client];
-        NSLog(@"_handleInputStateChoosingCandidate 31");
     } else {
-        NSLog(@"_handleInputStateChoosingCandidate 32");
         if (![previous isKindOfClass:[InputStateChoosingCandidate class]]) {
-            NSLog(@"_handleInputStateChoosingCandidate 33");
             [self _showCandidateWindowWithState:state client:client];
         }
     }
@@ -1507,7 +1495,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         NSLog(@"lineHeightRectangle %@", exception);
     }
 
-    NSLog(@"lineHeightRectangle %@", NSStringFromRect(lineHeightRect));
+//    NSLog(@"lineHeightRectangle %@", NSStringFromRect(lineHeightRect));
 
     if (useVerticalMode) {
         [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
