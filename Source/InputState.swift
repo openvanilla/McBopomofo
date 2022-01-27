@@ -13,6 +13,9 @@ class InputStateDeactive: InputState {
 
 /// Represents that the composing buffer is empty.
 class InputStateEmpty: InputState {
+    @objc var composingBuffer: String  {
+        ""
+    }
 }
 
 /// Represents that the input controller is committing text into client app.
@@ -127,6 +130,11 @@ class InputStateMarking: InputStateNotEmpty {
 
     override var description: String {
         return "<InputStateMarking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
+    }
+
+    @objc func convertToInputting() -> InputStateInputting {
+        let state = InputStateInputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+        return state
     }
 }
 

@@ -311,11 +311,12 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     return layout;
 }
 
-- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback candidateSelectionCallback:(void (^)(void))candidateSelectionCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback candidateSelectionCallback:(void (^)(void))candidateSelectionCallback errorCallback:(void (^)(void))errorCallback
 {
+    InputState *state = inState;
     // get the unicode character code
     UniChar charCode = input.charCode;
-    uint16 keyCode = input.keyCode;
+//    NSInteger keyCode = input.keyCode;
 
     NSEventModifierFlags flags = input.flags;
     McBopomofoEmacsKey emacsKey = input.emacsKey;
@@ -332,7 +333,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
-    if (charCode == 8 || charCode == 13 || keyCode == input.absorbedArrowKey || keyCode == input.extraChooseCandidateKey || keyCode == input.cursorForwardKey || keyCode == input.cursorBackwardKey) {
+    if (charCode == 8 || charCode == 13 || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
     } else if (flags & NSAlphaShiftKeyMask) {
         // process all possible combination, we hope.
@@ -357,7 +358,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     if (flags & NSEventModifierFlagNumericPad) {
-        if (keyCode != KeyCodeLeft && keyCode != KeyCodeRight && keyCode != KeyCodeDown && keyCode != KeyCodeUp && charCode != 32 && isprint(charCode)) {
+        if (![input isLeft]  && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
             stateCallback(emptyState);
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:[input.inputText lowercaseString]];
@@ -376,9 +377,12 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         NSLog(@"Handle Marking");
+        InputStateMarking *marking = (InputStateMarking *)state;
         if ([self _handleMarkingState:(InputStateMarking *)state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
             return YES;
         }
+        state = [marking convertToInputting];
+        stateCallback(state);
     }
 
     bool composeReading = false;
@@ -451,7 +455,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
             [state isKindOfClass:[InputStateNotEmpty class]] &&
-            (keyCode == input.extraChooseCandidateKey || charCode == 32 || (input.useVerticalMode && (keyCode == input.verticalModeOnlyChooseCandidateKey)))) {
+            ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ((flags & NSEventModifierFlagShift) != 0 || !Preferences.chooseCandidateUsingSpace) {
@@ -483,27 +487,27 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     // MARK: Cursor backward
-    if (keyCode == input.cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward) {
+    if ([input isCursorBackward] || emacsKey == McBopomofoEmacsKeyBackward) {
         return [self _handleBackwardWithState:state flags:flags stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK:  Cursor forward
-    if (keyCode == input.cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward) {
+    if ([input isCursorForward] || emacsKey == McBopomofoEmacsKeyForward) {
         return [self _handleForwardWithState:state flags:flags stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Home
-    if (keyCode == KeyCodeHome || emacsKey == McBopomofoEmacsKeyHome) {
+    if ([input isHome] || emacsKey == McBopomofoEmacsKeyHome) {
         return [self _handleHomeWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: End
-    if (keyCode == KeyCodeEnd || emacsKey == McBopomofoEmacsKeyEnd) {
+    if ([input isEnd] || emacsKey == McBopomofoEmacsKeyEnd) {
         return [self _handleEndWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: AbsorbedArrowKey
-    if (keyCode == input.absorbedArrowKey || keyCode == input.extraChooseCandidateKey) {
+    if ([input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey]) {
         return [self _handleAbsorbedArrowKeyWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -513,7 +517,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     // MARK: Delete
-    if (keyCode == KeyCodeDelete || emacsKey == McBopomofoEmacsKeyDelete) {
+    if ([input isDelete] || emacsKey == McBopomofoEmacsKeyDelete) {
         return [self _handleDeleteWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -524,6 +528,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     // MARK: Punctuation list
     if ((char) charCode == '`') {
+        // zonble: make candidate state
         if ([self _handlePunctuation:string("_punctuation_list") state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
             return YES;
         }
@@ -604,6 +609,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
     }
+
     InputStateInputting *currentState = (InputStateInputting *) state;
 
     if (flags & NSEventModifierFlagShift) {
@@ -829,13 +835,19 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
    candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
                 errorCallback:(void (^)(void))errorCallback
 {
-    if (input.charCode == 27) {
+    NSLog(@"_handleMarkingState 1");
+    UniChar charCode = input.charCode;
+
+    if (charCode == 27) {
         InputStateInputting *inputting = [self _buildInputtingState];
         stateCallback(inputting);
         return YES;
     }
+
+    NSLog(@"_handleMarkingState 2");
+
     // Enter
-    if (input.charCode == 13) {
+    if (charCode == 13) {
         if (![self _writeUserPhrase]) {
             errorCallback();
             return YES;
@@ -844,9 +856,13 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         stateCallback(inputting);
         return YES;
     }
+
+    NSLog(@"_handleMarkingState 3");
+
     // Shift + left
-    if ((input.keyCode == input.cursorBackwardKey || input.emacsKey == McBopomofoEmacsKeyBackward)
+    if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
         && (input.flags & NSEventModifierFlagShift)) {
+        NSLog(@"Shift + left");
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index -= 1;
@@ -855,14 +871,18 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
             NSLog(@"cursorBackwardKey %@", marking);
             stateCallback(marking);
         } else {
-            stateCallback(state);
             errorCallback();
+            stateCallback(state);
         }
         return YES;
     }
+
+    NSLog(@"_handleMarkingState 4");
+
     // Shift + Right
-    if ((input.keyCode == input.cursorForwardKey || input.emacsKey == McBopomofoEmacsKeyForward)
+    if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyForward)
         && (input.flags & NSEventModifierFlagShift)) {
+        NSLog(@"Shift + Right");
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index += 1;
@@ -871,11 +891,13 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
             NSLog(@"cursorForwardKey %@", marking);
             stateCallback(marking);
         } else {
-            stateCallback(state);
             errorCallback();
+            stateCallback(state);
         }
         return YES;
     }
+
+    NSLog(@"_handleMarkingState 5");
     return NO;
 }
 
@@ -888,13 +910,11 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 {
     NSString *inputText = input.inputText;
     UniChar charCode = input.charCode;
-    uint16 keyCode = input.keyCode;
-    McBopomofoEmacsKey emacsKey = input.emacsKey;
 
     BOOL cancelCandidateKey =
             (charCode == 27) ||
                     ((_inputMode == kPlainBopomofoModeIdentifier) &&
-                            (charCode == 8 || keyCode == KeyCodeDelete));
+                            (charCode == 8 || input.keyCode == KeyCodeDelete));
 
     if (cancelCandidateKey) {
         if (_inputMode == kPlainBopomofoModeIdentifier) {
@@ -904,102 +924,94 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         InputState *inputting = [self _buildInputtingState];
         stateCallback(inputting);
         return YES;
-    } else if (charCode == 13 || keyCode == KeyCodeEnter) {
+    } else if (charCode == 13 || [input isEnter]) {
         [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
         return YES;
-    } else if (charCode == 32 || keyCode == KeyCodePageDown || emacsKey == McBopomofoEmacsKeyNextPage) {
+    } else if (charCode == 32 || [input isPageDown] || input.emacsKey == McBopomofoEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if (keyCode == KeyCodePageUp) {
+    } else if ([input isPageUp]) {
         BOOL updated = [gCurrentCandidateController showPreviousPage];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if (keyCode == KeyCodeLeft) {
+    } else if ([input isLeft]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         } else {
             BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         }
-    } else if (emacsKey == McBopomofoEmacsKeyBackward) {
+        candidateSelectionCallback();
+        return YES;
+    } else if (input.emacsKey == McBopomofoEmacsKeyBackward) {
         BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if (keyCode == KeyCodeRight) {
+    } else if ([input isRight]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         } else {
             BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         }
-    } else if (emacsKey == McBopomofoEmacsKeyForward) {
+        candidateSelectionCallback();
+        return YES;
+    } else if (input.emacsKey == McBopomofoEmacsKeyForward) {
         BOOL updated = [gCurrentCandidateController highlightNextCandidate];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if (keyCode == KeyCodeUp) {
+    } else if ([input isUp]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         } else {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         }
-    } else if (keyCode == KeyCodeDown) {
+        candidateSelectionCallback();
+        return YES;
+    } else if ([input isDown]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         } else {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
                 errorCallback();
             }
-            candidateSelectionCallback();
-            return YES;
         }
-    } else if (keyCode == KeyCodeHome || emacsKey == McBopomofoEmacsKeyHome) {
+        candidateSelectionCallback();
+        return YES;
+    } else if ([input isHome] || input.emacsKey == McBopomofoEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             errorCallback();
         } else {
@@ -1008,7 +1020,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
         candidateSelectionCallback();
         return YES;
-    } else if ((keyCode == KeyCodeEnd || emacsKey == McBopomofoEmacsKeyEnd) && [state.candidates count] > 0) {
+    } else if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && [state.candidates count] > 0) {
         if (gCurrentCandidateController.selectedCandidateIndex == [state.candidates count] - 1) {
             errorCallback();
         } else {
@@ -1017,47 +1029,48 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
         candidateSelectionCallback();
         return YES;
-    } else {
-        NSInteger index = NSNotFound;
-        for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
-            if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
-                index = j;
-                break;
-            }
-        }
+    }
 
-        [gCurrentCandidateController.keyLabels indexOfObject:inputText];
-        if (index != NSNotFound) {
-            NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
+    NSInteger index = NSNotFound;
+    for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
+        if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+            index = j;
+            break;
+        }
+    }
+
+    [gCurrentCandidateController.keyLabels indexOfObject:inputText];
+
+    if (index != NSNotFound) {
+        NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
+        if (candidateIndex != NSUIntegerMax) {
+            [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
+            return YES;
+        }
+    }
+
+    if (_inputMode == kPlainBopomofoModeIdentifier) {
+        string layout = [self _currentLayout];
+        string customPunctuation = string("_punctuation_") + layout + string(1, (char) charCode);
+        string punctuation = string("_punctuation_") + string(1, (char) charCode);
+
+        BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
+                _languageModel->hasUnigramsForKey(punctuation);
+
+        if (shouldAutoSelectCandidate) {
+            NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
             if (candidateIndex != NSUIntegerMax) {
                 [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
-                return YES;
+                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                [self handleInput:input state:empty stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
             }
+            return YES;
         }
-
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
-            string layout = [self _currentLayout];
-            string customPunctuation = string("_punctuation_") + layout + string(1, (char) charCode);
-            string punctuation = string("_punctuation_") + string(1, (char) charCode);
-
-            BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
-                    _languageModel->hasUnigramsForKey(punctuation);
-
-            if (shouldAutoSelectCandidate) {
-                NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
-                if (candidateIndex != NSUIntegerMax) {
-                    [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:candidateIndex];
-                    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-                    [self handleInput:input state:empty stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
-                }
-                return YES;
-            }
-        }
-
-        errorCallback();
-        candidateSelectionCallback();
-        return YES;
     }
+
+    errorCallback();
+    candidateSelectionCallback();
+    return YES;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)client
@@ -1105,7 +1118,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     BOOL result = [self handleInput:input state:_state stateCallback:^(InputState *state) {
         [self handleState:state client:client];
     } candidateSelectionCallback:^{
-        [self handleState:self->_state client:(self->_currentCandidateClient ? self->_currentCandidateClient : client)];
+//        [self handleState:self->_state client:(self->_currentCandidateClient ? self->_currentCandidateClient : client)];
     } errorCallback:^{
         NSBeep();
     }];
@@ -1419,8 +1432,6 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 {
     NSUInteger cursorIndex = [state cursorIndex];
     NSAttributedString *attrString = [state attributedString];
-
-    NSLog(@"_handleInputStateChoosingCandidate cursorIndex %lu", (unsigned long)cursorIndex);
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer

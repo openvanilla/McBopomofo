@@ -58,4 +58,66 @@ import Cocoa
         self.verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
         super.init()
     }
+
+    @objc var isEnter: Bool {
+        self.keyCode == KeyCode.enter.rawValue
+    }
+
+    @objc var isUp: Bool {
+        self.keyCode == KeyCode.up.rawValue
+    }
+
+    @objc var isDown: Bool {
+        self.keyCode == KeyCode.down.rawValue
+    }
+
+    @objc var isLeft: Bool {
+        self.keyCode == KeyCode.left.rawValue
+    }
+
+    @objc var isRight: Bool {
+        self.keyCode == KeyCode.right.rawValue
+    }
+
+    @objc var isPageUp: Bool {
+        self.keyCode == KeyCode.pageUp.rawValue
+    }
+
+    @objc var isPageDown: Bool {
+        self.keyCode == KeyCode.pageDown.rawValue
+    }
+
+    @objc var isHome: Bool {
+        self.keyCode == KeyCode.home.rawValue
+    }
+
+    @objc var isEnd: Bool {
+        self.keyCode == KeyCode.end.rawValue
+    }
+
+    @objc var isDelete: Bool {
+        self.keyCode == KeyCode.delete.rawValue
+    }
+
+    @objc var isCursorBackward: Bool {
+        self.keyCode == cursorBackwardKey.rawValue
+    }
+
+    @objc var isCursorForward: Bool {
+        self.keyCode == cursorForwardKey.rawValue
+    }
+
+    @objc var isAbsorbedArrowKey: Bool {
+        self.keyCode == absorbedArrowKey.rawValue
+    }
+
+    @objc var isExtraChooseCandidateKey: Bool {
+        self.keyCode == extraChooseCandidateKey.rawValue
+    }
+
+    @objc var isVerticalModeOnlyChooseCandidateKey: Bool {
+        self.keyCode == verticalModeOnlyChooseCandidateKey.rawValue
+    }
+
 }
+
