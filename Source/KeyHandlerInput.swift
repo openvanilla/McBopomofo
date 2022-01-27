@@ -15,21 +15,10 @@ import Cocoa
 }
 
 @objc class KeyHandlerInput: NSObject {
-    @objc private (set) var event: NSEvent
     @objc private (set) var useVerticalMode: Bool
-
-    @objc var inputText: String? {
-        event.characters
-    }
-
-    @objc var keyCode: UInt16 {
-        event.keyCode
-    }
-
-    @objc var flags: NSEvent.ModifierFlags {
-        event.modifierFlags
-    }
-
+    @objc private (set) var inputText: String?
+    @objc private (set) var keyCode: UInt16
+    @objc private (set) var flags: NSEvent.ModifierFlags
     @objc private (set) var charCode: UInt16
     @objc private (set) var cursorForwardKey: KeyCode
     @objc private (set) var cursorBackwardKey: KeyCode
@@ -39,7 +28,9 @@ import Cocoa
     @objc private (set) var emacsKey: McBopomofoEmacsKey
 
     @objc init(event: NSEvent, isVerticalMode: Bool) {
-        self.event = event
+        self.inputText = event.characters
+        self.keyCode = event.keyCode
+        self.flags = event.modifierFlags
         self.useVerticalMode = isVerticalMode
         let charCode: UInt16 = {
             guard let inputText = event.characters, inputText.count > 0 else {
@@ -72,11 +63,13 @@ import Cocoa
     }
 
     @objc var isLeft: Bool {
-        self.keyCode == KeyCode.left.rawValue
+        NSLog("isLeft called \(self.keyCode == KeyCode.left.rawValue)")
+        return self.keyCode == KeyCode.left.rawValue
     }
 
     @objc var isRight: Bool {
-        self.keyCode == KeyCode.right.rawValue
+        NSLog("isRight called \(self.keyCode == KeyCode.right.rawValue)")
+        return self.keyCode == KeyCode.right.rawValue
     }
 
     @objc var isPageUp: Bool {
