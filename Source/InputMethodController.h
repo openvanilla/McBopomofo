@@ -53,7 +53,6 @@
 candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         errorCallback:(void (^)(void))errorCallback;
 
-- (void)handleState:(InputState *)newState
-             client:(id)client;
+- (void)handleState:(InputState *)newState client:(id)client;
 
 @end

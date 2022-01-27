@@ -239,9 +239,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 
-    [(AppDelegate * )[
-    NSApp
-    delegate] checkForUpdate];
+    [(AppDelegate * )[NSApp delegate] checkForUpdate];
 }
 
 - (void)deactivateServer:(id)client
@@ -324,7 +322,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionlHold] || [input isNumericPad]);
-    if (![state isKindOfClass:[InputStateInputting class]] && isFunctionKey) {
+    if (![state isKindOfClass:[InputStateNotEmpty class]] && isFunctionKey) {
         return NO;
     }
 
@@ -366,13 +364,11 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-        NSLog(@"Handle Candidates");
         return [self _handleCandidateState:(InputStateChoosingCandidate *) state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
-        NSLog(@"Handle Marking");
         InputStateMarking *marking = (InputStateMarking *)state;
         if ([self _handleMarkingState:(InputStateMarking *)state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
             return YES;
@@ -850,21 +846,14 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         return YES;
     }
 
-    NSLog(@"Test 3");
-
     // Shift + left
-    if (([input isCursorBackward]
-//         || input.emacsKey == McBopomofoEmacsKeyBackward
-         )
+    if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
         && ([input isShiftHold])) {
-        NSLog(@"Shift + left");
-        stateCallback(state);
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index -= 1;
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
             marking.readings = state.readings;
-            NSLog(@"cursorBackwardKey %@", marking);
             stateCallback(marking);
         } else {
             errorCallback();
@@ -873,21 +862,14 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         return YES;
     }
 
-    NSLog(@"Test 4");
-
     // Shift + Right
-    if (([input isCursorBackward]
-//         || input.emacsKey == McBopomofoEmacsKeyForward
-         )
+    if (([input isCursorForward] || input.emacsKey == McBopomofoEmacsKeyForward)
         && ([input isShiftHold])) {
-        NSLog(@"Shift + Right");
-        stateCallback(state);
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index += 1;
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
             marking.readings = state.readings;
-            NSLog(@"cursorForwardKey %@", marking);
             stateCallback(marking);
         } else {
             errorCallback();
@@ -895,8 +877,6 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         }
         return YES;
     }
-
-    NSLog(@"_handleMarkingState 5");
     return NO;
 }
 
@@ -923,24 +903,32 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         InputState *inputting = [self _buildInputtingState];
         stateCallback(inputting);
         return YES;
-    } else if (charCode == 13 || [input isEnter]) {
+    }
+
+    if (charCode == 13 || [input isEnter]) {
         [self candidateController:gCurrentCandidateController didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex];
         return YES;
-    } else if (charCode == 32 || [input isPageDown] || input.emacsKey == McBopomofoEmacsKeyNextPage) {
+    }
+
+    if (charCode == 32 || [input isPageDown] || input.emacsKey == McBopomofoEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if ([input isPageUp]) {
+    }
+
+    if ([input isPageUp]) {
         BOOL updated = [gCurrentCandidateController showPreviousPage];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if ([input isLeft]) {
+    }
+
+    if ([input isLeft]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
@@ -954,14 +942,18 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         }
         candidateSelectionCallback();
         return YES;
-    } else if (input.emacsKey == McBopomofoEmacsKeyBackward) {
+    }
+
+    if (input.emacsKey == McBopomofoEmacsKeyBackward) {
         BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if ([input isRight]) {
+    }
+
+    if ([input isRight]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
@@ -975,14 +967,18 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         }
         candidateSelectionCallback();
         return YES;
-    } else if (input.emacsKey == McBopomofoEmacsKeyForward) {
+    }
+
+    if (input.emacsKey == McBopomofoEmacsKeyForward) {
         BOOL updated = [gCurrentCandidateController highlightNextCandidate];
         if (!updated) {
             errorCallback();
         }
         candidateSelectionCallback();
         return YES;
-    } else if ([input isUp]) {
+    }
+
+    if ([input isUp]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
@@ -996,7 +992,9 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         }
         candidateSelectionCallback();
         return YES;
-    } else if ([input isDown]) {
+    }
+
+    if ([input isDown]) {
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
@@ -1010,7 +1008,9 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         }
         candidateSelectionCallback();
         return YES;
-    } else if ([input isHome] || input.emacsKey == McBopomofoEmacsKeyHome) {
+    }
+
+    if ([input isHome] || input.emacsKey == McBopomofoEmacsKeyHome) {
         if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             errorCallback();
         } else {
@@ -1019,7 +1019,9 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
         candidateSelectionCallback();
         return YES;
-    } else if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && [state.candidates count] > 0) {
+    }
+
+    if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && [state.candidates count] > 0) {
         if (gCurrentCandidateController.selectedCandidateIndex == [state.candidates count] - 1) {
             errorCallback();
         } else {
@@ -1117,6 +1119,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     BOOL result = [self handleInput:input state:_state stateCallback:^(InputState *state) {
         [self handleState:state client:client];
     } candidateSelectionCallback:^{
+        NSLog(@"candidateSelectionCallback ");
 //        [self handleState:self->_state client:(self->_currentCandidateClient ? self->_currentCandidateClient : client)];
     } errorCallback:^{
         NSBeep();
