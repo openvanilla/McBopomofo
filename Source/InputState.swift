@@ -72,8 +72,8 @@ private let kMaxMarkRangeLength = 6
 
 /// Represents that the user is marking a range in the composing buffer.
 class InputStateMarking: InputStateNotEmpty {
-    @objc private(set) var markerIndex: UInt = 0
-    @objc private(set) var markedRange: NSRange = NSRange(location: 0, length: 0)
+    @objc private(set) var markerIndex: UInt
+    @objc private(set) var markedRange: NSRange
     @objc var tooltip: String {
 
         if Preferences.phraseReplacementEnabled {
@@ -98,11 +98,11 @@ class InputStateMarking: InputStateNotEmpty {
     @objc var readings: [String] = []
 
     @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt) {
-        super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
         self.markerIndex = markerIndex
         let begin = min(cursorIndex, markerIndex)
         let end = max(cursorIndex, markerIndex)
         self.markedRange = NSMakeRange(Int(begin), Int(end - begin))
+        super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
     @objc var attributedString: NSAttributedString {

@@ -1408,13 +1408,19 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 
     gCurrentCandidateController.visible = NO;
-    [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer cursorIndex:state.cursorIndex client:client];
+    if (state.tooltip.length) {
+        [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer cursorIndex:cursorIndex client:client];
+    } else {
+        [self _hideTooltip];
+    }
 }
 
 - (void)_handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)state previous:(InputState *)previous client:(id)client
 {
     NSUInteger cursorIndex = [state cursorIndex];
     NSAttributedString *attrString = [state attributedString];
+
+    NSLog(@"_handleInputStateChoosingCandidate cursorIndex %lu", (unsigned long)cursorIndex);
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
@@ -1470,19 +1476,12 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     gCurrentCandidateController.keyLabels = keyLabels;
-
     gCurrentCandidateController.delegate = self;
     [gCurrentCandidateController reloadData];
-
-    // update the composing text, set the client
-    NSInteger cursor = 0;
-
-    NSAttributedString *attrString = [state attributedString];
-    [client setMarkedText:attrString selectionRange:NSMakeRange(cursor, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _currentCandidateClient = client;
 
     NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
-    cursor = state.cursorIndex;
+    NSInteger cursor = state.cursorIndex;
     if (cursor == [state.composingBuffer length] && cursor != 0) {
         cursor--;
     }
@@ -1494,8 +1493,6 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     @catch (NSException *exception) {
         NSLog(@"lineHeightRectangle %@", exception);
     }
-
-//    NSLog(@"lineHeightRectangle %@", NSStringFromRect(lineHeightRect));
 
     if (useVerticalMode) {
         [gCurrentCandidateController setWindowTopLeftPoint:NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0) bottomOutOfScreenAdjustmentHeight:lineHeightRect.size.height + 4.0];
