@@ -53,11 +53,6 @@ namespace Formosa {
             void setJoinSeparator(const string& separator);
             const string joinSeparator() const;
 
-            // TODO: Remove these later.
-            size_t markerCursorIndex() const;
-            // TODO: Remove these later.
-            void setMarkerCursorIndex(size_t inNewIndex);
-
             vector<string> readingsAtRange(size_t begin, size_t end) const;
 
             Grid& grid();
@@ -71,7 +66,6 @@ namespace Formosa {
             static const size_t MaximumBuildSpanLength = 6;
             
             size_t m_cursorIndex;
-            size_t m_markerCursorIndex;
             vector<string> m_readings;
             
             Grid m_grid;
@@ -82,14 +76,12 @@ namespace Formosa {
         inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel *inLM)
             : m_LM(inLM)
             , m_cursorIndex(0)
-            , m_markerCursorIndex(SIZE_MAX)
         {
         }
         
         inline void BlockReadingBuilder::clear()
         {
             m_cursorIndex = 0;
-            m_markerCursorIndex = SIZE_MAX;
             m_readings.clear();
             m_grid.clear();
         }
@@ -107,21 +99,6 @@ namespace Formosa {
         inline void BlockReadingBuilder::setCursorIndex(size_t inNewIndex)
         {
             m_cursorIndex = inNewIndex > m_readings.size() ? m_readings.size() : inNewIndex;
-        }
-
-        inline size_t BlockReadingBuilder::markerCursorIndex() const
-        {
-            return m_markerCursorIndex;
-        }
-
-        inline void BlockReadingBuilder::setMarkerCursorIndex(size_t inNewIndex)
-        {
-            if (inNewIndex == SIZE_MAX) {
-                m_markerCursorIndex = SIZE_MAX;
-                return;
-            }
-
-            m_markerCursorIndex = inNewIndex > m_readings.size() ? m_readings.size() : inNewIndex;
         }
         
         inline void BlockReadingBuilder::insertReadingAtCursor(const string& inReading)

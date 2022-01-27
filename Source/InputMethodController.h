@@ -27,12 +27,12 @@
 #import "Gramambular.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
+#import "McBopomofo-Swift.h"
 
-@interface McBopomofoInputMethodController : IMKInputController
-{
+@interface McBopomofoInputMethodController : IMKInputController {
 @private
     // the reading buffer that takes user input
-    Formosa::Mandarin::BopomofoReadingBuffer* _bpmfReadingBuffer;
+    Formosa::Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
 
     // language model
     McBopomofo::McBopomofoLM *_languageModel;
@@ -41,26 +41,19 @@
     McBopomofo::UserOverrideModel *_userOverrideModel;
 
     // the grid (lattice) builder for the unigrams (and bigrams)
-    Formosa::Gramambular::BlockReadingBuilder* _builder;
+    Formosa::Gramambular::BlockReadingBuilder *_builder;
 
     // latest walked path (trellis) using the Viterbi algorithm
     std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
-
-    // the latest composing buffer that is updated to the foreground app
-    NSMutableString *_composingBuffer;
-    NSInteger _latestReadingCursor;
-
-    // the current text input client; we need to keep this when candidate panel is on
-    id _currentCandidateClient;
-
-    // a special deferred client for Terminal.app fix
-    id _currentDeferredClient;
-    
-    // current available candidates
-    NSMutableArray *_candidates;
-
-    // current input mode
-    NSString *_inputMode;
 }
+
+- (BOOL)handleInput:(KeyHandlerInput *)input
+              state:(InputState *)state
+      stateCallback:(void (^)(InputState *))stateCallback
+candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
+        errorCallback:(void (^)(void))errorCallback;
+
+- (void)handleState:(InputState *)newState
+             client:(id)client;
 
 @end
