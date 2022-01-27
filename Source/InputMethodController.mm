@@ -314,11 +314,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 - (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback candidateSelectionCallback:(void (^)(void))candidateSelectionCallback errorCallback:(void (^)(void))errorCallback
 {
     InputState *state = inState;
-    // get the unicode character code
     UniChar charCode = input.charCode;
-//    NSInteger keyCode = input.keyCode;
-
-    NSEventModifierFlags flags = input.flags;
     McBopomofoEmacsKey emacsKey = input.emacsKey;
 
     // if the inputText is empty, it's a function key combination, we ignore it
@@ -327,7 +323,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    BOOL isFunctionKey = ((flags & NSEventModifierFlagCommand) || (flags & NSEventModifierFlagControl) || (flags & NSEventModifierFlagOption) || (flags & NSEventModifierFlagNumericPad));
+    BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionlHold] || [input isNumericPad]);
     if (![state isKindOfClass:[InputStateInputting class]] && isFunctionKey) {
         return NO;
     }
@@ -335,13 +331,13 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
     if (charCode == 8 || charCode == 13 || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
-    } else if (flags & NSAlphaShiftKeyMask) {
+    } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
         stateCallback(emptyState);
 
         // first commit everything in the buffer.
-        if (flags & NSEventModifierFlagShift) {
+        if ([input isShiftHold]) {
             return NO;
         }
 
@@ -357,7 +353,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         return YES;
     }
 
-    if (flags & NSEventModifierFlagNumericPad) {
+    if ([input isNumericPad]) {
         if (![input isLeft]  && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
             stateCallback(emptyState);
@@ -458,7 +454,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
             ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
-            if ((flags & NSEventModifierFlagShift) != 0 || !Preferences.chooseCandidateUsingSpace) {
+            if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
                     _bpmfReadingBuffer->clear();
                     InputStateCommitting *commiting = [[InputStateCommitting alloc] initWithPoppedText:@" "];
@@ -488,12 +484,12 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     // MARK: Cursor backward
     if ([input isCursorBackward] || emacsKey == McBopomofoEmacsKeyBackward) {
-        return [self _handleBackwardWithState:state flags:flags stateCallback:stateCallback errorCallback:errorCallback];
+        return [self _handleBackwardWithState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK:  Cursor forward
     if ([input isCursorForward] || emacsKey == McBopomofoEmacsKeyForward) {
-        return [self _handleForwardWithState:state flags:flags stateCallback:stateCallback errorCallback:errorCallback];
+        return [self _handleForwardWithState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Home
@@ -598,7 +594,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     return YES;
 }
 
-- (BOOL)_handleBackwardWithState:(InputState *)state flags:(NSEventModifierFlags)flags stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleBackwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
@@ -612,7 +608,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     InputStateInputting *currentState = (InputStateInputting *) state;
 
-    if (flags & NSEventModifierFlagShift) {
+    if ([input isShiftHold]) {
         // Shift + left
         if (_builder->cursorIndex() > 0) {
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1];
@@ -635,7 +631,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     return YES;
 }
 
-- (BOOL)_handleForwardWithState:(InputState *)state flags:(NSEventModifierFlags)flags stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleForwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
@@ -649,7 +645,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
     InputStateInputting *currentState = (InputStateInputting *) state;
 
-    if (flags & NSEventModifierFlagShift) {
+    if ([input isShiftHold]) {
         // Shift + Right
         if (_builder->cursorIndex() < _builder->length()) {
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1];
@@ -835,7 +831,6 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
    candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
                 errorCallback:(void (^)(void))errorCallback
 {
-    NSLog(@"_handleMarkingState 1");
     UniChar charCode = input.charCode;
 
     if (charCode == 27) {
@@ -843,8 +838,6 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         stateCallback(inputting);
         return YES;
     }
-
-    NSLog(@"_handleMarkingState 2");
 
     // Enter
     if (charCode == 13) {
@@ -857,12 +850,15 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         return YES;
     }
 
-    NSLog(@"_handleMarkingState 3");
+    NSLog(@"Test 3");
 
     // Shift + left
-    if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
-        && (input.flags & NSEventModifierFlagShift)) {
+    if (([input isCursorBackward]
+//         || input.emacsKey == McBopomofoEmacsKeyBackward
+         )
+        && ([input isShiftHold])) {
         NSLog(@"Shift + left");
+        stateCallback(state);
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index -= 1;
@@ -877,12 +873,15 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
         return YES;
     }
 
-    NSLog(@"_handleMarkingState 4");
+    NSLog(@"Test 4");
 
     // Shift + Right
-    if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyForward)
-        && (input.flags & NSEventModifierFlagShift)) {
+    if (([input isCursorBackward]
+//         || input.emacsKey == McBopomofoEmacsKeyForward
+         )
+        && ([input isShiftHold])) {
         NSLog(@"Shift + Right");
+        stateCallback(state);
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index += 1;
@@ -914,7 +913,7 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     BOOL cancelCandidateKey =
             (charCode == 27) ||
                     ((_inputMode == kPlainBopomofoModeIdentifier) &&
-                            (charCode == 8 || input.keyCode == KeyCodeDelete));
+                            (charCode == 8 || [input isDelete]));
 
     if (cancelCandidateKey) {
         if (_inputMode == kPlainBopomofoModeIdentifier) {
