@@ -53,7 +53,7 @@ namespace Formosa {
             void setJoinSeparator(const string& separator);
             const string joinSeparator() const;
 
-            vector<string> readingsAtRange(size_t begin, size_t end) const;
+            vector<string> readings() const;
 
             Grid& grid();
                         
@@ -110,12 +110,9 @@ namespace Formosa {
             m_cursorIndex++;   
         }
 
-        inline vector<string> BlockReadingBuilder::readingsAtRange(size_t begin, size_t end) const {
-            vector<string> v;
-            for (size_t i = begin; i < end; i++) {
-                v.push_back(m_readings[i]);
-            }
-            return v;
+        inline vector<string> BlockReadingBuilder::readings() const
+        {
+            return m_readings;
         }
         
         inline bool BlockReadingBuilder::deleteReadingBeforeCursor()

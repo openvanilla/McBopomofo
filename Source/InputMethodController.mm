@@ -308,18 +308,8 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
     return layout;
 }
 
-- (BOOL)       handleInput:(KeyHandlerInput *)input state:(InputState *)state
-             stateCallback:(void (^)(InputState *))stateCallback
-candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
-             errorCallback:(void (^)(void))errorCallback
+- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback candidateSelectionCallback:(void (^)(void))candidateSelectionCallback errorCallback:(void (^)(void))errorCallback
 {
-    bool composeReading = false;
-    NSInteger cursorForwardKey = input.cursorForwardKey;
-    NSInteger cursorBackwardKey = input.cursorBackwardKey;
-    NSInteger extraChooseCandidateKey = input.extraChooseCandidateKey;
-    NSInteger absorbedArrowKey = input.absorbedArrowKey;
-    NSInteger verticalModeOnlyChooseCandidateKey = input.verticalModeOnlyChooseCandidateKey;
-
     // get the unicode character code
     UniChar charCode = input.charCode;
     uint16 keyCode = input.keyCode;
@@ -334,12 +324,12 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey = ((flags & NSEventModifierFlagCommand) || (flags & NSEventModifierFlagControl) || (flags & NSEventModifierFlagOption) || (flags & NSEventModifierFlagNumericPad));
-    if (![_state isKindOfClass:[InputStateInputting class]] && isFunctionKey) {
+    if (![state isKindOfClass:[InputStateInputting class]] && isFunctionKey) {
         return NO;
     }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
-    if (charCode == 8 || charCode == 13 || keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey || keyCode == cursorForwardKey || keyCode == cursorBackwardKey) {
+    if (charCode == 8 || charCode == 13 || keyCode == input.absorbedArrowKey || keyCode == input.extraChooseCandidateKey || keyCode == input.cursorForwardKey || keyCode == input.cursorBackwardKey) {
         // do nothing if backspace is pressed -- we ignore the key
     } else if (flags & NSAlphaShiftKeyMask) {
         // process all possible combination, we hope.
@@ -385,6 +375,8 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
             return YES;
         }
     }
+
+    bool composeReading = false;
 
     // MARK: Handle BPMF Keys
     // see if it's valid BPMF reading
@@ -454,7 +446,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
             [state isKindOfClass:[InputStateNotEmpty class]] &&
-            (keyCode == extraChooseCandidateKey || charCode == 32 || (input.useVerticalMode && (keyCode == verticalModeOnlyChooseCandidateKey)))) {
+            (keyCode == input.extraChooseCandidateKey || charCode == 32 || (input.useVerticalMode && (keyCode == input.verticalModeOnlyChooseCandidateKey)))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ((flags & NSEventModifierFlagShift) != 0 || !Preferences.chooseCandidateUsingSpace) {
@@ -486,12 +478,12 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     }
 
     // MARK: Cursor backward
-    if (keyCode == cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward) {
+    if (keyCode == input.cursorBackwardKey || emacsKey == McBopomofoEmacsKeyBackward) {
         return [self _handleBackwardWithState:state flags:flags stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK:  Cursor forward
-    if (keyCode == cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward) {
+    if (keyCode == input.cursorForwardKey || emacsKey == McBopomofoEmacsKeyForward) {
         return [self _handleForwardWithState:state flags:flags stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -506,7 +498,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     }
 
     // MARK: AbsorbedArrowKey
-    if (keyCode == absorbedArrowKey || keyCode == extraChooseCandidateKey) {
+    if (keyCode == input.absorbedArrowKey || keyCode == input.extraChooseCandidateKey) {
         return [self _handleAbsorbedArrowKeyWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -584,7 +576,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
 
         if (_bpmfReadingBuffer->isEmpty()) {
             // no nee to beep since the event is deliberately triggered by user
-            if (![_state isKindOfClass:[InputStateInputting class]]) {
+            if (![state isKindOfClass:[InputStateInputting class]]) {
                 return NO;
             }
         } else {
@@ -604,7 +596,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         return YES;
     }
 
-    if (![_state isKindOfClass:[InputStateInputting class]]) {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
     }
     InputStateInputting *currentState = (InputStateInputting *) state;
@@ -613,6 +605,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         // Shift + left
         if (_builder->cursorIndex() > 0) {
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1];
+            marking.readings = [self _currentReadings];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -639,7 +632,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         return YES;
     }
 
-    if (![_state isKindOfClass:[InputStateInputting class]]) {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
     }
 
@@ -648,6 +641,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         // Shift + Right
         if (_builder->cursorIndex() < _builder->length()) {
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1];
+            marking.readings = [self _currentReadings];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -673,7 +667,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         return YES;
     }
 
-    if (![_state isKindOfClass:[InputStateInputting class]]) {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
     }
 
@@ -697,7 +691,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         return YES;
     }
 
-    if (![_state isKindOfClass:[InputStateInputting class]]) {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
     }
 
@@ -749,7 +743,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
 - (BOOL)_handleDeleteWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (_bpmfReadingBuffer->isEmpty()) {
-        if (![_state isKindOfClass:[InputStateInputting class]]) {
+        if (![state isKindOfClass:[InputStateInputting class]]) {
             return NO;
         }
 
@@ -849,6 +843,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         if (index > 0) {
             index -= 1;
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
+            marking.readings = state.readings;
             stateCallback(marking);
         } else {
             stateCallback(state);
@@ -863,6 +858,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         if (index < state.composingBuffer.length) {
             index += 1;
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
+            marking.readings = state.readings;
             stateCallback(marking);
         } else {
             stateCallback(state);
@@ -1098,9 +1094,9 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     KeyHandlerInput *input = [[KeyHandlerInput alloc] initWithEvent:event isVerticalMode:useVerticalMode];
     BOOL result = [self handleInput:input state:_state stateCallback:^(InputState *state) {
         [self handleState:state client:client];
-    }    candidateSelectionCallback:^{
-
-    }                 errorCallback:^{
+    } candidateSelectionCallback:^{
+        [self handleState:self->_state client:(self->_currentCandidateClient ? self->_currentCandidateClient : client)];
+    } errorCallback:^{
         NSBeep();
     }];
 
@@ -1252,6 +1248,16 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     return cursorIndex;
 }
 
+- (NSArray *)_currentReadings
+{
+    NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
+    vector<std::string> v = _builder->readings();
+    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
+        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
+    }
+    return readingsArray;
+}
+
 #pragma mark - States Handling
 
 - (NSString *)_convertToSimplifiedChineseIfRequired:(NSString *)text
@@ -1273,6 +1279,11 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
 
 - (void)_commitText:(NSString *)text client:(id)client
 {
+    NSString *buffer = [self _convertToSimplifiedChineseIfRequired:text];
+    if (!buffer.length) {
+        return;;
+    }
+
     // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
     // then we defer the update in the next runloop round -- so that the composing buffer is not
     // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
@@ -1280,46 +1291,44 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
         if (_currentDeferredClient) {
             id currentDeferredClient = _currentDeferredClient;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                NSString *buffer = [self _convertToSimplifiedChineseIfRequired:text];
                 [currentDeferredClient insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             });
         }
         return;
     }
-    NSString *buffer = [self _convertToSimplifiedChineseIfRequired:text];
     [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 }
 
 - (void)handleState:(InputState *)newState client:(id)client
 {
     if ([newState isKindOfClass:[InputStateDeactive class]]) {
-        [self _handleInputStateDeactive:(InputStateDeactive *) newState client:client];
+        [self _handleInputStateDeactive:(InputStateDeactive *) newState previous:_state client:client];
     }
 
     if ([newState isKindOfClass:[InputStateEmpty class]]) {
-        [self _handleInputStateEmpty:(InputStateEmpty *) newState client:client];
+        [self _handleInputStateEmpty:(InputStateEmpty *) newState previous:_state client:client];
     }
 
     if ([newState isKindOfClass:[InputStateCommitting class]]) {
-        [self _handleInputStateCommitting:(InputStateCommitting *) newState client:client];
+        [self _handleInputStateCommitting:(InputStateCommitting *) newState previous:_state client:client];
     }
 
     if ([newState isKindOfClass:[InputStateInputting class]]) {
-        [self _handleInputStateInputting:(InputStateInputting *) newState client:client];
+        [self _handleInputStateInputting:(InputStateInputting *) newState previous:_state client:client];
     }
 
     if ([newState isKindOfClass:[InputStateMarking class]]) {
-        [self _handleInputStateMarking:(InputStateMarking *) newState client:client];
+        [self _handleInputStateMarking:(InputStateMarking *) newState previous:_state client:client];
     }
 
     if ([newState isKindOfClass:[InputStateChoosingCandidate class]]) {
-        [self _handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)newState client:client];
+        [self _handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)newState previous:_state client:client];
     }
 
     _state = newState;
 }
 
-- (void)_handleInputStateDeactive:(InputStateDeactive *)state client:(id)client
+- (void)_handleInputStateDeactive:(InputStateDeactive *)state previous:(InputState *)previous client:(id)client
 {
     // clean up reading buffer residues
     if (!_bpmfReadingBuffer->isEmpty()) {
@@ -1328,7 +1337,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     }
 
     // commit any residue in the composing buffer
-    if ([_state isKindOfClass:[InputStateInputting class]]) {
+    if ([previous isKindOfClass:[InputStateInputting class]]) {
         NSString *buffer = [(InputStateInputting *) _state composingBuffer];
         [self _commitText:buffer client:client];
     }
@@ -1341,10 +1350,10 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateEmpty:(InputStateEmpty *)state client:(id)client
+- (void)_handleInputStateEmpty:(InputStateEmpty *)state previous:(InputState *)previous client:(id)client
 {
     // commit any residue in the composing buffer
-    if ([_state isKindOfClass:[InputStateInputting class]]) {
+    if ([previous isKindOfClass:[InputStateInputting class]]) {
         NSString *buffer = [(InputStateInputting *) _state composingBuffer];
         [self _commitText:buffer client:client];
     }
@@ -1355,19 +1364,19 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateCommitting:(InputStateCommitting *)state client:(id)client
+- (void)_handleInputStateCommitting:(InputStateCommitting *)state previous:(InputState *)previous client:(id)client
 {
     NSString *poppedText = [state poppedText];
-    [client insertText:poppedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    [self _commitText:poppedText client:client];
     gCurrentCandidateController.visible = NO;
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateInputting:(InputStateInputting *)state client:(id)client
+- (void)_handleInputStateInputting:(InputStateInputting *)state previous:(InputState *)previous client:(id)client
 {
     NSString *poppedText = state.poppedText;
     if (poppedText.length) {
-        [client insertText:poppedText replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+        [self _commitText:poppedText client:client];
     }
 
     NSUInteger cursorIndex = [state cursorIndex];
@@ -1381,7 +1390,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateMarking:(InputStateMarking *)state client:(id)client
+- (void)_handleInputStateMarking:(InputStateMarking *)state previous:(InputState *)previous client:(id)client
 {
     NSUInteger cursorIndex = [state cursorIndex];
     NSAttributedString *attrString = [state attributedString];
@@ -1394,7 +1403,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
     [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer client:client];
 }
 
-- (void)_handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)state client:(id)client
+- (void)_handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)state previous:(InputState *)previous client:(id)client
 {
     NSUInteger cursorIndex = [state cursorIndex];
     NSAttributedString *attrString = [state attributedString];
