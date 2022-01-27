@@ -1301,6 +1301,8 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 
 - (void)handleState:(InputState *)newState client:(id)client
 {
+    NSLog(@"current state: %@ new state: %@", _state, newState );
+    
     if ([newState isKindOfClass:[InputStateDeactive class]]) {
         [self _handleInputStateDeactive:(InputStateDeactive *) newState previous:_state client:client];
     }
@@ -1368,6 +1370,9 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 {
     NSString *poppedText = [state poppedText];
     [self _commitText:poppedText client:client];
+
+    _builder->clear();
+    _walkedNodes.clear();
     gCurrentCandidateController.visible = NO;
     [self _hideTooltip];
 }

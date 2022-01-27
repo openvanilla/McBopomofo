@@ -6,6 +6,9 @@ class InputState: NSObject {
 
 /// Represents that the input controller is deactive.
 class InputStateDeactive: InputState {
+    override var description: String {
+        return "<InputStateDeactive>"
+    }
 }
 
 /// Represents that the composing buffer is empty.
@@ -20,6 +23,10 @@ class InputStateCommitting: InputState {
         self.init()
         self.poppedText = poppedText
     }
+
+    override var description: String {
+        return "<InputStateCommitting poppedText:\(poppedText)>"
+    }
 }
 
 /// Represents that the composing buffer is not empty.
@@ -30,6 +37,10 @@ class InputStateNotEmpty: InputState {
     @objc init(composingBuffer: String, cursorIndex: UInt) {
         self.composingBuffer = composingBuffer
         self.cursorIndex = cursorIndex
+    }
+
+    override var description: String {
+        return "<InputStateNotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
 }
 
@@ -44,12 +55,15 @@ class InputStateInputting: InputStateNotEmpty {
     }
 
     @objc var attributedString: NSAttributedString {
-        let attrs: [NSAttributedString.Key : Any] = [
-            .underlineStyle: NSUnderlineStyle.single,
+        let attributedSting = NSAttributedString(string: composingBuffer, attributes:  [
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 0
-        ]
-        let attributedSting = NSAttributedString(string: composingBuffer, attributes: attrs)
+        ])
         return attributedSting
+    }
+
+    override var description: String {
+        return "<InputStateInputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
     }
 }
 
@@ -95,19 +109,23 @@ class InputStateMarking: InputStateNotEmpty {
     @objc var attributedString: NSAttributedString {
         let attributedSting = NSMutableAttributedString(string: composingBuffer)
         attributedSting.setAttributes([
-            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single,
-            NSAttributedString.Key.markedClauseSegment: 0
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: 0
         ], range: NSRange(location: 0, length: markedRange.location))
         attributedSting.setAttributes([
-            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single,
-            NSAttributedString.Key.markedClauseSegment: 1
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: 1
         ], range: markedRange)
         attributedSting.setAttributes([
-            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single,
-            NSAttributedString.Key.markedClauseSegment: 2
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .markedClauseSegment: 2
         ], range: NSRange(location: markedRange.location + markedRange.length,
                           length: composingBuffer.count - (markedRange.location + markedRange.length)  ))
         return attributedSting
+    }
+
+    override var description: String {
+        return "<InputStateMarking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
     }
 }
 
@@ -123,11 +141,14 @@ class InputStateChoosingCandidate: InputStateNotEmpty {
     }
 
     @objc var attributedString: NSAttributedString {
-        let attrs: [NSAttributedString.Key : Any] = [
-            .underlineStyle: NSUnderlineStyle.single,
+        let attributedSting = NSAttributedString(string: composingBuffer, attributes:  [
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 0
-        ]
-        let attributedSting = NSAttributedString(string: composingBuffer, attributes: attrs)
+        ])
         return attributedSting
+    }
+
+    override var description: String {
+        return "<InputStateChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
 }
