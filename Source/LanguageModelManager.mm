@@ -174,7 +174,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
         return NO;
     }
 
-    BOOL shuoldAddLineBreakAtFront = NO;
+    BOOL addLineBreakAtFront = NO;
     NSString *path = [self userPhrasesDataPathMcBopomofo];
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
@@ -188,7 +188,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
                 NSData *data = [readFile readDataToEndOfFile];
                 const void *bytes = [data bytes];
                 if (*(char *)bytes != '\n') {
-                    shuoldAddLineBreakAtFront = YES;
+                    addLineBreakAtFront = YES;
                 }
                 [readFile closeFile];
             }
@@ -196,7 +196,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     }
 
     NSMutableString *currentMarkedPhrase = [NSMutableString string];
-    if (shuoldAddLineBreakAtFront) {
+    if (addLineBreakAtFront) {
         [currentMarkedPhrase appendString:@"\n"];
     }
     [currentMarkedPhrase appendString:userPhrase];

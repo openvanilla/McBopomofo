@@ -21,12 +21,39 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
-#import <InputMethodKit/InputMethodKit.h>
+#import <Foundation/Foundation.h>
 #import "McBopomofo-Swift.h"
+@import CandidateUI;
 
-@interface McBopomofoInputMethodController : IMKInputController
+NS_ASSUME_NONNULL_BEGIN
 
-- (void)handleState:(InputState *)newState client:(id)client;
+extern NSString *const kBopomofoModeIdentifier;
+extern NSString *const kPlainBopomofoModeIdentifier;
 
+@class KeyHandler;
+
+@protocol KeyHandlerDelegate <NSObject>
+- (VTCandidateController *)candidateControllerForKeyHanlder:(KeyHandler *)keyHandler;
+- (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index candidateController:(VTCandidateController *)controller;
+- (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputStateMarking *)state;
 @end
+
+@interface KeyHandler : NSObject
+
+- (BOOL)handleInput:(KeyHandlerInput *)input
+              state:(InputState *)state
+      stateCallback:(void (^)(InputState *))stateCallback
+candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
+      errorCallback:(void (^)(void))errorCallback;
+
+- (void)synchWithPrefereneces;
+- (void)fixNodeWithvalue:(std::string)value;
+- (void)clear;
+
+- (InputStateInputting *)_buildInputtingState;
+
+@property (strong, nonatomic) NSString *inputMode;
+@property (weak, nonatomic) id <KeyHandlerDelegate> delegate;
+@end
+
+NS_ASSUME_NONNULL_END

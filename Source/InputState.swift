@@ -41,6 +41,13 @@ class InputStateEmpty: InputState {
     }
 }
 
+/// Represents that the composing buffer is empty.
+class InputStateEmptyIgnoringPreviousState: InputState {
+    @objc var composingBuffer: String  {
+        ""
+    }
+}
+
 /// Represents that the input controller is committing text into client app.
 class InputStateCommitting: InputState {
     @objc private(set) var poppedText: String = ""
@@ -158,6 +165,18 @@ class InputStateMarking: InputStateNotEmpty {
     @objc func convertToInputting() -> InputStateInputting {
         let state = InputStateInputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
         return state
+    }
+
+    @objc var validToWrite: Bool {
+        return self.markedRange.length >= kMinMarkRangeLength && self.markedRange.length <= kMaxMarkRangeLength
+    }
+
+    @objc var userPhrase: String {
+        let text = (composingBuffer as NSString).substring(with: markedRange)
+        let end = markedRange.location + markedRange.length
+        let readings = readings[markedRange.location..<end]
+        let joined = readings.joined(separator: "-")
+        return "\(text) \(joined)"
     }
 }
 
