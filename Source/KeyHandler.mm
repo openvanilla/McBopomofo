@@ -343,7 +343,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         if (_inputMode == kPlainBopomofoModeIdentifier) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
-            stateCallback(choosingCandidates);
+            if (choosingCandidates.candidates.count == 1) {
+                [self clear];
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:choosingCandidates.candidates.firstObject];
+                stateCallback(committing);
+                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                stateCallback(empty);
+            } else {
+                stateCallback(choosingCandidates);
+            }
         }
 
         // and tells the client that the key is consumed
@@ -699,13 +707,20 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if ([state isKindOfClass:[InputStateInputting class]]) {
+        if (_inputMode == kPlainBopomofoModeIdentifier) {
+            if (!_bpmfReadingBuffer->isEmpty()) {
+                errorCallback();
+            }
+            return YES;
+        }
+
         [self clear];
 
         InputStateInputting *current = (InputStateInputting *) state;
         NSString *composingBuffer = current.composingBuffer;
         InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
         stateCallback(committing);
-        InputState *empty = [[InputState alloc] init];
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
         stateCallback(empty);
         return YES;
     }
@@ -991,7 +1006,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             if (candidateIndex != NSUIntegerMax) {
                 [self.delegate keyHandler:self didSelectCandidateAtIndex:candidateIndex candidateController:gCurrentCandidateController];
                 [self clear];
-                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+                stateCallback(empty);
                 [self handleInput:input state:empty stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
             }
             return YES;

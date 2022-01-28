@@ -243,7 +243,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     BOOL result = [_keyHandler handleInput:input state:_state stateCallback:^(InputState *state) {
         [self handleState:state client:client];
     }           candidateSelectionCallback:^{
-//        NSLog(@"candidate window updated.");
+        NSLog(@"candidate window updated.");
     }                        errorCallback:^{
         NSBeep();
     }];
@@ -295,7 +295,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (void)handleState:(InputState *)newState client:(id)client
 {
-//    NSLog(@"current state: %@ new state: %@", _state, newState );
+    NSLog(@"new state: %@ / current state: %@", newState, _state);
 
     // We need to set the state to the member variable since the candidate
     // window need to read the candidates from it.
@@ -408,15 +408,8 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     // i.e. the client app needs to take care of where to put ths composing buffer
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 
-    if (_keyHandler.inputMode == kPlainBopomofoModeIdentifier && state.candidates.count == 1) {
-        NSString *buffer = [self _convertToSimplifiedChineseIfRequired:state.candidates.firstObject];
-        [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-        [self handleState:empty client:client];
-    } else {
-        if (![previous isKindOfClass:[InputStateChoosingCandidate class]]) {
-            [self _showCandidateWindowWithState:state client:client];
-        }
+    if (![previous isKindOfClass:[InputStateChoosingCandidate class]]) {
+        [self _showCandidateWindowWithState:state client:client];
     }
 }
 
