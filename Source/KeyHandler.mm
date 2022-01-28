@@ -833,8 +833,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = (charCode == 27) || [input isDelete] ||
-            ((_inputMode == kPlainBopomofoModeIdentifier) && (charCode == 8));
+    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete]; 
 
     if (cancelCandidateKey) {
         if (_inputMode == kPlainBopomofoModeIdentifier) {
