@@ -295,7 +295,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (void)handleState:(InputState *)newState client:(id)client
 {
-    NSLog(@"new state: %@ / current state: %@", newState, _state);
+//    NSLog(@"new state: %@ / current state: %@", newState, _state);
 
     // We need to set the state to the member variable since the candidate
     // window need to read the candidates from it.
