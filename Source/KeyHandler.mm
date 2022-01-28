@@ -658,7 +658,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     InputStateInputting *inputting = [self _buildInputtingState];
-    stateCallback(inputting);
+    if (!inputting.composingBuffer.length) {
+        InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+        stateCallback(empty);
+    } else {
+        stateCallback(inputting);
+    }
     return YES;
 }
 
@@ -673,7 +678,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             _builder->deleteReadingAfterCursor();
             [self _walk];
             InputStateInputting *inputting = [self _buildInputtingState];
-            stateCallback(inputting);
+            if (!inputting.composingBuffer.length) {
+                InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+                stateCallback(empty);
+            } else {
+                stateCallback(inputting);
+            }
         } else {
             errorCallback();
             stateCallback(state);
