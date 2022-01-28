@@ -60,7 +60,7 @@
 		D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3B82796A8A000657FF3 /* PreferencesTests.swift */; };
 		D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */; };
 		D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */; };
-		D4E569DF27A40F1400AC2CEF /* KeyHandlerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DE27A40F1400AC2CEF /* KeyHandlerTests.mm */; };
+		D4E569DF27A40F1400AC2CEF /* KeyHandlerBopomofoTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DE27A40F1400AC2CEF /* KeyHandlerBopomofoTests.mm */; };
 		D4E569E027A4123200AC2CEF /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
 		D4E569E127A4128300AC2CEF /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D4E569E227A412E700AC2CEF /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
@@ -224,7 +224,7 @@
 		D4E569DA27A34CC100AC2CEF /* KeyHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyHandler.h; sourceTree = "<group>"; };
 		D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandler.mm; sourceTree = "<group>"; };
 		D4E569DD27A40F1300AC2CEF /* McBopomofoTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		D4E569DE27A40F1400AC2CEF /* KeyHandlerTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandlerTests.mm; sourceTree = "<group>"; };
+		D4E569DE27A40F1400AC2CEF /* KeyHandlerBopomofoTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandlerBopomofoTests.mm; sourceTree = "<group>"; };
 		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D4F0BBE2279B08900071253C /* BundleTranslocate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BundleTranslocate.h; sourceTree = "<group>"; };
@@ -502,7 +502,7 @@
 			children = (
 				D485D3B82796A8A000657FF3 /* PreferencesTests.swift */,
 				D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */,
-				D4E569DE27A40F1400AC2CEF /* KeyHandlerTests.mm */,
+				D4E569DE27A40F1400AC2CEF /* KeyHandlerBopomofoTests.mm */,
 				D4E569DD27A40F1300AC2CEF /* McBopomofoTests-Bridging-Header.h */,
 			);
 			path = McBopomofoTests;
@@ -750,7 +750,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4E569DF27A40F1400AC2CEF /* KeyHandlerTests.mm in Sources */,
+				D4E569DF27A40F1400AC2CEF /* KeyHandlerBopomofoTests.mm in Sources */,
 				D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */,
 				D4E569E227A412E700AC2CEF /* Preferences.swift in Sources */,
 				D4E569E127A4128300AC2CEF /* InputState.swift in Sources */,
