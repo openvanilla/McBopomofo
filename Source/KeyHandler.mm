@@ -995,11 +995,19 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if (_inputMode == kPlainBopomofoModeIdentifier) {
         string layout = [self _currentLayout];
-        string customPunctuation = string("_punctuation_") + layout + string(1, (char) charCode);
-        string punctuation = string("_punctuation_") + string(1, (char) charCode);
+        string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_") : string("_punctuation_");
+        string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
+        string punctuation = punctuationNamePrefix + string(1, (char) charCode);
 
         BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
                 _languageModel->hasUnigramsForKey(punctuation);
+
+        if (!shouldAutoSelectCandidate && (char) charCode >= 'A' && (char) charCode <= 'Z') {
+            string letter = string("_letter_") + string(1, (char) charCode);
+            if (_languageModel->hasUnigramsForKey(letter)) {
+                shouldAutoSelectCandidate = YES;
+            }
+        }
 
         if (shouldAutoSelectCandidate) {
             NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
