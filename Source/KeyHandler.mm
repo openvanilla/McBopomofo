@@ -161,7 +161,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return self;
 }
 
-- (void)synchWithPrefereneces
+- (void)syncWithPreferences
 {
     NSInteger layout = Preferences.keyboardLayout;
     switch (layout) {
@@ -190,7 +190,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
 
-- (void)fixNodeWithvalue:(std::string)value
+- (void)fixNodeWithValue:(std::string)value
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     _builder->grid().fixNodeSelectedCandidate(cursorIndex, value);
@@ -226,7 +226,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionlHold] || [input isNumericPad]);
+    BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionHold] || [input isNumericPad]);
     if (![state isKindOfClass:[InputStateNotEmpty class]] && isFunctionKey) {
         return NO;
     }
@@ -258,7 +258,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     if ([input isNumericPad]) {
-        if (![input isLeft]  && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
+        if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
             [self clear];
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
             stateCallback(emptyState);
@@ -276,8 +276,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
-        InputStateMarking *marking = (InputStateMarking *)state;
-        if ([self _handleMarkingState:(InputStateMarking *)state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
+        InputStateMarking *marking = (InputStateMarking *) state;
+        if ([self _handleMarkingState:(InputStateMarking *) state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
             return YES;
         }
         state = [marking convertToInputting];
@@ -325,7 +325,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         // get user override model suggestion
         string overrideValue = (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
-        _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+                _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self _actualCandidateCursorIndex];
@@ -353,15 +353,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Space and Down
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
-        [state isKindOfClass:[InputStateNotEmpty class]] &&
-        ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
+            [state isKindOfClass:[InputStateNotEmpty class]] &&
+            ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
                     [self clear];
-                    InputStateCommitting *commiting = [[InputStateCommitting alloc] initWithPoppedText:@" "];
-                    stateCallback(commiting);
+                    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:@" "];
+                    stateCallback(committing);
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
                 } else if (_languageModel->hasUnigramsForKey(" ")) {
@@ -436,8 +436,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 stateCallback(inputting);
                 InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
                 stateCallback(choosingCandidate);
-            }
-            else { // If there is still unfinished bpmf reading, ignore the punctuation
+            } else { // If there is still unfinished bpmf reading, ignore the punctuation
                 errorCallback();
             }
             return YES;
@@ -483,7 +482,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     BOOL escToClearInputBufferEnabled = Preferences.escToCleanInputBuffer;
 
     if (escToClearInputBufferEnabled) {
-        // if the optioon is enabled, we clear everythiong including the composing
+        // if the option is enabled, we clear everything including the composing
         // buffer, walked nodes and the reading.
         [self clear];
         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -712,7 +711,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return NO;
     }
 
-    NSString *poppedText = @"";
+    NSString *poppedText;
     if (_bpmfReadingBuffer->isEmpty()) {
         _builder->insertReadingAtCursor(customPunctuation);
         poppedText = [self _popOverflowComposingTextAndWalk];
@@ -721,6 +720,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         stateCallback(state);
         return YES;
     }
+
     InputStateInputting *inputting = [self _buildInputtingState];
     inputting.poppedText = poppedText;
     stateCallback(inputting);
@@ -750,7 +750,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 {
     UniChar charCode = input.charCode;
 
-
     if (charCode == 27) {
         InputStateInputting *inputting = [self _buildInputtingState];
         stateCallback(inputting);
@@ -770,7 +769,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // Shift + left
     if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
-        && ([input isShiftHold])) {
+            && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index -= 1;
@@ -786,7 +785,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // Shift + Right
     if (([input isCursorForward] || input.emacsKey == McBopomofoEmacsKeyForward)
-        && ([input isShiftHold])) {
+            && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index += 1;
@@ -814,7 +813,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHanlder:self];
 
     BOOL cancelCandidateKey = (charCode == 27) || [input isDelete] ||
-        ((_inputMode == kPlainBopomofoModeIdentifier) && (charCode == 8));
+            ((_inputMode == kPlainBopomofoModeIdentifier) && (charCode == 8));
 
     if (cancelCandidateKey) {
         if (_inputMode == kPlainBopomofoModeIdentifier) {
@@ -979,7 +978,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         string punctuation = string("_punctuation_") + string(1, (char) charCode);
 
         BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
-        _languageModel->hasUnigramsForKey(punctuation);
+                _languageModel->hasUnigramsForKey(punctuation);
 
         if (shouldAutoSelectCandidate) {
             NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:0];
@@ -1026,7 +1025,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             // (the actual cursor on the screen) with the builder's logical
             // cursor (reading) cursor; each built node has a "spanning length"
             // (e.g. two reading blocks has a spanning length of 2), and we
-            // accumulate those lengthes to calculate the displayed cursor
+            // accumulate those lengths to calculate the displayed cursor
             // index
             size_t spanningLength = (*wi).spanningLength;
             if (readingCursorIndex + spanningLength <= builderCursorIndex) {
@@ -1083,7 +1082,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // but because the Viterbi algorithm has a complexity of O(N^2),
     // the walk will become slower as the number of nodes increase,
     // therefore we need to "pop out" overflown text -- they usually
-    // lose their influence over the whole MLE anyway -- so tht when
+    // lose their influence over the whole MLE anyway -- so that when
     // the user type along, the already composed text at front will
     // be popped out
 
@@ -1145,7 +1144,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 {
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
     vector<std::string> v = _builder->readings();
-    for(vector<std::string>::iterator it_i=v.begin(); it_i!=v.end(); ++it_i) {
+    for (vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i) {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
     return readingsArray;

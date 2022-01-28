@@ -76,7 +76,6 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 @implementation McBopomofoInputMethodController
 
-
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)client
 {
     // an instance is initialized whenever a text input client (a Mac app) requires
@@ -96,7 +95,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 {
     // a menu instance (autoreleased) is requested every time the user click on the input menu
     NSMenu *menu = [[NSMenu alloc] initWithTitle:LocalizationNotNeeded(@"Input Method Menu")];
-    NSString *inputMode = [_keyHandler inputMode];
+    NSString *inputMode = _keyHandler.inputMode;
 
     [menu addItemWithTitle:NSLocalizedString(@"McBopomofo Preferences", @"") action:@selector(showPreferences:) keyEquivalent:@""];
 
@@ -147,12 +146,14 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     // reset the state
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
-    InputStateEmpty *newState = [[InputStateEmpty alloc] init];
-    [self handleState:newState client:client];
+
+    [_keyHandler clear];
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    [self handleState:empty client:client];
 
     // checks and populates the default settings
-    [_keyHandler synchWithPrefereneces];
-    [(AppDelegate * )[NSApp delegate] checkForUpdate];
+    [_keyHandler syncWithPreferences];
+    [(AppDelegate *) NSApp.delegate checkForUpdate];
 }
 
 - (void)deactivateServer:(id)client
@@ -162,8 +163,8 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
     [self handleState:empty client:client];
 
-    InputStateDeactive *deactive = [[InputStateDeactive alloc] init];
-    [self handleState:deactive client:client];
+    InputStateDeactivated *inactive = [[InputStateDeactivated alloc] init];
+    [self handleState:inactive client:client];
 }
 
 - (void)setValue:(id)value forTag:(long)tag client:(id)sender
@@ -177,10 +178,10 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     }
 
     // Only apply the changes if the value is changed
-    if (![ [_keyHandler inputMode] isEqualToString:newInputMode]) {
+    if (![_keyHandler.inputMode isEqualToString:newInputMode]) {
         [[NSUserDefaults standardUserDefaults] synchronize];
 
-        // Remember to override the keyboard layout again -- treat this as an activate eventy
+        // Remember to override the keyboard layout again -- treat this as an activate event.
         NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
         [sender overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
         [_keyHandler clear];
@@ -194,12 +195,12 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (NSUInteger)recognizedEvents:(id)sender
 {
-    return NSKeyDownMask | NSFlagsChangedMask;
+    return NSEventMaskKeyDown | NSEventMaskFlagsChanged;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)client
 {
-    if ([event type] == NSFlagsChanged) {
+    if ([event type] == NSEventMaskFlagsChanged) {
         NSString *functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout;
         NSString *basisKeyboardLayoutID = Preferences.basisKeyboardLayout;
 
@@ -210,13 +211,13 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
         // Function key pressed.
         BOOL includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey;
-        if (([event modifierFlags] & ~NSEventModifierFlagShift) || (([event modifierFlags] & NSEventModifierFlagShift) && includeShift)) {
+        if ((event.modifierFlags & ~NSEventModifierFlagShift) || ((event.modifierFlags & NSEventModifierFlagShift) && includeShift)) {
             // Override the keyboard layout and let the OS do its thing
             [client overrideKeyboardWithKeyboardNamed:functionKeyKeyboardLayoutID];
             return NO;
         }
 
-        // Revert back to the basis layout when the function key is released
+        // Revert to the basis layout when the function key is released
         [client overrideKeyboardWithKeyboardNamed:basisKeyboardLayoutID];
         return NO;
     }
@@ -227,7 +228,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
     @try {
         attributes = [client attributesForCharacterIndex:0 lineHeightRectangle:&textFrame];
-        useVerticalMode = [attributes objectForKey:@"IMKTextOrientation"] && [[attributes objectForKey:@"IMKTextOrientation"] integerValue] == 0;
+        useVerticalMode = attributes[@"IMKTextOrientation"] && [attributes[@"IMKTextOrientation"] integerValue] == 0;
     }
     @catch (NSException *e) {
         // exception may raise while using Twitter.app's search filed.
@@ -241,10 +242,9 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     KeyHandlerInput *input = [[KeyHandlerInput alloc] initWithEvent:event isVerticalMode:useVerticalMode];
     BOOL result = [_keyHandler handleInput:input state:_state stateCallback:^(InputState *state) {
         [self handleState:state client:client];
-    } candidateSelectionCallback:^{
-        NSLog(@"candidateSelectionCallback ");
-//        [self handleState:self->_state client:(self->_currentCandidateClient ? self->_currentCandidateClient : client)];
-    } errorCallback:^{
+    }           candidateSelectionCallback:^{
+        NSLog(@"candidate window updated.");
+    }                        errorCallback:^{
         NSBeep();
     }];
 
@@ -284,7 +284,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     if ([[client bundleIdentifier] isEqualToString:@"com.apple.Terminal"] && ![NSStringFromClass([client class]) isEqualToString:@"IPMDServerClientWrapper"]) {
         if (_currentDeferredClient) {
             id currentDeferredClient = _currentDeferredClient;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [currentDeferredClient insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             });
         }
@@ -297,37 +297,37 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 {
 //    NSLog(@"current state: %@ new state: %@", _state, newState );
 
-    // We need to set the state to the member varible since the candidate
+    // We need to set the state to the member variable since the candidate
     // window need to read the candidates from it.
     InputState *previous = _state;
     _state = newState;
 
-    if ([newState isKindOfClass:[InputStateDeactive class]]) {
-        [self _handleInputStateDeactive:(InputStateDeactive *) newState previous:previous client:client];
+    if ([newState isKindOfClass:[InputStateDeactivated class]]) {
+        [self _handleDeactivated:(InputStateDeactivated *) newState previous:previous client:client];
     } else if ([newState isKindOfClass:[InputStateEmpty class]]) {
-        [self _handleInputStateEmpty:(InputStateEmpty *) newState previous:previous client:client];
+        [self _handleEmpty:(InputStateEmpty *) newState previous:previous client:client];
     } else if ([newState isKindOfClass:[InputStateEmptyIgnoringPreviousState class]]) {
-        [self _handleInputStateEmptyIgnoringPrevious:(InputStateEmptyIgnoringPreviousState *) newState previous:previous client:client];
+        [self _handleEmptyIgnoringPrevious:(InputStateEmptyIgnoringPreviousState *) newState previous:previous client:client];
     } else if ([newState isKindOfClass:[InputStateCommitting class]]) {
-        [self _handleInputStateCommitting:(InputStateCommitting *) newState previous:previous client:client];
+        [self _handleCommitting:(InputStateCommitting *) newState previous:previous client:client];
     } else if ([newState isKindOfClass:[InputStateInputting class]]) {
-        [self _handleInputStateInputting:(InputStateInputting *) newState previous:previous client:client];
+        [self _handleInputting:(InputStateInputting *) newState previous:previous client:client];
     } else if ([newState isKindOfClass:[InputStateMarking class]]) {
-        [self _handleInputStateMarking:(InputStateMarking *) newState previous:previous client:client];
+        [self _handleMarking:(InputStateMarking *) newState previous:previous client:client];
     } else if ([newState isKindOfClass:[InputStateChoosingCandidate class]]) {
-        [self _handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)newState previous:previous client:client];
+        [self _handleChoosingCandidate:(InputStateChoosingCandidate *) newState previous:previous client:client];
     }
 }
 
-- (void)_handleInputStateDeactive:(InputStateDeactive *)state previous:(InputState *)previous client:(id)client
+- (void)_handleDeactivated:(InputStateDeactivated *)state previous:(InputState *)previous client:(id)client
 {
     // commit any residue in the composing buffer
     if ([previous isKindOfClass:[InputStateInputting class]]) {
-        NSString *buffer = [(InputStateInputting *) previous composingBuffer];
+        NSString *buffer = ((InputStateInputting *) previous).composingBuffer;
         [self _commitText:buffer client:client];
     }
     [client setMarkedText:@"" selectionRange:NSMakeRange(0, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-    
+
     _currentDeferredClient = nil;
     _currentCandidateClient = nil;
 
@@ -336,11 +336,11 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateEmpty:(InputStateEmpty *)state previous:(InputState *)previous client:(id)client
+- (void)_handleEmpty:(InputStateEmpty *)state previous:(InputState *)previous client:(id)client
 {
     // commit any residue in the composing buffer
     if ([previous isKindOfClass:[InputStateInputting class]]) {
-        NSString *buffer = [(InputStateInputting *) previous composingBuffer];
+        NSString *buffer = ((InputStateInputting *) previous).composingBuffer;
         [self _commitText:buffer client:client];
     }
 
@@ -349,31 +349,30 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateEmptyIgnoringPrevious:(InputStateEmptyIgnoringPreviousState *)state previous:(InputState *)previous client:(id)client
+- (void)_handleEmptyIgnoringPrevious:(InputStateEmptyIgnoringPreviousState *)state previous:(InputState *)previous client:(id)client
 {
-//    [client insertText:@"" replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     [client setMarkedText:@"" selectionRange:NSMakeRange(0, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     gCurrentCandidateController.visible = NO;
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateCommitting:(InputStateCommitting *)state previous:(InputState *)previous client:(id)client
+- (void)_handleCommitting:(InputStateCommitting *)state previous:(InputState *)previous client:(id)client
 {
-    NSString *poppedText = [state poppedText];
+    NSString *poppedText = state.poppedText;
     [self _commitText:poppedText client:client];
     gCurrentCandidateController.visible = NO;
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateInputting:(InputStateInputting *)state previous:(InputState *)previous client:(id)client
+- (void)_handleInputting:(InputStateInputting *)state previous:(InputState *)previous client:(id)client
 {
     NSString *poppedText = state.poppedText;
     if (poppedText.length) {
         [self _commitText:poppedText client:client];
     }
 
-    NSUInteger cursorIndex = [state cursorIndex];
-    NSAttributedString *attrString = [state attributedString];
+    NSUInteger cursorIndex = state.cursorIndex;
+    NSAttributedString *attrString = state.attributedString;
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
@@ -383,10 +382,10 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     [self _hideTooltip];
 }
 
-- (void)_handleInputStateMarking:(InputStateMarking *)state previous:(InputState *)previous client:(id)client
+- (void)_handleMarking:(InputStateMarking *)state previous:(InputState *)previous client:(id)client
 {
-    NSUInteger cursorIndex = [state cursorIndex];
-    NSAttributedString *attrString = [state attributedString];
+    NSUInteger cursorIndex = state.cursorIndex;
+    NSAttributedString *attrString = state.attributedString;
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
@@ -400,16 +399,16 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     }
 }
 
-- (void)_handleInputStateChoosingCandidate:(InputStateChoosingCandidate *)state previous:(InputState *)previous client:(id)client
+- (void)_handleChoosingCandidate:(InputStateChoosingCandidate *)state previous:(InputState *)previous client:(id)client
 {
-    NSUInteger cursorIndex = [state cursorIndex];
-    NSAttributedString *attrString = [state attributedString];
+    NSUInteger cursorIndex = state.cursorIndex;
+    NSAttributedString *attrString = state.attributedString;
 
     // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
     // i.e. the client app needs to take care of where to put ths composing buffer
     [client setMarkedText:attrString selectionRange:NSMakeRange(cursorIndex, 0) replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
 
-    if ([_keyHandler inputMode] == kPlainBopomofoModeIdentifier && [state.candidates count] == 1) {
+    if (_keyHandler.inputMode == kPlainBopomofoModeIdentifier && state.candidates.count == 1) {
         NSString *buffer = [self _convertToSimplifiedChineseIfRequired:state.candidates.firstObject];
         [client insertText:buffer replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -444,17 +443,17 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
     NSString *ctFontName = Preferences.candidateTextFontName;
     NSString *klFontName = Preferences.candidateKeyLabelFontName;
-    NSString *ckeys = Preferences.candidateKeys;
+    NSString *candidateKeys = Preferences.candidateKeys;
 
     gCurrentCandidateController.keyLabelFont = klFontName ? [NSFont fontWithName:klFontName size:keyLabelSize] : [NSFont systemFontOfSize:keyLabelSize];
     gCurrentCandidateController.candidateFont = ctFontName ? [NSFont fontWithName:ctFontName size:textSize] : [NSFont systemFontOfSize:textSize];
 
-    NSMutableArray *keyLabels = [NSMutableArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", nil];
+    NSMutableArray *keyLabels = [@[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"] mutableCopy];
 
-    if ([ckeys length] > 1) {
+    if (candidateKeys.length > 1) {
         [keyLabels removeAllObjects];
-        for (NSUInteger i = 0, c = [ckeys length]; i < c; i++) {
-            [keyLabels addObject:[ckeys substringWithRange:NSMakeRange(i, 1)]];
+        for (NSUInteger i = 0, c = candidateKeys.length; i < c; i++) {
+            [keyLabels addObject:[candidateKeys substringWithRange:NSMakeRange(i, 1)]];
         }
     }
 
@@ -465,7 +464,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
     NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
     NSInteger cursor = state.cursorIndex;
-    if (cursor == [state.composingBuffer length] && cursor != 0) {
+    if (cursor == state.composingBuffer.length && cursor != 0) {
         cursor--;
     }
 
@@ -494,9 +493,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     if ([IMKInputController instancesRespondToSelector:@selector(showPreferences:)]) {
         [super showPreferences:sender];
     } else {
-        [(AppDelegate * )[
-        NSApp
-        delegate] showPreferences];
+        [(AppDelegate *) NSApp.delegate showPreferences];
     }
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 }
@@ -504,10 +501,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 - (void)toggleChineseConverter:(id)sender
 {
     BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
-    [NotifierController notifyWithMessage:
-            chineseConversionEnabled ?
-                    NSLocalizedString(@"Chinese conversion on", @"") :
-                    NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
+    [NotifierController notifyWithMessage:chineseConversionEnabled ? NSLocalizedString(@"Chinese conversion on", @"") : NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
 }
 
 - (void)toggleHalfWidthPunctuation:(id)sender
@@ -527,7 +521,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (void)checkForUpdate:(id)sender
 {
-    [(AppDelegate * )[[NSApplication sharedApplication] delegate] checkForUpdateForced:YES];
+    [(AppDelegate *) NSApp.delegate checkForUpdateForced:YES];
 }
 
 - (BOOL)_checkUserFiles
@@ -614,11 +608,11 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
         InputStateChoosingCandidate *state = (InputStateChoosingCandidate *) _state;
 
         // candidate selected, override the node with selection
-        string selectedValue = [[state.candidates objectAtIndex:index] UTF8String];
-        [_keyHandler fixNodeWithvalue:selectedValue];
+        string selectedValue = [state.candidates[index] UTF8String];
+        [_keyHandler fixNodeWithValue:selectedValue];
         InputStateInputting *inputting = [_keyHandler _buildInputtingState];
 
-        if ([_keyHandler inputMode] == kPlainBopomofoModeIdentifier) {
+        if (_keyHandler.inputMode == kPlainBopomofoModeIdentifier) {
             [_keyHandler clear];
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:inputting.composingBuffer];
             [self handleState:committing client:_currentCandidateClient];
@@ -644,8 +638,8 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     if (!state.validToWrite) {
         return NO;
     }
-    NSString *userphrase = state.userPhrase;
-    [LanguageModelManager writeUserPhrase:userphrase];
+    NSString *userPhrase = state.userPhrase;
+    [LanguageModelManager writeUserPhrase:userPhrase];
     return YES;
 }
 
@@ -693,8 +687,8 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 {
     NSRect lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0);
 
-    NSInteger cursor = cursorIndex;
-    if (cursor == [composingBuffer length] && cursor != 0) {
+    NSUInteger cursor = (NSUInteger) cursorIndex;
+    if (cursor == composingBuffer.length && cursor != 0) {
         cursor--;
     }
 
@@ -717,4 +711,3 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 }
 
 @end
-

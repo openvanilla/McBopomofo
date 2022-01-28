@@ -27,23 +27,23 @@ import Cocoa
 class InputState: NSObject {
 }
 
-/// Represents that the input controller is deactive.
-class InputStateDeactive: InputState {
+/// Represents that the input controller is deactivated.
+class InputStateDeactivated: InputState {
     override var description: String {
-        return "<InputStateDeactive>"
+        "<InputStateDeactivated>"
     }
 }
 
 /// Represents that the composing buffer is empty.
 class InputStateEmpty: InputState {
-    @objc var composingBuffer: String  {
+    @objc var composingBuffer: String {
         ""
     }
 }
 
 /// Represents that the composing buffer is empty.
 class InputStateEmptyIgnoringPreviousState: InputState {
-    @objc var composingBuffer: String  {
+    @objc var composingBuffer: String {
         ""
     }
 }
@@ -58,7 +58,7 @@ class InputStateCommitting: InputState {
     }
 
     override var description: String {
-        return "<InputStateCommitting poppedText:\(poppedText)>"
+        "<InputStateCommitting poppedText:\(poppedText)>"
     }
 }
 
@@ -73,14 +73,14 @@ class InputStateNotEmpty: InputState {
     }
 
     override var description: String {
-        return "<InputStateNotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        "<InputStateNotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
 }
 
 /// Represents that the user is inputting text.
 class InputStateInputting: InputStateNotEmpty {
     @objc var bpmfReading: String = ""
-    @objc var bpmfReadingCursotIndex: UInt8 = 0
+    @objc var bpmfReadingCursorIndex: UInt8 = 0
     @objc var poppedText: String = ""
 
     @objc override init(composingBuffer: String, cursorIndex: UInt) {
@@ -88,7 +88,7 @@ class InputStateInputting: InputStateNotEmpty {
     }
 
     @objc var attributedString: NSAttributedString {
-        let attributedSting = NSAttributedString(string: composingBuffer, attributes:  [
+        let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 0
         ])
@@ -96,7 +96,7 @@ class InputStateInputting: InputStateNotEmpty {
     }
 
     override var description: String {
-        return "<InputStateInputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
+        "<InputStateInputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
     }
 }
 
@@ -134,7 +134,7 @@ class InputStateMarking: InputStateNotEmpty {
         self.markerIndex = markerIndex
         let begin = min(cursorIndex, markerIndex)
         let end = max(cursorIndex, markerIndex)
-        self.markedRange = NSMakeRange(Int(begin), Int(end - begin))
+        markedRange = NSMakeRange(Int(begin), Int(end - begin))
         super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
     }
 
@@ -154,12 +154,12 @@ class InputStateMarking: InputStateNotEmpty {
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 2
         ], range: NSRange(location: end,
-                          length: composingBuffer.count - end))
+                length: composingBuffer.count - end))
         return attributedSting
     }
 
     override var description: String {
-        return "<InputStateMarking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
+        "<InputStateMarking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
     }
 
     @objc func convertToInputting() -> InputStateInputting {
@@ -168,7 +168,7 @@ class InputStateMarking: InputStateNotEmpty {
     }
 
     @objc var validToWrite: Bool {
-        return self.markedRange.length >= kMinMarkRangeLength && self.markedRange.length <= kMaxMarkRangeLength
+        markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
     }
 
     @objc var userPhrase: String {
@@ -192,7 +192,7 @@ class InputStateChoosingCandidate: InputStateNotEmpty {
     }
 
     @objc var attributedString: NSAttributedString {
-        let attributedSting = NSAttributedString(string: composingBuffer, attributes:  [
+        let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .markedClauseSegment: 0
         ])
@@ -200,6 +200,6 @@ class InputStateChoosingCandidate: InputStateNotEmpty {
     }
 
     override var description: String {
-        return "<InputStateChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        "<InputStateChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
     }
 }

@@ -46,8 +46,8 @@ extern NSString *const kPlainBopomofoModeIdentifier;
 candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
       errorCallback:(void (^)(void))errorCallback;
 
-- (void)synchWithPrefereneces;
-- (void)fixNodeWithvalue:(std::string)value;
+- (void)syncWithPreferences;
+- (void)fixNodeWithValue:(std::string)value;
 - (void)clear;
 
 - (InputStateInputting *)_buildInputtingState;

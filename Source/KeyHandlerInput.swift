@@ -37,7 +37,7 @@ enum KeyCode: UInt16 {
     case delete = 117
 }
 
-@objc class KeyHandlerInput: NSObject {
+class KeyHandlerInput: NSObject {
     @objc private (set) var useVerticalMode: Bool
     @objc private (set) var inputText: String?
     @objc private (set) var charCode: UInt16
@@ -55,21 +55,21 @@ enum KeyCode: UInt16 {
         self.keyCode = keyCode
         self.charCode = charCode
         self.flags = flags
-        self.useVerticalMode = isVerticalMode
-        self.emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: flags)
-        self.cursorForwardKey = useVerticalMode ? .down : .right
-        self.cursorBackwardKey = useVerticalMode ? .up : .left
-        self.extraChooseCandidateKey = useVerticalMode ? .left : .down
-        self.absorbedArrowKey = useVerticalMode ? .right : .up
-        self.verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
+        useVerticalMode = isVerticalMode
+        emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: flags)
+        cursorForwardKey = useVerticalMode ? .down : .right
+        cursorBackwardKey = useVerticalMode ? .up : .left
+        extraChooseCandidateKey = useVerticalMode ? .left : .down
+        absorbedArrowKey = useVerticalMode ? .right : .up
+        verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
         super.init()
     }
 
     @objc init(event: NSEvent, isVerticalMode: Bool) {
-        self.inputText = event.characters
-        self.keyCode = event.keyCode
-        self.flags = event.modifierFlags
-        self.useVerticalMode = isVerticalMode
+        inputText = event.characters
+        keyCode = event.keyCode
+        flags = event.modifierFlags
+        useVerticalMode = isVerticalMode
         let charCode: UInt16 = {
             guard let inputText = event.characters, inputText.count > 0 else {
                 return 0
@@ -78,98 +78,98 @@ enum KeyCode: UInt16 {
             return first
         }()
         self.charCode = charCode
-        self.emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: event.modifierFlags)
-        self.cursorForwardKey = useVerticalMode ? .down : .right
-        self.cursorBackwardKey = useVerticalMode ? .up : .left
-        self.extraChooseCandidateKey = useVerticalMode ? .left : .down
-        self.absorbedArrowKey = useVerticalMode ? .right : .up
-        self.verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
+        emacsKey = EmacsKeyHelper.detect(charCode: charCode, flags: event.modifierFlags)
+        cursorForwardKey = useVerticalMode ? .down : .right
+        cursorBackwardKey = useVerticalMode ? .up : .left
+        extraChooseCandidateKey = useVerticalMode ? .left : .down
+        absorbedArrowKey = useVerticalMode ? .right : .up
+        verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
         super.init()
-        NSLog("self.keyCode \(self.keyCode)")
+        NSLog("self.keyCode \(keyCode)")
     }
 
     @objc var isShiftHold: Bool {
-        self.flags.contains([.shift])
+        flags.contains([.shift])
     }
 
     @objc var isCommandHold: Bool {
-        self.flags.contains([.command])
+        flags.contains([.command])
     }
 
     @objc var isControlHold: Bool {
-        self.flags.contains([.control])
+        flags.contains([.control])
     }
 
-    @objc var isOptionlHold: Bool {
-        self.flags.contains([.option])
+    @objc var isOptionHold: Bool {
+        flags.contains([.option])
     }
 
     @objc var isCapsLockOn: Bool {
-        self.flags.contains([.capsLock])
+        flags.contains([.capsLock])
     }
 
     @objc var isNumericPad: Bool {
-        self.flags.contains([.numericPad])
+        flags.contains([.numericPad])
     }
 
     @objc var isEnter: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.enter
+        KeyCode(rawValue: keyCode) == KeyCode.enter
     }
 
     @objc var isUp: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.up
+        KeyCode(rawValue: keyCode) == KeyCode.up
     }
 
     @objc var isDown: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.down
+        KeyCode(rawValue: keyCode) == KeyCode.down
     }
 
     @objc var isLeft: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.left
+        KeyCode(rawValue: keyCode) == KeyCode.left
     }
 
     @objc var isRight: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.right
+        KeyCode(rawValue: keyCode) == KeyCode.right
     }
 
     @objc var isPageUp: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.pageUp
+        KeyCode(rawValue: keyCode) == KeyCode.pageUp
     }
 
     @objc var isPageDown: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.pageDown
+        KeyCode(rawValue: keyCode) == KeyCode.pageDown
     }
 
     @objc var isHome: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.home
+        KeyCode(rawValue: keyCode) == KeyCode.home
     }
 
     @objc var isEnd: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.end
+        KeyCode(rawValue: keyCode) == KeyCode.end
     }
 
     @objc var isDelete: Bool {
-        KeyCode(rawValue: self.keyCode) == KeyCode.delete
+        KeyCode(rawValue: keyCode) == KeyCode.delete
     }
 
     @objc var isCursorBackward: Bool {
-        KeyCode(rawValue: self.keyCode) == cursorBackwardKey
+        KeyCode(rawValue: keyCode) == cursorBackwardKey
     }
 
     @objc var isCursorForward: Bool {
-        KeyCode(rawValue: self.keyCode) == cursorForwardKey
+        KeyCode(rawValue: keyCode) == cursorForwardKey
     }
 
     @objc var isAbsorbedArrowKey: Bool {
-        KeyCode(rawValue: self.keyCode) == absorbedArrowKey
+        KeyCode(rawValue: keyCode) == absorbedArrowKey
     }
 
     @objc var isExtraChooseCandidateKey: Bool {
-        KeyCode(rawValue: self.keyCode) == extraChooseCandidateKey
+        KeyCode(rawValue: keyCode) == extraChooseCandidateKey
     }
 
     @objc var isVerticalModeOnlyChooseCandidateKey: Bool {
-        KeyCode(rawValue: self.keyCode) == verticalModeOnlyChooseCandidateKey
+        KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
     }
 
 }
