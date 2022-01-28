@@ -628,7 +628,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 @implementation McBopomofoInputMethodController (KeyHandlerDelegate)
 
-- (nonnull VTCandidateController *)candidateControllerForKeyHanlder:(nonnull KeyHandler *)keyHandler
+- (nonnull VTCandidateController *)candidateControllerForKeyHandler:(nonnull KeyHandler *)keyHandler
 {
     return gCurrentCandidateController;
 }

@@ -33,7 +33,7 @@ extern NSString *const kPlainBopomofoModeIdentifier;
 @class KeyHandler;
 
 @protocol KeyHandlerDelegate <NSObject>
-- (VTCandidateController *)candidateControllerForKeyHanlder:(KeyHandler *)keyHandler;
+- (VTCandidateController *)candidateControllerForKeyHandler:(KeyHandler *)keyHandler;
 - (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index candidateController:(VTCandidateController *)controller;
 - (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputStateMarking *)state;
 @end

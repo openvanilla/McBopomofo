@@ -62,7 +62,7 @@ public:
 };
 
 // if DEBUG is defined, a DOT file (GraphViz format) will be written to the
-// specified path everytime the grid is walked
+// specified path every time the grid is walked
 #if DEBUG
 static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot";
 #endif
@@ -525,8 +525,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     if ([input isShiftHold]) {
         // Shift + left
         if (_builder->cursorIndex() > 0) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1];
-            marking.readings = [self _currentReadings];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1 readings: [self _currentReadings]];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -562,8 +561,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     if ([input isShiftHold]) {
         // Shift + Right
         if (_builder->cursorIndex() < _builder->length()) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1];
-            marking.readings = [self _currentReadings];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1 readings: [self _currentReadings]];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -773,8 +771,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index -= 1;
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
-            marking.readings = state.readings;
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -789,8 +786,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index += 1;
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index];
-            marking.readings = state.readings;
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -810,7 +806,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 {
     NSString *inputText = input.inputText;
     UniChar charCode = input.charCode;
-    VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHanlder:self];
+    VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
     BOOL cancelCandidateKey = (charCode == 27) || [input isDelete] ||
             ((_inputMode == kPlainBopomofoModeIdentifier) && (charCode == 8));
