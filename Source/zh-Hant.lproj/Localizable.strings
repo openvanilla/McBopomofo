@@ -94,3 +94,7 @@
 "Phrase replacement mode is on. Not suggested to add phrase in the mode." = "詞彙轉換已開啟，不建議在此模式下加詞。";
 
 "Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
+
+"Half-width punctuation on" = "已經切換到半型標點模式";
+
+"Half-width punctuation off" = "已經切回到全型標點模式";

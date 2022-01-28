@@ -494,16 +494,14 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
 - (void)toggleChineseConverter:(id)sender
 {
-    BOOL chineseConversionEnabled = [Preferences toggleChineseConversionEnabled];
-    [NotifierController notifyWithMessage:chineseConversionEnabled ? NSLocalizedString(@"Chinese conversion on", @"") : NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
+    BOOL enabled = [Preferences toggleChineseConversionEnabled];
+    [NotifierController notifyWithMessage:enabled ? NSLocalizedString(@"Chinese conversion on", @"") : NSLocalizedString(@"Chinese conversion off", @"") stay:NO];
 }
 
 - (void)toggleHalfWidthPunctuation:(id)sender
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-    [Preferences toggleHalfWidthPunctuationEnabled];
-#pragma GCC diagnostic pop
+    BOOL enabled = [Preferences toggleHalfWidthPunctuationEnabled];
+    [NotifierController notifyWithMessage:enabled ? NSLocalizedString(@"Half-width punctuation on", @"") : NSLocalizedString(@"Half-width punctuation off", @"") stay:NO];
 }
 
 - (void)togglePhraseReplacementEnabled:(id)sender
