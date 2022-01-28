@@ -243,7 +243,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
     BOOL result = [_keyHandler handleInput:input state:_state stateCallback:^(InputState *state) {
         [self handleState:state client:client];
     }           candidateSelectionCallback:^{
-        NSLog(@"candidate window updated.");
+//        NSLog(@"candidate window updated.");
     }                        errorCallback:^{
         NSBeep();
     }];

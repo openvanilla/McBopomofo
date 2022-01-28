@@ -85,7 +85,6 @@ class KeyHandlerInput: NSObject {
         absorbedArrowKey = useVerticalMode ? .right : .up
         verticalModeOnlyChooseCandidateKey = useVerticalMode ? absorbedArrowKey : .none
         super.init()
-        NSLog("self.keyCode \(keyCode)")
     }
 
     @objc var isShiftHold: Bool {
