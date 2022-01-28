@@ -393,7 +393,7 @@ static inline NSString *LocalizationNotNeeded(NSString *s) {
 
     gCurrentCandidateController.visible = NO;
     if (state.tooltip.length) {
-        [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer cursorIndex:cursorIndex client:client];
+        [self _showTooltip:state.tooltip composingBuffer:state.composingBuffer cursorIndex:state.markerIndex client:client];
     } else {
         [self _hideTooltip];
     }
