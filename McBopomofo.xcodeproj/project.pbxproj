@@ -60,6 +60,12 @@
 		D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3B82796A8A000657FF3 /* PreferencesTests.swift */; };
 		D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */; };
 		D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */; };
+		D4E569DF27A40F1400AC2CEF /* KeyHandlerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DE27A40F1400AC2CEF /* KeyHandlerTests.mm */; };
+		D4E569E027A4123200AC2CEF /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
+		D4E569E127A4128300AC2CEF /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
+		D4E569E227A412E700AC2CEF /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
+		D4E569E427A414CB00AC2CEF /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
+		D4E569E527A414CB00AC2CEF /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
 		D4F0BBDF279AF1AF0071253C /* ArchiveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */; };
 		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 		D4F0BBE4279B08900071253C /* BundleTranslocate.m in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE3279B08900071253C /* BundleTranslocate.m */; };
@@ -217,6 +223,8 @@
 		D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionUpdateTests.swift; sourceTree = "<group>"; };
 		D4E569DA27A34CC100AC2CEF /* KeyHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyHandler.h; sourceTree = "<group>"; };
 		D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandler.mm; sourceTree = "<group>"; };
+		D4E569DD27A40F1300AC2CEF /* McBopomofoTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		D4E569DE27A40F1400AC2CEF /* KeyHandlerTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandlerTests.mm; sourceTree = "<group>"; };
 		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D4F0BBE2279B08900071253C /* BundleTranslocate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BundleTranslocate.h; sourceTree = "<group>"; };
@@ -494,6 +502,8 @@
 			children = (
 				D485D3B82796A8A000657FF3 /* PreferencesTests.swift */,
 				D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */,
+				D4E569DE27A40F1400AC2CEF /* KeyHandlerTests.mm */,
+				D4E569DD27A40F1300AC2CEF /* McBopomofoTests-Bridging-Header.h */,
 			);
 			path = McBopomofoTests;
 			sourceTree = "<group>";
@@ -601,6 +611,7 @@
 					};
 					D485D3B52796A8A000657FF3 = {
 						CreatedOnToolsVersion = 13.2.1;
+						LastSwiftMigration = 1320;
 						TestTargetID = 6A0D4EA115FC0D2D00ABF4B3;
 					};
 				};
@@ -672,6 +683,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4E569E527A414CB00AC2CEF /* data.txt in Resources */,
+				D4E569E427A414CB00AC2CEF /* data-plain-bpmf.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -737,8 +750,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4E569DF27A40F1400AC2CEF /* KeyHandlerTests.mm in Sources */,
 				D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */,
+				D4E569E227A412E700AC2CEF /* Preferences.swift in Sources */,
+				D4E569E127A4128300AC2CEF /* InputState.swift in Sources */,
 				D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */,
+				D4E569E027A4123200AC2CEF /* KeyHandlerInput.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1236,6 +1253,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -1256,6 +1274,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1265,6 +1288,7 @@
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "McBopomofoTests/McBopomofoTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/McBopomofo.app/Contents/MacOS/McBopomofo";
@@ -1280,6 +1304,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -1295,6 +1320,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1303,6 +1333,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "McBopomofoTests/McBopomofoTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/McBopomofo.app/Contents/MacOS/McBopomofo";

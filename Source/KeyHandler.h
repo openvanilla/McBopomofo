@@ -22,8 +22,13 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import "McBopomofo-Swift.h"
+#import <string>
 @import CandidateUI;
+
+@class KeyHandlerInput;
+@class InputState;
+@class InputStateInputting;
+@class InputStateMarking;
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -28,6 +28,7 @@
 #import "LanguageModelManager.h"
 #import "OVUTF8Helper.h"
 #import "KeyHandler.h"
+#import "McBopomofo-Swift.h"
 
 // C++ namespace usages
 using namespace std;
