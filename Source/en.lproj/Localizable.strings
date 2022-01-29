@@ -69,7 +69,7 @@
 
 "You are now selecting \"%@\". Press enter to add a new phrase." = "You are now selecting \"%@\". Press enter to add a new phrase.";
 
-"You are now selecting \"%@\". A phrase cannot be longer than 6 characters." = "You are now selecting \"%@\". A phrase cannot be longer than 6 characters.";
+"You are now selecting \"%@\". A phrase cannot be longer than %d characters." = "You are now selecting \"%@\". A phrase cannot be longer than %d characters.";
 
 "Chinese conversion on" = "Chinese conversion on";
 
@@ -94,3 +94,7 @@
 "Phrase replacement mode is on. Not suggested to add phrase in the mode." = "Phrase replacement mode is on. Not suggested to add phrase in the mode.";
 
 "Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "Model based Chinese conversion is on. Not suggested to add phrase in the mode.";
+
+"Half-width punctuation on" = "Half-width punctuation on";
+
+"Half-width punctuation off" = "Half-width punctuation off";

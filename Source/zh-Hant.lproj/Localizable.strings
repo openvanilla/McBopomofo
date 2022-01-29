@@ -69,7 +69,7 @@
 
 "You are now selecting \"%@\". Press enter to add a new phrase." = "您目前選擇了 \"%@\"。按下 Enter 就可以加入到使用者詞彙中。";
 
-"You are now selecting \"%@\". A phrase cannot be longer than 6 characters." = "您目前選擇了 \"%@\"。自訂詞彙不能超過六個字元。";
+"You are now selecting \"%@\". A phrase cannot be longer than %d characters." = "您目前選擇了 \"%@\"。自訂詞彙不能超過 %d 個字元。";
 
 "Chinese conversion on" = "已經切換到簡體中文模式";
 
@@ -94,3 +94,7 @@
 "Phrase replacement mode is on. Not suggested to add phrase in the mode." = "詞彙轉換已開啟，不建議在此模式下加詞。";
 
 "Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
+
+"Half-width punctuation on" = "已經切換到半型標點模式";
+
+"Half-width punctuation off" = "已經切回到全型標點模式";

@@ -22,20 +22,13 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "LanguageModelManager.h"
-#import <fstream>
-#import <iostream>
-#import <set>
-#import "OVStringHelper.h"
-#import "OVUTF8Helper.h"
 #import "McBopomofo-Swift.h"
 
 @import VXHanConvert;
 @import OpenCCBridge;
 
 using namespace std;
-using namespace Formosa::Gramambular;
 using namespace McBopomofo;
-using namespace OpenVanilla;
 
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
@@ -174,7 +167,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
         return NO;
     }
 
-    BOOL shuoldAddLineBreakAtFront = NO;
+    BOOL addLineBreakAtFront = NO;
     NSString *path = [self userPhrasesDataPathMcBopomofo];
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
@@ -188,7 +181,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
                 NSData *data = [readFile readDataToEndOfFile];
                 const void *bytes = [data bytes];
                 if (*(char *)bytes != '\n') {
-                    shuoldAddLineBreakAtFront = YES;
+                    addLineBreakAtFront = YES;
                 }
                 [readFile closeFile];
             }
@@ -196,7 +189,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     }
 
     NSMutableString *currentMarkedPhrase = [NSMutableString string];
-    if (shuoldAddLineBreakAtFront) {
+    if (addLineBreakAtFront) {
         [currentMarkedPhrase appendString:@"\n"];
     }
     [currentMarkedPhrase appendString:userPhrase];
@@ -218,7 +211,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 + (NSString *)dataFolderPath
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = [paths objectAtIndex:0];
+    NSString *appSupportPath = paths[0];
     NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
     return userDictPath;
 }

@@ -1,5 +1,5 @@
 import XCTest
-@testable import McBopomofo
+//@testable import McBopomofo
 
 class PreferencesTests: XCTestCase {
 
