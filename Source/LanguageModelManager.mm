@@ -60,6 +60,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
 }
 
++ (void)loadDataModel:(InputMode)mode
+{
+    if ([mode isEqualToString:InputModeBopomofo]) {
+        LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+    }
+    if ([mode isEqualToString:InputModePlainBopomofo]) {
+        LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    }
+}
+
 + (void)loadUserPhrases
 {
     gLanguageModelMcBopomofo.loadUserPhrases([[self userPhrasesDataPathMcBopomofo] UTF8String], [[self excludedPhrasesDataPathMcBopomofo] UTF8String]);

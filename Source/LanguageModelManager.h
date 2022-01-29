@@ -22,12 +22,14 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "KeyHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LanguageModelManager : NSObject
 
 + (void)loadDataModels;
++ (void)loadDataModel:(InputMode)mode;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 + (void)setupDataModelValueConverter;

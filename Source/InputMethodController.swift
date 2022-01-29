@@ -127,6 +127,7 @@ class McBopomofoInputMethodController: IMKInputController {
 
     override func setValue(_ value: Any!, forTag tag: Int, client: Any!) {
         let newInputMode = InputMode(rawValue: value as? String ?? InputMode.bopomofo.rawValue)
+        LanguageModelManager.loadDataModel(newInputMode)
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
             // Remember to override the keyboard layout again -- treat this as an activate event.
