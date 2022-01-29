@@ -64,7 +64,8 @@ fileprivate class HorizontalCandidateView: NSView {
         for index in 0..<count {
             let labelRect = (keyLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
             let candidateRect = (displayedCandidates[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict)
-            let cellWidth = max(labelRect.size.width, candidateRect.size.width) + cellPadding;
+            let cellWidth = max(keyLabelHeight * 2,
+                                max(labelRect.size.width, candidateRect.size.width)) + cellPadding;
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
