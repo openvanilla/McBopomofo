@@ -28,8 +28,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const kBopomofoModeIdentifier;
-extern NSString *const kPlainBopomofoModeIdentifier;
+typedef NSString *const InputMode NS_TYPED_ENUM;
+extern InputMode InputModeBopomofo;
+extern InputMode InputModePlainBopomofo;
 
 @class KeyHandler;
 
@@ -53,7 +54,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
 
 - (InputState *)buildInputtingState;
 
-@property (strong, nonatomic) NSString *inputMode;
+@property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id <KeyHandlerDelegate> delegate;
 @end
 

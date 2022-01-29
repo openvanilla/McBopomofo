@@ -76,7 +76,7 @@ class McBopomofoInputMethodController: IMKInputController {
         let inputMode = keyHandler.inputMode
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
 
-        if inputMode == kBopomofoModeIdentifier && optionKeyPressed {
+        if inputMode == .bopomofo && optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
         }
@@ -84,7 +84,7 @@ class McBopomofoInputMethodController: IMKInputController {
         menu.addItem(NSMenuItem.separator())
         menu.addItem(withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil, keyEquivalent: "")
 
-        if inputMode == kPlainBopomofoModeIdentifier {
+        if inputMode == .plainBopomofo {
             menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesPlainBopomofo(_:)), keyEquivalent: "")
         } else {
             menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
@@ -126,7 +126,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     override func setValue(_ value: Any!, forTag tag: Int, client: Any!) {
-        let newInputMode = value as? String ?? kBopomofoModeIdentifier
+        let newInputMode = InputMode(rawValue: value as? String ?? InputMode.bopomofo.rawValue)
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
             // Remember to override the keyboard layout again -- treat this as an activate event.
@@ -535,7 +535,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             return
         }
 
-        if keyHandler.inputMode == kPlainBopomofoModeIdentifier {
+        if keyHandler.inputMode == .plainBopomofo {
             keyHandler.clear()
             handle(state: .Committing(poppedText: inputting.composingBuffer), client: currentCandidateClient)
             handle(state: .Empty(), client: currentDeferredClient)

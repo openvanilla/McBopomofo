@@ -84,7 +84,7 @@ public:
 
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
-    /// If phrease replacement is enabled or not.
+    /// If phrase replacement is enabled or not.
     bool phraseReplacementEnabled();
 
     /// Enables or disables the external converter.
