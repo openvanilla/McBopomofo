@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "LanguageModelManager.h"
+#import "LanguageModelManager+Privates.h"
 #import "McBopomofo-Swift.h"
 
 @import VXHanConvert;
@@ -249,6 +250,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 + (McBopomofo::UserOverrideModel *)userOverrideModel
 {
     return &gUserOverrideModel;
+}
+
++ (BOOL)phraseReplacementEnabled
+{
+    return gLanguageModelMcBopomofo.phraseReplacementEnabled();
+}
+
++ (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled
+{
+    gLanguageModelMcBopomofo.setPhraseReplacementEnabled(phraseReplacementEnabled);
 }
 
 @end

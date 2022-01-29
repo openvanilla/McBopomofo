@@ -22,8 +22,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import "UserOverrideModel.h"
-#import "McBopomofoLM.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -41,9 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathMcBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathPlainBopomofo;
 @property (class, readonly, nonatomic) NSString *phraseReplacementDataPathMcBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelMcBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelPlainBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::UserOverrideModel *userOverrideModel;
+@property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -4,9 +4,5 @@
 
 @import Foundation;
 
-@interface LanguageModelManager : NSObject
-+ (void)loadDataModels;
-+ (void)loadUserPhrases;
-+ (void)loadUserPhraseReplacement;
-+ (void)setupDataModelValueConverter;
-@end
+#import "KeyHandler.h"
+#import "LanguageModelManager.h"

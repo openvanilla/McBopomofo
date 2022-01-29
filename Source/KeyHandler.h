@@ -22,13 +22,9 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import <string>
-@import CandidateUI;
 
 @class KeyHandlerInput;
 @class InputState;
-@class InputStateInputting;
-@class InputStateMarking;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,9 +34,9 @@ extern NSString *const kPlainBopomofoModeIdentifier;
 @class KeyHandler;
 
 @protocol KeyHandlerDelegate <NSObject>
-- (VTCandidateController *)candidateControllerForKeyHandler:(KeyHandler *)keyHandler;
-- (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index candidateController:(VTCandidateController *)controller;
-- (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputStateMarking *)state;
+- (id)candidateControllerForKeyHandler:(KeyHandler *)keyHandler;
+- (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index candidateController:(id)controller;
+- (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputState *)state;
 @end
 
 @interface KeyHandler : NSObject
@@ -52,10 +48,10 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
       errorCallback:(void (^)(void))errorCallback;
 
 - (void)syncWithPreferences;
-- (void)fixNodeWithValue:(std::string)value;
+- (void)fixNodeWithValue:(NSString *)value;
 - (void)clear;
 
-- (InputStateInputting *)_buildInputtingState;
+- (InputState *)buildInputtingState;
 
 @property (strong, nonatomic) NSString *inputMode;
 @property (weak, nonatomic) id <KeyHandlerDelegate> delegate;
