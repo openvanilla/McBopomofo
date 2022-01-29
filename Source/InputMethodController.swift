@@ -77,7 +77,7 @@ class McBopomofoInputMethodController: IMKInputController {
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
 
         if inputMode == kBopomofoModeIdentifier && optionKeyPressed {
-            let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacementEnabled(_:)), keyEquivalent: "")
+            let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
         }
 
@@ -199,7 +199,7 @@ class McBopomofoInputMethodController: IMKInputController {
         NotifierController.notify(message: enabled ? NSLocalizedString("Half-width punctuation on", comment: "") : NSLocalizedString("Half-width punctuation off", comment: ""))
     }
 
-    @objc func togglePhraseReplacementEnabled(_ sender: Any?) {
+    @objc func togglePhraseReplacement(_ sender: Any?) {
         let enabled = Preferences.togglePhraseReplacementEnabled()
         LanguageModelManager.phraseReplacementEnabled = enabled
     }
@@ -209,7 +209,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     private func open(userFileAt path: String) {
-        func checkUserFiles() -> Bool {
+        func checkIfUserFilesExist() -> Bool {
             if !LanguageModelManager.checkIfUserLanguageModelFilesExist() {
                 let content = String(format: NSLocalizedString("Please check the permission of at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
                 NonModalAlertWindowController.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
@@ -218,7 +218,7 @@ class McBopomofoInputMethodController: IMKInputController {
             return true
         }
 
-        if !checkUserFiles() {
+        if !checkIfUserFilesExist() {
             return
         }
         let url = URL(fileURLWithPath: path)
@@ -429,15 +429,15 @@ extension McBopomofoInputMethodController {
         let textSize = Preferences.candidateListTextSize
         let keyLabelSize = max(textSize / 2, kMinKeyLabelSize)
 
-        func fallbackFont(name: String?, size: CGFloat) -> NSFont {
+        func font(name: String?, size: CGFloat) -> NSFont {
             if let name = name {
                 return NSFont(name: name, size: size) ?? NSFont.systemFont(ofSize: size)
             }
             return NSFont.systemFont(ofSize: size)
         }
 
-        gCurrentCandidateController?.keyLabelFont = fallbackFont(name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
-        gCurrentCandidateController?.candidateFont = fallbackFont(name: Preferences.candidateTextFontName, size: textSize)
+        gCurrentCandidateController?.keyLabelFont = font(name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
+        gCurrentCandidateController?.candidateFont = font(name: Preferences.candidateTextFontName, size: textSize)
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
