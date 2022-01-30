@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LanguageModelManager : NSObject
 
-+ (void)loadDataModels;
 + (void)loadDataModel:(InputMode)mode;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
@@ -43,6 +42,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) NSString *phraseReplacementDataPathMcBopomofo;
 @property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
 
+@end
+
+/// The following methods are merely for testing.
+@interface LanguageModelManager ()
++ (void)loadDataModels;
 @end
 
 NS_ASSUME_NONNULL_END
