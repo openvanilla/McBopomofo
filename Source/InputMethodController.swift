@@ -119,7 +119,7 @@ class McBopomofoInputMethodController: IMKInputController {
         (NSApp.delegate as? AppDelegate)?.checkForUpdate()
     }
 
-    override func deactivateServer(_ sender: Any!) {
+    override func deactivateServer(_ client: Any!) {
         keyHandler.clear()
         self.handle(state: .Empty(), client: client)
         self.handle(state: .Deactivated(), client: client)
