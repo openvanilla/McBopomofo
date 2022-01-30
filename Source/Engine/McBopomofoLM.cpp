@@ -39,6 +39,11 @@ McBopomofoLM::~McBopomofoLM()
     m_phraseReplacement.close();
 }
 
+bool McBopomofoLM::isDataModelLoaded()
+{
+    return m_languageModel.isLoaded();
+}
+
 void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath)
 {
     if (languageModelDataPath) {

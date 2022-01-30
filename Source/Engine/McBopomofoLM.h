@@ -64,6 +64,8 @@ public:
     /// Asks to load the primary language model a the given path.
     /// @param languageModelPath Thw path of the language model.
     void loadLanguageModel(const char* languageModelPath);
+    /// If the data model is already loaded.
+    bool isDataModelLoaded();
     /// Asks to load the user phrases and excluded phrases at the given path.
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.

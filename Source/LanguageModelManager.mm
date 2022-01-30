@@ -55,17 +55,25 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 
 + (void)loadDataModels
 {
-    LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
-    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
+        LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+    }
+    if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
+        LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    }
 }
 
 + (void)loadDataModel:(InputMode)mode
 {
     if ([mode isEqualToString:InputModeBopomofo]) {
-        LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+        if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
+            LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+        }
     }
     if ([mode isEqualToString:InputModePlainBopomofo]) {
-        LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+        if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
+            LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+        }
     }
 }
 
