@@ -498,7 +498,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // if the option is enabled, we clear everything including the composing
         // buffer, walked nodes and the reading.
         [self clear];
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
     } else {
         // if reading is not empty, we cancel the reading; Apple's built-in
