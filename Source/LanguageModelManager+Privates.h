@@ -1,4 +1,4 @@
-// Copyright (c) 2011 and onwards The McBopomofo Authors.
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -21,12 +21,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
-#import <InputMethodKit/InputMethodKit.h>
-#import "McBopomofo-Swift.h"
+#import "LanguageModelManager.h"
+#import "UserOverrideModel.h"
+#import "McBopomofoLM.h"
 
-@interface McBopomofoInputMethodController : IMKInputController
+NS_ASSUME_NONNULL_BEGIN
 
-- (void)handleState:(InputState *)newState client:(id)client;
-
+@interface LanguageModelManager ()
+@property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelMcBopomofo;
+@property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelPlainBopomofo;
+@property (class, readonly, nonatomic) McBopomofo::UserOverrideModel *userOverrideModel;
 @end
+
+NS_ASSUME_NONNULL_END

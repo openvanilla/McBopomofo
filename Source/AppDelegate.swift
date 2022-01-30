@@ -153,7 +153,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.setupDataModelValueConverter()
-        LanguageModelManager.loadDataModels()
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()
 

@@ -37,8 +37,8 @@ using namespace Formosa::Gramambular;
 /// McBopomofoLM is a facade for managing a set of models including
 /// the input method language model, user phrases and excluded phrases.
 ///
-/// It is the primary model class that the input controller and grammer builder
-/// of McBopomofo talk to. When the grammer builder starts to build a sentense
+/// It is the primary model class that the input controller and grammar builder
+/// of McBopomofo talks to. When the grammar builder starts to build a sentence
 /// from a series of BPMF readings, it passes the readings to the model to see
 /// if there are valid unigrams, and use returned unigrams to produce the final
 /// results.
@@ -64,6 +64,8 @@ public:
     /// Asks to load the primary language model a the given path.
     /// @param languageModelPath Thw path of the language model.
     void loadLanguageModel(const char* languageModelPath);
+    /// If the data model is already loaded.
+    bool isDataModelLoaded();
     /// Asks to load the user phrases and excluded phrases at the given path.
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.
@@ -84,7 +86,7 @@ public:
 
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
-    /// If phrease replacement is enabled or not.
+    /// If phrase replacement is enabled or not.
     bool phraseReplacementEnabled();
 
     /// Enables or disables the external converter.

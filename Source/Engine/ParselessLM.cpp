@@ -32,6 +32,14 @@
 
 McBopomofo::ParselessLM::~ParselessLM() { close(); }
 
+bool McBopomofo::ParselessLM::isLoaded()
+{
+    if (data_) {
+        return true;
+    }
+    return false;
+}
+
 bool McBopomofo::ParselessLM::open(const std::string_view& path)
 {
     if (data_) {

@@ -37,6 +37,7 @@ class ParselessLM : public Formosa::Gramambular::LanguageModel {
 public:
     ~ParselessLM() override;
 
+    bool isLoaded();
     bool open(const std::string_view& path);
     void close();
 

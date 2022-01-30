@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "LanguageModelManager.h"
+#import "LanguageModelManager+Privates.h"
 #import "McBopomofo-Swift.h"
 
 @import VXHanConvert;
@@ -33,16 +34,15 @@ using namespace McBopomofo;
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 
-McBopomofoLM gLanguageModelMcBopomofo;
-McBopomofoLM gLanguageModelPlainBopomofo;
-UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static McBopomofoLM gLanguageModelMcBopomofo;
+static McBopomofoLM gLanguageModelPlainBopomofo;
+static UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
-NSString *const kUserDataTemplateName = @"template-data";
-NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
-NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
-NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
-NSString *const kTemplateExtension = @".txt";
-
+static NSString *const kUserDataTemplateName = @"template-data";
+static NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
+static NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
+static NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
+static NSString *const kTemplateExtension = @".txt";
 
 @implementation LanguageModelManager
 
@@ -55,8 +55,26 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 
 + (void)loadDataModels
 {
-    LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
-    LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
+        LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+    }
+    if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
+        LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    }
+}
+
++ (void)loadDataModel:(InputMode)mode
+{
+    if ([mode isEqualToString:InputModeBopomofo]) {
+        if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
+            LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+        }
+    }
+    if ([mode isEqualToString:InputModePlainBopomofo]) {
+        if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
+            LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+        }
+    }
 }
 
 + (void)loadUserPhrases
@@ -249,6 +267,16 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 + (McBopomofo::UserOverrideModel *)userOverrideModel
 {
     return &gUserOverrideModel;
+}
+
++ (BOOL)phraseReplacementEnabled
+{
+    return gLanguageModelMcBopomofo.phraseReplacementEnabled();
+}
+
++ (void)setPhraseReplacementEnabled:(BOOL)phraseReplacementEnabled
+{
+    gLanguageModelMcBopomofo.setPhraseReplacementEnabled(phraseReplacementEnabled);
 }
 
 @end

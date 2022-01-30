@@ -22,14 +22,13 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import "UserOverrideModel.h"
-#import "McBopomofoLM.h"
+#import "KeyHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LanguageModelManager : NSObject
 
-+ (void)loadDataModels;
++ (void)loadDataModel:(InputMode)mode;
 + (void)loadUserPhrases;
 + (void)loadUserPhraseReplacement;
 + (void)setupDataModelValueConverter;
@@ -41,9 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathMcBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathPlainBopomofo;
 @property (class, readonly, nonatomic) NSString *phraseReplacementDataPathMcBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelMcBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelPlainBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::UserOverrideModel *userOverrideModel;
+@property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
+
+@end
+
+/// The following methods are merely for testing.
+@interface LanguageModelManager ()
++ (void)loadDataModels;
 @end
 
 NS_ASSUME_NONNULL_END

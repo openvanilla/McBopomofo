@@ -25,10 +25,13 @@
 #import "Gramambular.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
-#import "LanguageModelManager.h"
+#import "LanguageModelManager+Privates.h"
 #import "OVUTF8Helper.h"
 #import "KeyHandler.h"
 #import "McBopomofo-Swift.h"
+#import <string>
+
+@import CandidateUI;
 
 // C++ namespace usages
 using namespace std;
@@ -37,8 +40,8 @@ using namespace Formosa::Gramambular;
 using namespace McBopomofo;
 using namespace OpenVanilla;
 
-NSString *const kBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
-NSString *const kPlainBopomofoModeIdentifier = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
+InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
+InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
 
 static const double kEpsilon = 0.000001;
 
@@ -102,12 +105,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     NSString *newInputMode;
     McBopomofoLM *newLanguageModel;
 
-    if ([value isKindOfClass:[NSString class]] && [value isEqual:kPlainBopomofoModeIdentifier]) {
-        newInputMode = kPlainBopomofoModeIdentifier;
+    if ([value isKindOfClass:[NSString class]] && [value isEqual:InputModePlainBopomofo]) {
+        newInputMode = InputModePlainBopomofo;
         newLanguageModel = [LanguageModelManager languageModelPlainBopomofo];
         newLanguageModel->setPhraseReplacementEnabled(false);
     } else {
-        newInputMode = kBopomofoModeIdentifier;
+        newInputMode = InputModeBopomofo;
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
         newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
@@ -157,7 +160,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
-        _inputMode = kBopomofoModeIdentifier;
+        _inputMode = InputModeBopomofo;
     }
     return self;
 }
@@ -191,12 +194,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
 
-- (void)fixNodeWithValue:(std::string)value
+- (void)fixNodeWithValue:(NSString *)value
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
-    _builder->grid().fixNodeSelectedCandidate(cursorIndex, value);
-    if (_inputMode != kPlainBopomofoModeIdentifier) {
-        _userOverrideModel->observe(_walkedNodes, cursorIndex, value, [[NSDate date] timeIntervalSince1970]);
+    string stringValue = [value UTF8String];
+    _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
+    if (_inputMode != InputModePlainBopomofo) {
+        _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
     }
     [self _walk];
 }
@@ -297,7 +301,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // update the composing buffer
         composeReading = _bpmfReadingBuffer->hasToneMarker();
         if (!composeReading) {
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
             return YES;
         }
@@ -313,7 +317,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
             errorCallback();
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
             return YES;
         }
@@ -325,7 +329,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        string overrideValue = (_inputMode == kPlainBopomofoModeIdentifier) ? "" :
+        string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" :
                 _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
@@ -338,11 +342,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // then update the text
         _bpmfReadingBuffer->clear();
 
-        InputStateInputting *inputting = [self _buildInputtingState];
+        InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         inputting.poppedText = poppedText;
         stateCallback(inputting);
 
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
+        if (_inputMode == InputModePlainBopomofo) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
@@ -376,7 +380,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 } else if (_languageModel->hasUnigramsForKey(" ")) {
                     _builder->insertReadingAtCursor(" ");
                     NSString *poppedText = [self _popOverflowComposingTextAndWalk];
-                    InputStateInputting *inputting = [self _buildInputtingState];
+                    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
                     inputting.poppedText = poppedText;
                     stateCallback(inputting);
                 }
@@ -440,7 +444,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             if (_bpmfReadingBuffer->isEmpty()) {
                 _builder->insertReadingAtCursor(string("_punctuation_list"));
                 NSString *poppedText = [self _popOverflowComposingTextAndWalk];
-                InputStateInputting *inputting = [self _buildInputtingState];
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
                 inputting.poppedText = poppedText;
                 stateCallback(inputting);
                 InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
@@ -494,7 +498,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // if the option is enabled, we clear everything including the composing
         // buffer, walked nodes and the reading.
         [self clear];
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
     } else {
         // if reading is not empty, we cancel the reading; Apple's built-in
@@ -510,7 +514,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             }
         } else {
             _bpmfReadingBuffer->clear();
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         }
     }
@@ -543,7 +547,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     } else {
         if (_builder->cursorIndex() > 0) {
             _builder->setCursorIndex(_builder->cursorIndex() - 1);
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         } else {
             errorCallback();
@@ -579,7 +583,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     } else {
         if (_builder->cursorIndex() < _builder->length()) {
             _builder->setCursorIndex(_builder->cursorIndex() + 1);
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         } else {
             errorCallback();
@@ -604,7 +608,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if (_builder->cursorIndex()) {
         _builder->setCursorIndex(0);
-        InputStateInputting *inputting = [self _buildInputtingState];
+        InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     } else {
         errorCallback();
@@ -628,7 +632,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if (_builder->cursorIndex() != _builder->length()) {
         _builder->setCursorIndex(_builder->length());
-        InputStateInputting *inputting = [self _buildInputtingState];
+        InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     } else {
         errorCallback();
@@ -666,7 +670,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _bpmfReadingBuffer->backspace();
     }
 
-    InputStateInputting *inputting = [self _buildInputtingState];
+    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     if (!inputting.composingBuffer.length) {
         InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
@@ -686,7 +690,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (_builder->cursorIndex() != _builder->length()) {
             _builder->deleteReadingAfterCursor();
             [self _walk];
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             if (!inputting.composingBuffer.length) {
                 InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);
@@ -708,7 +712,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if ([state isKindOfClass:[InputStateInputting class]]) {
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
+        if (_inputMode == InputModePlainBopomofo) {
             if (!_bpmfReadingBuffer->isEmpty()) {
                 errorCallback();
             }
@@ -745,11 +749,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    InputStateInputting *inputting = [self _buildInputtingState];
+    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     inputting.poppedText = poppedText;
     stateCallback(inputting);
 
-    if (_inputMode == kPlainBopomofoModeIdentifier && _bpmfReadingBuffer->isEmpty()) {
+    if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateState:inputting useVerticalMode:useVerticalMode];
 
         if ([candidateState.candidates count] == 1) {
@@ -775,7 +779,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     UniChar charCode = input.charCode;
 
     if (charCode == 27) {
-        InputStateInputting *inputting = [self _buildInputtingState];
+        InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
         return YES;
     }
@@ -786,7 +790,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             errorCallback();
             return YES;
         }
-        InputStateInputting *inputting = [self _buildInputtingState];
+        InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
         return YES;
     }
@@ -837,12 +841,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete]; 
 
     if (cancelCandidateKey) {
-        if (_inputMode == kPlainBopomofoModeIdentifier) {
+        if (_inputMode == InputModePlainBopomofo) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         } else {
-            InputStateInputting *inputting = [self _buildInputtingState];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         }
         return YES;
@@ -993,7 +997,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         }
     }
 
-    if (_inputMode == kPlainBopomofoModeIdentifier) {
+    if (_inputMode == InputModePlainBopomofo) {
         string layout = [self _currentLayout];
         string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_") : string("_punctuation_");
         string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
@@ -1029,7 +1033,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 #pragma mark - States Building
 
-- (InputStateInputting *)_buildInputtingState
+- (InputStateInputting *)buildInputtingState
 {
     // "updating the composing buffer" means to request the client to "refresh" the text input buffer
     // with our "composing text"
