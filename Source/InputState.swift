@@ -60,7 +60,7 @@ class InputState: NSObject {
     @objc (InputStateDeactivated)
     class Deactivated: InputState {
         override var description: String {
-            "<InputStateDeactivated>"
+            "<InputState.Deactivated>"
         }
     }
 
@@ -70,14 +70,20 @@ class InputState: NSObject {
         @objc var composingBuffer: String {
             ""
         }
-    }
 
+        override var description: String {
+            "<InputState.Empty>"
+        }
+    }
 
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmptyIgnoringPreviousState)
     class EmptyIgnoringPreviousState: InputState {
         @objc var composingBuffer: String {
             ""
+        }
+        override var description: String {
+            "<InputState.EmptyIgnoringPreviousState>"
         }
     }
 
@@ -92,7 +98,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputStateCommitting poppedText:\(poppedText)>"
+            "<InputState.Committing poppedText:\(poppedText)>"
         }
     }
     /// Represents that the composing buffer is not empty.
@@ -107,7 +113,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputStateNotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+            "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
     }
 
@@ -131,7 +137,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputStateInputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
+            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
         }
     }
 
@@ -196,7 +202,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputStateMarking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
+            "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
         }
 
         @objc func convertToInputting() -> Inputting {
@@ -238,7 +244,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputStateChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+            "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
     }
 
