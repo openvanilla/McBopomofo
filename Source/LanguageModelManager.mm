@@ -34,16 +34,15 @@ using namespace McBopomofo;
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
 
-McBopomofoLM gLanguageModelMcBopomofo;
-McBopomofoLM gLanguageModelPlainBopomofo;
-UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static McBopomofoLM gLanguageModelMcBopomofo;
+static McBopomofoLM gLanguageModelPlainBopomofo;
+static UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
-NSString *const kUserDataTemplateName = @"template-data";
-NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
-NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
-NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
-NSString *const kTemplateExtension = @".txt";
-
+static NSString *const kUserDataTemplateName = @"template-data";
+static NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
+static NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
+static NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
+static NSString *const kTemplateExtension = @".txt";
 
 @implementation LanguageModelManager
 
