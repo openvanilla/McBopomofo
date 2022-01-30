@@ -40,8 +40,9 @@ enum KeyCode: UInt16 {
 class KeyHandlerInput: NSObject {
     @objc private (set) var useVerticalMode: Bool
     @objc private (set) var inputText: String?
+    @objc private (set) var inputTextIgnoringModifiers: String?
     @objc private (set) var charCode: UInt16
-    private var keyCode: UInt16
+    @objc private (set) var keyCode: UInt16
     private var flags: NSEvent.ModifierFlags
     private var cursorForwardKey: KeyCode
     private var cursorBackwardKey: KeyCode
@@ -50,8 +51,9 @@ class KeyHandlerInput: NSObject {
     private var verticalModeOnlyChooseCandidateKey: KeyCode
     @objc private (set) var emacsKey: McBopomofoEmacsKey
 
-    @objc init(inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags, isVerticalMode: Bool) {
+    @objc init(inputText: String?, keyCode: UInt16, charCode: UInt16, flags: NSEvent.ModifierFlags, isVerticalMode: Bool, inputTextIgnoringModifiers: String? = nil) {
         self.inputText = inputText
+        self.inputTextIgnoringModifiers = inputTextIgnoringModifiers ?? inputText
         self.keyCode = keyCode
         self.charCode = charCode
         self.flags = flags
@@ -67,6 +69,7 @@ class KeyHandlerInput: NSObject {
 
     @objc init(event: NSEvent, isVerticalMode: Bool) {
         inputText = event.characters
+        inputTextIgnoringModifiers = event.charactersIgnoringModifiers
         keyCode = event.keyCode
         flags = event.modifierFlags
         useVerticalMode = isVerticalMode

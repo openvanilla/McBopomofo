@@ -28,6 +28,7 @@
 #include "UserPhrasesLM.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
+#include "AssociatedPhrases.h"
 #include <unordered_set>
 
 namespace McBopomofo {
@@ -61,11 +62,18 @@ public:
     McBopomofoLM();
     ~McBopomofoLM();
 
-    /// Asks to load the primary language model a the given path.
-    /// @param languageModelPath Thw path of the language model.
+    /// Asks to load the primary language model at the given path.
+    /// @param languageModelPath The path of the language model.
     void loadLanguageModel(const char* languageModelPath);
     /// If the data model is already loaded.
     bool isDataModelLoaded();
+
+    /// Asks to load the associated phrases at the given path.
+    /// @param associatedPhrasesPath The path of the associated phrases.
+    void loadAssociatedPhrases(const char* associatedPhrasesPath);
+    /// If the associated phrases already loaded.
+    bool isAssociatedPhrasesLoaded();
+
     /// Asks to load the user phrases and excluded phrases at the given path.
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.
@@ -96,6 +104,10 @@ public:
     /// Sets a lambda to let the values of unigrams could be converted by it.
     void setExternalConverter(std::function<string(string)> externalConverter);
 
+    const vector<std::string> associatedPhrasesForKey(const string& key);
+    bool hasAssociatedPhrasesForKey(const string& key);
+
+
 protected:
     /// Filters and converts the input unigrams and return a new list of unigrams.
     /// 
@@ -112,6 +124,7 @@ protected:
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
     PhraseReplacementMap m_phraseReplacement;
+    AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
     bool m_externalConverterEnabled;
     std::function<string(string)> m_externalConverter;

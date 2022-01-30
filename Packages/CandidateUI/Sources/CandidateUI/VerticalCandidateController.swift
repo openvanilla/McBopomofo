@@ -85,6 +85,12 @@ private let kCandidateTextLeftMargin: CGFloat = 8.0
 private let kCandidateTextPaddingWithMandatedTableViewPadding: CGFloat = 18.0
 private let kCandidateTextLeftMarginWithMandatedTableViewPadding: CGFloat = 0.0
 
+private class BackgroundView: NSView {
+    override func draw(_ dirtyRect: NSRect) {
+        NSColor.windowBackgroundColor.setFill()
+        NSBezierPath.fill(self.bounds)
+    }
+}
 
 @objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
@@ -95,6 +101,8 @@ public class VerticalCandidateController: CandidateController {
     private var candidateTextPadding: CGFloat = kCandidateTextPadding
     private var candidateTextLeftMargin: CGFloat = kCandidateTextLeftMargin
     private var maxCandidateAttrStringWidth: CGFloat = 0
+    private let tooltipPadding: CGFloat = 2.0
+    private var tooltipView: NSTextField
 
     public init() {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
@@ -102,6 +110,14 @@ public class VerticalCandidateController: CandidateController {
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
+        panel.contentView = BackgroundView()
+
+        tooltipView = NSTextField(frame: NSRect.zero)
+        tooltipView.isEditable = false
+        tooltipView.isSelectable = false
+        tooltipView.isBezeled = false
+        tooltipView.drawsBackground = true
+        tooltipView.lineBreakMode = .byTruncatingTail
 
         contentRect.origin = NSPoint.zero
         var stripRect = contentRect
@@ -400,6 +416,20 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             return
         }
 
+
+        var tooltipHeight: CGFloat = 0
+        var tooltipWidth: CGFloat = 0
+
+        if !tooltip.isEmpty {
+            tooltipView.stringValue = tooltip
+            let size = tooltipView.intrinsicContentSize
+            tooltipWidth = size.width + tooltipPadding * 2
+            tooltipHeight = size.height + tooltipPadding * 2
+            self.window?.contentView?.addSubview(tooltipView)
+        } else {
+            tooltipView.removeFromSuperview()
+        }
+
         let candidateFontSize = ceil(candidateFont.pointSize)
         let keyLabelFontSize = ceil(keyLabelFont.pointSize)
         let fontSize = max(candidateFontSize, keyLabelFontSize)
@@ -438,8 +468,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         let rowSpacing = tableView.intercellSpacing.height
         let stripWidth = ceil(maxKeyLabelWidth * 1.20)
         let tableViewStartWidth = ceil(maxCandidateAttrStringWidth + scrollerWidth)
-        let windowWidth = stripWidth + 1.0 + tableViewStartWidth
-        let windowHeight = CGFloat(keyLabelCount) * (rowHeight + rowSpacing)
+        let windowWidth = max(stripWidth + 1.0 + tableViewStartWidth, tooltipWidth)
+        let windowHeight = CGFloat(keyLabelCount) * (rowHeight + rowSpacing) + tooltipHeight
 
         var frameRect = self.window?.frame ?? NSRect.zero
         let topLeftPoint = NSMakePoint(frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
@@ -447,8 +477,9 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         frameRect.size = NSMakeSize(windowWidth, windowHeight)
         frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
 
-        keyLabelStripView.frame = NSRect(x: 0.0, y: 0.0, width: stripWidth, height: windowHeight)
-        scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0.0, width: tableViewStartWidth, height: windowHeight)
+        keyLabelStripView.frame = NSRect(x: 0.0, y: 0, width: stripWidth, height: windowHeight - tooltipHeight)
+        scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0, width: (windowWidth - stripWidth - 1), height: windowHeight - tooltipHeight)
+        tooltipView.frame = NSRect(x: tooltipPadding, y: windowHeight - tooltipHeight + tooltipPadding, width: windowWidth, height: tooltipHeight)
         self.window?.setFrame(frameRect, display: false)
     }
 }

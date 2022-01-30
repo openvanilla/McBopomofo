@@ -53,6 +53,13 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     lm.loadLanguageModel([dataPath UTF8String]);
 }
 
+static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
+{
+    Class cls = NSClassFromString(@"McBopomofoInputMethodController");
+    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"cin"];
+    lm.loadAssociatedPhrases([dataPath UTF8String]);
+}
+
 + (void)loadDataModels
 {
     if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
@@ -60,6 +67,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     }
     if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+    }
+    if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesLoaded()) {
+        LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
     }
 }
 
@@ -70,9 +80,13 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
             LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
         }
     }
+
     if ([mode isEqualToString:InputModePlainBopomofo]) {
         if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
+        }
+        if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesLoaded()) {
+            LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
         }
     }
 }

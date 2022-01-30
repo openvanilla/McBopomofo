@@ -232,7 +232,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionHold] || [input isNumericPad]);
-    if (![state isKindOfClass:[InputStateNotEmpty class]] && isFunctionKey) {
+    if (![state isKindOfClass:[InputStateNotEmpty class]] &&
+        ![state isKindOfClass:[InputStateAssociatedPhrases class]] &&
+        isFunctionKey) {
         return NO;
     }
 
@@ -276,7 +278,17 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-        return [self _handleCandidateState:(InputStateChoosingCandidate *) state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+    }
+
+    // MARK: Handle Associated Phrases
+    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+        BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+        if (result) {
+            return YES;
+        }
+        state = [[InputStateEmpty alloc] init];
+        stateCallback(state);
     }
 
     // MARK: Handle Marking
@@ -350,10 +362,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
-                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:choosingCandidates.candidates.firstObject];
+                NSString *text = choosingCandidates.candidates.firstObject;
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text];
                 stateCallback(committing);
-                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-                stateCallback(empty);
+
+                if (!Preferences.associatedPhrasesEnabled) {
+                    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                    stateCallback(empty);
+                }
+                else {
+                    InputStateAssociatedPhrases *associatedPhrases = (InputStateAssociatedPhrases *)[self buildAssociatePhraseStateWithKey:text useVerticalMode:input.useVerticalMode];
+                    if (associatedPhrases) {
+                        stateCallback(associatedPhrases);
+                    } else {
+                        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                        stateCallback(empty);
+                    }
+                }
             } else {
                 stateCallback(choosingCandidates);
             }
@@ -835,7 +860,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 }
 
 
-- (BOOL)_handleCandidateState:(InputStateChoosingCandidate *)state
+- (BOOL)_handleCandidateState:(InputState *)state
                         input:(KeyHandlerInput *)input
                 stateCallback:(void (^)(InputState *))stateCallback
    candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
@@ -845,10 +870,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete]; 
+    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
     if (cancelCandidateKey) {
-        if (_inputMode == InputModePlainBopomofo) {
+        if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
+        }
+        else if (_inputMode == InputModePlainBopomofo) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -860,6 +890,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     if (charCode == 13 || [input isEnter]) {
+        if ([state isKindOfClass: [InputStateAssociatedPhrases class]] && ![input isShiftHold]) {
+            return NO;
+        }
         [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
         return YES;
     }
@@ -975,26 +1008,46 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && [state.candidates count] > 0) {
-        if (gCurrentCandidateController.selectedCandidateIndex == [state.candidates count] - 1) {
+    NSArray *candidates;
+
+    if ([state isKindOfClass: [InputStateChoosingCandidate class]]) {
+        candidates = [(InputStateChoosingCandidate *)state candidates];
+    }
+
+    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        candidates = [(InputStateAssociatedPhrases *)state candidates];
+    }
+
+    if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && candidates.count > 0) {
+        if (gCurrentCandidateController.selectedCandidateIndex == candidates.count - 1) {
             errorCallback();
         } else {
-            gCurrentCandidateController.selectedCandidateIndex = [state.candidates count] - 1;
+            gCurrentCandidateController.selectedCandidateIndex = candidates.count - 1;
         }
 
         candidateSelectionCallback();
         return YES;
     }
 
+    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        if (![input isShiftHold]) {
+            return NO;
+        }
+    }
+
     NSInteger index = NSNotFound;
+    NSString *match = inputText;
+
+    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        match = input.inputTextIgnoringModifiers;
+    }
+
     for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
-        if ([inputText compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+        if ([match compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
             index = j;
             break;
         }
     }
-
-    [gCurrentCandidateController.keyLabels indexOfObject:inputText];
 
     if (index != NSNotFound) {
         NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
@@ -1002,6 +1055,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             [self.delegate keyHandler:self didSelectCandidateAtIndex:candidateIndex candidateController:gCurrentCandidateController];
             return YES;
         }
+    }
+
+    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        return NO;
     }
 
     if (_inputMode == InputModePlainBopomofo) {
@@ -1189,6 +1246,22 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
     return readingsArray;
+}
+
+- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
+{
+    string cppKey = string(key.UTF8String);
+    if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
+        vector<string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
+        NSMutableArray <NSString *> *array = [NSMutableArray array];
+        for (auto phrase: phrases) {
+            NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
+            [array addObject:item];
+        }
+        InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
+        return associatedPhrases;
+    }
+    return nil;
 }
 
 @end

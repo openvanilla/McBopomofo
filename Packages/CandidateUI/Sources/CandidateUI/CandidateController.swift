@@ -40,6 +40,7 @@ public class CandidateController: NSWindowController {
     @objc public var selectedCandidateIndex: UInt = UInt.max
     @objc public var visible: Bool = false {
         didSet {
+            NSObject.cancelPreviousPerformRequests(withTarget: self)
             if visible {
                 window?.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
             } else {
@@ -64,6 +65,7 @@ public class CandidateController: NSWindowController {
     @objc public var keyLabels: [String] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     @objc public var keyLabelFont: NSFont = NSFont.systemFont(ofSize: 14)
     @objc public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+    @objc public var tooltip: String = ""
 
     @objc public func reloadData() {
     }
