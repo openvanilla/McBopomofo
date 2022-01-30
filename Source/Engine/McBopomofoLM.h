@@ -37,8 +37,8 @@ using namespace Formosa::Gramambular;
 /// McBopomofoLM is a facade for managing a set of models including
 /// the input method language model, user phrases and excluded phrases.
 ///
-/// It is the primary model class that the input controller and grammer builder
-/// of McBopomofo talk to. When the grammer builder starts to build a sentense
+/// It is the primary model class that the input controller and grammar builder
+/// of McBopomofo talks to. When the grammar builder starts to build a sentence
 /// from a series of BPMF readings, it passes the readings to the model to see
 /// if there are valid unigrams, and use returned unigrams to produce the final
 /// results.
