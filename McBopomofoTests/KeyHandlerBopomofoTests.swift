@@ -12,7 +12,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
     override func setUpWithError() throws {
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
-        handler.inputMode = kBopomofoModeIdentifier
+        handler.inputMode = .bopomofo
     }
 
     override func tearDownWithError() throws {
