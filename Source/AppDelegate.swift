@@ -23,6 +23,7 @@
 
 import Cocoa
 import InputMethodKit
+import FSEventStreamHelper
 
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kNextUpdateCheckDateKey = "NextUpdateCheckDate"
@@ -150,11 +151,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var preferencesWindowController: PreferencesWindowController?
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
+    private var fsStreamHelper = FSEventStreamHelper(path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.setupDataModelValueConverter()
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()
+        fsStreamHelper.delegate = self
+        _ = fsStreamHelper.start()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
@@ -241,5 +245,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 
     func nonModalAlertWindowControllerDidCancel(_ controller: NonModalAlertWindowController) {
         updateNextStepURL = nil
+    }
+}
+
+extension AppDelegate : FSEventStreamHelperDelegate {
+    func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
+        DispatchQueue.main.async {
+            LanguageModelManager.loadUserPhrases()
+            LanguageModelManager.loadUserPhraseReplacement()
+        }
     }
 }

@@ -222,7 +222,9 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
     [writeFile writeData:data];
     [writeFile closeFile];
 
-    [self loadUserPhrases];
+//  We use FSEventStream to monitor the change of the user phrase folder,
+//  so we don't have to load data here.
+//  [self loadUserPhrases];
     return YES;
 }
 
