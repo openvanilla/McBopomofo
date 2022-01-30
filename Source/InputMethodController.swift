@@ -393,7 +393,7 @@ extension McBopomofoInputMethodController {
         if state.tooltip.isEmpty {
             hideTooltip()
         } else {
-            show(tooltip: state.tooltip, composingBuffer: state.composingBuffer, cursorIndex: state.cursorIndex, client: client)
+            show(tooltip: state.tooltip, composingBuffer: state.composingBuffer, cursorIndex: state.markerIndex, client: client)
         }
     }
 
