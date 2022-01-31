@@ -577,8 +577,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if ([input isShiftHold]) {
         // Shift + left
-        if (_builder->cursorIndex() > 0) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1 readings: [self _currentReadings]];
+        if (currentState.cursorIndex > 0) {
+            NSInteger previousPosition = [StringUtils previousUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition phrases:currentState.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -613,8 +614,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if ([input isShiftHold]) {
         // Shift + Right
-        if (_builder->cursorIndex() < _builder->length()) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1 readings: [self _currentReadings]];
+        if (currentState.cursorIndex < currentState.composingBuffer.length) {
+            NSInteger nextPosition = [StringUtils nextUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition phrases:currentState.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -840,8 +842,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index > 0) {
-            index -= 1;
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
+            index = [StringUtils previousUtf16PositionForIndex:index in:state.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index phrases:state.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -855,8 +857,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
-            index += 1;
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
+            index = [StringUtils nextUtf16PositionForIndex:index in:state.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index phrases:state.phrases];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -1129,6 +1131,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     size_t readingCursorIndex = 0;
     size_t builderCursorIndex = _builder->cursorIndex();
 
+    NSMutableArray <InputPhrase *> *phrases = [[NSMutableArray alloc] init];
+
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
@@ -1140,6 +1144,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [composingBuffer appendString:valueString];
+
+            NSString *readingString = [NSString stringWithUTF8String:(*wi).node->currentKeyValue().key.c_str()];
+            InputPhrase *phrase = [[InputPhrase alloc] initWithText:valueString reading:readingString];
+            [phrases addObject:phrase];
 
             // this re-aligns the cursor index in the composed string
             // (the actual cursor on the screen) with the builder's logical
@@ -1169,7 +1177,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
-    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex];
+    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex phrases:phrases];
     return newState;
 }
 
@@ -1239,7 +1247,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         }
     }
 
-    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
+    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray phrases:currentState.phrases useVerticalMode:useVerticalMode];
     return state;
 }
 

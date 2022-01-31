@@ -492,6 +492,10 @@ extension McBopomofoInputMethodController {
         }
 
         (client as? IMKTextInput)?.attributes(forCharacterIndex: Int(cursor), lineHeightRectangle: &lineHeightRect)
+        if lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor > 0 {
+            cursor -= 1
+            (client as? IMKTextInput)?.attributes(forCharacterIndex: Int(cursor), lineHeightRectangle: &lineHeightRect)
+        }
 
         if useVerticalMode {
             gCurrentCandidateController?.set(windowTopLeftPoint: NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0), bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
@@ -507,6 +511,10 @@ extension McBopomofoInputMethodController {
             cursor -= 1
         }
         (client as? IMKTextInput)?.attributes(forCharacterIndex: Int(cursor), lineHeightRectangle: &lineHeightRect)
+        if lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor > 0 {
+            cursor -= 1
+            (client as? IMKTextInput)?.attributes(forCharacterIndex: Int(cursor), lineHeightRectangle: &lineHeightRect)
+        }
         McBopomofoInputMethodController.tooltipController.show(tooltip: tooltip, at: lineHeightRect.origin)
     }
 

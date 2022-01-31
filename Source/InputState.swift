@@ -104,28 +104,28 @@ class InputState: NSObject {
     /// Represents that the composing buffer is not empty.
     @objc (InputStateNotEmpty)
     class NotEmpty: InputState {
-        @objc private(set) var composingBuffer: String = ""
-        @objc private(set) var cursorIndex: UInt = 0
+        @objc private(set) var composingBuffer: String
+        @objc private(set) var cursorIndex: UInt
+        @objc private(set) var phrases: [InputPhrase]
 
-        @objc init(composingBuffer: String, cursorIndex: UInt) {
+        @objc init(composingBuffer: String, cursorIndex: UInt, phrases: [InputPhrase]) {
             self.composingBuffer = composingBuffer
             self.cursorIndex = cursorIndex
+            self.phrases = phrases
         }
 
         override var description: String {
-            "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+            "<InputState.NotEmpty, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), phrases:\(phrases)>"
         }
     }
 
     /// Represents that the user is inputting text.
     @objc (InputStateInputting)
     class Inputting: NotEmpty {
-        @objc var bpmfReading: String = ""
-        @objc var bpmfReadingCursorIndex: UInt8 = 0
         @objc var poppedText: String = ""
 
-        @objc override init(composingBuffer: String, cursorIndex: UInt) {
-            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+        @objc override init(composingBuffer: String, cursorIndex: UInt, phrases: [InputPhrase]) {
+            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
         }
 
         @objc var attributedString: NSAttributedString {
@@ -137,7 +137,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
+            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), phrases:\(phrases)>, poppedText:\(poppedText)>"
         }
     }
 
@@ -147,6 +147,7 @@ class InputState: NSObject {
     /// Represents that the user is marking a range in the composing buffer.
     @objc (InputStateMarking)
     class Marking: NotEmpty {
+
         @objc private(set) var markerIndex: UInt
         @objc private(set) var markedRange: NSRange
         @objc var tooltip: String {
@@ -170,15 +171,12 @@ class InputState: NSObject {
             return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
         }
 
-        @objc private(set) var readings: [String]
-
-        @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
+        @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, phrases: [InputPhrase]) {
             self.markerIndex = markerIndex
             let begin = min(cursorIndex, markerIndex)
             let end = max(cursorIndex, markerIndex)
             markedRange = NSMakeRange(Int(begin), Int(end - begin))
-            self.readings = readings
-            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
         }
 
         @objc var attributedString: NSAttributedString {
@@ -197,16 +195,16 @@ class InputState: NSObject {
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
                 .markedClauseSegment: 2
             ], range: NSRange(location: end,
-                              length: composingBuffer.count - end))
+                              length: (composingBuffer as NSString).length - end))
             return attributedSting
         }
 
         override var description: String {
-            "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
+            "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), phrases:\(phrases)>"
         }
 
         @objc func convertToInputting() -> Inputting {
-            let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+            let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
             return state
         }
 
@@ -217,7 +215,19 @@ class InputState: NSObject {
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
             let end = markedRange.location + markedRange.length
-            let readings = readings[markedRange.location..<end]
+            var selectedPhrases = [InputPhrase]()
+            var length = 0
+            for component in self.phrases {
+                if length >= end {
+                    break
+                }
+                if length >= markedRange.location {
+                    selectedPhrases.append(component)
+                }
+                length += (component.text as NSString).length
+            }
+
+            let readings = selectedPhrases.map { $0.reading }
             let joined = readings.joined(separator: "-")
             return "\(text) \(joined)"
         }
@@ -229,10 +239,10 @@ class InputState: NSObject {
         @objc private(set) var candidates: [String]
         @objc private(set) var useVerticalMode: Bool
 
-        @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
+        @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], phrases: [InputPhrase], useVerticalMode: Bool) {
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
-            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+            super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex, phrases: phrases)
         }
 
         @objc var attributedString: NSAttributedString {
@@ -244,7 +254,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+            "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), phrases:\(phrases),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
     }
 
@@ -265,4 +275,49 @@ class InputState: NSObject {
         }
     }
 
+}
+
+class InputPhrase: NSObject {
+    @objc private (set) var text: String
+    @objc private (set) var reading: String
+
+    @objc init(text: String, reading: String) {
+        self.text = text
+        self.reading = reading
+        super.init()
+    }
+}
+
+class StringUtils: NSObject {
+
+    static func convertToCharIndex(from utf16Index: Int, in string: String) -> Int {
+        var length = 0
+        for (i, c) in string.enumerated() {
+            if length >= utf16Index {
+                return i
+            }
+            length += c.utf16.count
+        }
+        return string.count
+    }
+
+    @objc (nextUtf16PositionForIndex:in:)
+    static func nextUtf16Position(for index: Int, in string: String) -> Int {
+        var index = convertToCharIndex(from: index, in: string)
+        if index < string.count {
+            index += 1
+        }
+        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
+        return count
+    }
+
+    @objc (previousUtf16PositionForIndex:in:)
+    static func previousUtf16Position(for index: Int, in string: String) -> Int {
+        var index = convertToCharIndex(from: index, in: string)
+        if index > 0 {
+            index -= 1
+        }
+        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
+        return count
+    }
 }
