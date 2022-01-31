@@ -1,4 +1,7 @@
-// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// AssociatedPhrases.h
+//
+// Copyright (c) 2017 The McBopomofo Project.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -20,40 +23,39 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
+//
 
-#ifndef USERPHRASESLM_H
-#define USERPHRASESLM_H
+#ifndef ASSOCIATEDPHRASES_H
+#define ASSOCIATEDPHRASES_H
 
 #include <string>
 #include <map>
 #include <iostream>
-#include "LanguageModel.h"
+#include <vector>
 
 namespace McBopomofo {
 
-class UserPhrasesLM : public Formosa::Gramambular::LanguageModel
+class AssociatedPhrases
 {
 public:
-    UserPhrasesLM();
-    ~UserPhrasesLM();
+    AssociatedPhrases();
+    ~AssociatedPhrases();
 
-    bool isLoaded();
+    const bool isLoaded();
     bool open(const char *path);
     void close();
-    void dump();
-    
-    virtual const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
-    virtual const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(const std::string& key);
-    virtual bool hasUnigramsForKey(const std::string& key);
-    
+    const std::vector<std::string> valuesForKey(const std::string& key);
+    const bool hasValuesForKey(const std::string& key);
+
 protected:
     struct Row {
         Row(std::string_view& k, std::string_view& v) : key(k), value(v) {}
         std::string_view key;
         std::string_view value;
     };
-    
+
     std::map<std::string_view, std::vector<Row>> keyRowMap;
+
     int fd;
     void *data;
     size_t length;
@@ -61,4 +63,4 @@ protected:
 
 }
 
-#endif
+#endif /* AssociatedPhrases_hpp */

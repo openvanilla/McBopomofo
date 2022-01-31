@@ -42,6 +42,8 @@ private let kCandidateKeys = "CandidateKeys"
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyle = "ChineseConversionStyle"
+private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
+//private let kAssociatedPhrasesKeys = "AssociatedPhrasesKeys"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinCandidateListTextSize: CGFloat = 12
@@ -57,6 +59,7 @@ private let kMinComposingBufferSize = 4
 private let kMaxComposingBufferSize = 20
 
 private let kDefaultKeys = "123456789"
+private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 
 // MARK: Property wrappers
 
@@ -215,6 +218,8 @@ class Preferences: NSObject {
         defaults.removeObject(forKey: kPhraseReplacementEnabledKey)
         defaults.removeObject(forKey: kChineseConversionEngineKey)
         defaults.removeObject(forKey: kChineseConversionStyle)
+        defaults.removeObject(forKey: kAssociatedPhrasesEnabledKey)
+//        defaults.removeObject(forKey: kAssociatedPhrasesKeys)
     }
 
     @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
@@ -363,6 +368,14 @@ class Preferences: NSObject {
 
     @objc static var chineseConversionStyleName: String? {
         ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
+    }
+
+    @UserDefault(key: kAssociatedPhrasesEnabledKey, defaultValue: false)
+    @objc static var associatedPhrasesEnabled: Bool
+
+    @objc static func toggleAssociatedPhrasesEnabled() -> Bool {
+        associatedPhrasesEnabled = !associatedPhrasesEnabled
+        return associatedPhrasesEnabled
     }
 
 }

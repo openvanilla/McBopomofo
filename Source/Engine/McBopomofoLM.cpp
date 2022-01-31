@@ -37,11 +37,7 @@ McBopomofoLM::~McBopomofoLM()
     m_userPhrases.close();
     m_excludedPhrases.close();
     m_phraseReplacement.close();
-}
-
-bool McBopomofoLM::isDataModelLoaded()
-{
-    return m_languageModel.isLoaded();
+    m_associatedPhrases.close();
 }
 
 void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath)
@@ -50,6 +46,24 @@ void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath)
         m_languageModel.close();
         m_languageModel.open(languageModelDataPath);
     }
+}
+
+bool McBopomofoLM::isDataModelLoaded()
+{
+    return m_languageModel.isLoaded();
+}
+
+void McBopomofoLM::loadAssociatedPhrases(const char* associatedPhrasesPath)
+{
+    if (associatedPhrasesPath) {
+        m_associatedPhrases.close();
+        m_associatedPhrases.open(associatedPhrasesPath);
+    }
+}
+
+bool McBopomofoLM::isAssociatedPhrasesLoaded()
+{
+    return m_associatedPhrases.isLoaded();
 }
 
 void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
@@ -188,4 +202,14 @@ const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(const vector<Unig
         }
     }
     return results;
+}
+
+const vector<std::string> McBopomofoLM::associatedPhrasesForKey(const string& key)
+{
+    return m_associatedPhrases.valuesForKey(key);
+}
+
+bool McBopomofoLM::hasAssociatedPhrasesForKey(const string& key)
+{
+    return m_associatedPhrases.hasValuesForKey(key);
 }

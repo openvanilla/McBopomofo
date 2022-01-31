@@ -170,7 +170,7 @@ class InputState: NSObject {
             return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
         }
 
-        @objc private(set) var readings: [String] = []
+        @objc private(set) var readings: [String]
 
         @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
             self.markerIndex = markerIndex
@@ -226,8 +226,8 @@ class InputState: NSObject {
     /// Represents that the user is choosing in a candidates list.
     @objc (InputStateChoosingCandidate)
     class ChoosingCandidate: NotEmpty {
-        @objc private(set) var candidates: [String] = []
-        @objc private(set) var useVerticalMode: Bool = false
+        @objc private(set) var candidates: [String]
+        @objc private(set) var useVerticalMode: Bool
 
         @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
             self.candidates = candidates
@@ -245,6 +245,23 @@ class InputState: NSObject {
 
         override var description: String {
             "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        }
+    }
+
+    /// Represents that the user is choosing in a candidates list
+    /// in the associated phrases mode.
+    @objc (InputStateAssociatedPhrases)
+    class AssociatedPhrases: InputState {
+        @objc private(set) var candidates: [String] = []
+        @objc private(set) var useVerticalMode: Bool = false
+        @objc init(candidates: [String], useVerticalMode: Bool) {
+            self.candidates = candidates
+            self.useVerticalMode = useVerticalMode
+            super.init()
+        }
+
+        override var description: String {
+            "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
     }
 

@@ -248,7 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     }
 }
 
-extension AppDelegate : FSEventStreamHelperDelegate {
+extension AppDelegate: FSEventStreamHelperDelegate {
     func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
         DispatchQueue.main.async {
             LanguageModelManager.loadUserPhrases()

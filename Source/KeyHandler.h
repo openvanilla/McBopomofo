@@ -53,6 +53,7 @@ candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
 - (void)clear;
 
 - (InputState *)buildInputtingState;
+- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
 
 @property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id <KeyHandlerDelegate> delegate;

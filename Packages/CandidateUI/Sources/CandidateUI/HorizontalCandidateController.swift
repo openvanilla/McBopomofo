@@ -38,6 +38,23 @@ fileprivate class HorizontalCandidateView: NSView {
     private var elementWidths: [CGFloat] = []
     private var trackingHighlightedIndex: UInt = UInt.max
 
+    private let tooltipPadding: CGFloat = 2.0
+    private var tooltipSize: NSSize = NSSize.zero
+
+    override var toolTip: String? {
+        didSet {
+            if let toolTip = toolTip, !toolTip.isEmpty {
+                let baseSize = NSSize(width: 10240.0, height: 10240.0)
+                var tooltipRect = (toolTip as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
+                tooltipRect.size.height += tooltipPadding * 2
+                tooltipRect.size.width += tooltipPadding * 2
+                self.tooltipSize = tooltipRect.size
+            } else {
+                self.tooltipSize = NSSize.zero
+            }
+        }
+    }
+
     override var isFlipped: Bool {
         true
     }
@@ -50,10 +67,12 @@ fileprivate class HorizontalCandidateView: NSView {
             result.width += CGFloat(elementWidths.count)
             result.height = keyLabelHeight + candidateTextHeight + 1.0
         }
+
+        result.height += tooltipSize.height
+        result.width = max(tooltipSize.width, result.width)
         return result
     }
 
-    @objc(setKeyLabels:displayedCandidates:)
     func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0..<count])
@@ -64,14 +83,13 @@ fileprivate class HorizontalCandidateView: NSView {
         for index in 0..<count {
             let labelRect = (keyLabels[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
             let candidateRect = (displayedCandidates[index] as NSString).boundingRect(with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict)
-            let cellWidth = max(keyLabelHeight * 2,
+            let cellWidth = max(candidateTextHeight,
                                 max(labelRect.size.width, candidateRect.size.width)) + cellPadding;
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
     }
 
-    @objc(setKeyLabelFont:candidateFont:)
     func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -108,13 +126,21 @@ fileprivate class HorizontalCandidateView: NSView {
             NSColor.darkGray.setStroke()
         }
 
-        NSBezierPath.strokeLine(from: NSPoint(x: bounds.size.width, y: 0.0), to: NSPoint(x: bounds.size.width, y: bounds.size.height))
+        if let toolTip = toolTip {
+            lightGray.setFill()
+            NSBezierPath.fill(NSMakeRect(0, 0, bounds.width, tooltipSize.height))
+            let tooltipFrame = NSRect(x: 0, y: 0, width: tooltipSize.width, height: tooltipSize.height)
+            (toolTip as NSString).draw(in: tooltipFrame, withAttributes: keyLabelAttrDict)
+            NSBezierPath.strokeLine(from: NSPoint(x: 0, y: tooltipSize.height - 2), to: NSPoint(x: bounds.width, y: tooltipSize.height - 2))
+        }
+
+        NSBezierPath.strokeLine(from: NSPoint(x: bounds.width, y: 0), to: NSPoint(x: bounds.width, y: bounds.height))
 
         var accuWidth: CGFloat = 0
         for index in 0..<elementWidths.count {
             let currentWidth = elementWidths[index]
-            let labelRect = NSRect(x: accuWidth, y: 0.0, width: currentWidth, height: keyLabelHeight)
-            let candidateRect = NSRect(x: accuWidth, y: keyLabelHeight + 1.0, width: currentWidth, height: candidateTextHeight)
+            let labelRect = NSRect(x: accuWidth, y: tooltipSize.height, width: currentWidth, height: keyLabelHeight)
+            let candidateRect = NSRect(x: accuWidth, y: tooltipSize.height + keyLabelHeight + 1.0, width: currentWidth, height: candidateTextHeight)
             (index == highlightedIndex ? darkGray : lightGray).setFill()
             NSBezierPath.fill(labelRect)
             (keyLabels[index] as NSString).draw(in: labelRect, withAttributes: keyLabelAttrDict)
@@ -346,7 +372,8 @@ extension HorizontalCandidateController {
             let candidate = delegate.candidateController(self, candidateAtIndex: index)
             candidates.append(candidate)
         }
-        candidateView.set(keyLabels: keyLabels, displayedCandidates: candidates)
+        candidateView.set(keyLabels: keyLabels.map { $0.displayedText}, displayedCandidates: candidates)
+        candidateView.toolTip = tooltip
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame
         frameRect.size = newSize
