@@ -450,7 +450,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
-        keyLabelStripView.keyLabels = Array(keyLabels[0..<Int(keyLabelCount)])
+        let keyLabels = keyLabels[0..<Int(keyLabelCount)].map { $0.displayedText }
+        keyLabelStripView.keyLabels = keyLabels
         keyLabelStripView.labelOffsetY = (keyLabelFontSize >= candidateFontSize) ? 0.0 : floor((candidateFontSize - keyLabelFontSize) / 2.0)
 
         let rowHeight = ceil(fontSize * 1.25)

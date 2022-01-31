@@ -133,7 +133,9 @@ import Carbon
     }
 
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
-        guard let keys = (sender as AnyObject).stringValue?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+        guard let keys = (sender as AnyObject).stringValue?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased() else {
             return
         }
         do {

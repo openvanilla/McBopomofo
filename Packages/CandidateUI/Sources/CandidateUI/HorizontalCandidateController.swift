@@ -73,7 +73,6 @@ fileprivate class HorizontalCandidateView: NSView {
         return result
     }
 
-    @objc(setKeyLabels:displayedCandidates:)
     func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0..<count])
@@ -91,7 +90,6 @@ fileprivate class HorizontalCandidateView: NSView {
         elementWidths = newWidths
     }
 
-    @objc(setKeyLabelFont:candidateFont:)
     func set(keyLabelFont labelFont: NSFont, candidateFont: NSFont) {
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -374,7 +372,7 @@ extension HorizontalCandidateController {
             let candidate = delegate.candidateController(self, candidateAtIndex: index)
             candidates.append(candidate)
         }
-        candidateView.set(keyLabels: keyLabels, displayedCandidates: candidates)
+        candidateView.set(keyLabels: keyLabels.map { $0.displayedText}, displayedCandidates: candidates)
         candidateView.toolTip = tooltip
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame

@@ -437,11 +437,10 @@ extension McBopomofoInputMethodController {
 extension McBopomofoInputMethodController {
 
     private func show(candidateWindowWith state: InputState, client: Any!) {
-        let useVerticalMode:Bool = {
+        let useVerticalMode: Bool = {
             if let state = state as? InputState.ChoosingCandidate {
                 return state.useVerticalMode
-            }
-            else if let state = state as? InputState.AssociatedPhrases {
+            } else if let state = state as? InputState.AssociatedPhrases {
                 return state.useVerticalMode
             }
             return false
@@ -453,12 +452,6 @@ extension McBopomofoInputMethodController {
             gCurrentCandidateController = McBopomofoInputMethodController.horizontalCandidateController
         } else {
             gCurrentCandidateController = McBopomofoInputMethodController.verticalCandidateController
-        }
-
-        if state is InputState.AssociatedPhrases {
-            gCurrentCandidateController?.tooltip = NSLocalizedString("Associated Phrases", comment: "")
-        } else {
-            gCurrentCandidateController?.tooltip = ""
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -477,10 +470,11 @@ extension McBopomofoInputMethodController {
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
+        let keyLabelPrefix = state is InputState.AssociatedPhrases ? "⇧ " : ""
+        gCurrentCandidateController?.keyLabels = keyLabels.map {
+            CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))
+        }
 
-        gCurrentCandidateController?.keyLabels = Array(keyLabels.map {
-            String($0)
-        })
         gCurrentCandidateController?.delegate = self
         gCurrentCandidateController?.reloadData()
         currentCandidateClient = client
@@ -488,7 +482,7 @@ extension McBopomofoInputMethodController {
         gCurrentCandidateController?.visible = true
 
         var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
-        var cursor:UInt = 0
+        var cursor: UInt = 0
 
         if let state = state as? InputState.ChoosingCandidate {
             cursor = state.cursorIndex
@@ -579,10 +573,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
 
             if keyHandler.inputMode == .plainBopomofo {
                 keyHandler.clear()
-                let text = inputting.composingBuffer
-                handle(state: .Committing(poppedText: text), client: currentCandidateClient)
+                let composingBuffer = inputting.composingBuffer
+                handle(state: .Committing(poppedText: composingBuffer), client: currentCandidateClient)
                 if Preferences.associatedPhrasesEnabled,
-                    let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: text, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
+                   let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
                     self.handle(state: associatePhrases, client: self.currentCandidateClient)
                 } else {
                     handle(state: .Empty(), client: currentDeferredClient)
@@ -593,7 +587,12 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         } else if let state = state as? InputState.AssociatedPhrases {
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentCandidateClient)
-            handle(state: .Empty(), client: currentDeferredClient)
+            if Preferences.associatedPhrasesEnabled,
+               let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
+                self.handle(state: associatePhrases, client: self.currentCandidateClient)
+            } else {
+                handle(state: .Empty(), client: currentDeferredClient)
+            }
         }
     }
 }

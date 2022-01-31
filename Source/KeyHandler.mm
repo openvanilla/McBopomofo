@@ -890,8 +890,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     if (charCode == 13 || [input isEnter]) {
-        if ([state isKindOfClass: [InputStateAssociatedPhrases class]] && ![input isShiftHold]) {
-            return NO;
+        if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
+            return YES;
         }
         [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
         return YES;
@@ -1012,10 +1015,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if ([state isKindOfClass: [InputStateChoosingCandidate class]]) {
         candidates = [(InputStateChoosingCandidate *)state candidates];
+    } else if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        candidates = [(InputStateAssociatedPhrases *)state candidates];
     }
 
-    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
-        candidates = [(InputStateAssociatedPhrases *)state candidates];
+    if (!candidates) {
+        return NO;
     }
 
     if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && candidates.count > 0) {
@@ -1029,21 +1034,23 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         if (![input isShiftHold]) {
             return NO;
         }
     }
 
     NSInteger index = NSNotFound;
-    NSString *match = inputText;
-
-    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+    NSString *match;
+    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         match = input.inputTextIgnoringModifiers;
+    } else {
+        match = inputText;
     }
 
     for (NSUInteger j = 0, c = [gCurrentCandidateController.keyLabels count]; j < c; j++) {
-        if ([match compare:[gCurrentCandidateController.keyLabels objectAtIndex:j] options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+        VTCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
+        if ([match compare:label.key options:NSCaseInsensitiveSearch] == NSOrderedSame) {
             index = j;
             break;
         }
@@ -1057,7 +1064,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         }
     }
 
-    if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         return NO;
     }
 
