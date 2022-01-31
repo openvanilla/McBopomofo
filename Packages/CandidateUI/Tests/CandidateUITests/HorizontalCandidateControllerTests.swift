@@ -24,7 +24,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
         let controller = HorizontalCandidateController()
         let mock = Mock()
         controller.delegate = mock
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         controller.reloadData()
         controller.visible = true
         controller.set(windowTopLeftPoint: NSPoint(x: -100, y: 0), bottomOutOfScreenAdjustmentHeight: 10)
@@ -37,7 +39,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
         let controller = HorizontalCandidateController()
         let mock = Mock()
         controller.delegate = mock
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         controller.reloadData()
         controller.visible = true
         let screenRect = NSScreen.main?.frame ?? NSRect.zero
@@ -52,7 +56,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
         let controller = HorizontalCandidateController()
         let mock = Mock()
         controller.delegate = mock
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         controller.reloadData()
         XCTAssert(controller.selectedCandidateIndex == 0)
     }
@@ -60,7 +66,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
     func testHighlightNextCandidate() {
         let controller = HorizontalCandidateController()
         let mock = Mock()
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         controller.delegate = mock
         var result = controller.highlightNextCandidate()
         XCTAssert(result == true)
@@ -91,7 +99,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
     func testHighlightPreviousCandidate() {
         let controller = HorizontalCandidateController()
         let mock = Mock()
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         controller.delegate = mock
         _ = controller.showNextPage()
         XCTAssert(controller.selectedCandidateIndex == 4)
@@ -115,7 +125,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
     func testShowNextPage() {
         let controller = HorizontalCandidateController()
         let mock = Mock()
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         _ = controller.delegate = mock
         var result = controller.showNextPage()
         XCTAssert(result == true)
@@ -128,7 +140,9 @@ class HorizontalCandidateControllerTests: XCTestCase {
     func testShowPreviousPage() {
         let controller = HorizontalCandidateController()
         let mock = Mock()
-        controller.keyLabels = ["1", "2", "3", "4"]
+        controller.keyLabels = ["1", "2", "3", "4"].map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
         controller.delegate = mock
         _ = controller.showNextPage()
         var result = controller.showPreviousPage()
