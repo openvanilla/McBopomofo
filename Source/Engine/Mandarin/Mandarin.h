@@ -179,7 +179,7 @@ class BopomofoSyllable {
   friend std::ostream& operator<<(std::ostream& stream,
                                   const BopomofoSyllable& syllable);
 
-  static const Component
+  static constexpr Component
       ConsonantMask = 0x001f,    // 0000 0000 0001 1111, 21 consonants
       MiddleVowelMask = 0x0060,  // 0000 0000 0110 0000, 3 middle vowels
       VowelMask = 0x0780,        // 0000 0111 1000 0000, 13 vowels
