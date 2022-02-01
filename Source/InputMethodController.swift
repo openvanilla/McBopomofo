@@ -181,8 +181,6 @@ class McBopomofoInputMethodController: IMKInputController {
 
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
 
-        NSLog("input \(input)")
-
         let result = keyHandler.handle(input, state: state) { newState in
             self.handle(state: newState, client: client)
         } candidateSelectionCallback: {
