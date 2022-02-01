@@ -266,16 +266,9 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ue")) {
     secondComponent = BPMF::UE;
     thirdComponent = BPMF::E;
-  }
-#ifndef _MSC_VER
-  else if (PinyinParseHelper::ConsumePrefix(pinyin, "ü")) {
+  } else if (PinyinParseHelper::ConsumePrefix(pinyin, u8"ü")) {
     secondComponent = BPMF::UE;
   }
-#else
-  else if (PinyinParseHelper::ConsumePrefix(pinyin, "\xc3\xbc")) {
-    secondComponent = BPMF::UE;
-  }
-#endif
 
   // then consume the middle component...
   if (0) {
@@ -954,91 +947,47 @@ const BopomofoCharacterMap& BopomofoCharacterMap::SharedInstance() {
 }
 
 BopomofoCharacterMap::BopomofoCharacterMap() {
-#ifndef _MSC_VER
-  characterToComponent["ㄅ"] = BPMF::B;
-  characterToComponent["ㄆ"] = BPMF::P;
-  characterToComponent["ㄇ"] = BPMF::M;
-  characterToComponent["ㄈ"] = BPMF::F;
-  characterToComponent["ㄉ"] = BPMF::D;
-  characterToComponent["ㄊ"] = BPMF::T;
-  characterToComponent["ㄋ"] = BPMF::N;
-  characterToComponent["ㄌ"] = BPMF::L;
-  characterToComponent["ㄎ"] = BPMF::K;
-  characterToComponent["ㄍ"] = BPMF::G;
-  characterToComponent["ㄏ"] = BPMF::H;
-  characterToComponent["ㄐ"] = BPMF::J;
-  characterToComponent["ㄑ"] = BPMF::Q;
-  characterToComponent["ㄒ"] = BPMF::X;
-  characterToComponent["ㄓ"] = BPMF::ZH;
-  characterToComponent["ㄔ"] = BPMF::CH;
-  characterToComponent["ㄕ"] = BPMF::SH;
-  characterToComponent["ㄖ"] = BPMF::R;
-  characterToComponent["ㄗ"] = BPMF::Z;
-  characterToComponent["ㄘ"] = BPMF::C;
-  characterToComponent["ㄙ"] = BPMF::S;
-  characterToComponent["ㄧ"] = BPMF::I;
-  characterToComponent["ㄨ"] = BPMF::U;
-  characterToComponent["ㄩ"] = BPMF::UE;
-  characterToComponent["ㄚ"] = BPMF::A;
-  characterToComponent["ㄛ"] = BPMF::O;
-  characterToComponent["ㄜ"] = BPMF::ER;
-  characterToComponent["ㄝ"] = BPMF::E;
-  characterToComponent["ㄞ"] = BPMF::AI;
-  characterToComponent["ㄟ"] = BPMF::EI;
-  characterToComponent["ㄠ"] = BPMF::AO;
-  characterToComponent["ㄡ"] = BPMF::OU;
-  characterToComponent["ㄢ"] = BPMF::AN;
-  characterToComponent["ㄣ"] = BPMF::EN;
-  characterToComponent["ㄤ"] = BPMF::ANG;
-  characterToComponent["ㄥ"] = BPMF::ENG;
-  characterToComponent["ㄦ"] = BPMF::ERR;
-  characterToComponent["ˊ"] = BPMF::Tone2;
-  characterToComponent["ˇ"] = BPMF::Tone3;
-  characterToComponent["ˋ"] = BPMF::Tone4;
-  characterToComponent["˙"] = BPMF::Tone5;
-#else
-  characterToComponent["\xe3\x84\x85"] = BPMF::B;
-  characterToComponent["\xe3\x84\x86"] = BPMF::P;
-  characterToComponent["\xe3\x84\x87"] = BPMF::M;
-  characterToComponent["\xe3\x84\x88"] = BPMF::F;
-  characterToComponent["\xe3\x84\x89"] = BPMF::D;
-  characterToComponent["\xe3\x84\x8a"] = BPMF::T;
-  characterToComponent["\xe3\x84\x8b"] = BPMF::N;
-  characterToComponent["\xe3\x84\x8c"] = BPMF::L;
-  characterToComponent["\xe3\x84\x8e"] = BPMF::K;
-  characterToComponent["\xe3\x84\x8d"] = BPMF::G;
-  characterToComponent["\xe3\x84\x8f"] = BPMF::H;
-  characterToComponent["\xe3\x84\x90"] = BPMF::J;
-  characterToComponent["\xe3\x84\x91"] = BPMF::Q;
-  characterToComponent["\xe3\x84\x92"] = BPMF::X;
-  characterToComponent["\xe3\x84\x93"] = BPMF::ZH;
-  characterToComponent["\xe3\x84\x94"] = BPMF::CH;
-  characterToComponent["\xe3\x84\x95"] = BPMF::SH;
-  characterToComponent["\xe3\x84\x96"] = BPMF::R;
-  characterToComponent["\xe3\x84\x97"] = BPMF::Z;
-  characterToComponent["\xe3\x84\x98"] = BPMF::C;
-  characterToComponent["\xe3\x84\x99"] = BPMF::S;
-  characterToComponent["\xe3\x84\xa7"] = BPMF::I;
-  characterToComponent["\xe3\x84\xa8"] = BPMF::U;
-  characterToComponent["\xe3\x84\xa9"] = BPMF::UE;
-  characterToComponent["\xe3\x84\x9a"] = BPMF::A;
-  characterToComponent["\xe3\x84\x9b"] = BPMF::O;
-  characterToComponent["\xe3\x84\x9c"] = BPMF::ER;
-  characterToComponent["\xe3\x84\x9d"] = BPMF::E;
-  characterToComponent["\xe3\x84\x9e"] = BPMF::AI;
-  characterToComponent["\xe3\x84\x9f"] = BPMF::EI;
-  characterToComponent["\xe3\x84\xa0"] = BPMF::AO;
-  characterToComponent["\xe3\x84\xa1"] = BPMF::OU;
-  characterToComponent["\xe3\x84\xa2"] = BPMF::AN;
-  characterToComponent["\xe3\x84\xa3"] = BPMF::EN;
-  characterToComponent["\xe3\x84\xa4"] = BPMF::ANG;
-  characterToComponent["\xe3\x84\xa5"] = BPMF::ENG;
-  characterToComponent["\xe3\x84\xa6"] = BPMF::ERR;
-  characterToComponent["\xcb\x8a"] = BPMF::Tone2;
-  characterToComponent["\xcb\x87"] = BPMF::Tone3;
-  characterToComponent["\xcb\x8b"] = BPMF::Tone4;
-  characterToComponent["\xcb\x99"] = BPMF::Tone5;
-#endif
+  characterToComponent[u8"ㄅ"] = BPMF::B;
+  characterToComponent[u8"ㄆ"] = BPMF::P;
+  characterToComponent[u8"ㄇ"] = BPMF::M;
+  characterToComponent[u8"ㄈ"] = BPMF::F;
+  characterToComponent[u8"ㄉ"] = BPMF::D;
+  characterToComponent[u8"ㄊ"] = BPMF::T;
+  characterToComponent[u8"ㄋ"] = BPMF::N;
+  characterToComponent[u8"ㄌ"] = BPMF::L;
+  characterToComponent[u8"ㄎ"] = BPMF::K;
+  characterToComponent[u8"ㄍ"] = BPMF::G;
+  characterToComponent[u8"ㄏ"] = BPMF::H;
+  characterToComponent[u8"ㄐ"] = BPMF::J;
+  characterToComponent[u8"ㄑ"] = BPMF::Q;
+  characterToComponent[u8"ㄒ"] = BPMF::X;
+  characterToComponent[u8"ㄓ"] = BPMF::ZH;
+  characterToComponent[u8"ㄔ"] = BPMF::CH;
+  characterToComponent[u8"ㄕ"] = BPMF::SH;
+  characterToComponent[u8"ㄖ"] = BPMF::R;
+  characterToComponent[u8"ㄗ"] = BPMF::Z;
+  characterToComponent[u8"ㄘ"] = BPMF::C;
+  characterToComponent[u8"ㄙ"] = BPMF::S;
+  characterToComponent[u8"ㄧ"] = BPMF::I;
+  characterToComponent[u8"ㄨ"] = BPMF::U;
+  characterToComponent[u8"ㄩ"] = BPMF::UE;
+  characterToComponent[u8"ㄚ"] = BPMF::A;
+  characterToComponent[u8"ㄛ"] = BPMF::O;
+  characterToComponent[u8"ㄜ"] = BPMF::ER;
+  characterToComponent[u8"ㄝ"] = BPMF::E;
+  characterToComponent[u8"ㄞ"] = BPMF::AI;
+  characterToComponent[u8"ㄟ"] = BPMF::EI;
+  characterToComponent[u8"ㄠ"] = BPMF::AO;
+  characterToComponent[u8"ㄡ"] = BPMF::OU;
+  characterToComponent[u8"ㄢ"] = BPMF::AN;
+  characterToComponent[u8"ㄣ"] = BPMF::EN;
+  characterToComponent[u8"ㄤ"] = BPMF::ANG;
+  characterToComponent[u8"ㄥ"] = BPMF::ENG;
+  characterToComponent[u8"ㄦ"] = BPMF::ERR;
+  characterToComponent[u8"ˊ"] = BPMF::Tone2;
+  characterToComponent[u8"ˇ"] = BPMF::Tone3;
+  characterToComponent[u8"ˋ"] = BPMF::Tone4;
+  characterToComponent[u8"˙"] = BPMF::Tone5;
 
   for (std::map<std::string, BPMF::Component>::iterator iter =
            characterToComponent.begin();
