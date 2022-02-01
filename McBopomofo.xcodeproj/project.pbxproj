@@ -60,6 +60,7 @@
 		D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3B82796A8A000657FF3 /* PreferencesTests.swift */; };
 		D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */; };
 		D4A13D5A27A59F0B003BE359 /* InputMethodController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* InputMethodController.swift */; };
+		D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
 		D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */; };
@@ -218,6 +219,7 @@
 		D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionUpdateTests.swift; sourceTree = "<group>"; };
 		D495583A27A5C6C4006ADE1C /* LanguageModelManager+Privates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LanguageModelManager+Privates.h"; sourceTree = "<group>"; };
 		D4A13D5927A59D5C003BE359 /* InputMethodController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMethodController.swift; sourceTree = "<group>"; };
+		D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerPlainBopomofoTests.swift; sourceTree = "<group>"; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8B27A838D5006DB1CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8C27A838D8006DB1CF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -501,6 +503,7 @@
 			isa = PBXGroup;
 			children = (
 				D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */,
+				D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */,
 				D485D3B82796A8A000657FF3 /* PreferencesTests.swift */,
 				D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */,
 			);
@@ -754,6 +757,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */,
 				D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */,
 				D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */,
 				D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */,

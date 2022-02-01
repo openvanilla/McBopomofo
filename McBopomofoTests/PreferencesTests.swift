@@ -3,12 +3,37 @@ import XCTest
 
 class PreferencesTests: XCTestCase {
 
+    func reset() {
+        Preferences.allKeys.forEach {
+            UserDefaults.standard.removeObject(forKey: $0)
+        }
+    }
+
+    func makeSnapshot() -> [String: Any] {
+        var dict = [String: Any]()
+        Preferences.allKeys.forEach {
+            dict[$0] = UserDefaults.standard.object(forKey: $0)
+        }
+        return dict
+    }
+
+    func restore(from snapshot:[String: Any]) {
+        Preferences.allKeys.forEach {
+            UserDefaults.standard.set(snapshot[$0], forKey: $0)
+        }
+    }
+
+    var snapshot: [String: Any]?
+
     override func setUpWithError() throws {
-        Preferences.reset()
+        snapshot = makeSnapshot()
+        reset()
     }
 
     override func tearDownWithError() throws {
-        Preferences.reset()
+        if let snapshot = snapshot {
+            restore(from: snapshot)
+        }
     }
 
     func testKeyboardLayout() {
