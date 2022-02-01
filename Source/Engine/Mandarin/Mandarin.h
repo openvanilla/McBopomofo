@@ -271,9 +271,6 @@ namespace Formosa {
             static const BopomofoKeyboardLayout* IBMLayout();
             static const BopomofoKeyboardLayout* HanyuPinyinLayout();
             
-            // recognizes (case-insensitive): standard, eten, hsu, eten26, ibm
-            static const BopomofoKeyboardLayout* LayoutForName(const string& name);            
-            
             BopomofoKeyboardLayout(const BopomofoKeyToComponentMap& ktcm, const string& name)
                 : m_keyToComponent(ktcm)
                 , m_name(name)

@@ -29,14 +29,9 @@
 #include <algorithm>
 #include "Mandarin.h"
 
-#include "OVUTF8Helper.h"
-#include "OVWildcard.h"
-
 namespace Formosa {
 namespace Mandarin {
     
-using namespace OpenVanilla;
-
 class PinyinParseHelper {
 public:
     static const bool ConsumePrefix(string &target, const string &prefix)
@@ -591,15 +586,43 @@ const BPMF BPMF::FromPHT(const string& str)
 const BPMF BPMF::FromComposedString(const string& str)
 {
     BPMF syllable;
-    vector<string> components = OVUTF8Helper::SplitStringByCodePoint(str);
-    for (vector<string>::iterator iter = components.begin() ; iter != components.end() ; ++iter) {
-	
-		const map<string, BPMF::Component>& charToComp = BopomofoCharacterMap::SharedInstance().characterToComponent;
-		map<string, BPMF::Component>::const_iterator result = charToComp.find(*iter);
-		if (result != charToComp.end())
-        	syllable += BPMF((*result).second);
+    auto iter = str.begin();
+    while (iter != str.end()) {
+      // This is a naive implementation and we bail early at anything we don't recognize.
+      // A sound implementation would require to either use a trie for the Bopomofo character map
+      // or to split the input by codepoints. This suffices for now.
+
+      // Illegal.
+      if (!(*iter & 0x80)) {
+        break;
+      }
+
+      size_t utf8_length = -1;
+
+      // These are the code points for the tone markers.
+      if ((*iter & (0x80 | 0x40)) && !(*iter & 0x20)) {
+        utf8_length = 2;
+      } else if ((*iter & (0x80 | 0x40 | 0x20)) && !(*iter & 0x10)) {
+        utf8_length = 3;
+      } else {
+        // Illegal.
+        break;
+      }
+
+      if (iter + (utf8_length - 1) == str.end()) {
+        break;
+      }
+
+      string component = string(iter, iter + utf8_length);
+      const map<string, BPMF::Component>& charToComp = BopomofoCharacterMap::SharedInstance().characterToComponent;
+      map<string, BPMF::Component>::const_iterator result = charToComp.find(component);
+      if (result == charToComp.end()) {
+        break;
+      } else {
+        syllable += BPMF((*result).second);
+      }
+      iter += utf8_length;
     }
-    
     return syllable;
 }
 
@@ -734,29 +757,6 @@ void BopomofoKeyboardLayout::FinalizeLayouts()
     FL(c_IBMLayout);
     FL(c_HanyuPinyinLayout);
     #undef FL
-}
-
-const BopomofoKeyboardLayout* BopomofoKeyboardLayout::LayoutForName(const string& name)
-{
-    if (OVWildcard::Match(name, "standard"))
-        return StandardLayout();
-        
-    if (OVWildcard::Match(name, "eten"))
-        return ETenLayout();
-        
-    if (OVWildcard::Match(name, "hsu"))
-        return HsuLayout();
-    
-    if (OVWildcard::Match(name, "eten26"))
-        return ETen26Layout();
-
-    if (OVWildcard::Match(name, "IBM"))
-        return IBMLayout();
-
-    if (OVWildcard::Match(name, "hanyupinyin") || OVWildcard::Match(name, "hanyu pinyin") || OVWildcard::Match(name, "hanyu-pinyin") || OVWildcard::Match(name, "pinyin"))
-        return HanyuPinyinLayout();
-
-    return 0;
 }
 
 #define ASSIGNKEY1(m, vec, k, val) m[k] = (vec.clear(), vec.push_back((BPMF::Component)val), vec)
