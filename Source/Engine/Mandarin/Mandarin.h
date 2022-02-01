@@ -38,8 +38,9 @@ namespace Mandarin {
 
 class BopomofoSyllable {
  public:
-  typedef unsigned int Component;
-  BopomofoSyllable(Component syllable = 0) : m_syllable(syllable) {}
+  typedef uint16_t Component;
+
+  explicit BopomofoSyllable(Component syllable = 0) : m_syllable(syllable) {}
 
   BopomofoSyllable(const BopomofoSyllable&) = default;
   BopomofoSyllable(BopomofoSyllable&& another) = default;
@@ -122,9 +123,10 @@ class BopomofoSyllable {
 
   const BopomofoSyllable operator+(const BopomofoSyllable& another) const {
     Component newSyllable = m_syllable;
-#define OP_SOVER(mask)           \
-  if (another.m_syllable & mask) \
-  newSyllable = (newSyllable & ~mask) | (another.m_syllable & mask)
+#define OP_SOVER(mask) \
+  if (another.m_syllable & mask) { \
+    newSyllable = (newSyllable & ~mask) | (another.m_syllable & mask); \
+  }
     OP_SOVER(ConsonantMask);
     OP_SOVER(MiddleVowelMask);
     OP_SOVER(VowelMask);
@@ -134,9 +136,10 @@ class BopomofoSyllable {
   }
 
   BopomofoSyllable& operator+=(const BopomofoSyllable& another) {
-#define OPE_SOVER(mask)          \
-  if (another.m_syllable & mask) \
-  m_syllable = (m_syllable & ~mask) | (another.m_syllable & mask)
+#define OPE_SOVER(mask) \
+  if (another.m_syllable & mask) { \
+    m_syllable = (m_syllable & ~mask) | (another.m_syllable & mask); \
+  }
     OPE_SOVER(ConsonantMask);
     OPE_SOVER(MiddleVowelMask);
     OPE_SOVER(VowelMask);
@@ -145,26 +148,26 @@ class BopomofoSyllable {
     return *this;
   }
 
-  short absoluteOrder() const {
+  uint16_t absoluteOrder() const {
     // turn BPMF syllable into a 4*14*4*22 number
-    return (short)(m_syllable & ConsonantMask) +
-           (short)((m_syllable & MiddleVowelMask) >> 5) * 22 +
-           (short)((m_syllable & VowelMask) >> 7) * 22 * 4 +
-           (short)((m_syllable & ToneMarkerMask) >> 11) * 22 * 4 * 14;
+    return (uint16_t)(m_syllable & ConsonantMask) +
+           (uint16_t)((m_syllable & MiddleVowelMask) >> 5) * 22 +
+           (uint16_t)((m_syllable & VowelMask) >> 7) * 22 * 4 +
+           (uint16_t)((m_syllable & ToneMarkerMask) >> 11) * 22 * 4 * 14;
   }
 
   const std::string absoluteOrderString() const {
     // 5*14*4*22 = 6160, we use a 79*79 encoding to represent that
-    short order = absoluteOrder();
-    char low = 48 + (char)(order % 79);
-    char high = 48 + (char)(order / 79);
+    uint16_t order = absoluteOrder();
+    char low = 48 + static_cast<char>(order % 79);
+    char high = 48 + static_cast<char>(order / 79);
     std::string result(2, ' ');
     result[0] = low;
     result[1] = high;
     return result;
   }
 
-  static BopomofoSyllable FromAbsoluteOrder(short order) {
+  static BopomofoSyllable FromAbsoluteOrder(uint16_t order) {
     return BopomofoSyllable((order % 22) | ((order / 22) % 4) << 5 |
                             ((order / (22 * 4)) % 14) << 7 |
                             ((order / (22 * 4 * 14)) % 5) << 11);
@@ -173,7 +176,8 @@ class BopomofoSyllable {
   static BopomofoSyllable FromAbsoluteOrderString(const std::string& str) {
     if (str.length() != 2) return BopomofoSyllable();
 
-    return FromAbsoluteOrder((short)(str[1] - 48) * 79 + (short)(str[0] - 48));
+    return FromAbsoluteOrder((uint16_t)(str[1] - 48) * 79 +
+                             (uint16_t)(str[0] - 48));
   }
 
   friend std::ostream& operator<<(std::ostream& stream,
@@ -322,13 +326,14 @@ class BopomofoKeyboardLayout {
       // the nasty issue of only one char in the buffer
       if (iter == sequence.begin() && iter + 1 == sequence.end()) {
         if (head.hasVowel() || follow.hasToneMarker() ||
-            head.belongsToZCSRClass())
+            head.belongsToZCSRClass()) {
           syllable += head;
-        else {
-          if (follow.hasVowel() || ending.hasToneMarker())
+        } else {
+          if (follow.hasVowel() || ending.hasToneMarker()) {
             syllable += follow;
-          else
+          } else {
             syllable += ending;
+          }
         }
 
         continue;
@@ -413,7 +418,7 @@ class BopomofoKeyboardLayout {
 
 class BopomofoReadingBuffer {
  public:
-  BopomofoReadingBuffer(const BopomofoKeyboardLayout* layout)
+  explicit BopomofoReadingBuffer(const BopomofoKeyboardLayout* layout)
       : m_layout(layout), m_pinyinMode(false) {
     if (layout == BopomofoKeyboardLayout::HanyuPinyinLayout()) {
       m_pinyinMode = true;
