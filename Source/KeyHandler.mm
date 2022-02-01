@@ -532,6 +532,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleEscWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     BOOL escToClearInputBufferEnabled = Preferences.escToCleanInputBuffer;
 
     if (escToClearInputBufferEnabled) {
@@ -547,12 +551,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // Bopomofo reading, in odds with the expectation of users from
         // other platforms
 
-        if (_bpmfReadingBuffer->isEmpty()) {
-            // no need to beep since the event is deliberately triggered by user
-            if (![state isKindOfClass:[InputStateInputting class]]) {
-                return NO;
-            }
-        } else {
+        if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
@@ -563,14 +562,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleBackwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     InputStateInputting *currentState = (InputStateInputting *) state;
@@ -601,14 +600,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleForwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     InputStateInputting *currentState = (InputStateInputting *) state;
@@ -640,14 +639,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleHomeWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     if (_builder->cursorIndex()) {
@@ -664,14 +663,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleEndWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     if (_builder->cursorIndex() != _builder->length()) {
@@ -688,6 +687,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleAbsorbedArrowKeyWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
     }
@@ -697,11 +700,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleBackspaceWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (_bpmfReadingBuffer->isEmpty()) {
-        if (![state isKindOfClass:[InputStateInputting class]]) {
-            return NO;
-        }
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
 
+    if (_bpmfReadingBuffer->isEmpty()) {
         if (_builder->cursorIndex()) {
             _builder->deleteReadingBeforeCursor();
             [self _walk];
@@ -726,11 +729,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleDeleteWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (_bpmfReadingBuffer->isEmpty()) {
-        if (![state isKindOfClass:[InputStateInputting class]]) {
-            return NO;
-        }
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
 
+    if (_bpmfReadingBuffer->isEmpty()) {
         if (_builder->cursorIndex() != _builder->length()) {
             _builder->deleteReadingAfterCursor();
             [self _walk];
@@ -755,26 +758,26 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if ([state isKindOfClass:[InputStateInputting class]]) {
-        if (_inputMode == InputModePlainBopomofo) {
-            if (!_bpmfReadingBuffer->isEmpty()) {
-                errorCallback();
-            }
-            return YES;
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
+    if (_inputMode == InputModePlainBopomofo) {
+        if (!_bpmfReadingBuffer->isEmpty()) {
+            errorCallback();
         }
-
-        [self clear];
-
-        InputStateInputting *current = (InputStateInputting *) state;
-        NSString *composingBuffer = current.composingBuffer;
-        InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-        stateCallback(committing);
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-        stateCallback(empty);
         return YES;
     }
 
-    return NO;
+    [self clear];
+
+    InputStateInputting *current = (InputStateInputting *) state;
+    NSString *composingBuffer = current.composingBuffer;
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    stateCallback(committing);
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    stateCallback(empty);
+    return YES;
 }
 
 - (BOOL)_handlePunctuation:(string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback

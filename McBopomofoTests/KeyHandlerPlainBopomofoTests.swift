@@ -13,6 +13,21 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
+    func testPunctuationTable() {
+        let input = KeyHandlerInput(inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift, isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input, state: state) { newState in
+            state = newState
+        } candidateSelectionCallback: {
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
+        if let state = state as? InputState.ChoosingCandidate {
+            XCTAssertTrue(state.candidates.contains("，"))
+        }
+    }
+
     func testPunctuationComma() {
         let input = KeyHandlerInput(inputText: "<", keyCode: 0, charCode: charCode("<"), flags: .shift, isVerticalMode: false)
         var state: InputState = InputState.Empty()
