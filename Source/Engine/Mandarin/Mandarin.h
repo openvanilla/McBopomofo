@@ -212,7 +212,6 @@ typedef std::map<BPMF::Component, char> BopomofoComponentToKeyMap;
 
 class BopomofoKeyboardLayout {
  public:
-  static void FinalizeLayouts();
   static const BopomofoKeyboardLayout* StandardLayout();
   static const BopomofoKeyboardLayout* ETenLayout();
   static const BopomofoKeyboardLayout* HsuLayout();
@@ -400,16 +399,6 @@ class BopomofoKeyboardLayout {
   std::string m_name;
   BopomofoKeyToComponentMap m_keyToComponent;
   BopomofoComponentToKeyMap m_componentToKey;
-
-  static const BopomofoKeyboardLayout* c_StandardLayout;
-  static const BopomofoKeyboardLayout* c_ETenLayout;
-  static const BopomofoKeyboardLayout* c_HsuLayout;
-  static const BopomofoKeyboardLayout* c_ETen26Layout;
-  static const BopomofoKeyboardLayout* c_IBMLayout;
-
-  // this is essentially an empty layout, but we use pointer semantic to tell
-  // the differences--and pass on the responsibility to BopomofoReadingBuffer
-  static const BopomofoKeyboardLayout* c_HanyuPinyinLayout;
 };
 
 class BopomofoReadingBuffer {
