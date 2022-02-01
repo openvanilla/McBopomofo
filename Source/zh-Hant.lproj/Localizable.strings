@@ -82,3 +82,5 @@
 "Half-width punctuation off" = "已經切回到全型標點模式";
 
 "Associated Phrases" = "聯想詞";
+
+"There are special phrases in your text. We don't support adding new phrases in this case." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";

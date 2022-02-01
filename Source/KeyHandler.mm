@@ -579,7 +579,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // Shift + left
         if (currentState.cursorIndex > 0) {
             NSInteger previousPosition = [StringUtils previousUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition phrases:currentState.phrases];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition readings:[self _currentReadings]];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -616,7 +616,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // Shift + Right
         if (currentState.cursorIndex < currentState.composingBuffer.length) {
             NSInteger nextPosition = [StringUtils nextUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition phrases:currentState.phrases];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition readings:[self _currentReadings]];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -843,7 +843,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index = [StringUtils previousUtf16PositionForIndex:index in:state.composingBuffer];
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index phrases:state.phrases];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -858,7 +858,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index = [StringUtils nextUtf16PositionForIndex:index in:state.composingBuffer];
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index phrases:state.phrases];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             stateCallback(marking);
         } else {
             errorCallback();
@@ -1177,7 +1177,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
-    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex phrases:phrases];
+    InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex];
     return newState;
 }
 
@@ -1247,7 +1247,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         }
     }
 
-    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray phrases:currentState.phrases useVerticalMode:useVerticalMode];
+    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
     return state;
 }
 
