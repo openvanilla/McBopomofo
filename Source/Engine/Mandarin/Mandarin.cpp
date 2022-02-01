@@ -932,10 +932,10 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
 const std::string BPMF::composedString() const {
   std::string result;
 #define APPEND(c)                                                         \
-  if (m_syllable & c)                                                     \
+  if (syllable_ & c)                                                     \
   result +=                                                               \
       (*BopomofoCharacterMap::SharedInstance().componentToCharacter.find( \
-           m_syllable & c))                                               \
+           syllable_ & c))                                               \
           .second
   APPEND(ConsonantMask);
   APPEND(MiddleVowelMask);

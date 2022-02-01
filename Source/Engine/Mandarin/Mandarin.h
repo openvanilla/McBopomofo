@@ -36,7 +36,7 @@ class BopomofoSyllable {
  public:
   typedef uint16_t Component;
 
-  explicit BopomofoSyllable(Component syllable = 0) : m_syllable(syllable) {}
+  explicit BopomofoSyllable(Component syllable = 0) : syllable_(syllable) {}
 
   BopomofoSyllable(const BopomofoSyllable&) = default;
   BopomofoSyllable(BopomofoSyllable&& another) = default;
@@ -60,37 +60,37 @@ class BopomofoSyllable {
   static const BopomofoSyllable FromComposedString(const std::string& str);
   const std::string composedString() const;
 
-  void clear() { m_syllable = 0; }
+  void clear() { syllable_ = 0; }
 
-  bool isEmpty() const { return !m_syllable; }
+  bool isEmpty() const { return !syllable_; }
 
-  bool hasConsonant() const { return !!(m_syllable & ConsonantMask); }
+  bool hasConsonant() const { return !!(syllable_ & ConsonantMask); }
 
-  bool hasMiddleVowel() const { return !!(m_syllable & MiddleVowelMask); }
-  bool hasVowel() const { return !!(m_syllable & VowelMask); }
+  bool hasMiddleVowel() const { return !!(syllable_ & MiddleVowelMask); }
+  bool hasVowel() const { return !!(syllable_ & VowelMask); }
 
-  bool hasToneMarker() const { return !!(m_syllable & ToneMarkerMask); }
+  bool hasToneMarker() const { return !!(syllable_ & ToneMarkerMask); }
 
-  Component consonantComponent() const { return m_syllable & ConsonantMask; }
+  Component consonantComponent() const { return syllable_ & ConsonantMask; }
 
   Component middleVowelComponent() const {
-    return m_syllable & MiddleVowelMask;
+    return syllable_ & MiddleVowelMask;
   }
 
-  Component vowelComponent() const { return m_syllable & VowelMask; }
+  Component vowelComponent() const { return syllable_ & VowelMask; }
 
-  Component toneMarkerComponent() const { return m_syllable & ToneMarkerMask; }
+  Component toneMarkerComponent() const { return syllable_ & ToneMarkerMask; }
 
   bool operator==(const BopomofoSyllable& another) const {
-    return m_syllable == another.m_syllable;
+    return syllable_ == another.syllable_;
   }
 
   bool operator!=(const BopomofoSyllable& another) const {
-    return m_syllable != another.m_syllable;
+    return syllable_ != another.syllable_;
   }
 
   bool isOverlappingWith(const BopomofoSyllable& another) const {
-#define IOW_SAND(mask) ((m_syllable & mask) && (another.m_syllable & mask))
+#define IOW_SAND(mask) ((syllable_ & mask) && (another.syllable_ & mask))
     return IOW_SAND(ConsonantMask) || IOW_SAND(MiddleVowelMask) ||
            IOW_SAND(VowelMask) || IOW_SAND(ToneMarkerMask);
 #undef IOW_SAND
@@ -98,30 +98,30 @@ class BopomofoSyllable {
 
   // consonants J, Q, X all require the existence of vowel I or UE
   bool belongsToJQXClass() const {
-    Component consonant = m_syllable & ConsonantMask;
+    Component consonant = syllable_ & ConsonantMask;
     return (consonant == J || consonant == Q || consonant == X);
   }
 
   // zi, ci, si, chi, chi, shi, ri
   bool belongsToZCSRClass() const {
-    Component consonant = m_syllable & ConsonantMask;
+    Component consonant = syllable_ & ConsonantMask;
     return (consonant >= ZH && consonant <= S);
   }
 
   Component maskType() const {
     Component mask = 0;
-    mask |= (m_syllable & ConsonantMask) ? ConsonantMask : 0;
-    mask |= (m_syllable & MiddleVowelMask) ? MiddleVowelMask : 0;
-    mask |= (m_syllable & VowelMask) ? VowelMask : 0;
-    mask |= (m_syllable & ToneMarkerMask) ? ToneMarkerMask : 0;
+    mask |= (syllable_ & ConsonantMask) ? ConsonantMask : 0;
+    mask |= (syllable_ & MiddleVowelMask) ? MiddleVowelMask : 0;
+    mask |= (syllable_ & VowelMask) ? VowelMask : 0;
+    mask |= (syllable_ & ToneMarkerMask) ? ToneMarkerMask : 0;
     return mask;
   }
 
   const BopomofoSyllable operator+(const BopomofoSyllable& another) const {
-    Component newSyllable = m_syllable;
+    Component newSyllable = syllable_;
 #define OP_SOVER(mask) \
-  if (another.m_syllable & mask) { \
-    newSyllable = (newSyllable & ~mask) | (another.m_syllable & mask); \
+  if (another.syllable_ & mask) { \
+    newSyllable = (newSyllable & ~mask) | (another.syllable_ & mask); \
   }
     OP_SOVER(ConsonantMask);
     OP_SOVER(MiddleVowelMask);
@@ -133,8 +133,8 @@ class BopomofoSyllable {
 
   BopomofoSyllable& operator+=(const BopomofoSyllable& another) {
 #define OPE_SOVER(mask) \
-  if (another.m_syllable & mask) { \
-    m_syllable = (m_syllable & ~mask) | (another.m_syllable & mask); \
+  if (another.syllable_ & mask) { \
+    syllable_ = (syllable_ & ~mask) | (another.syllable_ & mask); \
   }
     OPE_SOVER(ConsonantMask);
     OPE_SOVER(MiddleVowelMask);
@@ -146,10 +146,10 @@ class BopomofoSyllable {
 
   uint16_t absoluteOrder() const {
     // turn BPMF syllable into a 4*14*4*22 number
-    return (uint16_t)(m_syllable & ConsonantMask) +
-           (uint16_t)((m_syllable & MiddleVowelMask) >> 5) * 22 +
-           (uint16_t)((m_syllable & VowelMask) >> 7) * 22 * 4 +
-           (uint16_t)((m_syllable & ToneMarkerMask) >> 11) * 22 * 4 * 14;
+    return (uint16_t)(syllable_ & ConsonantMask) +
+           (uint16_t)((syllable_ & MiddleVowelMask) >> 5) * 22 +
+           (uint16_t)((syllable_ & VowelMask) >> 7) * 22 * 4 +
+           (uint16_t)((syllable_ & ToneMarkerMask) >> 11) * 22 * 4 * 14;
   }
 
   const std::string absoluteOrderString() const {
@@ -196,7 +196,7 @@ class BopomofoSyllable {
       Tone3 = 0x1000, Tone4 = 0x1800, Tone5 = 0x2000;
 
  protected:
-  Component m_syllable;
+  Component syllable_;
 };
 
 inline std::ostream& operator<<(std::ostream& stream,
@@ -415,32 +415,32 @@ class BopomofoKeyboardLayout {
 class BopomofoReadingBuffer {
  public:
   explicit BopomofoReadingBuffer(const BopomofoKeyboardLayout* layout)
-      : m_layout(layout), m_pinyinMode(false) {
+      : layout_(layout), pinyin_mode_(false) {
     if (layout == BopomofoKeyboardLayout::HanyuPinyinLayout()) {
-      m_pinyinMode = true;
-      m_pinyinSequence = "";
+      pinyin_mode_ = true;
+      pinyin_sequence_ = "";
     }
   }
 
   void setKeyboardLayout(const BopomofoKeyboardLayout* layout) {
-    m_layout = layout;
+    layout_ = layout;
 
     if (layout == BopomofoKeyboardLayout::HanyuPinyinLayout()) {
-      m_pinyinMode = true;
-      m_pinyinSequence = "";
+      pinyin_mode_ = true;
+      pinyin_sequence_ = "";
     }
   }
 
   bool isValidKey(char k) const {
-    if (!m_pinyinMode) {
-      return m_layout ? (m_layout->keyToComponents(k)).size() > 0 : false;
+    if (!pinyin_mode_) {
+      return layout_ ? (layout_->keyToComponents(k)).size() > 0 : false;
     }
 
     char lk = tolower(k);
     if (lk >= 'a' && lk <= 'z') {
       // if a tone marker is already in place
-      if (m_pinyinSequence.length()) {
-        char lastc = m_pinyinSequence[m_pinyinSequence.length() - 1];
+      if (pinyin_sequence_.length()) {
+        char lastc = pinyin_sequence_[pinyin_sequence_.length() - 1];
         if (lastc >= '2' && lastc <= '5') {
           return false;
         }
@@ -449,7 +449,7 @@ class BopomofoReadingBuffer {
       return true;
     }
 
-    if (m_pinyinSequence.length() && (lk >= '2' && lk <= '5')) {
+    if (pinyin_sequence_.length() && (lk >= '2' && lk <= '5')) {
       return true;
     }
 
@@ -459,72 +459,72 @@ class BopomofoReadingBuffer {
   bool combineKey(char k) {
     if (!isValidKey(k)) return false;
 
-    if (m_pinyinMode) {
-      m_pinyinSequence += std::string(1, tolower(k));
-      m_syllable = BPMF::FromHanyuPinyin(m_pinyinSequence);
+    if (pinyin_mode_) {
+      pinyin_sequence_ += std::string(1, tolower(k));
+      syllable_ = BPMF::FromHanyuPinyin(pinyin_sequence_);
       return true;
     }
 
     std::string sequence =
-        m_layout->keySequenceFromSyllable(m_syllable) + std::string(1, k);
-    m_syllable = m_layout->syllableFromKeySequence(sequence);
+        layout_->keySequenceFromSyllable(syllable_) + std::string(1, k);
+    syllable_ = layout_->syllableFromKeySequence(sequence);
     return true;
   }
 
   void clear() {
-    m_pinyinSequence.clear();
-    m_syllable.clear();
+    pinyin_sequence_.clear();
+    syllable_.clear();
   }
 
   void backspace() {
-    if (!m_layout) return;
+    if (!layout_) return;
 
-    if (m_pinyinMode) {
-      if (m_pinyinSequence.length()) {
-        m_pinyinSequence =
-            m_pinyinSequence.substr(0, m_pinyinSequence.length() - 1);
+    if (pinyin_mode_) {
+      if (pinyin_sequence_.length()) {
+        pinyin_sequence_ =
+            pinyin_sequence_.substr(0, pinyin_sequence_.length() - 1);
       }
 
-      m_syllable = BPMF::FromHanyuPinyin(m_pinyinSequence);
+      syllable_ = BPMF::FromHanyuPinyin(pinyin_sequence_);
       return;
     }
 
-    std::string sequence = m_layout->keySequenceFromSyllable(m_syllable);
+    std::string sequence = layout_->keySequenceFromSyllable(syllable_);
     if (sequence.length()) {
       sequence = sequence.substr(0, sequence.length() - 1);
-      m_syllable = m_layout->syllableFromKeySequence(sequence);
+      syllable_ = layout_->syllableFromKeySequence(sequence);
     }
   }
 
-  bool isEmpty() const { return m_syllable.isEmpty(); }
+  bool isEmpty() const { return syllable_.isEmpty(); }
 
   const std::string composedString() const {
-    if (m_pinyinMode) {
-      return m_pinyinSequence;
+    if (pinyin_mode_) {
+      return pinyin_sequence_;
     }
 
-    return m_syllable.composedString();
+    return syllable_.composedString();
   }
 
-  const BPMF syllable() const { return m_syllable; }
+  const BPMF syllable() const { return syllable_; }
 
   const std::string standardLayoutQueryString() const {
     return BopomofoKeyboardLayout::StandardLayout()->keySequenceFromSyllable(
-        m_syllable);
+        syllable_);
   }
 
   const std::string absoluteOrderQueryString() const {
-    return m_syllable.absoluteOrderString();
+    return syllable_.absoluteOrderString();
   }
 
-  bool hasToneMarker() const { return m_syllable.hasToneMarker(); }
+  bool hasToneMarker() const { return syllable_.hasToneMarker(); }
 
  protected:
-  const BopomofoKeyboardLayout* m_layout;
-  BPMF m_syllable;
+  const BopomofoKeyboardLayout* layout_;
+  BPMF syllable_;
 
-  bool m_pinyinMode;
-  std::string m_pinyinSequence;
+  bool pinyin_mode_;
+  std::string pinyin_sequence_;
 };
 }  // namespace Mandarin
 }  // namespace Formosa
