@@ -35,7 +35,6 @@
 
 namespace Formosa {
 namespace Mandarin {
-using namespace std;
 
 class BopomofoSyllable {
  public:
@@ -54,19 +53,20 @@ class BopomofoSyllable {
 
   // takes the ASCII-form, "v"-tolerant, TW-style Hanyu Pinyin (fong, pong, bong
   // acceptable)
-  static const BopomofoSyllable FromHanyuPinyin(const string& str);
+  static const BopomofoSyllable FromHanyuPinyin(const std::string& str);
 
   // TO DO: Support accented vowels
-  const string HanyuPinyinString(bool includesTone, bool useVForUUmlaut) const;
-  // const string HanyuPinyinString(bool includesTone, bool useVForUUmlaut, bool
-  // composeAccentedVowel) const;
+  const std::string HanyuPinyinString(bool includesTone,
+                                      bool useVForUUmlaut) const;
+  // const std::string HanyuPinyinString(bool includesTone, bool useVForUUmlaut,
+  // bool composeAccentedVowel) const;
 
   // PHT = Pai-hua-tsi
-  static const BopomofoSyllable FromPHT(const string& str);
-  const string PHTString(bool includesTone) const;
+  static const BopomofoSyllable FromPHT(const std::string& str);
+  const std::string PHTString(bool includesTone) const;
 
-  static const BopomofoSyllable FromComposedString(const string& str);
-  const string composedString() const;
+  static const BopomofoSyllable FromComposedString(const std::string& str);
+  const std::string composedString() const;
 
   void clear() { m_syllable = 0; }
 
@@ -158,12 +158,12 @@ class BopomofoSyllable {
            (short)((m_syllable & ToneMarkerMask) >> 11) * 22 * 4 * 14;
   }
 
-  const string absoluteOrderString() const {
+  const std::string absoluteOrderString() const {
     // 5*14*4*22 = 6160, we use a 79*79 encoding to represent that
     short order = absoluteOrder();
     char low = 48 + (char)(order % 79);
     char high = 48 + (char)(order / 79);
-    string result(2, ' ');
+    std::string result(2, ' ');
     result[0] = low;
     result[1] = high;
     return result;
@@ -175,13 +175,14 @@ class BopomofoSyllable {
                             ((order / (22 * 4 * 14)) % 5) << 11);
   }
 
-  static BopomofoSyllable FromAbsoluteOrderString(const string& str) {
+  static BopomofoSyllable FromAbsoluteOrderString(const std::string& str) {
     if (str.length() != 2) return BopomofoSyllable();
 
     return FromAbsoluteOrder((short)(str[1] - 48) * 79 + (short)(str[0] - 48));
   }
 
-  friend ostream& operator<<(ostream& stream, const BopomofoSyllable& syllable);
+  friend std::ostream& operator<<(std::ostream& stream,
+                                  const BopomofoSyllable& syllable);
 
   static const Component
       ConsonantMask = 0x001f,    // 0000 0000 0001 1111, 21 consonants
@@ -203,15 +204,16 @@ class BopomofoSyllable {
   Component m_syllable;
 };
 
-inline ostream& operator<<(ostream& stream, const BopomofoSyllable& syllable) {
+inline std::ostream& operator<<(std::ostream& stream,
+                                const BopomofoSyllable& syllable) {
   stream << syllable.composedString();
   return stream;
 }
 
 typedef BopomofoSyllable BPMF;
 
-typedef map<char, vector<BPMF::Component> > BopomofoKeyToComponentMap;
-typedef map<BPMF::Component, char> BopomofoComponentToKeyMap;
+typedef std::map<char, std::vector<BPMF::Component> > BopomofoKeyToComponentMap;
+typedef std::map<BPMF::Component, char> BopomofoComponentToKeyMap;
 
 class BopomofoKeyboardLayout {
  public:
@@ -224,18 +226,18 @@ class BopomofoKeyboardLayout {
   static const BopomofoKeyboardLayout* HanyuPinyinLayout();
 
   BopomofoKeyboardLayout(const BopomofoKeyToComponentMap& ktcm,
-                         const string& name)
+                         const std::string& name)
       : m_keyToComponent(ktcm), m_name(name) {
     for (BopomofoKeyToComponentMap::const_iterator miter =
              m_keyToComponent.begin();
          miter != m_keyToComponent.end(); ++miter)
-      for (vector<BPMF::Component>::const_iterator viter =
+      for (std::vector<BPMF::Component>::const_iterator viter =
                (*miter).second.begin();
            viter != (*miter).second.end(); ++viter)
         m_componentToKey[*viter] = (*miter).first;
   }
 
-  const string name() const { return m_name; }
+  const std::string name() const { return m_name; }
 
   char componentToKey(BPMF::Component component) const {
     BopomofoComponentToKeyMap::const_iterator iter =
@@ -243,20 +245,20 @@ class BopomofoKeyboardLayout {
     return (iter == m_componentToKey.end()) ? 0 : (*iter).second;
   }
 
-  const vector<BPMF::Component> keyToComponents(char key) const {
+  const std::vector<BPMF::Component> keyToComponents(char key) const {
     BopomofoKeyToComponentMap::const_iterator iter = m_keyToComponent.find(key);
-    return (iter == m_keyToComponent.end()) ? vector<BPMF::Component>()
+    return (iter == m_keyToComponent.end()) ? std::vector<BPMF::Component>()
                                             : (*iter).second;
   }
 
-  const string keySequenceFromSyllable(BPMF syllable) const {
-    string sequence;
+  const std::string keySequenceFromSyllable(BPMF syllable) const {
+    std::string sequence;
 
     BPMF::Component c;
     char k;
-#define STKS_COMBINE(component)                            \
-  if ((c = component)) {                                   \
-    if ((k = componentToKey(c))) sequence += string(1, k); \
+#define STKS_COMBINE(component)                                 \
+  if ((c = component)) {                                        \
+    if ((k = componentToKey(c))) sequence += std::string(1, k); \
   }
     STKS_COMBINE(syllable.consonantComponent());
     STKS_COMBINE(syllable.middleVowelComponent());
@@ -266,15 +268,15 @@ class BopomofoKeyboardLayout {
     return sequence;
   }
 
-  const BPMF syllableFromKeySequence(const string& sequence) const {
+  const BPMF syllableFromKeySequence(const std::string& sequence) const {
     BPMF syllable;
 
-    for (string::const_iterator iter = sequence.begin(); iter != sequence.end();
-         ++iter) {
+    for (std::string::const_iterator iter = sequence.begin();
+         iter != sequence.end(); ++iter) {
       bool beforeSeqHasIorUE = sequenceContainsIorUE(sequence.begin(), iter);
       bool aheadSeqHasIorUE = sequenceContainsIorUE(iter + 1, sequence.end());
 
-      vector<BPMF::Component> components = keyToComponents(*iter);
+      std::vector<BPMF::Component> components = keyToComponents(*iter);
 
       if (!components.size()) continue;
 
@@ -369,8 +371,8 @@ class BopomofoKeyboardLayout {
   }
 
  protected:
-  bool endAheadOrAheadHasToneMarkKey(string::const_iterator ahead,
-                                     string::const_iterator end) const {
+  bool endAheadOrAheadHasToneMarkKey(std::string::const_iterator ahead,
+                                     std::string::const_iterator end) const {
     if (ahead == end) return true;
 
     char tone1 = componentToKey(BPMF::Tone1);
@@ -389,8 +391,8 @@ class BopomofoKeyboardLayout {
     return false;
   }
 
-  bool sequenceContainsIorUE(string::const_iterator start,
-                             string::const_iterator end) const {
+  bool sequenceContainsIorUE(std::string::const_iterator start,
+                             std::string::const_iterator end) const {
     char iChar = componentToKey(BPMF::I);
     char ueChar = componentToKey(BPMF::UE);
 
@@ -399,7 +401,7 @@ class BopomofoKeyboardLayout {
     return false;
   }
 
-  string m_name;
+  std::string m_name;
   BopomofoKeyToComponentMap m_keyToComponent;
   BopomofoComponentToKeyMap m_componentToKey;
 
@@ -462,13 +464,13 @@ class BopomofoReadingBuffer {
     if (!isValidKey(k)) return false;
 
     if (m_pinyinMode) {
-      m_pinyinSequence += string(1, tolower(k));
+      m_pinyinSequence += std::string(1, tolower(k));
       m_syllable = BPMF::FromHanyuPinyin(m_pinyinSequence);
       return true;
     }
 
-    string sequence =
-        m_layout->keySequenceFromSyllable(m_syllable) + string(1, k);
+    std::string sequence =
+        m_layout->keySequenceFromSyllable(m_syllable) + std::string(1, k);
     m_syllable = m_layout->syllableFromKeySequence(sequence);
     return true;
   }
@@ -491,7 +493,7 @@ class BopomofoReadingBuffer {
       return;
     }
 
-    string sequence = m_layout->keySequenceFromSyllable(m_syllable);
+    std::string sequence = m_layout->keySequenceFromSyllable(m_syllable);
     if (sequence.length()) {
       sequence = sequence.substr(0, sequence.length() - 1);
       m_syllable = m_layout->syllableFromKeySequence(sequence);
@@ -500,7 +502,7 @@ class BopomofoReadingBuffer {
 
   bool isEmpty() const { return m_syllable.isEmpty(); }
 
-  const string composedString() const {
+  const std::string composedString() const {
     if (m_pinyinMode) {
       return m_pinyinSequence;
     }
@@ -510,12 +512,12 @@ class BopomofoReadingBuffer {
 
   const BPMF syllable() const { return m_syllable; }
 
-  const string standardLayoutQueryString() const {
+  const std::string standardLayoutQueryString() const {
     return BopomofoKeyboardLayout::StandardLayout()->keySequenceFromSyllable(
         m_syllable);
   }
 
-  const string absoluteOrderQueryString() const {
+  const std::string absoluteOrderQueryString() const {
     return m_syllable.absoluteOrderString();
   }
 
@@ -526,7 +528,7 @@ class BopomofoReadingBuffer {
   BPMF m_syllable;
 
   bool m_pinyinMode;
-  string m_pinyinSequence;
+  std::string m_pinyinSequence;
 };
 }  // namespace Mandarin
 }  // namespace Formosa

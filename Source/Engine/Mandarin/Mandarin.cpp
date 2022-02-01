@@ -35,7 +35,8 @@ namespace Mandarin {
 
 class PinyinParseHelper {
  public:
-  static const bool ConsumePrefix(string& target, const string& prefix) {
+  static const bool ConsumePrefix(std::string& target,
+                                  const std::string& prefix) {
     if (target.length() < prefix.length()) {
       return false;
     }
@@ -54,20 +55,20 @@ class BopomofoCharacterMap {
  public:
   static const BopomofoCharacterMap& SharedInstance();
 
-  map<BPMF::Component, string> componentToCharacter;
-  map<string, BPMF::Component> characterToComponent;
+  std::map<BPMF::Component, std::string> componentToCharacter;
+  std::map<std::string, BPMF::Component> characterToComponent;
 
  protected:
   BopomofoCharacterMap();
   static BopomofoCharacterMap* c_map;
 };
 
-const BPMF BPMF::FromHanyuPinyin(const string& str) {
+const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   if (!str.length()) {
     return BPMF();
   }
 
-  string pinyin = str;
+  std::string pinyin = str;
   transform(pinyin.begin(), pinyin.end(), pinyin.begin(), ::tolower);
 
   BPMF::Component firstComponent = 0;
@@ -347,9 +348,9 @@ const BPMF BPMF::FromHanyuPinyin(const string& str) {
               toneComponent);
 }
 
-const string BPMF::HanyuPinyinString(bool includesTone,
-                                     bool useVForUUmlaut) const {
-  string consonant, middle, vowel, tone;
+const std::string BPMF::HanyuPinyinString(bool includesTone,
+                                          bool useVForUUmlaut) const {
+  std::string consonant, middle, vowel, tone;
 
   Component cc = consonantComponent(), mvc = middleVowelComponent(),
             vc = vowelComponent();
@@ -564,8 +565,8 @@ const string BPMF::HanyuPinyinString(bool includesTone,
   return consonant + middle + vowel + tone;
 }
 
-const string BPMF::PHTString(bool includesTone) const {
-  string consonant, middle, vowel, tone;
+const std::string BPMF::PHTString(bool includesTone) const {
+  std::string consonant, middle, vowel, tone;
 
   Component cc = consonantComponent(), mvc = middleVowelComponent(),
             vc = vowelComponent();
@@ -734,12 +735,12 @@ const string BPMF::PHTString(bool includesTone) const {
   return consonant + middle + vowel + tone;
 }
 
-const BPMF BPMF::FromPHT(const string& str) {
+const BPMF BPMF::FromPHT(const std::string& str) {
   if (!str.length()) {
     return BPMF();
   }
 
-  string pht = str;
+  std::string pht = str;
   transform(pht.begin(), pht.end(), pht.begin(), ::tolower);
 
   BPMF::Component firstComponent = 0;
@@ -887,7 +888,7 @@ const BPMF BPMF::FromPHT(const string& str) {
               toneComponent);
 }
 
-const BPMF BPMF::FromComposedString(const string& str) {
+const BPMF BPMF::FromComposedString(const std::string& str) {
   BPMF syllable;
   auto iter = str.begin();
   while (iter != str.end()) {
@@ -917,10 +918,10 @@ const BPMF BPMF::FromComposedString(const string& str) {
       break;
     }
 
-    string component = string(iter, iter + utf8_length);
-    const map<string, BPMF::Component>& charToComp =
+    std::string component = std::string(iter, iter + utf8_length);
+    const std::map<std::string, BPMF::Component>& charToComp =
         BopomofoCharacterMap::SharedInstance().characterToComponent;
-    map<string, BPMF::Component>::const_iterator result =
+    std::map<std::string, BPMF::Component>::const_iterator result =
         charToComp.find(component);
     if (result == charToComp.end()) {
       break;
@@ -932,8 +933,8 @@ const BPMF BPMF::FromComposedString(const string& str) {
   return syllable;
 }
 
-const string BPMF::composedString() const {
-  string result;
+const std::string BPMF::composedString() const {
+  std::string result;
 #define APPEND(c)                                                         \
   if (m_syllable & c)                                                     \
   result +=                                                               \
@@ -1043,7 +1044,7 @@ BopomofoCharacterMap::BopomofoCharacterMap() {
   characterToComponent["\xcb\x99"] = BPMF::Tone5;
 #endif
 
-  for (map<string, BPMF::Component>::iterator iter =
+  for (std::map<std::string, BPMF::Component>::iterator iter =
            characterToComponent.begin();
        iter != characterToComponent.end(); ++iter)
     componentToCharacter[(*iter).second] = (*iter).first;
@@ -1083,7 +1084,7 @@ void BopomofoKeyboardLayout::FinalizeLayouts() {
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::StandardLayout() {
   if (!c_StandardLayout) {
-    vector<BPMF::Component> vec;
+    std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
 
     ASSIGNKEY1(ktcm, vec, '1', BPMF::B);
@@ -1135,7 +1136,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::StandardLayout() {
 }
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::IBMLayout() {
   if (!c_IBMLayout) {
-    vector<BPMF::Component> vec;
+    std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
 
     ASSIGNKEY1(ktcm, vec, '1', BPMF::B);
@@ -1188,7 +1189,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::IBMLayout() {
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETenLayout() {
   if (!c_ETenLayout) {
-    vector<BPMF::Component> vec;
+    std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
 
     ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
@@ -1241,7 +1242,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETenLayout() {
 
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HsuLayout() {
   if (!c_HsuLayout) {
-    vector<BPMF::Component> vec;
+    std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
 
     ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
@@ -1277,7 +1278,7 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HsuLayout() {
 }
 const BopomofoKeyboardLayout* BopomofoKeyboardLayout::ETen26Layout() {
   if (!c_ETen26Layout) {
-    vector<BPMF::Component> vec;
+    std::vector<BPMF::Component> vec;
     BopomofoKeyToComponentMap ktcm;
 
     ASSIGNKEY1(ktcm, vec, 'b', BPMF::B);
