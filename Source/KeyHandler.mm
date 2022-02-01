@@ -302,10 +302,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     bool composeReading = false;
+    BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold];
 
     // MARK: Handle BPMF Keys
+
     // see if it's valid BPMF reading
-    if (![input isControlHold] && _bpmfReadingBuffer->isValidKey((char) charCode)) {
+    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char) charCode)) {
         _bpmfReadingBuffer->combineKey((char) charCode);
 
         // if we have a tone marker, we have to insert the reading to the
