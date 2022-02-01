@@ -84,3 +84,9 @@
 "Associated Phrases" = "Associated Phrases";
 
 "There are special phrases in your text. We don't support adding new phrases in this case." = "There are special phrases in your text. We don't support adding new phrases in this case.";
+
+"Cursor is before \"%@\"." = "Cursor is before \"%@\".";
+
+"Cursor is after \"%@\"." = "Cursor is after \"%@\".";
+
+"Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";

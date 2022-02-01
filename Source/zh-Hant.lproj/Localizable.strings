@@ -84,3 +84,9 @@
 "Associated Phrases" = "聯想詞";
 
 "There are special phrases in your text. We don't support adding new phrases in this case." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";
+
+"Cursor is before \"%@\"." = "游標正在「%@」前方";
+
+"Cursor is after \"%@\"." = "游標正在「%@」後方";
+
+"Cursor is between \"%@\" and \"%@\"." = "游標正在「%@」與「%@」之間";

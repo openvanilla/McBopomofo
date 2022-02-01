@@ -64,6 +64,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmpty)
     class Empty: InputState {
@@ -76,6 +78,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmptyIgnoringPreviousState)
     class EmptyIgnoringPreviousState: InputState {
@@ -86,6 +90,8 @@ class InputState: NSObject {
             "<InputState.EmptyIgnoringPreviousState>"
         }
     }
+
+    // MARK: -
 
     /// Represents that the input controller is committing text into client app.
     @objc (InputStateCommitting)
@@ -101,6 +107,9 @@ class InputState: NSObject {
             "<InputState.Committing poppedText:\(poppedText)>"
         }
     }
+
+    // MARK: -
+
     /// Represents that the composing buffer is not empty.
     @objc (InputStateNotEmpty)
     class NotEmpty: InputState {
@@ -117,10 +126,13 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the user is inputting text.
     @objc (InputStateInputting)
     class Inputting: NotEmpty {
         @objc var poppedText: String = ""
+        @objc var tooltip: String = ""
 
         @objc override init(composingBuffer: String, cursorIndex: UInt) {
             super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
@@ -138,6 +150,8 @@ class InputState: NSObject {
             "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, poppedText:\(poppedText)>"
         }
     }
+
+    // MARK: -
 
     private let kMinMarkRangeLength = 2
     private let kMaxMarkRangeLength = 6
@@ -173,6 +187,7 @@ class InputState: NSObject {
             return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
         }
 
+        @objc var tooltipForInputting: String = ""
         @objc private(set) var readings: [String]
 
         @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
@@ -210,14 +225,21 @@ class InputState: NSObject {
 
         @objc func convertToInputting() -> Inputting {
             let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+            state.tooltip = tooltipForInputting
             return state
         }
 
         @objc var validToWrite: Bool {
+            /// McBopomofo allows users to input a string whose length differs
+            /// from the amount of Bopomofo readings. In this case, the range
+            /// in the composing buffer and the readings could not match, so
+            /// we disable the function to write user phrases in this case.
             if composingBuffer.count != readings.count {
                 return false
             }
-            return markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
+
+            return markedRange.length >= kMinMarkRangeLength &&
+                markedRange.length <= kMaxMarkRangeLength
         }
 
         @objc var userPhrase: String {
@@ -229,6 +251,8 @@ class InputState: NSObject {
             return "\(text) \(joined)"
         }
     }
+
+    // MARK: -
 
     /// Represents that the user is choosing in a candidates list.
     @objc (InputStateChoosingCandidate)
@@ -255,6 +279,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
     @objc (InputStateAssociatedPhrases)
@@ -270,51 +296,5 @@ class InputState: NSObject {
         override var description: String {
             "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
-    }
-
-}
-
-class InputPhrase: NSObject {
-    @objc private (set) var text: String
-    @objc private (set) var reading: String
-
-    @objc init(text: String, reading: String) {
-        self.text = text
-        self.reading = reading
-        super.init()
-    }
-}
-
-class StringUtils: NSObject {
-
-    static func convertToCharIndex(from utf16Index: Int, in string: String) -> Int {
-        var length = 0
-        for (i, c) in string.enumerated() {
-            if length >= utf16Index {
-                return i
-            }
-            length += c.utf16.count
-        }
-        return string.count
-    }
-
-    @objc (nextUtf16PositionForIndex:in:)
-    static func nextUtf16Position(for index: Int, in string: String) -> Int {
-        var index = convertToCharIndex(from: index, in: string)
-        if index < string.count {
-            index += 1
-        }
-        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
-        return count
-    }
-
-    @objc (previousUtf16PositionForIndex:in:)
-    static func previousUtf16Position(for index: Int, in string: String) -> Int {
-        var index = convertToCharIndex(from: index, in: string)
-        if index > 0 {
-            index -= 1
-        }
-        let count = string[..<string.index(string.startIndex, offsetBy: index)].utf16.count
-        return count
     }
 }
