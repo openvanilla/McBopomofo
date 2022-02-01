@@ -64,6 +64,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmpty)
     class Empty: InputState {
@@ -76,6 +78,8 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the composing buffer is empty.
     @objc (InputStateEmptyIgnoringPreviousState)
     class EmptyIgnoringPreviousState: InputState {
@@ -86,6 +90,8 @@ class InputState: NSObject {
             "<InputState.EmptyIgnoringPreviousState>"
         }
     }
+
+    // MARK: -
 
     /// Represents that the input controller is committing text into client app.
     @objc (InputStateCommitting)
@@ -101,11 +107,14 @@ class InputState: NSObject {
             "<InputState.Committing poppedText:\(poppedText)>"
         }
     }
+
+    // MARK: -
+
     /// Represents that the composing buffer is not empty.
     @objc (InputStateNotEmpty)
     class NotEmpty: InputState {
-        @objc private(set) var composingBuffer: String = ""
-        @objc private(set) var cursorIndex: UInt = 0
+        @objc private(set) var composingBuffer: String
+        @objc private(set) var cursorIndex: UInt
 
         @objc init(composingBuffer: String, cursorIndex: UInt) {
             self.composingBuffer = composingBuffer
@@ -117,12 +126,13 @@ class InputState: NSObject {
         }
     }
 
+    // MARK: -
+
     /// Represents that the user is inputting text.
     @objc (InputStateInputting)
     class Inputting: NotEmpty {
-        @objc var bpmfReading: String = ""
-        @objc var bpmfReadingCursorIndex: UInt8 = 0
         @objc var poppedText: String = ""
+        @objc var tooltip: String = ""
 
         @objc override init(composingBuffer: String, cursorIndex: UInt) {
             super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
@@ -137,9 +147,11 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), poppedText:\(poppedText)>"
+            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, poppedText:\(poppedText)>"
         }
     }
+
+    // MARK: -
 
     private let kMinMarkRangeLength = 2
     private let kMaxMarkRangeLength = 6
@@ -147,9 +159,14 @@ class InputState: NSObject {
     /// Represents that the user is marking a range in the composing buffer.
     @objc (InputStateMarking)
     class Marking: NotEmpty {
+
         @objc private(set) var markerIndex: UInt
         @objc private(set) var markedRange: NSRange
         @objc var tooltip: String {
+
+            if composingBuffer.count != readings.count {
+                return NSLocalizedString("There are special phrases in your text. We don't support adding new phrases in this case.", comment: "")
+            }
 
             if Preferences.phraseReplacementEnabled {
                 return NSLocalizedString("Phrase replacement mode is on. Not suggested to add phrase in the mode.", comment: "")
@@ -170,6 +187,7 @@ class InputState: NSObject {
             return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
         }
 
+        @objc var tooltipForInputting: String = ""
         @objc private(set) var readings: [String]
 
         @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
@@ -197,31 +215,44 @@ class InputState: NSObject {
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
                 .markedClauseSegment: 2
             ], range: NSRange(location: end,
-                              length: composingBuffer.count - end))
+                              length: (composingBuffer as NSString).length - end))
             return attributedSting
         }
 
         override var description: String {
-            "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange), readings:\(readings)>"
+            "<InputState.Marking, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex), markedRange:\(markedRange)>"
         }
 
         @objc func convertToInputting() -> Inputting {
             let state = Inputting(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
+            state.tooltip = tooltipForInputting
             return state
         }
 
         @objc var validToWrite: Bool {
-            markedRange.length >= kMinMarkRangeLength && markedRange.length <= kMaxMarkRangeLength
+            /// McBopomofo allows users to input a string whose length differs
+            /// from the amount of Bopomofo readings. In this case, the range
+            /// in the composing buffer and the readings could not match, so
+            /// we disable the function to write user phrases in this case.
+            if composingBuffer.count != readings.count {
+                return false
+            }
+
+            return markedRange.length >= kMinMarkRangeLength &&
+                markedRange.length <= kMaxMarkRangeLength
         }
 
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
-            let end = markedRange.location + markedRange.length
-            let readings = readings[markedRange.location..<end]
+            let exactBegin = StringUtils.convertToCharIndex(from: markedRange.location, in: composingBuffer)
+            let exactEnd = StringUtils.convertToCharIndex(from: markedRange.location + markedRange.length, in: composingBuffer)
+            let readings = readings[exactBegin..<exactEnd]
             let joined = readings.joined(separator: "-")
             return "\(text) \(joined)"
         }
     }
+
+    // MARK: -
 
     /// Represents that the user is choosing in a candidates list.
     @objc (InputStateChoosingCandidate)
@@ -244,9 +275,11 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode), composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+            "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
     }
+
+    // MARK: -
 
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
@@ -264,5 +297,4 @@ class InputState: NSObject {
             "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
     }
-
 }

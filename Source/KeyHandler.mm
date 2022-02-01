@@ -226,12 +226,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     McBopomofoEmacsKey emacsKey = input.emacsKey;
 
     // if the inputText is empty, it's a function key combination, we ignore it
-    if (![input.inputText length]) {
+    if (!input.inputText.length) {
         return NO;
     }
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
-    BOOL isFunctionKey = ([input isCommandHold] || [input isControlHold] || [input isOptionHold] || [input isNumericPad]);
+    BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
     if (![state isKindOfClass:[InputStateNotEmpty class]] &&
         ![state isKindOfClass:[InputStateAssociatedPhrases class]] &&
         isFunctionKey) {
@@ -302,10 +302,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     bool composeReading = false;
+    BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold];
 
     // MARK: Handle BPMF Keys
+
     // see if it's valid BPMF reading
-    if (_bpmfReadingBuffer->isValidKey((char) charCode)) {
+    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char) charCode)) {
         _bpmfReadingBuffer->combineKey((char) charCode);
 
         // if we have a tone marker, we have to insert the reading to the
@@ -348,7 +350,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             size_t cursorIndex = [self _actualCandidateCursorIndex];
             vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
             double highestScore = FindHighestScore(nodes, kEpsilon);
-            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, highestScore);
+            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, static_cast<float>(highestScore));
         }
 
         // then update the text
@@ -397,12 +399,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
-                    if ([state isKindOfClass:[InputStateNotEmpty class]]) {
-                        NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
-                        if ([composingBuffer length]) {
-                            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-                            stateCallback(committing);
-                        }
+                    NSString *composingBuffer = [(InputStateNotEmpty*) state composingBuffer];
+                    if (composingBuffer.length) {
+                        InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+                        stateCallback (committing);
                     }
                     [self clear];
                     InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:@" "];
@@ -490,8 +490,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Punctuation
     // if nothing is matched, see if it's a punctuation key for current layout.
+
+    string punctuationNamePrefix;
+    if ([input isControlHold]) {
+        punctuationNamePrefix = string("_ctrl_punctuation_");
+    } else if (Preferences.halfWidthPunctuationEnabled) {
+        punctuationNamePrefix = string("_half_punctuation_");
+    } else {
+        punctuationNamePrefix = string("_punctuation_");
+    }
     string layout = [self _currentLayout];
-    string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_") : string("_punctuation_");
     string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
     if ([self _handlePunctuation:customPunctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
@@ -540,7 +548,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // other platforms
 
         if (_bpmfReadingBuffer->isEmpty()) {
-            // no nee to beep since the event is deliberately triggered by user
+            // no need to beep since the event is deliberately triggered by user
             if (![state isKindOfClass:[InputStateInputting class]]) {
                 return NO;
             }
@@ -569,8 +577,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if ([input isShiftHold]) {
         // Shift + left
-        if (_builder->cursorIndex() > 0) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex - 1 readings: [self _currentReadings]];
+        if (currentState.cursorIndex > 0) {
+            NSInteger previousPosition = [StringUtils previousUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition readings:[self _currentReadings]];
+            marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
         } else {
             errorCallback();
@@ -605,8 +615,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if ([input isShiftHold]) {
         // Shift + Right
-        if (_builder->cursorIndex() < _builder->length()) {
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:currentState.cursorIndex + 1 readings: [self _currentReadings]];
+        if (currentState.cursorIndex < currentState.composingBuffer.length) {
+            NSInteger nextPosition = [StringUtils nextUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition readings:[self _currentReadings]];
+            marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
         } else {
             errorCallback();
@@ -832,8 +844,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index > 0) {
-            index -= 1;
+            index = [StringUtils previousUtf16PositionForIndex:index in:state.composingBuffer];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
+            marking.tooltipForInputting = state.tooltipForInputting;
             stateCallback(marking);
         } else {
             errorCallback();
@@ -847,8 +860,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
-            index += 1;
+            index = [StringUtils nextUtf16PositionForIndex:index in:state.composingBuffer];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
+            marking.tooltipForInputting = state.tooltipForInputting;
             stateCallback(marking);
         } else {
             errorCallback();
@@ -1070,7 +1084,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     if (_inputMode == InputModePlainBopomofo) {
         string layout = [self _currentLayout];
-        string punctuationNamePrefix = Preferences.halfWidthPunctuationEnabled ? string("_half_punctuation_") : string("_punctuation_");
+        string punctuationNamePrefix;
+        if ([input isControlHold]) {
+            punctuationNamePrefix = string("_ctrl_punctuation_");
+        } else if (Preferences.halfWidthPunctuationEnabled) {
+            punctuationNamePrefix = string("_half_punctuation_");
+        } else {
+            punctuationNamePrefix = string("_punctuation_");
+        }
         string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
         string punctuation = punctuationNamePrefix + string(1, (char) charCode);
 
@@ -1114,6 +1135,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     size_t readingCursorIndex = 0;
     size_t builderCursorIndex = _builder->cursorIndex();
 
+    NSString *tooltip = @"";
+
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
@@ -1137,9 +1160,30 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 composedStringCursorIndex += [valueString length];
                 readingCursorIndex += spanningLength;
             } else {
-                for (size_t i = 0; i < codepointCount && readingCursorIndex < builderCursorIndex; i++) {
-                    composedStringCursorIndex += [[NSString stringWithUTF8String:codepoints[i].c_str()] length];
-                    readingCursorIndex++;
+                if (codepointCount == spanningLength) {
+                    for (size_t i = 0; i < codepointCount && readingCursorIndex < builderCursorIndex; i++) {
+                        composedStringCursorIndex += [[NSString stringWithUTF8String:codepoints[i].c_str()] length];
+                        readingCursorIndex++;
+                    }
+                } else {
+                    if (readingCursorIndex < builderCursorIndex) {
+                        composedStringCursorIndex += [valueString length];
+                        readingCursorIndex += spanningLength;
+                        if (readingCursorIndex > builderCursorIndex) {
+                            readingCursorIndex = builderCursorIndex;
+                        }
+                        if (builderCursorIndex == 0) {
+                            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is before \"%@\".", @""),
+                                       [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
+                        } else if (builderCursorIndex >= _builder->readings().size()) {
+                            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is after \"%@\".", @""),
+                                       [NSString stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()]];
+                        } else {
+                            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is between \"%@\" and \"%@\".", @""),
+                                       [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()],
+                                       [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
+                        }
+                    }
                 }
             }
         }
@@ -1155,6 +1199,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     NSInteger cursorIndex = composedStringCursorIndex + [reading length];
 
     InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex];
+    newState.tooltip = tooltip;
     return newState;
 }
 

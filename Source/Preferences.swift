@@ -219,7 +219,6 @@ class Preferences: NSObject {
         defaults.removeObject(forKey: kChineseConversionEngineKey)
         defaults.removeObject(forKey: kChineseConversionStyle)
         defaults.removeObject(forKey: kAssociatedPhrasesEnabledKey)
-//        defaults.removeObject(forKey: kAssociatedPhrasesKeys)
     }
 
     @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)

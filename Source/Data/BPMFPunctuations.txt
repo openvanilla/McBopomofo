@@ -102,6 +102,12 @@ Z _letter_Z 0.0
 Ｘ _letter_X 0.0
 Ｙ _letter_Y 0.0
 Ｚ _letter_Z 0.0
+， _ctrl_punctuation_, 0.0
+。 _ctrl_punctuation_. 0.0
+、 _ctrl_punctuation_' 0.0
+； _ctrl_punctuation_; 0.0
+？ _ctrl_punctuation_/ 0.0
+！ _ctrl_punctuation_! 0.0
 [ _half_punctuation_[ 0.0
 ] _half_punctuation_] 0.0
 < _half_punctuation_< 0.0

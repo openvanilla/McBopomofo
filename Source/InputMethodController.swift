@@ -180,6 +180,7 @@ class McBopomofoInputMethodController: IMKInputController {
         }
 
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
+
         let result = keyHandler.handle(input, state: state) { newState in
             self.handle(state: newState, client: client)
         } candidateSelectionCallback: {
@@ -388,6 +389,9 @@ extension McBopomofoInputMethodController {
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
         client.setMarkedText(state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        if !state.tooltip.isEmpty {
+            show(tooltip: state.tooltip, composingBuffer: state.composingBuffer, cursorIndex: state.cursorIndex, client: client)
+        }
     }
 
     private func handle(state: InputState.Marking, previous: InputState, client: Any?) {
@@ -482,16 +486,19 @@ extension McBopomofoInputMethodController {
         gCurrentCandidateController?.visible = true
 
         var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
-        var cursor: UInt = 0
+        var cursor: Int = 0
 
         if let state = state as? InputState.ChoosingCandidate {
-            cursor = state.cursorIndex
+            cursor = Int(state.cursorIndex)
             if cursor == state.composingBuffer.count && cursor != 0 {
                 cursor -= 1
             }
         }
 
-        (client as? IMKTextInput)?.attributes(forCharacterIndex: Int(cursor), lineHeightRectangle: &lineHeightRect)
+        while lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor >= 0 {
+            (client as? IMKTextInput)?.attributes(forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
+            cursor -= 1
+        }
 
         if useVerticalMode {
             gCurrentCandidateController?.set(windowTopLeftPoint: NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0), bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
@@ -502,11 +509,14 @@ extension McBopomofoInputMethodController {
 
     private func show(tooltip: String, composingBuffer: String, cursorIndex: UInt, client: Any!) {
         var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
-        var cursor = cursorIndex
+        var cursor: Int = Int(cursorIndex)
         if cursor == composingBuffer.count && cursor != 0 {
             cursor -= 1
         }
-        (client as? IMKTextInput)?.attributes(forCharacterIndex: Int(cursor), lineHeightRectangle: &lineHeightRect)
+        while lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor >= 0 {
+            (client as? IMKTextInput)?.attributes(forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
+            cursor -= 1
+        }
         McBopomofoInputMethodController.tooltipController.show(tooltip: tooltip, at: lineHeightRect.origin)
     }
 

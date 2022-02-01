@@ -2,28 +2,10 @@
 "About McBopomofo…" = "關於小麥注音…";
 
 /* No comment provided by engineer. */
-"Clear Learning Dictionary (%ju Items)" = "清除學習辭典 (%ju 個項目)";
-
-/* No comment provided by engineer. */
-"Dump Learning Data to Console" = "將學習辭典內容輸出到 Console 上";
-
-/* No comment provided by engineer. */
-"Enable Selection Learning" = "使用自動學習功能";
-
-/* No comment provided by engineer. */
 "McBopomofo Preferences" = "小麥注音偏好設定";
 
 /* No comment provided by engineer. */
-"Check Later" = "晚點再通知我";
-
-/* No comment provided by engineer. */
 "Check for Updates…" = "檢查是否有新版…";
-
-/* No comment provided by engineer. */
-"Check for Update Completed" = "新版檢查完畢";
-
-/* No comment provided by engineer. */
-"You are already using the latest version of McBopomofo." = "目前使用的已經是最新版本。";
 
 /* No comment provided by engineer. */
 "Update Check Failed" = "無法檢查新版";
@@ -100,3 +82,11 @@
 "Half-width punctuation off" = "已經切回到全型標點模式";
 
 "Associated Phrases" = "聯想詞";
+
+"There are special phrases in your text. We don't support adding new phrases in this case." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";
+
+"Cursor is before \"%@\"." = "游標正在「%@」前方";
+
+"Cursor is after \"%@\"." = "游標正在「%@」後方";
+
+"Cursor is between \"%@\" and \"%@\"." = "游標正在「%@」與「%@」之間";
