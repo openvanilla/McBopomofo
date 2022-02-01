@@ -41,15 +41,10 @@ class BopomofoSyllable {
   typedef unsigned int Component;
   BopomofoSyllable(Component syllable = 0) : m_syllable(syllable) {}
 
-  BopomofoSyllable(const BopomofoSyllable& another)
-      : m_syllable(another.m_syllable) {}
-
-  ~BopomofoSyllable() {}
-
-  BopomofoSyllable& operator=(const BopomofoSyllable& another) {
-    m_syllable = another.m_syllable;
-    return *this;
-  }
+  BopomofoSyllable(const BopomofoSyllable&) = default;
+  BopomofoSyllable(BopomofoSyllable&& another) = default;
+  BopomofoSyllable& operator=(const BopomofoSyllable&) = default;
+  BopomofoSyllable& operator=(BopomofoSyllable&&) = default;
 
   // takes the ASCII-form, "v"-tolerant, TW-style Hanyu Pinyin (fong, pong, bong
   // acceptable)
