@@ -139,6 +139,50 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    func testIgnoreCommand() {
+        let input = KeyHandlerInput(inputText: "A", keyCode: 0, charCode: 0, flags: [.command], isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        let result = handler.handle(input, state: state) { newState in
+            state = newState
+        } candidateSelectionCallback: {
+        } errorCallback: {
+        }
+        XCTAssertFalse(result)
+    }
+
+    func testIgnoreOption() {
+        let input = KeyHandlerInput(inputText: "A", keyCode: 0, charCode: 0, flags: [.option], isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        let result = handler.handle(input, state: state) { newState in
+            state = newState
+        } candidateSelectionCallback: {
+        } errorCallback: {
+        }
+        XCTAssertFalse(result)
+    }
+
+    func testIgnoreNumericPad() {
+        let input = KeyHandlerInput(inputText: "A", keyCode: 0, charCode: 0, flags: [.numericPad], isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        let result = handler.handle(input, state: state) { newState in
+            state = newState
+        } candidateSelectionCallback: {
+        } errorCallback: {
+        }
+        XCTAssertFalse(result)
+    }
+
+    func testIgnoreCapslock() {
+        let input = KeyHandlerInput(inputText: "A", keyCode: 0, charCode: 0, flags: [.capsLock], isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        let result = handler.handle(input, state: state) { newState in
+            state = newState
+        } candidateSelectionCallback: {
+        } errorCallback: {
+        }
+        XCTAssertFalse(result)
+    }
+
     func testPunctuationTable() {
         let enabled = Preferences.halfWidthPunctuationEnabled
         Preferences.halfWidthPunctuationEnabled = false
