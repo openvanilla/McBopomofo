@@ -37,5 +37,3 @@
 "Warning" = "安裝不完整";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "輸入法已經安裝好，但可能沒有完全啟用。請從「系統偏好設定」 > 「鍵盤」 > 「輸入方式」分頁加入輸入法。";
 "Continue" = "繼續";
-
-"Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "Model based Chinese conversion is on. Not suggested to add phrase in the mode.";
