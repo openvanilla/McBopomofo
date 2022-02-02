@@ -43,5 +43,78 @@ TEST(MandarinTest, FromComposedString) {
   ASSERT_EQ(RoundTrip("ㄅeㄆ"), "ㄅ");
 }
 
+TEST(MandarinTest, SimpleCompositions) {
+  BopomofoSyllable syllable;
+  syllable += BopomofoSyllable(BopomofoSyllable::X);
+  syllable += BopomofoSyllable(BopomofoSyllable::I);
+  ASSERT_EQ(syllable.composedString(), "ㄒㄧ");
+
+  syllable.clear();
+  syllable += BopomofoSyllable(BopomofoSyllable::Z);
+  syllable += BopomofoSyllable(BopomofoSyllable::ANG);
+  syllable += BopomofoSyllable(BopomofoSyllable::Tone4);
+  ASSERT_EQ(syllable.composedString(), "ㄗㄤˋ");
+}
+
+TEST(MandarinTest, StandardLayout) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::StandardLayout());
+  buf.combineKey('w');
+  buf.combineKey('9');
+  buf.combineKey('6');
+  ASSERT_EQ(buf.composedString(), "ㄊㄞˊ");
+}
+
+TEST(MandarinTest, StandardLayoutCombination) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::StandardLayout());
+  buf.combineKey('w');
+  buf.combineKey('9');
+  buf.combineKey('6');
+  ASSERT_EQ(buf.composedString(), "ㄊㄞˊ");
+
+  buf.backspace();
+  ASSERT_EQ(buf.composedString(), "ㄊㄞ");
+
+  buf.combineKey('y');
+  ASSERT_EQ(buf.composedString(), "ㄗㄞ");
+
+  buf.combineKey('4');
+  ASSERT_EQ(buf.composedString(), "ㄗㄞˋ");
+
+  buf.combineKey('3');
+  ASSERT_EQ(buf.composedString(), "ㄗㄞˇ");
+}
+
+TEST(MandarinTest, ETenLayout) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::ETenLayout());
+  buf.combineKey('x');
+  buf.combineKey('8');
+  ASSERT_EQ(buf.composedString(), "ㄨㄢ");
+}
+
+TEST(MandarinTest, ETen26Layout) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::ETen26Layout());
+  buf.combineKey('q');
+  buf.combineKey('m');  // AN in the vowel state
+  buf.combineKey('k');  // Tone 4 in the tone state
+  ASSERT_EQ(buf.composedString(), "ㄗㄢˋ");
+}
+
+TEST(MandarinTest, HsuLayout) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::HsuLayout());
+  buf.combineKey('f');
+  buf.combineKey('a');  // EI when in the vowel state
+  buf.combineKey('f');  // Tone 3 when in the tone state
+  ASSERT_EQ(buf.composedString(), "ㄈㄟˇ");
+}
+
+TEST(MandarinTest, IBMLayout) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::IBMLayout());
+  buf.combineKey('9');
+  buf.combineKey('s');
+  buf.combineKey('g');
+  buf.combineKey('m');
+  ASSERT_EQ(buf.composedString(), "ㄍㄨㄛˊ");
+}
+
 }  // namespace Mandarin
 }  // namespace Formosa
