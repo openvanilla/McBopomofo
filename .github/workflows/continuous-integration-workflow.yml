@@ -15,6 +15,12 @@ jobs:
       - name: Run McBopomofoLMLibTest
         run: make runTest
         working-directory: Source/Engine/build
+      - name: Build MandarinTest
+        run: cmake -S . -B build
+        working-directory: Source/Engine/Mandarin
+      - name: Run MandarinTest
+        run: make runTest
+        working-directory: Source/Engine/Mandarin/build
       - name: Test McBopomofo App Bundle
         run: xcodebuild -scheme McBopomofo -configuration Debug test
       - name: Test CandidateUI
