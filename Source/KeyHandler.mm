@@ -219,7 +219,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return layout;
 }
 
-- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback candidateSelectionCallback:(void (^)(void))candidateSelectionCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     InputState *state = inState;
     UniChar charCode = input.charCode;
@@ -278,12 +278,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-        return [self _handleCandidateState:state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Associated Phrases
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-        BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+        BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
         if (result) {
             return YES;
         }
@@ -294,7 +294,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         InputStateMarking *marking = (InputStateMarking *) state;
-        if ([self _handleMarkingState:(InputStateMarking *) state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
+        if ([self _handleMarkingState:(InputStateMarking *) state input:input stateCallback:stateCallback  errorCallback:errorCallback]) {
             return YES;
         }
         state = [marking convertToInputting];
@@ -820,7 +820,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (BOOL)_handleMarkingState:(InputStateMarking *)state
                       input:(KeyHandlerInput *)input
               stateCallback:(void (^)(InputState *))stateCallback
- candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
               errorCallback:(void (^)(void))errorCallback
 {
     UniChar charCode = input.charCode;
@@ -880,7 +879,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (BOOL)_handleCandidateState:(InputState *)state
                         input:(KeyHandlerInput *)input
                 stateCallback:(void (^)(InputState *))stateCallback
-   candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
                 errorCallback:(void (^)(void))errorCallback;
 {
     NSString *inputText = input.inputText;
@@ -922,7 +920,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -931,7 +928,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -947,7 +943,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -956,7 +951,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -972,7 +966,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -981,7 +974,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -997,7 +989,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1013,7 +1004,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1024,7 +1014,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             gCurrentCandidateController.selectedCandidateIndex = 0;
         }
 
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1046,8 +1035,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         } else {
             gCurrentCandidateController.selectedCandidateIndex = candidates.count - 1;
         }
-
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1115,14 +1102,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 [self clear];
                 InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);
-                [self handleInput:input state:empty stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+                [self handleInput:input state:empty stateCallback:stateCallback errorCallback:errorCallback];
             }
             return YES;
         }
     }
 
     errorCallback();
-    candidateSelectionCallback();
     return YES;
 }
 

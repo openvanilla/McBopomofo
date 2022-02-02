@@ -71,7 +71,7 @@ class McBopomofoInputMethodController: IMKInputController {
 
         let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Use Half-Width Punctuations", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "h")
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
-        halfWidthPunctuationItem.state = Preferences.chineseConversionEnabled.state
+        halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
 
         let inputMode = keyHandler.inputMode
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
@@ -181,9 +181,8 @@ class McBopomofoInputMethodController: IMKInputController {
 
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
 
-        let result = keyHandler.handle(input, state: state) { newState in
+        let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
-        } candidateSelectionCallback: {
         } errorCallback: {
             NSSound.beep()
         }
@@ -575,7 +574,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
 
         if let state = state as? InputState.ChoosingCandidate {
             let selectedValue = state.candidates[Int(index)]
-            keyHandler.fixNode(withValue: selectedValue)
+            keyHandler.fixNode(value: selectedValue)
 
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return
