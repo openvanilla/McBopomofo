@@ -46,7 +46,6 @@
 		D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */ = {isa = PBXBuildFile; productRef = D44FB7492791B829003C80A6 /* VXHanConvert */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
 		D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
-		D45EB5C127A9894C00E28B17 /* StringUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45EB5BF27A9890C00E28B17 /* StringUtils.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */; };
@@ -60,6 +59,7 @@
 		D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3B82796A8A000657FF3 /* PreferencesTests.swift */; };
 		D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */; };
 		D4A13D5A27A59F0B003BE359 /* InputMethodController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* InputMethodController.swift */; };
+		D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */ = {isa = PBXBuildFile; productRef = D4C9CAB027AAC9690058DFEA /* NSStringUtils */; };
 		D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
@@ -115,38 +115,6 @@
 		6A0D4F1E15FC0EB100ABF4B3 /* Walker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Walker.h; sourceTree = "<group>"; };
 		6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mandarin.cpp; sourceTree = "<group>"; };
 		6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mandarin.h; sourceTree = "<group>"; };
-		6A0D4F2315FC0EB100ABF4B3 /* OpenVanilla.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenVanilla.h; sourceTree = "<group>"; };
-		6A0D4F2415FC0EB100ABF4B3 /* OVAroundFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVAroundFilter.h; sourceTree = "<group>"; };
-		6A0D4F2515FC0EB100ABF4B3 /* OVBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVBase.h; sourceTree = "<group>"; };
-		6A0D4F2615FC0EB100ABF4B3 /* OVBenchmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVBenchmark.h; sourceTree = "<group>"; };
-		6A0D4F2715FC0EB100ABF4B3 /* OVCandidateService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVCandidateService.h; sourceTree = "<group>"; };
-		6A0D4F2815FC0EB100ABF4B3 /* OVCINDatabaseService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVCINDatabaseService.h; sourceTree = "<group>"; };
-		6A0D4F2915FC0EB100ABF4B3 /* OVCINDataTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVCINDataTable.h; sourceTree = "<group>"; };
-		6A0D4F2A15FC0EB100ABF4B3 /* OVCINToSQLiteConvertor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVCINToSQLiteConvertor.h; sourceTree = "<group>"; };
-		6A0D4F2B15FC0EB100ABF4B3 /* OVDatabaseService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVDatabaseService.h; sourceTree = "<group>"; };
-		6A0D4F2C15FC0EB100ABF4B3 /* OVDateTimeHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVDateTimeHelper.h; sourceTree = "<group>"; };
-		6A0D4F2D15FC0EB100ABF4B3 /* OVEncodingService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVEncodingService.h; sourceTree = "<group>"; };
-		6A0D4F2E15FC0EB100ABF4B3 /* OVEventHandlingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVEventHandlingContext.h; sourceTree = "<group>"; };
-		6A0D4F2F15FC0EB100ABF4B3 /* OVException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVException.h; sourceTree = "<group>"; };
-		6A0D4F3015FC0EB100ABF4B3 /* OVFileHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVFileHelper.h; sourceTree = "<group>"; };
-		6A0D4F3115FC0EB100ABF4B3 /* OVFrameworkInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVFrameworkInfo.h; sourceTree = "<group>"; };
-		6A0D4F3215FC0EB100ABF4B3 /* OVInputMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVInputMethod.h; sourceTree = "<group>"; };
-		6A0D4F3315FC0EB100ABF4B3 /* OVKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVKey.h; sourceTree = "<group>"; };
-		6A0D4F3415FC0EB100ABF4B3 /* OVKeyPreprocessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVKeyPreprocessor.h; sourceTree = "<group>"; };
-		6A0D4F3515FC0EB100ABF4B3 /* OVKeyValueMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVKeyValueMap.h; sourceTree = "<group>"; };
-		6A0D4F3615FC0EB100ABF4B3 /* OVLoaderBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVLoaderBase.h; sourceTree = "<group>"; };
-		6A0D4F3715FC0EB100ABF4B3 /* OVLoaderService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVLoaderService.h; sourceTree = "<group>"; };
-		6A0D4F3815FC0EB100ABF4B3 /* OVLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVLocalization.h; sourceTree = "<group>"; };
-		6A0D4F3915FC0EB100ABF4B3 /* OVModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVModule.h; sourceTree = "<group>"; };
-		6A0D4F3A15FC0EB100ABF4B3 /* OVModulePackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVModulePackage.h; sourceTree = "<group>"; };
-		6A0D4F3B15FC0EB100ABF4B3 /* OVOutputFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVOutputFilter.h; sourceTree = "<group>"; };
-		6A0D4F3C15FC0EB100ABF4B3 /* OVPathInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVPathInfo.h; sourceTree = "<group>"; };
-		6A0D4F3D15FC0EB100ABF4B3 /* OVSQLiteDatabaseService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVSQLiteDatabaseService.h; sourceTree = "<group>"; };
-		6A0D4F3E15FC0EB100ABF4B3 /* OVSQLiteWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVSQLiteWrapper.h; sourceTree = "<group>"; };
-		6A0D4F3F15FC0EB100ABF4B3 /* OVStringHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVStringHelper.h; sourceTree = "<group>"; };
-		6A0D4F4015FC0EB100ABF4B3 /* OVTextBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVTextBuffer.h; sourceTree = "<group>"; };
-		6A0D4F4115FC0EB100ABF4B3 /* OVUTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVUTF8Helper.h; sourceTree = "<group>"; };
-		6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OVWildcard.h; sourceTree = "<group>"; };
 		6A0D4F5615FC0EF900ABF4B3 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "zh-Hant"; path = "Source/zh-Hant.lproj/preferences.xib"; sourceTree = "<group>"; };
 		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -202,7 +170,6 @@
 		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
-		D45EB5BF27A9890C00E28B17 /* StringUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtils.swift; sourceTree = "<group>"; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerBopomofoTests.swift; sourceTree = "<group>"; };
@@ -219,6 +186,7 @@
 		D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionUpdateTests.swift; sourceTree = "<group>"; };
 		D495583A27A5C6C4006ADE1C /* LanguageModelManager+Privates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LanguageModelManager+Privates.h"; sourceTree = "<group>"; };
 		D4A13D5927A59D5C003BE359 /* InputMethodController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMethodController.swift; sourceTree = "<group>"; };
+		D4C9CAAF27AAC8EC0058DFEA /* NSStringUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = NSStringUtils; path = Packages/NSStringUtils; sourceTree = "<group>"; };
 		D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerPlainBopomofoTests.swift; sourceTree = "<group>"; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8B27A838D5006DB1CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -248,6 +216,7 @@
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
+				D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */,
 				D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -306,7 +275,6 @@
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
-				D45EB5BF27A9890C00E28B17 /* StringUtils.swift */,
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
 				D44FB74427915555003C80A6 /* Preferences.swift */,
 				D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */,
@@ -335,7 +303,6 @@
 			children = (
 				6A0D4F1315FC0EB100ABF4B3 /* Gramambular */,
 				6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */,
-				6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
@@ -381,45 +348,6 @@
 				6A0D4F2115FC0EB100ABF4B3 /* Mandarin.h */,
 			);
 			path = Mandarin;
-			sourceTree = "<group>";
-		};
-		6A0D4F2215FC0EB100ABF4B3 /* OpenVanilla */ = {
-			isa = PBXGroup;
-			children = (
-				6A0D4F2315FC0EB100ABF4B3 /* OpenVanilla.h */,
-				6A0D4F2415FC0EB100ABF4B3 /* OVAroundFilter.h */,
-				6A0D4F2515FC0EB100ABF4B3 /* OVBase.h */,
-				6A0D4F2615FC0EB100ABF4B3 /* OVBenchmark.h */,
-				6A0D4F2715FC0EB100ABF4B3 /* OVCandidateService.h */,
-				6A0D4F2815FC0EB100ABF4B3 /* OVCINDatabaseService.h */,
-				6A0D4F2915FC0EB100ABF4B3 /* OVCINDataTable.h */,
-				6A0D4F2A15FC0EB100ABF4B3 /* OVCINToSQLiteConvertor.h */,
-				6A0D4F2B15FC0EB100ABF4B3 /* OVDatabaseService.h */,
-				6A0D4F2C15FC0EB100ABF4B3 /* OVDateTimeHelper.h */,
-				6A0D4F2D15FC0EB100ABF4B3 /* OVEncodingService.h */,
-				6A0D4F2E15FC0EB100ABF4B3 /* OVEventHandlingContext.h */,
-				6A0D4F2F15FC0EB100ABF4B3 /* OVException.h */,
-				6A0D4F3015FC0EB100ABF4B3 /* OVFileHelper.h */,
-				6A0D4F3115FC0EB100ABF4B3 /* OVFrameworkInfo.h */,
-				6A0D4F3215FC0EB100ABF4B3 /* OVInputMethod.h */,
-				6A0D4F3315FC0EB100ABF4B3 /* OVKey.h */,
-				6A0D4F3415FC0EB100ABF4B3 /* OVKeyPreprocessor.h */,
-				6A0D4F3515FC0EB100ABF4B3 /* OVKeyValueMap.h */,
-				6A0D4F3615FC0EB100ABF4B3 /* OVLoaderBase.h */,
-				6A0D4F3715FC0EB100ABF4B3 /* OVLoaderService.h */,
-				6A0D4F3815FC0EB100ABF4B3 /* OVLocalization.h */,
-				6A0D4F3915FC0EB100ABF4B3 /* OVModule.h */,
-				6A0D4F3A15FC0EB100ABF4B3 /* OVModulePackage.h */,
-				6A0D4F3B15FC0EB100ABF4B3 /* OVOutputFilter.h */,
-				6A0D4F3C15FC0EB100ABF4B3 /* OVPathInfo.h */,
-				6A0D4F3D15FC0EB100ABF4B3 /* OVSQLiteDatabaseService.h */,
-				6A0D4F3E15FC0EB100ABF4B3 /* OVSQLiteWrapper.h */,
-				6A0D4F3F15FC0EB100ABF4B3 /* OVStringHelper.h */,
-				6A0D4F4015FC0EB100ABF4B3 /* OVTextBuffer.h */,
-				6A0D4F4115FC0EB100ABF4B3 /* OVUTF8Helper.h */,
-				6A0D4F4215FC0EB100ABF4B3 /* OVWildcard.h */,
-			);
-			path = OpenVanilla;
 			sourceTree = "<group>";
 		};
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
@@ -488,6 +416,7 @@
 				D427F7BF27908EAC004A2160 /* OpenCCBridge */,
 				D44FB7482791B346003C80A6 /* VXHanConvert */,
 				D47D73C027A71FFA00255A50 /* FSEventStreamHelper */,
+				D4C9CAAF27AAC8EC0058DFEA /* NSStringUtils */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -552,6 +481,7 @@
 				D427F7C027908EFC004A2160 /* OpenCCBridge */,
 				D44FB7492791B829003C80A6 /* VXHanConvert */,
 				D47D73C227A7200500255A50 /* FSEventStreamHelper */,
+				D4C9CAB027AAC9690058DFEA /* NSStringUtils */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -736,7 +666,6 @@
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
-				D45EB5C127A9894C00E28B17 /* StringUtils.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */,
@@ -1425,6 +1354,10 @@
 		D47D73C227A7200500255A50 /* FSEventStreamHelper */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FSEventStreamHelper;
+		};
+		D4C9CAB027AAC9690058DFEA /* NSStringUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NSStringUtils;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
