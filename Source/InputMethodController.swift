@@ -310,9 +310,9 @@ extension McBopomofoInputMethodController {
         // then we defer the update in the next runloop round -- so that the composing buffer is not
         // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
         if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" && NSStringFromClass(client.self as! AnyClass) != "IPMDServerClientWrapper" {
-            let currentDeferredClient = currentDeferredClient
+            let innerCurrentDeferredClient = currentDeferredClient
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-                (currentDeferredClient as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
+                (innerCurrentDeferredClient as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
             }
         }
         (client as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))

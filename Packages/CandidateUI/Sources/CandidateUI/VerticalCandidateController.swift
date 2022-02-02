@@ -450,8 +450,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
-        let keyLabels = keyLabels[0..<Int(keyLabelCount)].map { $0.displayedText }
-        keyLabelStripView.keyLabels = keyLabels
+        let actualKeyLabels = keyLabels[0..<Int(keyLabelCount)].map { $0.displayedText }
+        keyLabelStripView.keyLabels = actualKeyLabels
         keyLabelStripView.labelOffsetY = (keyLabelFontSize >= candidateFontSize) ? 0.0 : floor((candidateFontSize - keyLabelFontSize) / 2.0)
 
         let rowHeight = ceil(fontSize * 1.25)
@@ -461,7 +461,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         let textAttr: [NSAttributedString.Key: AnyObject] = [.font: keyLabelFont]
         let boundingBox = NSSize(width: 1600.0, height: 1600.0)
 
-        for label in keyLabels {
+        for label in actualKeyLabels {
             let rect = (label as NSString).boundingRect(with: boundingBox, options: .usesLineFragmentOrigin, attributes: textAttr)
             maxKeyLabelWidth = max(rect.size.width, maxKeyLabelWidth)
         }
