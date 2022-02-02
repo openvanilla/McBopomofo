@@ -70,4 +70,10 @@ extension NSString {
     @objc var count: Int {
         (self as String).count
     }
+
+    @objc var split: [NSString] {
+        Array(self as String).map {
+            NSString(string: String($0))
+        }
+    }
 }

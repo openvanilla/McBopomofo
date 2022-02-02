@@ -38,7 +38,6 @@ using namespace std;
 using namespace Formosa::Mandarin;
 using namespace Formosa::Gramambular;
 using namespace McBopomofo;
-using namespace OpenVanilla;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
@@ -1143,11 +1142,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     for (vector<NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
         if ((*wi).node) {
             string nodeStr = (*wi).node->currentKeyValue().value;
-            vector<string> codepoints = OVUTF8Helper::SplitStringByCodePoint(nodeStr);
-            size_t codepointCount = codepoints.size();
-
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [composingBuffer appendString:valueString];
+
+            NSArray *splited = [valueString split];
+            NSInteger codepointCount = splited.count;
 
             // this re-aligns the cursor index in the composed string
             // (the actual cursor on the screen) with the builder's logical
@@ -1162,7 +1161,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             } else {
                 if (codepointCount == spanningLength) {
                     for (size_t i = 0; i < codepointCount && readingCursorIndex < builderCursorIndex; i++) {
-                        composedStringCursorIndex += [[NSString stringWithUTF8String:codepoints[i].c_str()] length];
+                        composedStringCursorIndex += [splited[i] length];
                         readingCursorIndex++;
                     }
                 } else {
