@@ -1,4 +1,4 @@
-// Copyright (c) 2011 and onwards The McBopomofo Authors.
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -852,7 +852,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             index = [state.composingBuffer previousUtf16PositionFor:index];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             marking.tooltipForInputting = state.tooltipForInputting;
-            stateCallback(marking);
+
+            if (marking.markedRange.length == 0) {
+                InputState *inputting = [marking convertToInputting];
+                stateCallback(inputting);
+            } else {
+                stateCallback(marking);
+            }
         } else {
             errorCallback();
             stateCallback(state);
@@ -868,6 +874,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             index = [state.composingBuffer nextUtf16PositionFor:index];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             marking.tooltipForInputting = state.tooltipForInputting;
+            if (marking.markedRange.length == 0) {
+                InputState *inputting = [marking convertToInputting];
+                stateCallback(inputting);
+            } else {
+                stateCallback(marking);
+            }
             stateCallback(marking);
         } else {
             errorCallback();
