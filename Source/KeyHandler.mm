@@ -371,8 +371,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 if (!Preferences.associatedPhrasesEnabled) {
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
-                }
-                else {
+                } else {
                     InputStateAssociatedPhrases *associatedPhrases = (InputStateAssociatedPhrases *)[self buildAssociatePhraseStateWithKey:text useVerticalMode:input.useVerticalMode];
                     if (associatedPhrases) {
                         stateCallback(associatedPhrases);
