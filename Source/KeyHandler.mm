@@ -218,7 +218,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return layout;
 }
 
-- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback candidateSelectionCallback:(void (^)(void))candidateSelectionCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)handleInput:(KeyHandlerInput *)input state:(InputState *)inState stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     InputState *state = inState;
     UniChar charCode = input.charCode;
@@ -277,12 +277,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-        return [self _handleCandidateState:state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Associated Phrases
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-        BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+        BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
         if (result) {
             return YES;
         }
@@ -293,7 +293,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         InputStateMarking *marking = (InputStateMarking *) state;
-        if ([self _handleMarkingState:(InputStateMarking *) state input:input stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback]) {
+        if ([self _handleMarkingState:(InputStateMarking *) state input:input stateCallback:stateCallback  errorCallback:errorCallback]) {
             return YES;
         }
         state = [marking convertToInputting];
@@ -370,8 +370,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 if (!Preferences.associatedPhrasesEnabled) {
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
-                }
-                else {
+                } else {
                     InputStateAssociatedPhrases *associatedPhrases = (InputStateAssociatedPhrases *)[self buildAssociatePhraseStateWithKey:text useVerticalMode:input.useVerticalMode];
                     if (associatedPhrases) {
                         stateCallback(associatedPhrases);
@@ -531,6 +530,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleEscWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     BOOL escToClearInputBufferEnabled = Preferences.escToCleanInputBuffer;
 
     if (escToClearInputBufferEnabled) {
@@ -546,15 +549,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // Bopomofo reading, in odds with the expectation of users from
         // other platforms
 
-        if (_bpmfReadingBuffer->isEmpty()) {
-            // no need to beep since the event is deliberately triggered by user
-            if (![state isKindOfClass:[InputStateInputting class]]) {
-                return NO;
-            }
-        } else {
+        if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
+            if (!_builder->length()) {
+                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                stateCallback(empty);
+            } else {
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                stateCallback(inputting);
+            }
         }
     }
     return YES;
@@ -562,14 +565,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleBackwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     InputStateInputting *currentState = (InputStateInputting *) state;
@@ -600,14 +603,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleForwardWithState:(InputState *)state input:(KeyHandlerInput *)input stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     InputStateInputting *currentState = (InputStateInputting *) state;
@@ -639,14 +642,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleHomeWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     if (_builder->cursorIndex()) {
@@ -663,14 +666,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleEndWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         stateCallback(state);
         return YES;
-    }
-
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
     }
 
     if (_builder->cursorIndex() != _builder->length()) {
@@ -687,6 +690,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleAbsorbedArrowKeyWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
     }
@@ -696,11 +703,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleBackspaceWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (_bpmfReadingBuffer->isEmpty()) {
-        if (![state isKindOfClass:[InputStateInputting class]]) {
-            return NO;
-        }
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
 
+    if (_bpmfReadingBuffer->isEmpty()) {
         if (_builder->cursorIndex()) {
             _builder->deleteReadingBeforeCursor();
             [self _walk];
@@ -713,11 +720,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _bpmfReadingBuffer->backspace();
     }
 
-    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-    if (!inputting.composingBuffer.length) {
+    if (!_builder->length()) {
         InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
     } else {
+        InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     }
     return YES;
@@ -725,11 +732,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleDeleteWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (_bpmfReadingBuffer->isEmpty()) {
-        if (![state isKindOfClass:[InputStateInputting class]]) {
-            return NO;
-        }
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
 
+    if (_bpmfReadingBuffer->isEmpty()) {
         if (_builder->cursorIndex() != _builder->length()) {
             _builder->deleteReadingAfterCursor();
             [self _walk];
@@ -754,26 +761,26 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if ([state isKindOfClass:[InputStateInputting class]]) {
-        if (_inputMode == InputModePlainBopomofo) {
-            if (!_bpmfReadingBuffer->isEmpty()) {
-                errorCallback();
-            }
-            return YES;
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+
+    if (_inputMode == InputModePlainBopomofo) {
+        if (!_bpmfReadingBuffer->isEmpty()) {
+            errorCallback();
         }
-
-        [self clear];
-
-        InputStateInputting *current = (InputStateInputting *) state;
-        NSString *composingBuffer = current.composingBuffer;
-        InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-        stateCallback(committing);
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-        stateCallback(empty);
         return YES;
     }
 
-    return NO;
+    [self clear];
+
+    InputStateInputting *current = (InputStateInputting *) state;
+    NSString *composingBuffer = current.composingBuffer;
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    stateCallback(committing);
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    stateCallback(empty);
+    return YES;
 }
 
 - (BOOL)_handlePunctuation:(string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
@@ -816,7 +823,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (BOOL)_handleMarkingState:(InputStateMarking *)state
                       input:(KeyHandlerInput *)input
               stateCallback:(void (^)(InputState *))stateCallback
- candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
               errorCallback:(void (^)(void))errorCallback
 {
     UniChar charCode = input.charCode;
@@ -876,7 +882,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (BOOL)_handleCandidateState:(InputState *)state
                         input:(KeyHandlerInput *)input
                 stateCallback:(void (^)(InputState *))stateCallback
-   candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
                 errorCallback:(void (^)(void))errorCallback;
 {
     NSString *inputText = input.inputText;
@@ -918,7 +923,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -927,7 +931,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -943,7 +946,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -952,7 +954,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -968,7 +969,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -977,7 +977,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (!updated) {
             errorCallback();
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -993,7 +992,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1009,7 +1007,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 errorCallback();
             }
         }
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1020,7 +1017,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             gCurrentCandidateController.selectedCandidateIndex = 0;
         }
 
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1042,8 +1038,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         } else {
             gCurrentCandidateController.selectedCandidateIndex = candidates.count - 1;
         }
-
-        candidateSelectionCallback();
         return YES;
     }
 
@@ -1111,14 +1105,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                 [self clear];
                 InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);
-                [self handleInput:input state:empty stateCallback:stateCallback candidateSelectionCallback:candidateSelectionCallback errorCallback:errorCallback];
+                [self handleInput:input state:empty stateCallback:stateCallback errorCallback:errorCallback];
             }
             return YES;
         }
     }
 
     errorCallback();
-    candidateSelectionCallback();
     return YES;
 }
 
