@@ -720,7 +720,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _bpmfReadingBuffer->backspace();
     }
 
-    if (!_builder->length()) {
+    if (_bpmfReadingBuffer->isEmpty() && !_builder->length()) {
         InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
     } else {
