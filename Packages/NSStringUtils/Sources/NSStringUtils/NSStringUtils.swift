@@ -42,7 +42,7 @@ public extension NSString {
         (self as String).count
     }
 
-    @objc var split: [NSString] {
+    @objc func split() -> [NSString] {
         Array(self as String).map {
             NSString(string: String($0))
         }
