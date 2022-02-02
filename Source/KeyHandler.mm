@@ -31,6 +31,7 @@
 #import <string>
 
 @import CandidateUI;
+@import NSStringUtils;
 
 // C++ namespace usages
 using namespace std;
@@ -576,7 +577,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     if ([input isShiftHold]) {
         // Shift + left
         if (currentState.cursorIndex > 0) {
-            NSInteger previousPosition = [StringUtils previousUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            NSInteger previousPosition = [currentState.composingBuffer nextUtf16PositionFor:currentState.cursorIndex];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition readings:[self _currentReadings]];
             marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
@@ -614,7 +615,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     if ([input isShiftHold]) {
         // Shift + Right
         if (currentState.cursorIndex < currentState.composingBuffer.length) {
-            NSInteger nextPosition = [StringUtils nextUtf16PositionForIndex:currentState.cursorIndex in:currentState.composingBuffer];
+            NSInteger nextPosition = [currentState.composingBuffer nextUtf16PositionFor:currentState.cursorIndex];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition readings:[self _currentReadings]];
             marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
@@ -842,7 +843,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index > 0) {
-            index = [StringUtils previousUtf16PositionForIndex:index in:state.composingBuffer];
+            index = [state.composingBuffer previousUtf16PositionFor:index];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             marking.tooltipForInputting = state.tooltipForInputting;
             stateCallback(marking);
@@ -858,7 +859,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
-            index = [StringUtils nextUtf16PositionForIndex:index in:state.composingBuffer];
+            index = [state.composingBuffer nextUtf16PositionFor:index];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex markerIndex:index readings:state.readings];
             marking.tooltipForInputting = state.tooltipForInputting;
             stateCallback(marking);

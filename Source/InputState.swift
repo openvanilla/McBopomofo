@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
+import NSStringUtils
 
 /// Represents the states for the input method controller.
 ///
@@ -244,8 +245,8 @@ class InputState: NSObject {
 
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
-            let exactBegin = StringUtils.convertToCharIndex(from: markedRange.location, in: composingBuffer)
-            let exactEnd = StringUtils.convertToCharIndex(from: markedRange.location + markedRange.length, in: composingBuffer)
+            let exactBegin = (composingBuffer as NSString).nextUtf16Position(for: markedRange.location)
+            let exactEnd = (composingBuffer as NSString).previousUtf16Position(for: markedRange.location)
             let readings = readings[exactBegin..<exactEnd]
             let joined = readings.joined(separator: "-")
             return "\(text) \(joined)"
