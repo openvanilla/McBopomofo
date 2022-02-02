@@ -32,6 +32,9 @@ jobs:
       - name: Test VXHanConvert
         run: swift test
         working-directory: Packages/VXHanConvert
+      - name: Test NSStringUtils
+        run: swift test
+        working-directory: Packages/NSStringUtils
       - name: Clean McBopomofo
         run: xcodebuild -scheme McBopomofo -configuration Release clean
       - name: Clean McBopomofoInstaller
@@ -40,4 +43,3 @@ jobs:
         run: xcodebuild -scheme McBopomofo -configuration Release build
       - name: Build McBopomofoInstaller
         run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
-
