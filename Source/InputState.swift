@@ -246,7 +246,7 @@ class InputState: NSObject {
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
             let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
-            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
             let readings = readings[exactBegin..<exactEnd]
             let joined = readings.joined(separator: "-")
             return "\(text) \(joined)"
