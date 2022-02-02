@@ -577,7 +577,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     if ([input isShiftHold]) {
         // Shift + left
         if (currentState.cursorIndex > 0) {
-            NSInteger previousPosition = [currentState.composingBuffer nextUtf16PositionFor:currentState.cursorIndex];
+            NSInteger previousPosition = [currentState.composingBuffer previousUtf16PositionFor:currentState.cursorIndex];
             InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition readings:[self _currentReadings]];
             marking.tooltipForInputting = currentState.tooltip;
             stateCallback(marking);
