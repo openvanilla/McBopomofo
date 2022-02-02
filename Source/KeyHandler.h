@@ -45,11 +45,10 @@ extern InputMode InputModePlainBopomofo;
 - (BOOL)handleInput:(KeyHandlerInput *)input
               state:(InputState *)state
       stateCallback:(void (^)(InputState *))stateCallback
-candidateSelectionCallback:(void (^)(void))candidateSelectionCallback
-      errorCallback:(void (^)(void))errorCallback;
+      errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
 - (void)syncWithPreferences;
-- (void)fixNodeWithValue:(NSString *)value;
+- (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
 - (void)clear;
 
 - (InputState *)buildInputtingState;
