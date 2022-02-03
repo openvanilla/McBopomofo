@@ -202,6 +202,20 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
     }
     [self _walk];
+
+    if (Preferences.selectPhraseAfterCursorAsCandidate &&
+        Preferences.moveCursorAfterSelectingCandidate) {
+        size_t nextPosition = 0;
+        for (auto node: _walkedNodes) {
+            if (nextPosition >= cursorIndex) {
+                break;
+            }
+            nextPosition += node.spanningLength;
+        }
+        if (nextPosition < _builder->length()) {
+            _builder->setCursorIndex(nextPosition);
+        }
+    }
 }
 
 - (void)clear

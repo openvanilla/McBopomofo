@@ -2,6 +2,8 @@
 ├── AppDelegate.swift
 ├── Base.lproj
 │   ├── Credits.rtf
+│   ├── InfoPlist.strings
+│   ├── Localizable.strings
 │   ├── MainMenu.xib
 │   ├── preferences.xib
 │   ├── template-data.txt
@@ -16,6 +18,7 @@
 │   ├── PhraseFreq.txt
 │   ├── README
 │   ├── Symbols.txt
+│   ├── associated-phrases.cin
 │   ├── bin
 │   │   ├── C_Version
 │   │   │   ├── Makefile
@@ -59,6 +62,8 @@
 │   │   └── falsecount.txt
 │   └── phrase.occ
 ├── Engine
+│   ├── AssociatedPhrases.cpp
+│   ├── AssociatedPhrases.h
 │   ├── CMakeLists.txt
 │   ├── Gramambular
 │   │   ├── Bigram.h
@@ -76,43 +81,12 @@
 │   ├── KeyValueBlobReader.h
 │   ├── KeyValueBlobReaderTest.cpp
 │   ├── Mandarin
+│   │   ├── CMakeLists.txt
 │   │   ├── Mandarin.cpp
-│   │   └── Mandarin.h
+│   │   ├── Mandarin.h
+│   │   └── MandarinTest.cpp
 │   ├── McBopomofoLM.cpp
 │   ├── McBopomofoLM.h
-│   ├── OpenVanilla
-│   │   ├── OVAroundFilter.h
-│   │   ├── OVBase.h
-│   │   ├── OVBenchmark.h
-│   │   ├── OVCINDataTable.h
-│   │   ├── OVCINDatabaseService.h
-│   │   ├── OVCINToSQLiteConvertor.h
-│   │   ├── OVCandidateService.h
-│   │   ├── OVDatabaseService.h
-│   │   ├── OVDateTimeHelper.h
-│   │   ├── OVEncodingService.h
-│   │   ├── OVEventHandlingContext.h
-│   │   ├── OVException.h
-│   │   ├── OVFileHelper.h
-│   │   ├── OVFrameworkInfo.h
-│   │   ├── OVInputMethod.h
-│   │   ├── OVKey.h
-│   │   ├── OVKeyPreprocessor.h
-│   │   ├── OVKeyValueMap.h
-│   │   ├── OVLoaderBase.h
-│   │   ├── OVLoaderService.h
-│   │   ├── OVLocalization.h
-│   │   ├── OVModule.h
-│   │   ├── OVModulePackage.h
-│   │   ├── OVOutputFilter.h
-│   │   ├── OVPathInfo.h
-│   │   ├── OVSQLiteDatabaseService.h
-│   │   ├── OVSQLiteWrapper.h
-│   │   ├── OVStringHelper.h
-│   │   ├── OVTextBuffer.h
-│   │   ├── OVUTF8Helper.h
-│   │   ├── OVWildcard.h
-│   │   └── OpenVanilla.h
 │   ├── ParselessLM.cpp
 │   ├── ParselessLM.h
 │   ├── ParselessLMBenchmark.cpp
@@ -205,4 +179,4 @@
     ├── template-exclude-phrases.txt
     └── template-phrases-replacement.txt
 
-23 directories, 182 files
+22 directories, 157 files
