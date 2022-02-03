@@ -212,7 +212,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             }
             nextPosition += node.spanningLength;
         }
-        if (nextPosition < _builder->length()) {
+        if (nextPosition <= _builder->length()) {
             _builder->setCursorIndex(nextPosition);
         }
     }
