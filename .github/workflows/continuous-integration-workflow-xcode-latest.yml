@@ -1,0 +1,48 @@
+name: Build
+on: [push]
+
+jobs:
+  build:
+    name: Build and Test with Latest Xcode
+    runs-on: macOS-latest
+    env:
+        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v1
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Build McBopomofoLMLibTest
+        run: cmake -S . -B build
+        working-directory: Source/Engine
+      - name: Run McBopomofoLMLibTest
+        run: make runTest
+        working-directory: Source/Engine/build
+      - name: Build MandarinTest
+        run: cmake -S . -B build
+        working-directory: Source/Engine/Mandarin
+      - name: Run MandarinTest
+        run: make runTest
+        working-directory: Source/Engine/Mandarin/build
+      - name: Test McBopomofo App Bundle
+        run: xcodebuild -scheme McBopomofo -configuration Debug test
+      - name: Test CandidateUI
+        run: swift test
+        working-directory: Packages/CandidateUI
+      - name: Test OpenCCBridge
+        run: swift test
+        working-directory: Packages/OpenCCBridge
+      - name: Test VXHanConvert
+        run: swift test
+        working-directory: Packages/VXHanConvert
+      - name: Test NSStringUtils
+        run: swift test
+        working-directory: Packages/NSStringUtils
+      - name: Clean McBopomofo
+        run: xcodebuild -scheme McBopomofo -configuration Release clean
+      - name: Clean McBopomofoInstaller
+        run: xcodebuild -scheme McBopomofoInstaller -configuration Release clean
+      - name: Build McBopomofo
+        run: xcodebuild -scheme McBopomofo -configuration Release build
+      - name: Build McBopomofoInstaller
+        run: xcodebuild -scheme McBopomofoInstaller -configuration Release build

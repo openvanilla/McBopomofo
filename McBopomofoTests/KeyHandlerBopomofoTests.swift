@@ -601,6 +601,113 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
     }
 
+    func testBackspaceToDeleteReading() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let backspace = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "ㄋ")
+            XCTAssertEqual(state.cursorIndex, 1)
+        }
+
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    }
+
+    func testBackspaceAtBegin() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let left = KeyHandlerInput(inputText: " ", keyCode: KeyCode.left.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: left, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        handler.handle(input: left, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你好")
+            XCTAssertEqual(state.cursorIndex, 0)
+        }
+
+        let backspace = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        var errorCall = false
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            errorCall = true
+        }
+        XCTAssertTrue(errorCall)
+    }
+
+    func testBackspaceToDeleteReadingWithText() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let backspace = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你ㄏ")
+            XCTAssertEqual(state.cursorIndex, 2)
+        }
+
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你")
+            XCTAssertEqual(state.cursorIndex, 1)
+        }
+    }
+
     func testBackspace() {
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
@@ -638,6 +745,39 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
 
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    }
+
+    func testCursorWithReading() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let left = KeyHandlerInput(inputText: " ", keyCode: KeyCode.left.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        let right = KeyHandlerInput(inputText: " ", keyCode: KeyCode.right.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        var leftErrorCalled = false
+        var rightErrorCalled = false
+
+        handler.handle(input: left, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            leftErrorCalled = true
+        }
+
+        handler.handle(input: right, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            rightErrorCalled = true
+        }
+
+        XCTAssertTrue(leftErrorCalled)
+        XCTAssertTrue(rightErrorCalled)
     }
 
     func testCursor() {
@@ -918,6 +1058,20 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.cursorIndex, 0)
         }
 
+        var homeErrorCalled = false
+        handler.handle(input: home, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            homeErrorCalled = true
+        }
+
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你好")
+            XCTAssertEqual(state.cursorIndex, 0)
+        }
+        XCTAssertTrue(homeErrorCalled)
+
         handler.handle(input: end, state: state) { newState in
             state = newState
         } errorCallback: {
@@ -927,6 +1081,125 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.composingBuffer, "你好")
             XCTAssertEqual(state.cursorIndex, 2)
         }
+
+        var endErrorCalled = false
+        handler.handle(input: end, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            endErrorCalled = true
+        }
+
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你好")
+            XCTAssertEqual(state.cursorIndex, 2)
+        }
+        XCTAssertTrue(endErrorCalled)
+    }
+
+    func testHomeAndEndWithReading() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你ㄏㄠ")
+            XCTAssertEqual(state.cursorIndex, 3)
+        }
+
+        let home = KeyHandlerInput(inputText: " ", keyCode: KeyCode.home.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        let end = KeyHandlerInput(inputText: " ", keyCode: KeyCode.end.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        var homeErrorCalled = false
+        var endErrorCalled = false
+
+        handler.handle(input: home, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            homeErrorCalled = true
+        }
+
+        XCTAssertTrue(homeErrorCalled)
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你ㄏㄠ")
+            XCTAssertEqual(state.cursorIndex, 3)
+        }
+
+        handler.handle(input: end, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            endErrorCalled = true
+        }
+
+        XCTAssertTrue(endErrorCalled)
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你ㄏㄠ")
+            XCTAssertEqual(state.cursorIndex, 3)
+        }
+    }
+
+    func testMarkingLeftAtBegin() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.left.rawValue, charCode: 0, flags: .shift, isVerticalMode: false)
+        var errorCalled = false
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            errorCalled = true
+        }
+        XCTAssertTrue(errorCalled)
+    }
+
+
+    func testMarkingRightAtEnd() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.right.rawValue, charCode: 0, flags: .shift, isVerticalMode: false)
+        var errorCalled = false
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            errorCalled = true
+        }
+        XCTAssertTrue(errorCalled)
     }
 
     func testMarkingLeft() {
@@ -974,6 +1247,20 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.markerIndex, 0)
             XCTAssertEqual(state.markedRange, NSRange(location: 0, length: 2))
         }
+
+        var stateForGoingRight: InputState = state
+
+        let right = KeyHandlerInput(inputText: " ", keyCode: KeyCode.right.rawValue, charCode: 0, flags: .shift, isVerticalMode: false)
+        handler.handle(input: right, state: stateForGoingRight) { newState in
+            stateForGoingRight = newState
+        } errorCallback: {
+        }
+        handler.handle(input: right, state: stateForGoingRight) { newState in
+            stateForGoingRight = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(stateForGoingRight is InputState.Inputting, "\(stateForGoingRight)")
     }
 
     func testMarkingRight() {
@@ -1004,6 +1291,16 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
+        let errorInput = KeyHandlerInput(inputText: " ", keyCode: KeyCode.left.rawValue, charCode: 0, flags: .shift, isVerticalMode: false)
+        var errorCalled = false
+        handler.handle(input: errorInput, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            errorCalled = true
+        }
+        XCTAssertTrue(errorCalled)
+
+
         let input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.right.rawValue, charCode: 0, flags: .shift, isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
@@ -1030,6 +1327,19 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.markerIndex, 2)
             XCTAssertEqual(state.markedRange, NSRange(location: 0, length: 2))
         }
+
+        var stateForGoingLeft: InputState = state
+
+        handler.handle(input: left, state: stateForGoingLeft) { newState in
+            stateForGoingLeft = newState
+        } errorCallback: {
+        }
+        handler.handle(input: left, state: stateForGoingLeft) { newState in
+            stateForGoingLeft = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(stateForGoingLeft is InputState.Inputting, "\(stateForGoingLeft)")
     }
 
     func testCancelMarking() {

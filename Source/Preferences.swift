@@ -24,11 +24,15 @@
 import Cocoa
 
 private let kKeyboardLayoutPreferenceKey = "KeyboardLayout"
-private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout" // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout" // alphanumeric ("ASCII") input basi
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift" // whether include shif
+/// alphanumeric ("ASCII") input basic keyboard layout.
+private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"
+/// alphanumeric ("ASCII") input basic keyboard layout.
+private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout"
+/// whether include shift.
+private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
 private let kCandidateListTextSizeKey = "CandidateListTextSize"
-private let kSelectPhraseAfterCursorAsCandidatePreferenceKey = "SelectPhraseAfterCursorAsCandidate"
+private let kSelectPhraseAfterCursorAsCandidateKey = "SelectPhraseAfterCursorAsCandidate"
+private let kMoveCursorAfterSelectingCandidateKey = "MoveCursorAfterSelectingCandidate"
 private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
 private let kComposingBufferSizePreferenceKey = "ComposingBufferSize"
 private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
@@ -41,9 +45,8 @@ private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
-private let kChineseConversionStyle = "ChineseConversionStyle"
+private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
-//private let kAssociatedPhrasesKeys = "AssociatedPhrasesKeys"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinCandidateListTextSize: CGFloat = 12
@@ -204,7 +207,7 @@ class Preferences: NSObject {
          kFunctionKeyKeyboardLayoutPreferenceKey,
          kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey,
          kCandidateListTextSizeKey,
-         kSelectPhraseAfterCursorAsCandidatePreferenceKey,
+         kSelectPhraseAfterCursorAsCandidateKey,
          kUseHorizontalCandidateListPreferenceKey,
          kComposingBufferSizePreferenceKey,
          kChooseCandidateUsingSpaceKey,
@@ -216,7 +219,7 @@ class Preferences: NSObject {
          kCandidateKeys,
          kPhraseReplacementEnabledKey,
          kChineseConversionEngineKey,
-         kChineseConversionStyle,
+         kChineseConversionStyleKey,
          kAssociatedPhrasesEnabledKey]
     }
 
@@ -240,8 +243,11 @@ class Preferences: NSObject {
     @CandidateListTextSize(key: kCandidateListTextSizeKey)
     @objc static var candidateListTextSize: CGFloat
 
-    @UserDefault(key: kSelectPhraseAfterCursorAsCandidatePreferenceKey, defaultValue: false)
+    @UserDefault(key: kSelectPhraseAfterCursorAsCandidateKey, defaultValue: false)
     @objc static var selectPhraseAfterCursorAsCandidate: Bool
+
+    @UserDefault(key: kMoveCursorAfterSelectingCandidateKey, defaultValue: false)
+    @objc static var moveCursorAfterSelectingCandidate: Bool
 
     @UserDefault(key: kUseHorizontalCandidateListPreferenceKey, defaultValue: false)
     @objc static var useHorizontalCandidateList: Bool
@@ -362,7 +368,7 @@ class Preferences: NSObject {
     ///
     /// - 0: convert the output
     /// - 1: convert the phrase models.
-    @UserDefault(key: kChineseConversionStyle, defaultValue: 0)
+    @UserDefault(key: kChineseConversionStyleKey, defaultValue: 0)
     @objc static var chineseConversionStyle: Int
 
     @objc static var chineseConversionStyleName: String? {
