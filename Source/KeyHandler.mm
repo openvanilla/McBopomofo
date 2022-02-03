@@ -779,12 +779,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return NO;
     }
 
-    if (_inputMode == InputModePlainBopomofo) {
-        if (!_bpmfReadingBuffer->isEmpty()) {
-            errorCallback();
-        }
-        return YES;
-    }
+// Actually the lines would not be reached. When there is BMPF reading and
+// a user input enter, we just send the readings to the client app.
+
+//    if (_inputMode == InputModePlainBopomofo) {
+//        if (!_bpmfReadingBuffer->isEmpty()) {
+//            errorCallback();
+//        }
+//        return YES;
+//    }
 
     [self clear];
 

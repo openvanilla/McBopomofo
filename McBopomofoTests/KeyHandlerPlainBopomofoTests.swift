@@ -119,6 +119,36 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
         }
     }
 
+    func testEnterWithReading() {
+        let input = KeyHandlerInput(inputText: "s", keyCode: 0, charCode: charCode("s"), flags: .shift, isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "ㄋ")
+        }
+
+        let enter = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 13, flags: [], isVerticalMode: false)
+        var count = 0
+
+        handler.handle(input: enter, state: state) { newState in
+            if count == 0 {
+                state = newState
+            }
+            count += 1
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "ㄋ")
+        }
+    }
+
     func testInputNe() {
         let input = KeyHandlerInput(inputText: "s", keyCode: 0, charCode: charCode("s"), flags: .shift, isVerticalMode: false)
         var state: InputState = InputState.Empty()
