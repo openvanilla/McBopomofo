@@ -894,7 +894,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             } else {
                 stateCallback(marking);
             }
-            stateCallback(marking);
         } else {
             errorCallback();
             stateCallback(state);
