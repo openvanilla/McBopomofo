@@ -90,3 +90,6 @@
 "Cursor is after \"%@\"." = "Cursor is after \"%@\".";
 
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
+
+"You are now selecting \"%@\". The phrase already exists." = "You are now selecting \"%@\". The phrase already exists.";
+

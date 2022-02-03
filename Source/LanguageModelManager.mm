@@ -193,6 +193,19 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
     return YES;
 }
 
++ (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:))
+{
+    string unigramKey = string(key.UTF8String);
+    vector<Unigram> unigrams = gLanguageModelMcBopomofo.unigramsForKey(unigramKey);
+    string userPhraseString = string(userPhrase.UTF8String);
+    for (auto unigram: unigrams) {
+        if (unigram.keyValue.value == userPhraseString) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 + (BOOL)writeUserPhrase:(NSString *)userPhrase
 {
     if (![self checkIfUserLanguageModelFilesExist]) {

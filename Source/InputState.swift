@@ -185,6 +185,16 @@ class InputState: NSObject {
             } else if (markedRange.length > kMaxMarkRangeLength) {
                 return String(format: NSLocalizedString("You are now selecting \"%@\". A phrase cannot be longer than %d characters.", comment: ""), text, kMaxMarkRangeLength)
             }
+
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let selectedReadings = readings[exactBegin..<exactEnd]
+            let joined = selectedReadings.joined(separator: "-")
+            let exist = LanguageModelManager.checkIfExist(userPhrase: text, key: joined)
+            if exist {
+                return String(format: NSLocalizedString("You are now selecting \"%@\". The phrase already exists.", comment: ""), text)
+            }
+
             return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
         }
 
@@ -238,9 +248,18 @@ class InputState: NSObject {
             if composingBuffer.count != readings.count {
                 return false
             }
-
-            return markedRange.length >= kMinMarkRangeLength &&
-                markedRange.length <= kMaxMarkRangeLength
+            if  markedRange.length < kMinMarkRangeLength {
+                return false
+            }
+            if markedRange.length > kMaxMarkRangeLength {
+                return false
+            }
+            let text = (composingBuffer as NSString).substring(with: markedRange)
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let selectedReadings = readings[exactBegin..<exactEnd]
+            let joined = selectedReadings.joined(separator: "-")
+            return LanguageModelManager.checkIfExist(userPhrase: text, key: joined) == false
         }
 
         @objc var userPhrase: String {
