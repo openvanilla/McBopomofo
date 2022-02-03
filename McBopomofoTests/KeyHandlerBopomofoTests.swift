@@ -633,6 +633,45 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
     }
 
+    func testBackspaceAtBegin() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3cl3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let left = KeyHandlerInput(inputText: " ", keyCode: KeyCode.left.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: left, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        handler.handle(input: left, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你好")
+            XCTAssertEqual(state.cursorIndex, 0)
+        }
+
+        let backspace = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        var errorCall = false
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            errorCall = true
+        }
+        XCTAssertTrue(errorCall)
+    }
+
     func testBackspaceToDeleteReadingWithText() {
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl").map {
@@ -1019,6 +1058,20 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.cursorIndex, 0)
         }
 
+        var homeErrorCalled = false
+        handler.handle(input: home, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            homeErrorCalled = true
+        }
+
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你好")
+            XCTAssertEqual(state.cursorIndex, 0)
+        }
+        XCTAssertTrue(homeErrorCalled)
+
         handler.handle(input: end, state: state) { newState in
             state = newState
         } errorCallback: {
@@ -1028,6 +1081,19 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.composingBuffer, "你好")
             XCTAssertEqual(state.cursorIndex, 2)
         }
+
+        var endErrorCalled = false
+        handler.handle(input: end, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            endErrorCalled = true
+        }
+
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "你好")
+            XCTAssertEqual(state.cursorIndex, 2)
+        }
+        XCTAssertTrue(endErrorCalled)
     }
 
     func testHomeAndEndWithReading() {
