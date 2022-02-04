@@ -571,6 +571,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
     }
 
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
+        let client = currentCandidateClient
 
         if let state = state as? InputState.ChoosingCandidate {
             let selectedValue = state.candidates[Int(index)]
@@ -583,24 +584,24 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             if keyHandler.inputMode == .plainBopomofo {
                 keyHandler.clear()
                 let composingBuffer = inputting.composingBuffer
-                handle(state: .Committing(poppedText: composingBuffer), client: currentCandidateClient)
+                handle(state: .Committing(poppedText: composingBuffer), client: client)
                 if Preferences.associatedPhrasesEnabled,
                    let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
-                    self.handle(state: associatePhrases, client: self.currentCandidateClient)
+                    self.handle(state: associatePhrases, client: client)
                 } else {
-                    handle(state: .Empty(), client: currentDeferredClient)
+                    handle(state: .Empty(), client: client)
                 }
             } else {
-                handle(state: inputting, client: currentCandidateClient)
+                handle(state: inputting, client: client)
             }
         } else if let state = state as? InputState.AssociatedPhrases {
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentCandidateClient)
             if Preferences.associatedPhrasesEnabled,
                let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
-                self.handle(state: associatePhrases, client: self.currentCandidateClient)
+                self.handle(state: associatePhrases, client: client)
             } else {
-                handle(state: .Empty(), client: currentDeferredClient)
+                handle(state: .Empty(), client: client)
             }
         }
     }
