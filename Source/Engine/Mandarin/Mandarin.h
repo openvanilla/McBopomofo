@@ -138,38 +138,6 @@ class BopomofoSyllable {
     return *this;
   }
 
-  uint16_t absoluteOrder() const {
-    // turn BPMF syllable into a 4*14*4*22 number
-    return (uint16_t)(syllable_ & ConsonantMask) +
-           (uint16_t)((syllable_ & MiddleVowelMask) >> 5) * 22 +
-           (uint16_t)((syllable_ & VowelMask) >> 7) * 22 * 4 +
-           (uint16_t)((syllable_ & ToneMarkerMask) >> 11) * 22 * 4 * 14;
-  }
-
-  const std::string absoluteOrderString() const {
-    // 5*14*4*22 = 6160, we use a 79*79 encoding to represent that
-    uint16_t order = absoluteOrder();
-    char low = 48 + static_cast<char>(order % 79);
-    char high = 48 + static_cast<char>(order / 79);
-    std::string result(2, ' ');
-    result[0] = low;
-    result[1] = high;
-    return result;
-  }
-
-  static BopomofoSyllable FromAbsoluteOrder(uint16_t order) {
-    return BopomofoSyllable((order % 22) | ((order / 22) % 4) << 5 |
-                            ((order / (22 * 4)) % 14) << 7 |
-                            ((order / (22 * 4 * 14)) % 5) << 11);
-  }
-
-  static BopomofoSyllable FromAbsoluteOrderString(const std::string& str) {
-    if (str.length() != 2) return BopomofoSyllable();
-
-    return FromAbsoluteOrder((uint16_t)(str[1] - 48) * 79 +
-                             (uint16_t)(str[0] - 48));
-  }
-
   friend std::ostream& operator<<(std::ostream& stream,
                                   const BopomofoSyllable& syllable);
 
@@ -494,10 +462,6 @@ class BopomofoReadingBuffer {
   const std::string standardLayoutQueryString() const {
     return BopomofoKeyboardLayout::StandardLayout()->keySequenceFromSyllable(
         syllable_);
-  }
-
-  const std::string absoluteOrderQueryString() const {
-    return syllable_.absoluteOrderString();
   }
 
   bool hasToneMarker() const { return syllable_.hasToneMarker(); }
