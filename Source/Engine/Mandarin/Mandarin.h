@@ -50,12 +50,6 @@ class BopomofoSyllable {
   // TO DO: Support accented vowels
   const std::string HanyuPinyinString(bool includesTone,
                                       bool useVForUUmlaut) const;
-  // const std::string HanyuPinyinString(bool includesTone, bool useVForUUmlaut,
-  // bool composeAccentedVowel) const;
-
-  // PHT = Pai-hua-tsi
-  static const BopomofoSyllable FromPHT(const std::string& str);
-  const std::string PHTString(bool includesTone) const;
 
   static const BopomofoSyllable FromComposedString(const std::string& str);
   const std::string composedString() const;
