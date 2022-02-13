@@ -47,6 +47,7 @@ private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
+private let kControlEnterOutputKey = "ControlEnterOutput"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinCandidateListTextSize: CGFloat = 12
@@ -383,4 +384,6 @@ class Preferences: NSObject {
         return associatedPhrasesEnabled
     }
 
+    @UserDefault(key: kControlEnterOutputKey, defaultValue: 0)
+    @objc static var controlEnterOutput: Int
 }

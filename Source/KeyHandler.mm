@@ -484,7 +484,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Enter
     if (charCode == 13) {
-        if ([input isControlHold]) {
+        if ([input isControlHold] && Preferences.controlEnterOutput != 0) {
             return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
