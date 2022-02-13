@@ -479,6 +479,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Enter
     if (charCode == 13) {
+        if ([input isControlHold]) {
+            return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -773,21 +776,30 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return YES;
 }
 
-- (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
     }
 
-// Actually the lines would not be reached. When there is BMPF reading and
-// a user input enter, we just send the readings to the client app.
+    NSArray *readings = [self _currentReadings];
+    NSString *composingBuffer = [readings componentsJoinedByString:@"-"];
 
-//    if (_inputMode == InputModePlainBopomofo) {
-//        if (!_bpmfReadingBuffer->isEmpty()) {
-//            errorCallback();
-//        }
-//        return YES;
-//    }
+    [self clear];
+
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    stateCallback(committing);
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    stateCallback(empty);
+    return YES;
+}
+
+
+- (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+{
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
 
     [self clear];
 

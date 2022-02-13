@@ -197,7 +197,7 @@ if __name__ == '__main__':
     with open(sys.argv[5]) as symbols_file:
         for line in symbols_file:
             row = line.rstrip().split(" ")
-            assert len(row) == 3
+            assert len(row) == 3, row
             output.append(tuple(row))
 
     output = convert_vks_rows_to_sorted_kvs_rows(output)
