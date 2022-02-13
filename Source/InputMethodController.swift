@@ -29,7 +29,7 @@ import TooltipUI
 import VXHanConvert
 import OpenCCBridge
 
-extension Bool {
+private extension Bool {
     var state: NSControl.StateValue {
         self ? .on : .off
     }
@@ -39,11 +39,14 @@ private let kMinKeyLabelSize: CGFloat = 10
 
 private var gCurrentCandidateController: CandidateController?
 
+private extension CandidateController {
+    static let horizontal = HorizontalCandidateController()
+    static let vertical = VerticalCandidateController()
+}
+
 @objc(McBopomofoInputMethodController)
 class McBopomofoInputMethodController: IMKInputController {
 
-    private static let horizontalCandidateController = HorizontalCandidateController()
-    private static let verticalCandidateController = VerticalCandidateController()
     private static let tooltipController = TooltipController()
 
     // MARK: -
@@ -441,20 +444,37 @@ extension McBopomofoInputMethodController {
 
     private func show(candidateWindowWith state: InputState, client: Any!) {
         let useVerticalMode: Bool = {
+            var useVerticalMode = false
+            var candidates: [String] = []
             if let state = state as? InputState.ChoosingCandidate {
-                return state.useVerticalMode
+                useVerticalMode = state.useVerticalMode
+                candidates = state.candidates
             } else if let state = state as? InputState.AssociatedPhrases {
-                return state.useVerticalMode
+                useVerticalMode = state.useVerticalMode
+                candidates = state.candidates
+            }
+            if useVerticalMode == true {
+                return true
+            }
+            candidates.sort {
+                return $0.count > $1.count
+            }
+            // If there is a candidate which is too long, we use the vertical
+            // candidate list window automatically.
+            if candidates.first?.count ?? 0 > 8 {
+                return true
             }
             return false
         }()
 
+        gCurrentCandidateController?.delegate = nil
+
         if useVerticalMode {
-            gCurrentCandidateController = McBopomofoInputMethodController.verticalCandidateController
+            gCurrentCandidateController = .vertical
         } else if Preferences.useHorizontalCandidateList {
-            gCurrentCandidateController = McBopomofoInputMethodController.horizontalCandidateController
+            gCurrentCandidateController = .horizontal
         } else {
-            gCurrentCandidateController = McBopomofoInputMethodController.verticalCandidateController
+            gCurrentCandidateController = .vertical
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -528,7 +548,7 @@ extension McBopomofoInputMethodController {
 
 extension McBopomofoInputMethodController: KeyHandlerDelegate {
     func candidateController(for keyHandler: KeyHandler) -> Any {
-        gCurrentCandidateController ?? McBopomofoInputMethodController.verticalCandidateController
+        gCurrentCandidateController ?? .vertical
     }
 
     func keyHandler(_ keyHandler: KeyHandler, didSelectCandidateAt index: Int, candidateController controller: Any) {

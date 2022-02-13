@@ -51,6 +51,7 @@ namespace Formosa {
             
             const string& key() const;
             double score() const;
+            double scoreForCandidate(string &candidate) const;
             const KeyValuePair currentKeyValue() const;
             double highestUnigramScore() const;
             
@@ -196,6 +197,16 @@ namespace Formosa {
         inline double Node::score() const
         {
             return m_score;
+        }
+
+        inline double Node::scoreForCandidate(string &candidate) const
+        {
+            for (auto unigram : m_unigrams) {
+                if (unigram.keyValue.value == candidate) {
+                    return unigram.score;
+                }
+            }
+            return 0.0;
         }
 
         inline double Node::highestUnigramScore() const {

@@ -48,11 +48,11 @@ namespace Formosa {
             vector<NodeAnchor> nodesEndingAt(size_t inLocation);
             vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
 
-            // "Freeze" the node with the unigram that represents the selected canditate value.
+            // "Freeze" the node with the unigram that represents the selected candidate value.
             // After this, the node that contains the unigram will always be evaluated to that
             // unigram, while all other overlapping nodes will be reset to their initial state
             // (that is, if any of those nodes were "frozen" or fixed, they will be unfrozen.)
-            void fixNodeSelectedCandidate(size_t location, const string& value);
+            NodeAnchor fixNodeSelectedCandidate(size_t location, const string& value);
 
             // Similar to fixNodeSelectedCandidate, but instead of "freezing" the node, only
             // boost the unigram that represents the value with an overriding score. This
@@ -188,9 +188,10 @@ namespace Formosa {
         }
 
         // For nodes found at the location, fix their currently-selected candidate using the supplied string value.
-        inline void Grid::fixNodeSelectedCandidate(size_t location, const string& value)
+        inline NodeAnchor Grid::fixNodeSelectedCandidate(size_t location, const string& value)
         {
             vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+            NodeAnchor node;
             for (auto nodeAnchor : nodes) {
                 auto candidates = nodeAnchor.node->candidates();
 
@@ -200,10 +201,12 @@ namespace Formosa {
                 for (size_t i = 0, c = candidates.size(); i < c; ++i) {
                     if (candidates[i].value == value) {
                         const_cast<Node*>(nodeAnchor.node)->selectCandidateAtIndex(i);
-                        break;
+                        node = nodeAnchor;
+                        break;;
                     }
                 }
             }
+            return node;
         }
 
         inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location, const string& value, float overridingScore)
