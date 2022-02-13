@@ -202,7 +202,17 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // If the length of the readings and the characters do not match,
         // it often means it is a special symbol and it should not be stored
         // in the user override model.
-        if (selectedNode.spanningLength == [value count]) {
+        BOOL addToOverrideModel = YES;
+        if (selectedNode.spanningLength != [value count]) {
+            addToOverrideModel = NO;
+        }
+        if (addToOverrideModel) {
+            double score = selectedNode.node->scoreForCandidate(stringValue);
+            if (score <= -8) {
+                addToOverrideModel = NO;
+            }
+        }
+        if (addToOverrideModel) {
             _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
         }
     }
