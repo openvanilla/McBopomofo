@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
+import Foundation
 
 struct ArchiveUtil {
     var appName: String
@@ -95,16 +96,16 @@ struct ArchiveUtil {
         unzipTask.waitUntilExit()
 
         assert(unzipTask.terminationStatus == 0, "Must successfully unzipped")
-        guard let result = (tempFilePath as NSString).appendingPathExtension(targetAppBundleName) else {
-            return nil
-        }
-        assert(FileManager.default.fileExists(atPath: result), "App bundle must be unzipped at \(resourcePath).")
+        let result = (tempFilePath as NSString).appendingPathComponent(targetAppBundleName)
+        assert(FileManager.default.fileExists(atPath: result), "App bundle must be unzipped at \(result).")
         return result
     }
 
     private var notarizedArchivesPath: String? {
-        let resourePath = Bundle.main.resourcePath
-        let notarizedArchivesPath = resourePath?.appending("NotarizedArchives")
+        guard let resourePath = Bundle.main.resourcePath else {
+            return nil
+        }
+        let notarizedArchivesPath = (resourePath as NSString).appendingPathComponent("NotarizedArchives")
         return notarizedArchivesPath
     }
 
@@ -114,7 +115,7 @@ struct ArchiveUtil {
             return nil
         }
         let notarizedArchiveBasename = "\(appName)-r\(bundleVersion).zip"
-        let notarizedArchive = notarizedArchivesPath.appending(notarizedArchiveBasename)
+        let notarizedArchive = (notarizedArchivesPath as NSString).appendingPathComponent(notarizedArchiveBasename)
         return notarizedArchive
     }
 
