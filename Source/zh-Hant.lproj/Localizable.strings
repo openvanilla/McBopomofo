@@ -73,7 +73,7 @@
 
 "Candidate keys cannot be longer than 15 characters." = "選字按鍵數量不可大於 15。";
 
-"Phrase replacement mode is on. Not recommended to add user phases." = "詞彙轉換已開啟，不建議在此模式下加詞。";
+"Phrase replacement mode is on. Not recommended to add user phrases." = "詞彙轉換已開啟，不建議在此模式下加詞。";
 
 "Model-based Chinese conversion is on. Not recommended to add user phrases." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
 

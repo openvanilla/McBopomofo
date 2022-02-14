@@ -73,7 +73,7 @@
 
 "Candidate keys cannot be longer than 15 characters." = "Candidate keys cannot be longer than 15 characters.";
 
-"Phrase replacement mode is on. Not recommended to add user phases." = "Phrase replacement mode is on. Not recommended to add user phases.";
+"Phrase replacement mode is on. Not recommended to add user phrases." = "Phrase replacement mode is on. Not recommended to add user phrases.";
 
 "Model-based Chinese conversion is on. Not recommended to add user phrases." = "Model-based Chinese conversion is on. Not recommended to add user phrases.";
 

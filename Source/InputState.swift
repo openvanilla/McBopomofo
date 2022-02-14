@@ -170,7 +170,7 @@ class InputState: NSObject {
             }
 
             if Preferences.phraseReplacementEnabled {
-                return NSLocalizedString("Phrase replacement mode is on. Not recommended to add user phases.", comment: "")
+                return NSLocalizedString("Phrase replacement mode is on. Not recommended to add user phrases.", comment: "")
             }
             if Preferences.chineseConversionStyle == 1 && Preferences.chineseConversionEnabled {
                 return NSLocalizedString("Model-based Chinese conversion is on. Not recommended to add user phrases.", comment: "")
