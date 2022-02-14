@@ -41,17 +41,17 @@
 
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 
-"Please check the permission of at \"%@\"." = "Please check the permission of at \"%@\".";
+"Please check the permission of the path at \"%@\"." = "Please check the permission of the path at \"%@\".";
 
 "Edit Excluded Phrases" = "Edit Excluded Phrases";
 
 "Use Half-Width Punctuations" = "Use Half-Width Punctuations";
 
-"You are now selecting \"%@\". You can add a phrase with two or more characters." = "You are now selecting \"%@\". You can add a phrase with two or more characters.";
+"Marking \"%@\": add a custom phrase by selecting two or more characters." = "Marking \"%@\": add a custom phrase by selecting two or more characters.";
 
-"You are now selecting \"%@\". Press enter to add a new phrase." = "You are now selecting \"%@\". Press enter to add a new phrase.";
+"Marking \"%@\". Press Enter to add it as a new phrase." = "Marking \"%@\". Press Enter to add it as a new phrase.";
 
-"You are now selecting \"%@\". A phrase cannot be longer than %d characters." = "You are now selecting \"%@\". A phrase cannot be longer than %d characters.";
+"The phrase being marked \"%@\" is longer than the allowed %d characters." = "The phrase being marked \"%@\" is longer than the allowed %d characters.";
 
 "Chinese conversion on" = "Chinese conversion on";
 
@@ -63,27 +63,27 @@
 
 "Candidates keys cannot be empty." = "Candidates keys cannot be empty.";
 
-"Candidate keys can only contain latin characters and numbers." = "Candidate keys can only contain latin characters and numbers.";
+"Candidate keys can only contain Latin characters and numbers." = "Candidate keys can only contain Latin characters and numbers.";
 
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
 
 "There should not be duplicated keys." = "There should not be duplicated keys.";
 
-"The length of your candidate keys can not be less than 4 characters." = "The length of your candidate keys can not be less than 4 characters.";
+"Candidate keys cannot be shorter than 4 characters." = "Candidate keys cannot be shorter than 4 characters.";
 
-"The length of your candidate keys can not be larger than 15 characters." = "The length of your candidate keys can not be larger than 15 characters.";
+"Candidate keys cannot be longer than 15 characters." = "Candidate keys cannot be longer than 15 characters.";
 
-"Phrase replacement mode is on. Not suggested to add phrase in the mode." = "Phrase replacement mode is on. Not suggested to add phrase in the mode.";
+"Phrase replacement mode is on. Not recommended to add user phases." = "Phrase replacement mode is on. Not recommended to add user phases.";
 
-"Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "Model based Chinese conversion is on. Not suggested to add phrase in the mode.";
+"Model-based Chinese conversion is on. Not recommended to add user phrases." = "Model-based Chinese conversion is on. Not recommended to add user phrases.";
 
-"Half-width punctuation on" = "Half-width punctuation on";
+"Half-Width Punctuation On" = "Half-Width Punctuation On";
 
-"Half-width punctuation off" = "Half-width punctuation off";
+"Half-Width Punctuation Off" = "Half-Width Punctuation Off";
 
 "Associated Phrases" = "Associated Phrases";
 
-"There are special phrases in your text. We don't support adding new phrases in this case." = "There are special phrases in your text. We don't support adding new phrases in this case.";
+"Certain Unicode symbols or characters not supported as user phrases." = "Certain Unicode symbols or characters not supported as user phrases.";
 
 "Cursor is before \"%@\"." = "Cursor is before \"%@\".";
 
@@ -91,4 +91,4 @@
 
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
 
-"You are now selecting \"%@\". The phrase already exists." = "You are now selecting \"%@\". The phrase already exists.";
+"The phrase being marked \"%@\" already exists." = "The phrase being marked \"%@\" already exists.";

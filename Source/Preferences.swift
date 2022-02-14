@@ -332,15 +332,15 @@ class Preferences: NSObject {
             case .empty:
                 return NSLocalizedString("Candidates keys cannot be empty.", comment: "")
             case .invalidCharacters:
-                return NSLocalizedString("Candidate keys can only contain latin characters and numbers.", comment: "")
+                return NSLocalizedString("Candidate keys can only contain Latin characters and numbers.", comment: "")
             case .containSpace:
                 return NSLocalizedString("Candidate keys cannot contain space.", comment: "")
             case .duplicatedCharacters:
                 return NSLocalizedString("There should not be duplicated keys.", comment: "")
             case .tooShort:
-                return NSLocalizedString("The length of your candidate keys can not be less than 4 characters.", comment: "")
+                return NSLocalizedString("Candidate keys cannot be shorter than 4 characters.", comment: "")
             case .tooLong:
-                return NSLocalizedString("The length of your candidate keys can not be larger than 15 characters.", comment: "")
+                return NSLocalizedString("Candidate keys cannot be longer than 15 characters.", comment: "")
             }
         }
 

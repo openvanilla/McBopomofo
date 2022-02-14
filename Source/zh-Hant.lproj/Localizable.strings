@@ -41,17 +41,17 @@
 
 "Unable to create the user phrase file." = "無法建立使用者詞彙檔案";
 
-"Please check the permission of at \"%@\"." = "請檢查以下路徑的寫入權限 \"%@\"。";
+"Please check the permission of the path at \"%@\"." = "請檢查以下路徑的寫入權限 \"%@\"。";
 
 "Edit Excluded Phrases" = "編輯要排除的詞彙";
 
 "Use Half-Width Punctuations" = "使用半型標點符號";
 
-"You are now selecting \"%@\". You can add a phrase with two or more characters." = "您目前選擇了「%@」。請選擇兩個字以上，才能加入使用者詞彙。";
+"Marking \"%@\": add a custom phrase by selecting two or more characters." = "您目前選擇了「%@」。請選擇兩個字以上，才能加入使用者詞彙。";
 
-"You are now selecting \"%@\". Press enter to add a new phrase." = "您目前選擇了「%@」。按下 Enter 就可以加入到使用者詞彙中。";
+"Marking \"%@\". Press Enter to add it as a new phrase." = "您目前選擇了「%@」。按下 Enter 就可以加入到使用者詞彙中。";
 
-"You are now selecting \"%@\". A phrase cannot be longer than %d characters." = "您目前選擇了「%@」。自訂詞彙不能超過 %d 個字元。";
+"The phrase being marked \"%@\" is longer than the allowed %d characters." = "您目前選擇了「%@」。自訂詞彙不能超過 %d 個字元。";
 
 "Chinese conversion on" = "已經切換到簡體中文模式";
 
@@ -63,27 +63,27 @@
 
 "Candidates keys cannot be empty." = "選字鍵不可為空。";
 
-"Candidate keys can only contain latin characters and numbers." = "選字鍵只可包含英數與半型標點。";
+"Candidate keys can only contain Latin characters and numbers." = "選字鍵只可包含英數與半型標點。";
 
 "Candidate keys cannot contain space." = "選字鍵不可包含空白。";
 
 "There should not be duplicated keys." = "選字鍵中不可包含重複的字元。";
 
-"The length of your candidate keys can not be less than 4 characters." = "選字按鍵數量不可小於 4。";
+"Candidate keys cannot be shorter than 4 characters." = "選字按鍵數量不可小於 4。";
 
-"The length of your candidate keys can not be larger than 15 characters." = "選字按鍵數量不可大於 15。";
+"Candidate keys cannot be longer than 15 characters." = "選字按鍵數量不可大於 15。";
 
-"Phrase replacement mode is on. Not suggested to add phrase in the mode." = "詞彙轉換已開啟，不建議在此模式下加詞。";
+"Phrase replacement mode is on. Not recommended to add user phases." = "詞彙轉換已開啟，不建議在此模式下加詞。";
 
-"Model based Chinese conversion is on. Not suggested to add phrase in the mode." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
+"Model-based Chinese conversion is on. Not recommended to add user phrases." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
 
-"Half-width punctuation on" = "已經切換到半型標點模式";
+"Half-Width Punctuation On" = "已經切換到半型標點模式";
 
-"Half-width punctuation off" = "已經切回到全型標點模式";
+"Half-Width Punctuation Off" = "已經切回到全型標點模式";
 
 "Associated Phrases" = "聯想詞";
 
-"There are special phrases in your text. We don't support adding new phrases in this case." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";
+"Certain Unicode symbols or characters not supported as user phrases." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";
 
 "Cursor is before \"%@\"." = "游標正在「%@」前方";
 
@@ -91,4 +91,4 @@
 
 "Cursor is between \"%@\" and \"%@\"." = "游標正在「%@」與「%@」之間";
 
-"You are now selecting \"%@\". The phrase already exists." = "您目前選擇了「%@」，這個詞彙已經存在了";
+"The phrase being marked \"%@\" already exists." = "您目前選擇了「%@」，這個詞彙已經存在了";

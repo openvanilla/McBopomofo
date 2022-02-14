@@ -166,14 +166,14 @@ class InputState: NSObject {
         @objc var tooltip: String {
 
             if composingBuffer.count != readings.count {
-                return NSLocalizedString("There are special phrases in your text. We don't support adding new phrases in this case.", comment: "")
+                return NSLocalizedString("Certain Unicode symbols or characters not supported as user phrases.", comment: "")
             }
 
             if Preferences.phraseReplacementEnabled {
-                return NSLocalizedString("Phrase replacement mode is on. Not suggested to add phrase in the mode.", comment: "")
+                return NSLocalizedString("Phrase replacement mode is on. Not recommended to add user phases.", comment: "")
             }
             if Preferences.chineseConversionStyle == 1 && Preferences.chineseConversionEnabled {
-                return NSLocalizedString("Model based Chinese conversion is on. Not suggested to add phrase in the mode.", comment: "")
+                return NSLocalizedString("Model-based Chinese conversion is on. Not recommended to add user phrases.", comment: "")
             }
             if markedRange.length == 0 {
                 return ""
@@ -181,9 +181,9 @@ class InputState: NSObject {
 
             let text = (composingBuffer as NSString).substring(with: markedRange)
             if markedRange.length < kMinMarkRangeLength {
-                return String(format: NSLocalizedString("You are now selecting \"%@\". You can add a phrase with two or more characters.", comment: ""), text)
+                return String(format: NSLocalizedString("Marking \"%@\": add a custom phrase by selecting two or more characters.", comment: ""), text)
             } else if (markedRange.length > kMaxMarkRangeLength) {
-                return String(format: NSLocalizedString("You are now selecting \"%@\". A phrase cannot be longer than %d characters.", comment: ""), text, kMaxMarkRangeLength)
+                return String(format: NSLocalizedString("The phrase being marked \"%@\" is longer than the allowed %d characters.", comment: ""), text, kMaxMarkRangeLength)
             }
 
             let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
@@ -192,10 +192,10 @@ class InputState: NSObject {
             let joined = selectedReadings.joined(separator: "-")
             let exist = LanguageModelManager.checkIfExist(userPhrase: text, key: joined)
             if exist {
-                return String(format: NSLocalizedString("You are now selecting \"%@\". The phrase already exists.", comment: ""), text)
+                return String(format: NSLocalizedString("The phrase being marked \"%@\" already exists.", comment: ""), text)
             }
 
-            return String(format: NSLocalizedString("You are now selecting \"%@\". Press enter to add a new phrase.", comment: ""), text)
+            return String(format: NSLocalizedString("Marking \"%@\". Press Enter to add it as a new phrase.", comment: ""), text)
         }
 
         @objc var tooltipForInputting: String = ""
