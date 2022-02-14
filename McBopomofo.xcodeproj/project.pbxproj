@@ -49,8 +49,8 @@
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */; };
-		D47D73A827A6C84F00255A50 /* associated-phrases.cin in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.cin */; };
-		D47D73A927A6C84F00255A50 /* associated-phrases.cin in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.cin */; };
+		D47D73A827A6C84F00255A50 /* associated-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.txt */; };
+		D47D73A927A6C84F00255A50 /* associated-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.txt */; };
 		D47D73AC27A6CAE600255A50 /* AssociatedPhrases.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */; };
 		D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D47D73C227A7200500255A50 /* FSEventStreamHelper */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
@@ -173,7 +173,7 @@
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerBopomofoTests.swift; sourceTree = "<group>"; };
-		D47D73A727A6C84F00255A50 /* associated-phrases.cin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "associated-phrases.cin"; sourceTree = "<group>"; };
+		D47D73A727A6C84F00255A50 /* associated-phrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "associated-phrases.txt"; sourceTree = "<group>"; };
 		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AssociatedPhrases.cpp; sourceTree = "<group>"; };
 		D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AssociatedPhrases.h; sourceTree = "<group>"; };
 		D47D73C027A71FFA00255A50 /* FSEventStreamHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FSEventStreamHelper; path = Packages/FSEventStreamHelper; sourceTree = "<group>"; };
@@ -369,7 +369,7 @@
 		6A38BBDD15FC115800A8A51F /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				D47D73A727A6C84F00255A50 /* associated-phrases.cin */,
+				D47D73A727A6C84F00255A50 /* associated-phrases.txt */,
 				6A38BBF615FC117A00A8A51F /* data.txt */,
 				6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */,
 			);
@@ -595,7 +595,7 @@
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
 				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
-				D47D73A827A6C84F00255A50 /* associated-phrases.cin in Resources */,
+				D47D73A827A6C84F00255A50 /* associated-phrases.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -619,7 +619,7 @@
 			files = (
 				D4E569E527A414CB00AC2CEF /* data.txt in Resources */,
 				D4E569E427A414CB00AC2CEF /* data-plain-bpmf.txt in Resources */,
-				D47D73A927A6C84F00255A50 /* associated-phrases.cin in Resources */,
+				D47D73A927A6C84F00255A50 /* associated-phrases.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

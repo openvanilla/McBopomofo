@@ -56,7 +56,7 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
-    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"cin"];
+    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"txt"];
     lm.loadAssociatedPhrases([dataPath UTF8String]);
 }
 

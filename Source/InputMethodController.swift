@@ -66,7 +66,6 @@ class McBopomofoInputMethodController: IMKInputController {
 
     override func menu() -> NSMenu! {
         let menu = NSMenu(title: "Input Method Menu")
-        menu.addItem(withTitle: NSLocalizedString("McBopomofo Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
 
         let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Chinese Conversion", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "g")
         chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
@@ -105,6 +104,7 @@ class McBopomofoInputMethodController: IMKInputController {
         menu.addItem(withTitle: NSLocalizedString("Reload User Phrases", comment: ""), action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
 
+        menu.addItem(withTitle: NSLocalizedString("McBopomofo Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
         menu.addItem(withTitle: NSLocalizedString("About McBopomofo…", comment: ""), action: #selector(showAbout(_:)), keyEquivalent: "")
         return menu
@@ -204,8 +204,8 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
-        let enabled = Preferences.togglePhraseReplacementEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Half-width punctuation on", comment: "") : NSLocalizedString("Half-width punctuation off", comment: ""))
+        let enabled = Preferences.toggleHalfWidthPunctuationEnabled()
+        NotifierController.notify(message: enabled ? NSLocalizedString("Half-Width Punctuation On", comment: "") : NSLocalizedString("Half-Width Punctuation Off", comment: ""))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
@@ -224,7 +224,7 @@ class McBopomofoInputMethodController: IMKInputController {
     private func open(userFileAt path: String) {
         func checkIfUserFilesExist() -> Bool {
             if !LanguageModelManager.checkIfUserLanguageModelFilesExist() {
-                let content = String(format: NSLocalizedString("Please check the permission of at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
+                let content = String(format: NSLocalizedString("Please check the permission of the path at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
                 NonModalAlertWindowController.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 return false
             }
