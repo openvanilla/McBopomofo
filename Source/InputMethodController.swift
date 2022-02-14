@@ -204,7 +204,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
-        let enabled = Preferences.togglePhraseReplacementEnabled()
+        let enabled = Preferences.toggleHalfWidthPunctuationEnabled()
         NotifierController.notify(message: enabled ? NSLocalizedString("Half-Width Punctuation On", comment: "") : NSLocalizedString("Half-Width Punctuation Off", comment: ""))
     }
 
