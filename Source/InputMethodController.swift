@@ -52,7 +52,6 @@ class McBopomofoInputMethodController: IMKInputController {
     // MARK: -
 
     private var currentCandidateClient: Any?
-    private var currentDeferredClient: Any?
 
     private var keyHandler: KeyHandler = KeyHandler()
     private var state: InputState = InputState.Empty()
@@ -118,7 +117,6 @@ class McBopomofoInputMethodController: IMKInputController {
         // Override the keyboard layout. Use US if not set.
         (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
         // reset the state
-        currentDeferredClient = nil
         currentCandidateClient = nil
 
         keyHandler.clear()
@@ -176,12 +174,6 @@ class McBopomofoInputMethodController: IMKInputController {
         var textFrame = NSRect.zero
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-
-        if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" &&
-            String(describing: client.self) == "IPMDServerClientWrapper" {
-            currentDeferredClient = client
-        }
-
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
 
         let result = keyHandler.handle(input: input, state: state) { newState in
@@ -309,20 +301,10 @@ extension McBopomofoInputMethodController {
         if buffer.isEmpty {
             return
         }
-        // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
-        // then we defer the update in the next runloop round -- so that the composing buffer is not
-        // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
-        if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" && String(describing: client.self) != "IPMDServerClientWrapper" {
-            let innerCurrentDeferredClient = currentDeferredClient
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-                (innerCurrentDeferredClient as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
-            }
-        }
         (client as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
     }
 
     private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
-        currentDeferredClient = nil
         currentCandidateClient = nil
 
         gCurrentCandidateController?.delegate = nil
