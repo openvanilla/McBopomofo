@@ -178,7 +178,7 @@ class McBopomofoInputMethodController: IMKInputController {
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
         if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" &&
-                   NSStringFromClass(client.self as! AnyClass) == "IPMDServerClientWrapper" {
+            String(describing: client.self) == "IPMDServerClientWrapper" {
             currentDeferredClient = client
         }
 
@@ -312,7 +312,7 @@ extension McBopomofoInputMethodController {
         // if it's Terminal, we don't commit at the first call (the client of which will not be IPMDServerClientWrapper)
         // then we defer the update in the next runloop round -- so that the composing buffer is not
         // meaninglessly flushed, an annoying bug in Terminal.app since Mac OS X 10.5
-        if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" && NSStringFromClass(client.self as! AnyClass) != "IPMDServerClientWrapper" {
+        if (client as? IMKTextInput)?.bundleIdentifier() == "com.apple.Terminal" && String(describing: client.self) != "IPMDServerClientWrapper" {
             let innerCurrentDeferredClient = currentDeferredClient
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
                 (innerCurrentDeferredClient as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
