@@ -38,6 +38,10 @@ jobs:
       - name: Test NSStringUtils
         run: swift test
         working-directory: Packages/NSStringUtils
+      - name: Clean McBopomofo for testing
+        run: xcodebuild -scheme McBopomofo -configuration Debug clean
+      - name: Test McBopomofo
+        run: xcodebuild -scheme McBopomofo -configuration Debug test
       - name: Clean McBopomofo
         run: xcodebuild -scheme McBopomofo -configuration Release clean
       - name: Clean McBopomofoInstaller
