@@ -541,7 +541,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if ((char) charCode >= 'A' && (char) charCode <= 'Z') {
+    if ([state isKindOfClass:[InputStateNotEmpty class]] && (char) charCode >= 'A' && (char) charCode <= 'Z') {
         string letter = string("_letter_") + string(1, (char) charCode);
         if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
             return YES;
