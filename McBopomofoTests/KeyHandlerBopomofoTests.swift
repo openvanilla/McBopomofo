@@ -266,17 +266,40 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
     }
 
-    func testLetter() {
-        let input = KeyHandlerInput(inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift, isVerticalMode: false)
+    // Regression test for #292.
+    func testUppercaseLetterWhenEmpty() {
+        let input = KeyHandlerInput(inputText: "A", keyCode: KeyCode.enter.rawValue, charCode: charCode("A"), flags: [], isVerticalMode: false)
         var state: InputState = InputState.Empty()
-        handler.handle(input: input, state: state) { newState in
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertFalse(result)
+    }
+
+    // Regression test for #292.
+    func testUppercaseLetterWhenNotEmpty() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("u6").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        let letterInput = KeyHandlerInput(inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift, isVerticalMode: false)
+        handler.handle(input: letterInput, state: state) { newState in
             state = newState
         } errorCallback: {
         }
 
         XCTAssertTrue(state is InputState.Inputting, "\(state)")
         if let state = state as? InputState.Inputting {
-            XCTAssertEqual(state.composingBuffer, "a")
+            XCTAssertEqual(state.composingBuffer, "一a")
         }
     }
 
