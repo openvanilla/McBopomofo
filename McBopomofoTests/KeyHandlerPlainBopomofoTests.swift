@@ -25,15 +25,22 @@ import XCTest
 @testable import McBopomofo
 
 class KeyHandlerPlainBopomofoTests: XCTestCase {
+    var savedKeyboardLayout: Int = 0
     var handler = KeyHandler()
 
     override func setUpWithError() throws {
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
         handler.inputMode = .plainBopomofo
+
+        savedKeyboardLayout = Preferences.keyboardLayout
+
+        // Punctuation-related tests only work when the layout is Standard.
+        Preferences.keyboardLayout = KeyboardLayout.standard.rawValue
     }
 
     override func tearDownWithError() throws {
+        Preferences.keyboardLayout = savedKeyboardLayout
     }
 
     func testPunctuationTable() {
