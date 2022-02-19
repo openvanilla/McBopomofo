@@ -28,15 +28,12 @@
 @import VXHanConvert;
 @import OpenCCBridge;
 
-using namespace std;
-using namespace McBopomofo;
-
 static const int kUserOverrideModelCapacity = 500;
 static const double kObservedOverrideHalflife = 5400.0; // 1.5 hr.
 
-static McBopomofoLM gLanguageModelMcBopomofo;
-static McBopomofoLM gLanguageModelPlainBopomofo;
-static UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static McBopomofo::McBopomofoLM gLanguageModelMcBopomofo;
+static McBopomofo::McBopomofoLM gLanguageModelPlainBopomofo;
+static McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
@@ -46,14 +43,14 @@ static NSString *const kTemplateExtension = @".txt";
 
 @implementation LanguageModelManager
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomofoLM &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomofo::McBopomofoLM &lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
     lm.loadLanguageModel([dataPath UTF8String]);
 }
 
-static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
+static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"txt"];
@@ -104,7 +101,7 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
 
 + (void)setupDataModelValueConverter
 {
-    auto converter = [](string input) {
+    auto converter = [](std::string input) {
         if (!Preferences.chineseConversionEnabled) {
             return input;
         }
@@ -119,7 +116,7 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
         } else {
             text = [OpenCCBridge convertToSimplified:text];
         }
-        return string(text.UTF8String);
+        return std::string(text.UTF8String);
     };
 
     gLanguageModelMcBopomofo.setExternalConverter(converter);
@@ -194,9 +191,9 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
 
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:))
 {
-    string unigramKey = string(key.UTF8String);
-    vector<Unigram> unigrams = gLanguageModelMcBopomofo.unigramsForKey(unigramKey);
-    string userPhraseString = string(userPhrase.UTF8String);
+    std::string unigramKey(key.UTF8String);
+    std::vector<Formosa::Gramambular::Unigram> unigrams = gLanguageModelMcBopomofo.unigramsForKey(unigramKey);
+    std::string userPhraseString(userPhrase.UTF8String);
     for (auto unigram : unigrams) {
         if (unigram.keyValue.value == userPhraseString) {
             return YES;
@@ -282,12 +279,12 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
     return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
 }
 
-+ (McBopomofoLM *)languageModelMcBopomofo
++ (McBopomofo::McBopomofoLM *)languageModelMcBopomofo
 {
     return &gLanguageModelMcBopomofo;
 }
 
-+ (McBopomofoLM *)languageModelPlainBopomofo
++ (McBopomofo::McBopomofoLM *)languageModelPlainBopomofo
 {
     return &gLanguageModelPlainBopomofo;
 }

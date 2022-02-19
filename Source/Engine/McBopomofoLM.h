@@ -24,16 +24,14 @@
 #ifndef MCBOPOMOFOLM_H
 #define MCBOPOMOFOLM_H
 
-#include <stdio.h>
-#include "UserPhrasesLM.h"
+#include "AssociatedPhrases.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
-#include "AssociatedPhrases.h"
+#include "UserPhrasesLM.h"
+#include <stdio.h>
 #include <unordered_set>
 
 namespace McBopomofo {
-
-using namespace Formosa::Gramambular;
 
 /// McBopomofoLM is a facade for managing a set of models including
 /// the input method language model, user phrases and excluded phrases.
@@ -57,7 +55,7 @@ using namespace Formosa::Gramambular;
 /// model while launching and to load the user phrases anytime if the custom
 /// files are modified. It does not keep the reference of the data pathes but
 /// you have to pass the paths when you ask it to do loading.
-class McBopomofoLM : public LanguageModel {
+class McBopomofoLM : public Formosa::Gramambular::LanguageModel {
 public:
     McBopomofoLM();
     ~McBopomofoLM();
@@ -83,14 +81,14 @@ public:
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
     /// Not implemented since we do not have data to provide bigram function.
-    const vector<Bigram> bigramsForKeys(const string& preceedingKey, const string& key);
+    const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
     /// Returns a list of available unigram for the given key.
     /// @param key A string represents the BPMF reading or a symbol key. For
     ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
-    const vector<Unigram> unigramsForKey(const string& key);
+    const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(const std::string& key);
     /// If the model has unigrams for the given key.
     /// @param key The key.
-    bool hasUnigramsForKey(const string& key);
+    bool hasUnigramsForKey(const std::string& key);
 
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
@@ -102,23 +100,22 @@ public:
     /// If the external converted is enabled or not.
     bool externalConverterEnabled();
     /// Sets a lambda to let the values of unigrams could be converted by it.
-    void setExternalConverter(std::function<string(string)> externalConverter);
+    void setExternalConverter(std::function<std::string(std::string)> externalConverter);
 
-    const vector<std::string> associatedPhrasesForKey(const string& key);
-    bool hasAssociatedPhrasesForKey(const string& key);
-
+    const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
+    bool hasAssociatedPhrasesForKey(const std::string& key);
 
 protected:
     /// Filters and converts the input unigrams and return a new list of unigrams.
-    /// 
+    ///
     /// @param unigrams The unigrams to be processed.
     /// @param excludedValues The values to excluded unigrams.
     /// @param insertedValues The values for unigrams already in the results.
     ///   It helps to prevent duplicated unigrams. Please note that the method
     ///   has a side effect that it inserts values to `insertedValues`.
-    const vector<Unigram> filterAndTransformUnigrams(const vector<Unigram> unigrams,
-        const std::unordered_set<string>& excludedValues,
-        std::unordered_set<string>& insertedValues);
+    const std::vector<Formosa::Gramambular::Unigram> filterAndTransformUnigrams(const std::vector<Formosa::Gramambular::Unigram> unigrams,
+        const std::unordered_set<std::string>& excludedValues,
+        std::unordered_set<std::string>& insertedValues);
 
     ParselessLM m_languageModel;
     UserPhrasesLM m_userPhrases;
@@ -127,7 +124,7 @@ protected:
     AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
     bool m_externalConverterEnabled;
-    std::function<string(string)> m_externalConverter;
+    std::function<std::string(std::string)> m_externalConverter;
 };
 };
 

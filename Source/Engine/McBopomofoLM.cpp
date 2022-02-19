@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <iterator>
 
-using namespace McBopomofo;
+namespace McBopomofo {
 
 McBopomofoLM::McBopomofoLM()
 {
@@ -87,43 +87,43 @@ void McBopomofoLM::loadPhraseReplacementMap(const char* phraseReplacementPath)
     }
 }
 
-const vector<Bigram> McBopomofoLM::bigramsForKeys(const string& preceedingKey, const string& key)
+const std::vector<Formosa::Gramambular::Bigram> McBopomofoLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
 {
-    return vector<Bigram>();
+    return std::vector<Formosa::Gramambular::Bigram>();
 }
 
-const vector<Unigram> McBopomofoLM::unigramsForKey(const string& key)
+const std::vector<Formosa::Gramambular::Unigram> McBopomofoLM::unigramsForKey(const std::string& key)
 {
     if (key == " ") {
-        vector<Unigram> spaceUnigrams;
-        Unigram g;
+        std::vector<Formosa::Gramambular::Unigram> spaceUnigrams;
+        Formosa::Gramambular::Unigram g;
         g.keyValue.key = " ";
-        g.keyValue.value= " ";
+        g.keyValue.value = " ";
         g.score = 0;
         spaceUnigrams.push_back(g);
         return spaceUnigrams;
     }
 
-    vector<Unigram> allUnigrams;
-    vector<Unigram> userUnigrams;
+    std::vector<Formosa::Gramambular::Unigram> allUnigrams;
+    std::vector<Formosa::Gramambular::Unigram> userUnigrams;
 
-    unordered_set<string> excludedValues;
-    unordered_set<string> insertedValues;
+    std::unordered_set<std::string> excludedValues;
+    std::unordered_set<std::string> insertedValues;
 
     if (m_excludedPhrases.hasUnigramsForKey(key)) {
-        vector<Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
+        std::vector<Formosa::Gramambular::Unigram> excludedUnigrams = m_excludedPhrases.unigramsForKey(key);
         transform(excludedUnigrams.begin(), excludedUnigrams.end(),
             inserter(excludedValues, excludedValues.end()),
-            [](const Unigram& u) { return u.keyValue.value; });
+            [](const Formosa::Gramambular::Unigram& u) { return u.keyValue.value; });
     }
 
     if (m_userPhrases.hasUnigramsForKey(key)) {
-        vector<Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
+        std::vector<Formosa::Gramambular::Unigram> rawUserUnigrams = m_userPhrases.unigramsForKey(key);
         userUnigrams = filterAndTransformUnigrams(rawUserUnigrams, excludedValues, insertedValues);
     }
 
     if (m_languageModel.hasUnigramsForKey(key)) {
-        vector<Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
+        std::vector<Formosa::Gramambular::Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
@@ -131,7 +131,7 @@ const vector<Unigram> McBopomofoLM::unigramsForKey(const string& key)
     return allUnigrams;
 }
 
-bool McBopomofoLM::hasUnigramsForKey(const string& key)
+bool McBopomofoLM::hasUnigramsForKey(const std::string& key)
 {
     if (key == " ") {
         return true;
@@ -164,36 +164,36 @@ bool McBopomofoLM::externalConverterEnabled()
     return m_externalConverterEnabled;
 }
 
-void McBopomofoLM::setExternalConverter(std::function<string(string)> externalConverter)
+void McBopomofoLM::setExternalConverter(std::function<std::string(std::string)> externalConverter)
 {
     m_externalConverter = externalConverter;
 }
 
-const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(const vector<Unigram> unigrams, const unordered_set<string>& excludedValues, unordered_set<string>& insertedValues)
+const std::vector<Formosa::Gramambular::Unigram> McBopomofoLM::filterAndTransformUnigrams(const std::vector<Formosa::Gramambular::Unigram> unigrams, const std::unordered_set<std::string>& excludedValues, std::unordered_set<std::string>& insertedValues)
 {
-    vector<Unigram> results;
+    std::vector<Formosa::Gramambular::Unigram> results;
 
     for (auto&& unigram : unigrams) {
         // excludedValues filters out the unigrams with the original value.
         // insertedValues filters out the ones with the converted value
-        string originalValue = unigram.keyValue.value;
+        std::string originalValue = unigram.keyValue.value;
         if (excludedValues.find(originalValue) != excludedValues.end()) {
             continue;
         }
 
-        string value = originalValue;
+        std::string value = originalValue;
         if (m_phraseReplacementEnabled) {
-            string replacement = m_phraseReplacement.valueForKey(value);
+            std::string replacement = m_phraseReplacement.valueForKey(value);
             if (replacement != "") {
                 value = replacement;
             }
         }
         if (m_externalConverterEnabled && m_externalConverter) {
-            string replacement = m_externalConverter(value);
+            std::string replacement = m_externalConverter(value);
             value = replacement;
         }
         if (insertedValues.find(value) == insertedValues.end()) {
-            Unigram g;
+            Formosa::Gramambular::Unigram g;
             g.keyValue.value = value;
             g.keyValue.key = unigram.keyValue.key;
             g.score = unigram.score;
@@ -204,12 +204,14 @@ const vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(const vector<Unig
     return results;
 }
 
-const vector<std::string> McBopomofoLM::associatedPhrasesForKey(const string& key)
+const std::vector<std::string> McBopomofoLM::associatedPhrasesForKey(const std::string& key)
 {
     return m_associatedPhrases.valuesForKey(key);
 }
 
-bool McBopomofoLM::hasAssociatedPhrasesForKey(const string& key)
+bool McBopomofoLM::hasAssociatedPhrasesForKey(const std::string& key)
 {
     return m_associatedPhrases.hasValuesForKey(key);
 }
+
+} // namespace McBopomofo

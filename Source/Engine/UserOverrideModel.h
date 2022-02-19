@@ -32,35 +32,40 @@
 
 namespace McBopomofo {
 
-using namespace Formosa::Gramambular;
-
 class UserOverrideModel {
 public:
     UserOverrideModel(size_t capacity, double decayConstant);
 
-    void observe(const std::vector<NodeAnchor>& walkedNodes,
-                 size_t cursorIndex,
-                 const string& candidate,
-                 double timestamp);
+    void observe(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+        size_t cursorIndex,
+        const std::string& candidate,
+        double timestamp);
 
-    string suggest(const std::vector<NodeAnchor>& walkedNodes,
-                   size_t cursorIndex,
-                   double timestamp);
+    std::string suggest(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+        size_t cursorIndex,
+        double timestamp);
 
 private:
     struct Override {
         size_t count;
         double timestamp;
 
-        Override() : count(0), timestamp(0.0) {}
+        Override()
+            : count(0)
+            , timestamp(0.0)
+        {
+        }
     };
 
     struct Observation {
         size_t count;
         std::map<std::string, Override> overrides;
 
-        Observation() : count(0) {}
-        void update(const string& candidate, double timestamp);
+        Observation()
+            : count(0)
+        {
+        }
+        void update(const std::string& candidate, double timestamp);
     };
 
     typedef std::pair<std::string, Observation> KeyObservationPair;
@@ -71,7 +76,6 @@ private:
     std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
 };
 
-};   // namespace McBopomofo
+}; // namespace McBopomofo
 
 #endif
-
