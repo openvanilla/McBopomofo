@@ -25,8 +25,10 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef NodeAnchor_h
-#define NodeAnchor_h
+#ifndef NODEANCHOR_H_
+#define NODEANCHOR_H_
+
+#include <vector>
 
 #include "Node.h"
 

@@ -35,9 +35,9 @@ std::string Grid::dumpDOT() {
   sst << "graph [ rankdir=LR ];" << std::endl;
   sst << "BOS;" << std::endl;
 
-  for (unsigned long p = 0; p < m_spans.size(); p++) {
+  for (size_t p = 0; p < m_spans.size(); p++) {
     Span& span = m_spans[p];
-    for (unsigned long ni = 0; ni <= span.maximumLength(); ni++) {
+    for (size_t ni = 0; ni <= span.maximumLength(); ni++) {
       Node* np = span.nodeOfLength(ni);
       if (np) {
         if (!p) {
@@ -48,7 +48,7 @@ std::string Grid::dumpDOT() {
 
         if (p + ni < m_spans.size()) {
           Span& dstSpan = m_spans[p + ni];
-          for (unsigned long q = 0; q <= dstSpan.maximumLength(); q++) {
+          for (size_t q = 0; q <= dstSpan.maximumLength(); q++) {
             Node* dn = dstSpan.nodeOfLength(q);
             if (dn) {
               sst << np->currentKeyValue().value << " -> "

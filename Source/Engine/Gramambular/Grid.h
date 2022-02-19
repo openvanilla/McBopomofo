@@ -25,10 +25,12 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Grid_h
-#define Grid_h
+#ifndef GRID_H_
+#define GRID_H_
 
 #include <map>
+#include <string>
+#include <vector>
 
 #include "NodeAnchor.h"
 #include "Span.h"
@@ -198,7 +200,6 @@ inline NodeAnchor Grid::fixNodeSelectedCandidate(size_t location,
         const_cast<Node*>(nodeAnchor.node)->selectCandidateAtIndex(i);
         node = nodeAnchor;
         break;
-        ;
       }
     }
   }

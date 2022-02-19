@@ -25,9 +25,10 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef LanguageModel_h
-#define LanguageModel_h
+#ifndef LANGUAGEMODEL_H_
+#define LANGUAGEMODEL_H_
 
+#include <string>
 #include <vector>
 
 #include "Bigram.h"

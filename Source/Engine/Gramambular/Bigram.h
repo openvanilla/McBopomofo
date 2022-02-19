@@ -25,8 +25,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Bigram_h
-#define Bigram_h
+#ifndef BIGRAM_H_
+#define BIGRAM_H_
 
 #include <vector>
 

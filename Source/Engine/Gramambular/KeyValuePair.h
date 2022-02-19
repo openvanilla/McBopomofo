@@ -25,8 +25,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef KeyValuePair_h
-#define KeyValuePair_h
+#ifndef KEYVALUEPAIR_H_
+#define KEYVALUEPAIR_H_
 
 #include <ostream>
 #include <string>

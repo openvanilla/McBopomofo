@@ -25,8 +25,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Unigram_h
-#define Unigram_h
+#ifndef UNIGRAM_H_
+#define UNIGRAM_H_
 
 #include <vector>
 

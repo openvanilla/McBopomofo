@@ -25,9 +25,10 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef BlockReadingBuilder_h
-#define BlockReadingBuilder_h
+#ifndef BLOCKREADINGBUILDER_H_
+#define BLOCKREADINGBUILDER_H_
 
+#include <string>
 #include <vector>
 
 #include "Grid.h"
@@ -38,7 +39,7 @@ namespace Gramambular {
 
 class BlockReadingBuilder {
  public:
-  BlockReadingBuilder(LanguageModel* lm);
+  explicit BlockReadingBuilder(LanguageModel* lm);
   void clear();
 
   size_t length() const;

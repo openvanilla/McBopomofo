@@ -25,8 +25,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Gramambular_h
-#define Gramambular_h
+#ifndef GRAMAMBULAR_H_
+#define GRAMAMBULAR_H_
 
 #include "Bigram.h"
 #include "BlockReadingBuilder.h"

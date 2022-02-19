@@ -25,10 +25,12 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Node_h
-#define Node_h
+#ifndef NODE_H_
+#define NODE_H_
 
 #include <limits>
+#include <map>
+#include <string>
 #include <vector>
 
 #include "LanguageModel.h"
@@ -53,7 +55,7 @@ class Node {
 
   const std::string& key() const;
   double score() const;
-  double scoreForCandidate(std::string& candidate) const;
+  double scoreForCandidate(const std::string& candidate) const;
   const KeyValuePair currentKeyValue() const;
   double highestUnigramScore() const;
 
@@ -190,7 +192,7 @@ inline const std::string& Node::key() const { return m_key; }
 
 inline double Node::score() const { return m_score; }
 
-inline double Node::scoreForCandidate(std::string& candidate) const {
+inline double Node::scoreForCandidate(const std::string& candidate) const {
   for (auto unigram : m_unigrams) {
     if (unigram.keyValue.value == candidate) {
       return unigram.score;

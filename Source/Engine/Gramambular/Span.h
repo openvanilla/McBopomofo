@@ -25,8 +25,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Span_h
-#define Span_h
+#ifndef SPAN_H_
+#define SPAN_H_
 
 #include <map>
 #include <set>

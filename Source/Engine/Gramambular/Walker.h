@@ -25,10 +25,11 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef Walker_h
-#define Walker_h
+#ifndef WALKER_H_
+#define WALKER_H_
 
 #include <algorithm>
+#include <vector>
 
 #include "Grid.h"
 
@@ -37,7 +38,7 @@ namespace Gramambular {
 
 class Walker {
  public:
-  Walker(Grid* inGrid);
+  explicit Walker(Grid* inGrid);
   const std::vector<NodeAnchor> reverseWalk(size_t location,
                                             double accumulatedScore = 0.0);
 
