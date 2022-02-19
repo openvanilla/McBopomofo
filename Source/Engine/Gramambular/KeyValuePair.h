@@ -33,18 +33,18 @@
 
 namespace Formosa {
 namespace Gramambular {
-using namespace std;
 
 class KeyValuePair {
  public:
-  string key;
-  string value;
+  std::string key;
+  std::string value;
 
   bool operator==(const KeyValuePair& inAnother) const;
   bool operator<(const KeyValuePair& inAnother) const;
 };
 
-inline ostream& operator<<(ostream& inStream, const KeyValuePair& inPair) {
+inline std::ostream& operator<<(std::ostream& inStream,
+                                const KeyValuePair& inPair) {
   inStream << "(" << inPair.key << "," << inPair.value << ")";
   return inStream;
 }

@@ -48,7 +48,7 @@ class Span {
   size_t maximumLength() const;
 
  protected:
-  map<size_t, Node> m_lengthNodeMap;
+  std::map<size_t, Node> m_lengthNodeMap;
   size_t m_maximumLength;
 };
 
@@ -72,9 +72,9 @@ inline void Span::removeNodeOfLengthGreaterThan(size_t inLength) {
   }
 
   size_t max = 0;
-  set<size_t> removeSet;
-  for (map<size_t, Node>::iterator i = m_lengthNodeMap.begin(),
-                                   e = m_lengthNodeMap.end();
+  std::set<size_t> removeSet;
+  for (std::map<size_t, Node>::iterator i = m_lengthNodeMap.begin(),
+                                        e = m_lengthNodeMap.end();
        i != e; ++i) {
     if ((*i).first > inLength) {
       removeSet.insert((*i).first);
@@ -85,8 +85,8 @@ inline void Span::removeNodeOfLengthGreaterThan(size_t inLength) {
     }
   }
 
-  for (set<size_t>::iterator i = removeSet.begin(), e = removeSet.end(); i != e;
-       ++i) {
+  for (std::set<size_t>::iterator i = removeSet.begin(), e = removeSet.end();
+       i != e; ++i) {
     m_lengthNodeMap.erase(*i);
   }
 
@@ -94,7 +94,7 @@ inline void Span::removeNodeOfLengthGreaterThan(size_t inLength) {
 }
 
 inline Node* Span::nodeOfLength(size_t inLength) {
-  map<size_t, Node>::iterator f = m_lengthNodeMap.find(inLength);
+  std::map<size_t, Node>::iterator f = m_lengthNodeMap.find(inLength);
   return f == m_lengthNodeMap.end() ? 0 : &(*f).second;
 }
 

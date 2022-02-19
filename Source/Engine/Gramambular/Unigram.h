@@ -47,20 +47,21 @@ class Unigram {
   static bool ScoreCompare(const Unigram& a, const Unigram& b);
 };
 
-inline ostream& operator<<(ostream& inStream, const Unigram& inGram) {
-  streamsize p = inStream.precision();
+inline std::ostream& operator<<(std::ostream& inStream, const Unigram& inGram) {
+  std::streamsize p = inStream.precision();
   inStream.precision(6);
   inStream << "(" << inGram.keyValue << "," << inGram.score << ")";
   inStream.precision(p);
   return inStream;
 }
 
-inline ostream& operator<<(ostream& inStream, const vector<Unigram>& inGrams) {
+inline std::ostream& operator<<(std::ostream& inStream,
+                                const std::vector<Unigram>& inGrams) {
   inStream << "[" << inGrams.size() << "]=>{";
 
   size_t index = 0;
 
-  for (vector<Unigram>::const_iterator gi = inGrams.begin();
+  for (std::vector<Unigram>::const_iterator gi = inGrams.begin();
        gi != inGrams.end(); ++gi, ++index) {
     inStream << index << "=>";
     inStream << *gi;

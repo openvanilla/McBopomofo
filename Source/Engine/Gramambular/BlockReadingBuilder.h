@@ -35,7 +35,6 @@
 
 namespace Formosa {
 namespace Gramambular {
-using namespace std;
 
 class BlockReadingBuilder {
  public:
@@ -45,35 +44,35 @@ class BlockReadingBuilder {
   size_t length() const;
   size_t cursorIndex() const;
   void setCursorIndex(size_t inNewIndex);
-  void insertReadingAtCursor(const string& inReading);
+  void insertReadingAtCursor(const std::string& inReading);
   bool deleteReadingBeforeCursor();  // backspace
   bool deleteReadingAfterCursor();   // delete
 
   bool removeHeadReadings(size_t count);
 
-  void setJoinSeparator(const string& separator);
-  const string joinSeparator() const;
+  void setJoinSeparator(const std::string& separator);
+  const std::string joinSeparator() const;
 
-  vector<string> readings() const;
+  std::vector<std::string> readings() const;
 
   Grid& grid();
 
  protected:
   void build();
 
-  static const string Join(vector<string>::const_iterator begin,
-                           vector<string>::const_iterator end,
-                           const string& separator);
+  static const std::string Join(std::vector<std::string>::const_iterator begin,
+                                std::vector<std::string>::const_iterator end,
+                                const std::string& separator);
 
   //最多使用六個字組成一個詞
   static const size_t MaximumBuildSpanLength = 6;
 
   size_t m_cursorIndex;
-  vector<string> m_readings;
+  std::vector<std::string> m_readings;
 
   Grid m_grid;
   LanguageModel* m_LM;
-  string m_joinSeparator;
+  std::string m_joinSeparator;
 };
 
 inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel* inLM)
@@ -95,7 +94,7 @@ inline void BlockReadingBuilder::setCursorIndex(size_t inNewIndex) {
 }
 
 inline void BlockReadingBuilder::insertReadingAtCursor(
-    const string& inReading) {
+    const std::string& inReading) {
   m_readings.insert(m_readings.begin() + m_cursorIndex, inReading);
 
   m_grid.expandGridByOneAtLocation(m_cursorIndex);
@@ -103,7 +102,7 @@ inline void BlockReadingBuilder::insertReadingAtCursor(
   m_cursorIndex++;
 }
 
-inline vector<string> BlockReadingBuilder::readings() const {
+inline std::vector<std::string> BlockReadingBuilder::readings() const {
   return m_readings;
 }
 
@@ -149,11 +148,12 @@ inline bool BlockReadingBuilder::removeHeadReadings(size_t count) {
   return true;
 }
 
-inline void BlockReadingBuilder::setJoinSeparator(const string& separator) {
+inline void BlockReadingBuilder::setJoinSeparator(
+    const std::string& separator) {
   m_joinSeparator = separator;
 }
 
-inline const string BlockReadingBuilder::joinSeparator() const {
+inline const std::string BlockReadingBuilder::joinSeparator() const {
   return m_joinSeparator;
 }
 
@@ -179,14 +179,14 @@ inline void BlockReadingBuilder::build() {
 
   for (size_t p = begin; p < end; p++) {
     for (size_t q = 1; q <= MaximumBuildSpanLength && p + q <= end; q++) {
-      string combinedReading = Join(
+      std::string combinedReading = Join(
           m_readings.begin() + p, m_readings.begin() + p + q, m_joinSeparator);
       if (!m_grid.hasNodeAtLocationSpanningLengthMatchingKey(p, q,
                                                              combinedReading)) {
-        vector<Unigram> unigrams = m_LM->unigramsForKey(combinedReading);
+        std::vector<Unigram> unigrams = m_LM->unigramsForKey(combinedReading);
 
         if (unigrams.size() > 0) {
-          Node n(combinedReading, unigrams, vector<Bigram>());
+          Node n(combinedReading, unigrams, std::vector<Bigram>());
           m_grid.insertNode(n, p, q);
         }
       }
@@ -194,11 +194,12 @@ inline void BlockReadingBuilder::build() {
   }
 }
 
-inline const string BlockReadingBuilder::Join(
-    vector<string>::const_iterator begin, vector<string>::const_iterator end,
-    const string& separator) {
-  string result;
-  for (vector<string>::const_iterator iter = begin; iter != end;) {
+inline const std::string BlockReadingBuilder::Join(
+    std::vector<std::string>::const_iterator begin,
+    std::vector<std::string>::const_iterator end,
+    const std::string& separator) {
+  std::string result;
+  for (std::vector<std::string>::const_iterator iter = begin; iter != end;) {
     result += *iter;
     ++iter;
     if (iter != end) {

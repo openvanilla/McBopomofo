@@ -36,16 +36,14 @@
 namespace Formosa {
 namespace Gramambular {
 
-using namespace std;
-
 class LanguageModel {
  public:
   virtual ~LanguageModel() {}
 
-  virtual const vector<Bigram> bigramsForKeys(const string& preceedingKey,
-                                              const string& key) = 0;
-  virtual const vector<Unigram> unigramsForKey(const string& key) = 0;
-  virtual bool hasUnigramsForKey(const string& key) = 0;
+  virtual const std::vector<Bigram> bigramsForKeys(
+      const std::string& preceedingKey, const std::string& key) = 0;
+  virtual const std::vector<Unigram> unigramsForKey(const std::string& key) = 0;
+  virtual bool hasUnigramsForKey(const std::string& key) = 0;
 };
 }  // namespace Gramambular
 }  // namespace Formosa

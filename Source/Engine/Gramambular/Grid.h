@@ -43,34 +43,35 @@ class Grid {
                   size_t inSpanningLength);
   bool hasNodeAtLocationSpanningLengthMatchingKey(size_t inLocation,
                                                   size_t inSpanningLength,
-                                                  const string& inKey);
+                                                  const std::string& inKey);
 
   void expandGridByOneAtLocation(size_t inLocation);
   void shrinkGridByOneAtLocation(size_t inLocation);
 
   size_t width() const;
-  vector<NodeAnchor> nodesEndingAt(size_t inLocation);
-  vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
+  std::vector<NodeAnchor> nodesEndingAt(size_t inLocation);
+  std::vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
 
   // "Freeze" the node with the unigram that represents the selected candidate
   // value. After this, the node that contains the unigram will always be
   // evaluated to that unigram, while all other overlapping nodes will be reset
   // to their initial state (that is, if any of those nodes were "frozen" or
   // fixed, they will be unfrozen.)
-  NodeAnchor fixNodeSelectedCandidate(size_t location, const string& value);
+  NodeAnchor fixNodeSelectedCandidate(size_t location,
+                                      const std::string& value);
 
   // Similar to fixNodeSelectedCandidate, but instead of "freezing" the node,
   // only boost the unigram that represents the value with an overriding score.
   // This has the same side effect as fixNodeSelectedCandidate, which is that
   // all other overlapping nodes will be reset to their initial state.
   void overrideNodeScoreForSelectedCandidate(size_t location,
-                                             const string& value,
+                                             const std::string& value,
                                              float overridingScore);
 
-  const string dumpDOT();
+  const std::string dumpDOT();
 
  protected:
-  vector<Span> m_spans;
+  std::vector<Span> m_spans;
 };
 
 inline void Grid::clear() { m_spans.clear(); }
@@ -89,7 +90,7 @@ inline void Grid::insertNode(const Node& inNode, size_t inLocation,
 }
 
 inline bool Grid::hasNodeAtLocationSpanningLengthMatchingKey(
-    size_t inLocation, size_t inSpanningLength, const string& inKey) {
+    size_t inLocation, size_t inSpanningLength, const std::string& inKey) {
   if (inLocation > m_spans.size()) {
     return false;
   }
@@ -128,8 +129,8 @@ inline void Grid::shrinkGridByOneAtLocation(size_t inLocation) {
 
 inline size_t Grid::width() const { return m_spans.size(); }
 
-inline vector<NodeAnchor> Grid::nodesEndingAt(size_t inLocation) {
-  vector<NodeAnchor> result;
+inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t inLocation) {
+  std::vector<NodeAnchor> result;
 
   if (m_spans.size() && inLocation <= m_spans.size()) {
     for (size_t i = 0; i < inLocation; i++) {
@@ -151,8 +152,9 @@ inline vector<NodeAnchor> Grid::nodesEndingAt(size_t inLocation) {
   return result;
 }
 
-inline vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t inLocation) {
-  vector<NodeAnchor> result;
+inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(
+    size_t inLocation) {
+  std::vector<NodeAnchor> result;
 
   if (m_spans.size() && inLocation <= m_spans.size()) {
     for (size_t i = 0; i < inLocation; i++) {
@@ -184,8 +186,8 @@ inline vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t inLocation) {
 // For nodes found at the location, fix their currently-selected candidate using
 // the supplied string value.
 inline NodeAnchor Grid::fixNodeSelectedCandidate(size_t location,
-                                                 const string& value) {
-  vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+                                                 const std::string& value) {
+  std::vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
   NodeAnchor node;
   for (auto nodeAnchor : nodes) {
     auto candidates = nodeAnchor.node->candidates();
@@ -205,10 +207,9 @@ inline NodeAnchor Grid::fixNodeSelectedCandidate(size_t location,
   return node;
 }
 
-inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location,
-                                                        const string& value,
-                                                        float overridingScore) {
-  vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+inline void Grid::overrideNodeScoreForSelectedCandidate(
+    size_t location, const std::string& value, float overridingScore) {
+  std::vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
   for (auto nodeAnchor : nodes) {
     auto candidates = nodeAnchor.node->candidates();
 
@@ -225,11 +226,11 @@ inline void Grid::overrideNodeScoreForSelectedCandidate(size_t location,
   }
 }
 
-inline const string Grid::dumpDOT() {
-  stringstream sst;
-  sst << "digraph {" << endl;
-  sst << "graph [ rankdir=LR ];" << endl;
-  sst << "BOS;" << endl;
+inline const std::string Grid::dumpDOT() {
+  std::stringstream sst;
+  sst << "digraph {" << std::endl;
+  sst << "graph [ rankdir=LR ];" << std::endl;
+  sst << "BOS;" << std::endl;
 
   for (size_t p = 0; p < m_spans.size(); p++) {
     Span& span = m_spans[p];
@@ -237,10 +238,10 @@ inline const string Grid::dumpDOT() {
       Node* np = span.nodeOfLength(ni);
       if (np) {
         if (!p) {
-          sst << "BOS -> " << np->currentKeyValue().value << ";" << endl;
+          sst << "BOS -> " << np->currentKeyValue().value << ";" << std::endl;
         }
 
-        sst << np->currentKeyValue().value << ";" << endl;
+        sst << np->currentKeyValue().value << ";" << std::endl;
 
         if (p + ni < m_spans.size()) {
           Span& dstSpan = m_spans[p + ni];
@@ -248,20 +249,20 @@ inline const string Grid::dumpDOT() {
             Node* dn = dstSpan.nodeOfLength(q);
             if (dn) {
               sst << np->currentKeyValue().value << " -> "
-                  << dn->currentKeyValue().value << ";" << endl;
+                  << dn->currentKeyValue().value << ";" << std::endl;
             }
           }
         }
 
         if (p + ni == m_spans.size()) {
           sst << np->currentKeyValue().value << " -> "
-              << "EOS;" << endl;
+              << "EOS;" << std::endl;
         }
       }
     }
   }
 
-  sst << "EOS;" << endl;
+  sst << "EOS;" << std::endl;
   sst << "}";
   return sst.str();
 }

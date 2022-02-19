@@ -31,6 +31,9 @@
 #include "Gramambular.h"
 #include "gtest/gtest.h"
 
+namespace Formosa {
+namespace Gramambular {
+
 const char* SampleData = R"(
 #
 # The sample is from libtabe (http://sourceforge.net/projects/libtabe/)
@@ -120,25 +123,22 @@ const char* SampleData = R"(
 ㄍㄠㄎㄜㄐㄧˋ 高科技 -9.842421
 )";
 
-using namespace std;
-using namespace Formosa::Gramambular;
-
 class SimpleLM : public LanguageModel {
  public:
   SimpleLM(const char* input, bool swapKeyValue = false) {
-    stringstream sstream(input);
+    std::stringstream sstream(input);
     while (sstream.good()) {
-      string line;
+      std::string line;
       getline(sstream, line);
 
       if (!line.size() || (line.size() && line[0] == '#')) {
         continue;
       }
 
-      stringstream linestream(line);
-      string col0;
-      string col1;
-      string col2;
+      std::stringstream linestream(line);
+      std::string col0;
+      std::string col1;
+      std::string col2;
       linestream >> col0;
       linestream >> col1;
       linestream >> col2;
@@ -159,23 +159,25 @@ class SimpleLM : public LanguageModel {
     }
   }
 
-  const vector<Bigram> bigramsForKeys(const string& preceedingKey,
-                                      const string& key) override {
-    return vector<Bigram>();
+  const std::vector<Bigram> bigramsForKeys(const std::string& preceedingKey,
+                                           const std::string& key) override {
+    return std::vector<Bigram>();
   }
 
-  const vector<Unigram> unigramsForKey(const string& key) override {
-    map<string, vector<Unigram> >::const_iterator f = m_db.find(key);
-    return f == m_db.end() ? vector<Unigram>() : (*f).second;
+  const std::vector<Unigram> unigramsForKey(const std::string& key) override {
+    std::map<std::string, std::vector<Unigram> >::const_iterator f =
+        m_db.find(key);
+    return f == m_db.end() ? std::vector<Unigram>() : (*f).second;
   }
 
-  bool hasUnigramsForKey(const string& key) override {
-    map<string, vector<Unigram> >::const_iterator f = m_db.find(key);
+  bool hasUnigramsForKey(const std::string& key) override {
+    std::map<std::string, std::vector<Unigram> >::const_iterator f =
+        m_db.find(key);
     return f != m_db.end();
   }
 
  protected:
-  map<string, vector<Unigram> > m_db;
+  std::map<std::string, std::vector<Unigram> > m_db;
 };
 
 TEST(GramambularTest, InputTest) {
@@ -200,15 +202,17 @@ TEST(GramambularTest, InputTest) {
 
   Walker walker(&builder.grid());
 
-  vector<NodeAnchor> walked = walker.reverseWalk(builder.grid().width(), 0.0);
+  std::vector<NodeAnchor> walked =
+      walker.reverseWalk(builder.grid().width(), 0.0);
   reverse(walked.begin(), walked.end());
 
-  vector<string> composed;
-  for (vector<NodeAnchor>::iterator wi = walked.begin(); wi != walked.end();
-       ++wi) {
+  std::vector<std::string> composed;
+  for (std::vector<NodeAnchor>::iterator wi = walked.begin();
+       wi != walked.end(); ++wi) {
     composed.push_back((*wi).node->currentKeyValue().value);
   }
-  ASSERT_EQ(composed, (vector<string>{"高科技", "公司", "的", "年中", "獎金"}));
+  ASSERT_EQ(composed,
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
 }
 
 TEST(GramambularTest, WordSegmentationTest) {
@@ -226,14 +230,18 @@ TEST(GramambularTest, WordSegmentationTest) {
   builder2.insertReadingAtCursor("金");
   Walker walker2(&builder2.grid());
 
-  vector<NodeAnchor> walked = walker2.reverseWalk(builder2.grid().width(), 0.0);
+  std::vector<NodeAnchor> walked =
+      walker2.reverseWalk(builder2.grid().width(), 0.0);
   reverse(walked.begin(), walked.end());
 
-  vector<string> segmented;
-  for (vector<NodeAnchor>::iterator wi = walked.begin(); wi != walked.end();
-       ++wi) {
+  std::vector<std::string> segmented;
+  for (std::vector<NodeAnchor>::iterator wi = walked.begin();
+       wi != walked.end(); ++wi) {
     segmented.push_back((*wi).node->currentKeyValue().key);
   }
   ASSERT_EQ(segmented,
-            (vector<string>{"高科技", "公司", "的", "年終", "獎金"}));
+            (std::vector<std::string>{"高科技", "公司", "的", "年終", "獎金"}));
 }
+
+}  // namespace Gramambular
+}  // namespace Formosa

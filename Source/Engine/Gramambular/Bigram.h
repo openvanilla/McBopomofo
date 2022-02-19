@@ -46,8 +46,8 @@ class Bigram {
   bool operator<(const Bigram& inAnother) const;
 };
 
-inline ostream& operator<<(ostream& inStream, const Bigram& inGram) {
-  streamsize p = inStream.precision();
+inline std::ostream& operator<<(std::ostream& inStream, const Bigram& inGram) {
+  std::streamsize p = inStream.precision();
   inStream.precision(6);
   inStream << "(" << inGram.keyValue << "|" << inGram.preceedingKeyValue << ","
            << inGram.score << ")";
@@ -55,13 +55,14 @@ inline ostream& operator<<(ostream& inStream, const Bigram& inGram) {
   return inStream;
 }
 
-inline ostream& operator<<(ostream& inStream, const vector<Bigram>& inGrams) {
+inline std::ostream& operator<<(std::ostream& inStream,
+                                const std::vector<Bigram>& inGrams) {
   inStream << "[" << inGrams.size() << "]=>{";
 
   size_t index = 0;
 
-  for (vector<Bigram>::const_iterator gi = inGrams.begin(); gi != inGrams.end();
-       ++gi, ++index) {
+  for (std::vector<Bigram>::const_iterator gi = inGrams.begin();
+       gi != inGrams.end(); ++gi, ++index) {
     inStream << index << "=>";
     inStream << *gi;
     if (gi + 1 != inGrams.end()) {

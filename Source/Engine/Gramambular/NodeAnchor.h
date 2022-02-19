@@ -44,7 +44,8 @@ class NodeAnchor {
 inline NodeAnchor::NodeAnchor()
     : node(0), location(0), spanningLength(0), accumulatedScore(0.0) {}
 
-inline ostream& operator<<(ostream& inStream, const NodeAnchor& inAnchor) {
+inline std::ostream& operator<<(std::ostream& inStream,
+                                const NodeAnchor& inAnchor) {
   inStream << "{@(" << inAnchor.location << "," << inAnchor.spanningLength
            << "),";
   if (inAnchor.node) {
@@ -56,9 +57,9 @@ inline ostream& operator<<(ostream& inStream, const NodeAnchor& inAnchor) {
   return inStream;
 }
 
-inline ostream& operator<<(ostream& inStream,
-                           const vector<NodeAnchor>& inAnchor) {
-  for (vector<NodeAnchor>::const_iterator i = inAnchor.begin();
+inline std::ostream& operator<<(std::ostream& inStream,
+                                const std::vector<NodeAnchor>& inAnchor) {
+  for (std::vector<NodeAnchor>::const_iterator i = inAnchor.begin();
        i != inAnchor.end(); ++i) {
     inStream << *i;
     if (i + 1 != inAnchor.end()) {
