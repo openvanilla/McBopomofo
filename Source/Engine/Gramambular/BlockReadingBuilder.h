@@ -38,13 +38,13 @@ namespace Gramambular {
 
 class BlockReadingBuilder {
  public:
-  BlockReadingBuilder(LanguageModel* inLM);
+  BlockReadingBuilder(LanguageModel* lm);
   void clear();
 
   size_t length() const;
   size_t cursorIndex() const;
-  void setCursorIndex(size_t inNewIndex);
-  void insertReadingAtCursor(const std::string& inReading);
+  void setCursorIndex(size_t newIndex);
+  void insertReadingAtCursor(const std::string& reading);
   bool deleteReadingBeforeCursor();  // backspace
   bool deleteReadingAfterCursor();   // delete
 
@@ -64,7 +64,7 @@ class BlockReadingBuilder {
                                 std::vector<std::string>::const_iterator end,
                                 const std::string& separator);
 
-  //最多使用六個字組成一個詞
+  // 最多使用六個字組成一個詞
   static const size_t MaximumBuildSpanLength = 6;
 
   size_t m_cursorIndex;
@@ -75,8 +75,8 @@ class BlockReadingBuilder {
   std::string m_joinSeparator;
 };
 
-inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel* inLM)
-    : m_LM(inLM), m_cursorIndex(0) {}
+inline BlockReadingBuilder::BlockReadingBuilder(LanguageModel* lm)
+    : m_LM(lm), m_cursorIndex(0) {}
 
 inline void BlockReadingBuilder::clear() {
   m_cursorIndex = 0;
@@ -88,14 +88,13 @@ inline size_t BlockReadingBuilder::length() const { return m_readings.size(); }
 
 inline size_t BlockReadingBuilder::cursorIndex() const { return m_cursorIndex; }
 
-inline void BlockReadingBuilder::setCursorIndex(size_t inNewIndex) {
-  m_cursorIndex =
-      inNewIndex > m_readings.size() ? m_readings.size() : inNewIndex;
+inline void BlockReadingBuilder::setCursorIndex(size_t newIndex) {
+  m_cursorIndex = newIndex > m_readings.size() ? m_readings.size() : newIndex;
 }
 
 inline void BlockReadingBuilder::insertReadingAtCursor(
-    const std::string& inReading) {
-  m_readings.insert(m_readings.begin() + m_cursorIndex, inReading);
+    const std::string& reading) {
+  m_readings.insert(m_readings.begin() + m_cursorIndex, reading);
 
   m_grid.expandGridByOneAtLocation(m_cursorIndex);
   build();

@@ -39,18 +39,17 @@ namespace Gramambular {
 class Grid {
  public:
   void clear();
-  void insertNode(const Node& inNode, size_t inLocation,
-                  size_t inSpanningLength);
-  bool hasNodeAtLocationSpanningLengthMatchingKey(size_t inLocation,
-                                                  size_t inSpanningLength,
-                                                  const std::string& inKey);
+  void insertNode(const Node& node, size_t location, size_t spanningLength);
+  bool hasNodeAtLocationSpanningLengthMatchingKey(size_t location,
+                                                  size_t spanningLength,
+                                                  const std::string& key);
 
-  void expandGridByOneAtLocation(size_t inLocation);
-  void shrinkGridByOneAtLocation(size_t inLocation);
+  void expandGridByOneAtLocation(size_t location);
+  void shrinkGridByOneAtLocation(size_t location);
 
   size_t width() const;
-  std::vector<NodeAnchor> nodesEndingAt(size_t inLocation);
-  std::vector<NodeAnchor> nodesCrossingOrEndingAt(size_t inLocation);
+  std::vector<NodeAnchor> nodesEndingAt(size_t location);
+  std::vector<NodeAnchor> nodesCrossingOrEndingAt(size_t location);
 
   // "Freeze" the node with the unigram that represents the selected candidate
   // value. After this, the node that contains the unigram will always be
@@ -76,72 +75,72 @@ class Grid {
 
 inline void Grid::clear() { m_spans.clear(); }
 
-inline void Grid::insertNode(const Node& inNode, size_t inLocation,
-                             size_t inSpanningLength) {
-  if (inLocation >= m_spans.size()) {
-    size_t diff = inLocation - m_spans.size() + 1;
+inline void Grid::insertNode(const Node& node, size_t location,
+                             size_t spanningLength) {
+  if (location >= m_spans.size()) {
+    size_t diff = location - m_spans.size() + 1;
 
     for (size_t i = 0; i < diff; i++) {
       m_spans.push_back(Span());
     }
   }
 
-  m_spans[inLocation].insertNodeOfLength(inNode, inSpanningLength);
+  m_spans[location].insertNodeOfLength(node, spanningLength);
 }
 
 inline bool Grid::hasNodeAtLocationSpanningLengthMatchingKey(
-    size_t inLocation, size_t inSpanningLength, const std::string& inKey) {
-  if (inLocation > m_spans.size()) {
+    size_t location, size_t spanningLength, const std::string& key) {
+  if (location > m_spans.size()) {
     return false;
   }
 
-  const Node* n = m_spans[inLocation].nodeOfLength(inSpanningLength);
+  const Node* n = m_spans[location].nodeOfLength(spanningLength);
   if (!n) {
     return false;
   }
 
-  return inKey == n->key();
+  return key == n->key();
 }
 
-inline void Grid::expandGridByOneAtLocation(size_t inLocation) {
-  if (!inLocation || inLocation == m_spans.size()) {
-    m_spans.insert(m_spans.begin() + inLocation, Span());
+inline void Grid::expandGridByOneAtLocation(size_t location) {
+  if (!location || location == m_spans.size()) {
+    m_spans.insert(m_spans.begin() + location, Span());
   } else {
-    m_spans.insert(m_spans.begin() + inLocation, Span());
-    for (size_t i = 0; i < inLocation; i++) {
+    m_spans.insert(m_spans.begin() + location, Span());
+    for (size_t i = 0; i < location; i++) {
       // zaps overlapping spans
-      m_spans[i].removeNodeOfLengthGreaterThan(inLocation - i);
+      m_spans[i].removeNodeOfLengthGreaterThan(location - i);
     }
   }
 }
 
-inline void Grid::shrinkGridByOneAtLocation(size_t inLocation) {
-  if (inLocation >= m_spans.size()) {
+inline void Grid::shrinkGridByOneAtLocation(size_t location) {
+  if (location >= m_spans.size()) {
     return;
   }
 
-  m_spans.erase(m_spans.begin() + inLocation);
-  for (size_t i = 0; i < inLocation; i++) {
+  m_spans.erase(m_spans.begin() + location);
+  for (size_t i = 0; i < location; i++) {
     // zaps overlapping spans
-    m_spans[i].removeNodeOfLengthGreaterThan(inLocation - i);
+    m_spans[i].removeNodeOfLengthGreaterThan(location - i);
   }
 }
 
 inline size_t Grid::width() const { return m_spans.size(); }
 
-inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t inLocation) {
+inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t location) {
   std::vector<NodeAnchor> result;
 
-  if (m_spans.size() && inLocation <= m_spans.size()) {
-    for (size_t i = 0; i < inLocation; i++) {
+  if (m_spans.size() && location <= m_spans.size()) {
+    for (size_t i = 0; i < location; i++) {
       Span& span = m_spans[i];
-      if (i + span.maximumLength() >= inLocation) {
-        Node* np = span.nodeOfLength(inLocation - i);
+      if (i + span.maximumLength() >= location) {
+        Node* np = span.nodeOfLength(location - i);
         if (np) {
           NodeAnchor na;
           na.node = np;
           na.location = i;
-          na.spanningLength = inLocation - i;
+          na.spanningLength = location - i;
 
           result.push_back(na);
         }
@@ -152,17 +151,16 @@ inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t inLocation) {
   return result;
 }
 
-inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(
-    size_t inLocation) {
+inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t location) {
   std::vector<NodeAnchor> result;
 
-  if (m_spans.size() && inLocation <= m_spans.size()) {
-    for (size_t i = 0; i < inLocation; i++) {
+  if (m_spans.size() && location <= m_spans.size()) {
+    for (size_t i = 0; i < location; i++) {
       Span& span = m_spans[i];
 
-      if (i + span.maximumLength() >= inLocation) {
+      if (i + span.maximumLength() >= location) {
         for (size_t j = 1, m = span.maximumLength(); j <= m; j++) {
-          if (i + j < inLocation) {
+          if (i + j < location) {
             continue;
           }
 
@@ -171,7 +169,7 @@ inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(
             NodeAnchor na;
             na.node = np;
             na.location = i;
-            na.spanningLength = inLocation - i;
+            na.spanningLength = location - i;
 
             result.push_back(na);
           }

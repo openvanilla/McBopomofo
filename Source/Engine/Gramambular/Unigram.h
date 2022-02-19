@@ -34,6 +34,7 @@
 
 namespace Formosa {
 namespace Gramambular {
+
 class Unigram {
  public:
   Unigram();
@@ -41,50 +42,50 @@ class Unigram {
   KeyValuePair keyValue;
   double score;
 
-  bool operator==(const Unigram& inAnother) const;
-  bool operator<(const Unigram& inAnother) const;
+  bool operator==(const Unigram& another) const;
+  bool operator<(const Unigram& another) const;
 
   static bool ScoreCompare(const Unigram& a, const Unigram& b);
 };
 
-inline std::ostream& operator<<(std::ostream& inStream, const Unigram& inGram) {
-  std::streamsize p = inStream.precision();
-  inStream.precision(6);
-  inStream << "(" << inGram.keyValue << "," << inGram.score << ")";
-  inStream.precision(p);
-  return inStream;
+inline std::ostream& operator<<(std::ostream& stream, const Unigram& gram) {
+  std::streamsize p = stream.precision();
+  stream.precision(6);
+  stream << "(" << gram.keyValue << "," << gram.score << ")";
+  stream.precision(p);
+  return stream;
 }
 
-inline std::ostream& operator<<(std::ostream& inStream,
-                                const std::vector<Unigram>& inGrams) {
-  inStream << "[" << inGrams.size() << "]=>{";
+inline std::ostream& operator<<(std::ostream& stream,
+                                const std::vector<Unigram>& grams) {
+  stream << "[" << grams.size() << "]=>{";
 
   size_t index = 0;
 
-  for (std::vector<Unigram>::const_iterator gi = inGrams.begin();
-       gi != inGrams.end(); ++gi, ++index) {
-    inStream << index << "=>";
-    inStream << *gi;
-    if (gi + 1 != inGrams.end()) {
-      inStream << ",";
+  for (std::vector<Unigram>::const_iterator gi = grams.begin();
+       gi != grams.end(); ++gi, ++index) {
+    stream << index << "=>";
+    stream << *gi;
+    if (gi + 1 != grams.end()) {
+      stream << ",";
     }
   }
 
-  inStream << "}";
-  return inStream;
+  stream << "}";
+  return stream;
 }
 
 inline Unigram::Unigram() : score(0.0) {}
 
-inline bool Unigram::operator==(const Unigram& inAnother) const {
-  return keyValue == inAnother.keyValue && score == inAnother.score;
+inline bool Unigram::operator==(const Unigram& another) const {
+  return keyValue == another.keyValue && score == another.score;
 }
 
-inline bool Unigram::operator<(const Unigram& inAnother) const {
-  if (keyValue < inAnother.keyValue) {
+inline bool Unigram::operator<(const Unigram& another) const {
+  if (keyValue < another.keyValue) {
     return true;
-  } else if (keyValue == inAnother.keyValue) {
-    return score < inAnother.score;
+  } else if (keyValue == another.keyValue) {
+    return score < another.score;
   }
   return false;
 }

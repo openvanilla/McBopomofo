@@ -42,53 +42,53 @@ class Bigram {
   KeyValuePair keyValue;
   double score;
 
-  bool operator==(const Bigram& inAnother) const;
-  bool operator<(const Bigram& inAnother) const;
+  bool operator==(const Bigram& another) const;
+  bool operator<(const Bigram& another) const;
 };
 
-inline std::ostream& operator<<(std::ostream& inStream, const Bigram& inGram) {
-  std::streamsize p = inStream.precision();
-  inStream.precision(6);
-  inStream << "(" << inGram.keyValue << "|" << inGram.preceedingKeyValue << ","
-           << inGram.score << ")";
-  inStream.precision(p);
-  return inStream;
+inline std::ostream& operator<<(std::ostream& stream, const Bigram& gram) {
+  std::streamsize p = stream.precision();
+  stream.precision(6);
+  stream << "(" << gram.keyValue << "|" << gram.preceedingKeyValue << ","
+         << gram.score << ")";
+  stream.precision(p);
+  return stream;
 }
 
-inline std::ostream& operator<<(std::ostream& inStream,
-                                const std::vector<Bigram>& inGrams) {
-  inStream << "[" << inGrams.size() << "]=>{";
+inline std::ostream& operator<<(std::ostream& stream,
+                                const std::vector<Bigram>& grams) {
+  stream << "[" << grams.size() << "]=>{";
 
   size_t index = 0;
 
-  for (std::vector<Bigram>::const_iterator gi = inGrams.begin();
-       gi != inGrams.end(); ++gi, ++index) {
-    inStream << index << "=>";
-    inStream << *gi;
-    if (gi + 1 != inGrams.end()) {
-      inStream << ",";
+  for (std::vector<Bigram>::const_iterator gi = grams.begin();
+       gi != grams.end(); ++gi, ++index) {
+    stream << index << "=>";
+    stream << *gi;
+    if (gi + 1 != grams.end()) {
+      stream << ",";
     }
   }
 
-  inStream << "}";
-  return inStream;
+  stream << "}";
+  return stream;
 }
 
 inline Bigram::Bigram() : score(0.0) {}
 
-inline bool Bigram::operator==(const Bigram& inAnother) const {
-  return preceedingKeyValue == inAnother.preceedingKeyValue &&
-         keyValue == inAnother.keyValue && score == inAnother.score;
+inline bool Bigram::operator==(const Bigram& another) const {
+  return preceedingKeyValue == another.preceedingKeyValue &&
+         keyValue == another.keyValue && score == another.score;
 }
 
-inline bool Bigram::operator<(const Bigram& inAnother) const {
-  if (preceedingKeyValue < inAnother.preceedingKeyValue) {
+inline bool Bigram::operator<(const Bigram& another) const {
+  if (preceedingKeyValue < another.preceedingKeyValue) {
     return true;
-  } else if (preceedingKeyValue == inAnother.preceedingKeyValue) {
-    if (keyValue < inAnother.keyValue) {
+  } else if (preceedingKeyValue == another.preceedingKeyValue) {
+    if (keyValue < another.keyValue) {
       return true;
-    } else if (keyValue == inAnother.keyValue) {
-      return score < inAnother.score;
+    } else if (keyValue == another.keyValue) {
+      return score < another.score;
     }
     return false;
   }

@@ -39,15 +39,15 @@ namespace Gramambular {
 class Node {
  public:
   Node();
-  Node(const std::string& inKey, const std::vector<Unigram>& inUnigrams,
-       const std::vector<Bigram>& inBigrams);
+  Node(const std::string& key, const std::vector<Unigram>& unigrams,
+       const std::vector<Bigram>& bigrams);
 
   void primeNodeWithPreceedingKeyValues(
-      const std::vector<KeyValuePair>& inKeyValues);
+      const std::vector<KeyValuePair>& keyValues);
 
   bool isCandidateFixed() const;
   const std::vector<KeyValuePair>& candidates() const;
-  void selectCandidateAtIndex(size_t inIndex = 0, bool inFix = true);
+  void selectCandidateAtIndex(size_t index = 0, bool fix = true);
   void resetCandidate();
   void selectFloatingCandidateAtIndex(size_t index, double score);
 
@@ -71,25 +71,24 @@ class Node {
   bool m_candidateFixed;
   size_t m_selectedUnigramIndex;
 
-  friend std::ostream& operator<<(std::ostream& inStream, const Node& inNode);
+  friend std::ostream& operator<<(std::ostream& stream, const Node& node);
 };
 
-inline std::ostream& operator<<(std::ostream& inStream, const Node& inNode) {
-  inStream << "(node,key:" << inNode.m_key
-           << ",fixed:" << (inNode.m_candidateFixed ? "true" : "false")
-           << ",selected:" << inNode.m_selectedUnigramIndex << ","
-           << inNode.m_unigrams << ")";
-  return inStream;
+inline std::ostream& operator<<(std::ostream& stream, const Node& node) {
+  stream << "(node,key:" << node.m_key
+         << ",fixed:" << (node.m_candidateFixed ? "true" : "false")
+         << ",selected:" << node.m_selectedUnigramIndex << ","
+         << node.m_unigrams << ")";
+  return stream;
 }
 
 inline Node::Node()
     : m_candidateFixed(false), m_selectedUnigramIndex(0), m_score(0.0) {}
 
-inline Node::Node(const std::string& inKey,
-                  const std::vector<Unigram>& inUnigrams,
-                  const std::vector<Bigram>& inBigrams)
-    : m_key(inKey),
-      m_unigrams(inUnigrams),
+inline Node::Node(const std::string& key, const std::vector<Unigram>& unigrams,
+                  const std::vector<Bigram>& bigrams)
+    : m_key(key),
+      m_unigrams(unigrams),
       m_candidateFixed(false),
       m_selectedUnigramIndex(0),
       m_score(0.0) {
@@ -108,20 +107,20 @@ inline Node::Node(const std::string& inKey,
     m_candidates.push_back((*ui).keyValue);
   }
 
-  for (std::vector<Bigram>::const_iterator bi = inBigrams.begin();
-       bi != inBigrams.end(); ++bi) {
+  for (std::vector<Bigram>::const_iterator bi = bigrams.begin();
+       bi != bigrams.end(); ++bi) {
     m_preceedingGramBigramMap[(*bi).preceedingKeyValue].push_back(*bi);
   }
 }
 
 inline void Node::primeNodeWithPreceedingKeyValues(
-    const std::vector<KeyValuePair>& inKeyValues) {
+    const std::vector<KeyValuePair>& keyValues) {
   size_t newIndex = m_selectedUnigramIndex;
   double max = m_score;
 
   if (!isCandidateFixed()) {
-    for (std::vector<KeyValuePair>::const_iterator kvi = inKeyValues.begin();
-         kvi != inKeyValues.end(); ++kvi) {
+    for (std::vector<KeyValuePair>::const_iterator kvi = keyValues.begin();
+         kvi != keyValues.end(); ++kvi) {
       std::map<KeyValuePair, std::vector<Bigram> >::const_iterator f =
           m_preceedingGramBigramMap.find(*kvi);
       if (f != m_preceedingGramBigramMap.end()) {
@@ -158,14 +157,14 @@ inline const std::vector<KeyValuePair>& Node::candidates() const {
   return m_candidates;
 }
 
-inline void Node::selectCandidateAtIndex(size_t inIndex, bool inFix) {
-  if (inIndex >= m_unigrams.size()) {
+inline void Node::selectCandidateAtIndex(size_t index, bool fix) {
+  if (index >= m_unigrams.size()) {
     m_selectedUnigramIndex = 0;
   } else {
-    m_selectedUnigramIndex = inIndex;
+    m_selectedUnigramIndex = index;
   }
 
-  m_candidateFixed = inFix;
+  m_candidateFixed = fix;
   m_score = 99;
 }
 

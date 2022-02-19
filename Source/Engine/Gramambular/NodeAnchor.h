@@ -32,42 +32,37 @@
 
 namespace Formosa {
 namespace Gramambular {
-class NodeAnchor {
- public:
-  NodeAnchor();
-  const Node* node;
-  size_t location;
-  size_t spanningLength;
-  double accumulatedScore;
+
+struct NodeAnchor {
+  const Node* node = nullptr;
+  size_t location = 0;
+  size_t spanningLength = 0;
+  double accumulatedScore = 0.0;
 };
 
-inline NodeAnchor::NodeAnchor()
-    : node(0), location(0), spanningLength(0), accumulatedScore(0.0) {}
-
-inline std::ostream& operator<<(std::ostream& inStream,
-                                const NodeAnchor& inAnchor) {
-  inStream << "{@(" << inAnchor.location << "," << inAnchor.spanningLength
-           << "),";
-  if (inAnchor.node) {
-    inStream << *(inAnchor.node);
+inline std::ostream& operator<<(std::ostream& stream,
+                                const NodeAnchor& anchor) {
+  stream << "{@(" << anchor.location << "," << anchor.spanningLength << "),";
+  if (anchor.node) {
+    stream << *(anchor.node);
   } else {
-    inStream << "null";
+    stream << "null";
   }
-  inStream << "}";
-  return inStream;
+  stream << "}";
+  return stream;
 }
 
-inline std::ostream& operator<<(std::ostream& inStream,
-                                const std::vector<NodeAnchor>& inAnchor) {
-  for (std::vector<NodeAnchor>::const_iterator i = inAnchor.begin();
-       i != inAnchor.end(); ++i) {
-    inStream << *i;
-    if (i + 1 != inAnchor.end()) {
-      inStream << "<-";
+inline std::ostream& operator<<(std::ostream& stream,
+                                const std::vector<NodeAnchor>& anchor) {
+  for (std::vector<NodeAnchor>::const_iterator i = anchor.begin();
+       i != anchor.end(); ++i) {
+    stream << *i;
+    if (i + 1 != anchor.end()) {
+      stream << "<-";
     }
   }
 
-  return inStream;
+  return stream;
 }
 }  // namespace Gramambular
 }  // namespace Formosa

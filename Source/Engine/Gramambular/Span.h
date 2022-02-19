@@ -38,36 +38,32 @@ namespace Formosa {
 namespace Gramambular {
 class Span {
  public:
-  Span();
-
   void clear();
-  void insertNodeOfLength(const Node& inNode, size_t inLength);
-  void removeNodeOfLengthGreaterThan(size_t inLength);
+  void insertNodeOfLength(const Node& node, size_t length);
+  void removeNodeOfLengthGreaterThan(size_t length);
 
-  Node* nodeOfLength(size_t inLength);
+  Node* nodeOfLength(size_t length);
   size_t maximumLength() const;
 
  protected:
   std::map<size_t, Node> m_lengthNodeMap;
-  size_t m_maximumLength;
+  size_t m_maximumLength = 0;
 };
-
-inline Span::Span() : m_maximumLength(0) {}
 
 inline void Span::clear() {
   m_lengthNodeMap.clear();
   m_maximumLength = 0;
 }
 
-inline void Span::insertNodeOfLength(const Node& inNode, size_t inLength) {
-  m_lengthNodeMap[inLength] = inNode;
-  if (inLength > m_maximumLength) {
-    m_maximumLength = inLength;
+inline void Span::insertNodeOfLength(const Node& node, size_t length) {
+  m_lengthNodeMap[length] = node;
+  if (length > m_maximumLength) {
+    m_maximumLength = length;
   }
 }
 
-inline void Span::removeNodeOfLengthGreaterThan(size_t inLength) {
-  if (inLength > m_maximumLength) {
+inline void Span::removeNodeOfLengthGreaterThan(size_t length) {
+  if (length > m_maximumLength) {
     return;
   }
 
@@ -76,7 +72,7 @@ inline void Span::removeNodeOfLengthGreaterThan(size_t inLength) {
   for (std::map<size_t, Node>::iterator i = m_lengthNodeMap.begin(),
                                         e = m_lengthNodeMap.end();
        i != e; ++i) {
-    if ((*i).first > inLength) {
+    if ((*i).first > length) {
       removeSet.insert((*i).first);
     } else {
       if ((*i).first > max) {
@@ -93,8 +89,8 @@ inline void Span::removeNodeOfLengthGreaterThan(size_t inLength) {
   m_maximumLength = max;
 }
 
-inline Node* Span::nodeOfLength(size_t inLength) {
-  std::map<size_t, Node>::iterator f = m_lengthNodeMap.find(inLength);
+inline Node* Span::nodeOfLength(size_t length) {
+  std::map<size_t, Node>::iterator f = m_lengthNodeMap.find(length);
   return f == m_lengthNodeMap.end() ? 0 : &(*f).second;
 }
 

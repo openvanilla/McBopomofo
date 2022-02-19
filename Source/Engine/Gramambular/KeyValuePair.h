@@ -39,25 +39,25 @@ class KeyValuePair {
   std::string key;
   std::string value;
 
-  bool operator==(const KeyValuePair& inAnother) const;
-  bool operator<(const KeyValuePair& inAnother) const;
+  bool operator==(const KeyValuePair& another) const;
+  bool operator<(const KeyValuePair& another) const;
 };
 
-inline std::ostream& operator<<(std::ostream& inStream,
-                                const KeyValuePair& inPair) {
-  inStream << "(" << inPair.key << "," << inPair.value << ")";
-  return inStream;
+inline std::ostream& operator<<(std::ostream& stream,
+                                const KeyValuePair& pair) {
+  stream << "(" << pair.key << "," << pair.value << ")";
+  return stream;
 }
 
-inline bool KeyValuePair::operator==(const KeyValuePair& inAnother) const {
-  return key == inAnother.key && value == inAnother.value;
+inline bool KeyValuePair::operator==(const KeyValuePair& another) const {
+  return key == another.key && value == another.value;
 }
 
-inline bool KeyValuePair::operator<(const KeyValuePair& inAnother) const {
-  if (key < inAnother.key) {
+inline bool KeyValuePair::operator<(const KeyValuePair& another) const {
+  if (key < another.key) {
     return true;
-  } else if (key == inAnother.key) {
-    return value < inAnother.value;
+  } else if (key == another.key) {
+    return value < another.value;
   }
   return false;
 }
