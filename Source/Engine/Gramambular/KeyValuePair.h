@@ -32,40 +32,36 @@
 #include <string>
 
 namespace Formosa {
-  namespace Gramambular {
-      using namespace std;
-      
-      class KeyValuePair {
-      public:
-          string key;
-          string value;
+namespace Gramambular {
+using namespace std;
 
-          bool operator==(const KeyValuePair& inAnother) const;
-          bool operator<(const KeyValuePair& inAnother) const;
-      };
+class KeyValuePair {
+ public:
+  string key;
+  string value;
 
-      inline ostream& operator<<(ostream& inStream, const KeyValuePair& inPair)
-      {
-          inStream << "(" << inPair.key << "," << inPair.value << ")";
-          return inStream;
-      }
-      
-      inline bool KeyValuePair::operator==(const KeyValuePair& inAnother) const
-      {
-          return key == inAnother.key && value == inAnother.value;
-      }
+  bool operator==(const KeyValuePair& inAnother) const;
+  bool operator<(const KeyValuePair& inAnother) const;
+};
 
-      inline bool KeyValuePair::operator<(const KeyValuePair& inAnother) const
-      {
-          if (key < inAnother.key) {
-              return true;
-          }
-          else if (key == inAnother.key) {
-              return value < inAnother.value;
-          }
-          return false;
-      }      
-  }
+inline ostream& operator<<(ostream& inStream, const KeyValuePair& inPair) {
+  inStream << "(" << inPair.key << "," << inPair.value << ")";
+  return inStream;
 }
+
+inline bool KeyValuePair::operator==(const KeyValuePair& inAnother) const {
+  return key == inAnother.key && value == inAnother.value;
+}
+
+inline bool KeyValuePair::operator<(const KeyValuePair& inAnother) const {
+  if (key < inAnother.key) {
+    return true;
+  } else if (key == inAnother.key) {
+    return value < inAnother.value;
+  }
+  return false;
+}
+}  // namespace Gramambular
+}  // namespace Formosa
 
 #endif

@@ -21,14 +21,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include "gtest/gtest.h"
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <map>
-#include <vector>
-#include <cstdlib>
 #include <sstream>
+#include <vector>
+
 #include "Gramambular.h"
+#include "gtest/gtest.h"
 
 const char* SampleData = R"(
 #
@@ -122,11 +123,9 @@ const char* SampleData = R"(
 using namespace std;
 using namespace Formosa::Gramambular;
 
-class SimpleLM : public LanguageModel
-{
+class SimpleLM : public LanguageModel {
  public:
-  SimpleLM(const char* input, bool swapKeyValue = false)
-  {
+  SimpleLM(const char* input, bool swapKeyValue = false) {
     stringstream sstream(input);
     while (sstream.good()) {
       string line;
@@ -149,8 +148,7 @@ class SimpleLM : public LanguageModel
       if (swapKeyValue) {
         u.keyValue.key = col1;
         u.keyValue.value = col0;
-      }
-      else {
+      } else {
         u.keyValue.key = col0;
         u.keyValue.value = col1;
       }
@@ -161,19 +159,17 @@ class SimpleLM : public LanguageModel
     }
   }
 
-  const vector<Bigram> bigramsForKeys(const string &preceedingKey, const string& key) override
-  {
+  const vector<Bigram> bigramsForKeys(const string& preceedingKey,
+                                      const string& key) override {
     return vector<Bigram>();
   }
 
-  const vector<Unigram> unigramsForKey(const string &key) override
-  {
+  const vector<Unigram> unigramsForKey(const string& key) override {
     map<string, vector<Unigram> >::const_iterator f = m_db.find(key);
     return f == m_db.end() ? vector<Unigram>() : (*f).second;
   }
 
-  bool hasUnigramsForKey(const string& key) override
-  {
+  bool hasUnigramsForKey(const string& key) override {
     map<string, vector<Unigram> >::const_iterator f = m_db.find(key);
     return f != m_db.end();
   }
@@ -208,7 +204,8 @@ TEST(GramambularTest, InputTest) {
   reverse(walked.begin(), walked.end());
 
   vector<string> composed;
-  for (vector<NodeAnchor>::iterator wi = walked.begin() ; wi != walked.end() ; ++wi) {
+  for (vector<NodeAnchor>::iterator wi = walked.begin(); wi != walked.end();
+       ++wi) {
     composed.push_back((*wi).node->currentKeyValue().value);
   }
   ASSERT_EQ(composed, (vector<string>{"高科技", "公司", "的", "年中", "獎金"}));
@@ -233,8 +230,10 @@ TEST(GramambularTest, WordSegmentationTest) {
   reverse(walked.begin(), walked.end());
 
   vector<string> segmented;
-  for (vector<NodeAnchor>::iterator wi = walked.begin(); wi != walked.end(); ++wi) {
+  for (vector<NodeAnchor>::iterator wi = walked.begin(); wi != walked.end();
+       ++wi) {
     segmented.push_back((*wi).node->currentKeyValue().key);
   }
-  ASSERT_EQ(segmented, (vector<string>{"高科技", "公司", "的", "年終", "獎金"}));
+  ASSERT_EQ(segmented,
+            (vector<string>{"高科技", "公司", "的", "年終", "獎金"}));
 }

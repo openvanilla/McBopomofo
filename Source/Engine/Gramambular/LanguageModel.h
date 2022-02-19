@@ -29,24 +29,25 @@
 #define LanguageModel_h
 
 #include <vector>
+
 #include "Bigram.h"
 #include "Unigram.h"
 
 namespace Formosa {
-    namespace Gramambular {
-        
-        using namespace std;
-        
-        class LanguageModel {
-        public:
-            virtual ~LanguageModel() {}
+namespace Gramambular {
 
-            virtual const vector<Bigram> bigramsForKeys(const string &preceedingKey, const string& key) = 0;
-            virtual const vector<Unigram> unigramsForKey(const string &key) = 0;
-            virtual bool hasUnigramsForKey(const string& key) = 0;
-        };
-    }
-}
+using namespace std;
 
+class LanguageModel {
+ public:
+  virtual ~LanguageModel() {}
+
+  virtual const vector<Bigram> bigramsForKeys(const string& preceedingKey,
+                                              const string& key) = 0;
+  virtual const vector<Unigram> unigramsForKey(const string& key) = 0;
+  virtual bool hasUnigramsForKey(const string& key) = 0;
+};
+}  // namespace Gramambular
+}  // namespace Formosa
 
 #endif

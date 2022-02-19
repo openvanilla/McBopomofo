@@ -29,63 +29,65 @@
 #define Walker_h
 
 #include <algorithm>
+
 #include "Grid.h"
 
 namespace Formosa {
-    namespace Gramambular {
-        using namespace std;
+namespace Gramambular {
+using namespace std;
 
-        class Walker {
-        public:
-            Walker(Grid* inGrid);
-            const vector<NodeAnchor> reverseWalk(size_t inLocation, double inAccumulatedScore = 0.0);            
-            
-        protected:
-            Grid* m_grid;
-        };
-        
-        inline Walker::Walker(Grid* inGrid)
-            : m_grid(inGrid)
-        {
-        }
-        
-        inline const vector<NodeAnchor> Walker::reverseWalk(size_t inLocation, double inAccumulatedScore)
-        {
-            if (!inLocation || inLocation > m_grid->width()) {
-                return vector<NodeAnchor>();
-            }
-            
-            vector<vector<NodeAnchor> > paths;
+class Walker {
+ public:
+  Walker(Grid* inGrid);
+  const vector<NodeAnchor> reverseWalk(size_t inLocation,
+                                       double inAccumulatedScore = 0.0);
 
-            vector<NodeAnchor> nodes = m_grid->nodesEndingAt(inLocation);
-            
-            for (vector<NodeAnchor>::iterator ni = nodes.begin() ; ni != nodes.end() ; ++ni) {
-                if (!(*ni).node) {
-                    continue;
-                }
+ protected:
+  Grid* m_grid;
+};
 
-                (*ni).accumulatedScore = inAccumulatedScore + (*ni).node->score();
+inline Walker::Walker(Grid* inGrid) : m_grid(inGrid) {}
 
-                vector<NodeAnchor> path = reverseWalk(inLocation - (*ni).spanningLength, (*ni).accumulatedScore);
-                path.insert(path.begin(), *ni);
-                
-                paths.push_back(path);
-            }
-            
-            if (!paths.size()) {
-                return vector<NodeAnchor>();
-            }
-            
-            vector<NodeAnchor>* result = &*(paths.begin());
-            for (vector<vector<NodeAnchor> >::iterator pi = paths.begin() ; pi != paths.end() ; ++pi) {                
-                if ((*pi).back().accumulatedScore > result->back().accumulatedScore) {
-                    result = &*pi;
-                }
-            }
-            
-            return *result;
-        }
+inline const vector<NodeAnchor> Walker::reverseWalk(size_t inLocation,
+                                                    double inAccumulatedScore) {
+  if (!inLocation || inLocation > m_grid->width()) {
+    return vector<NodeAnchor>();
+  }
+
+  vector<vector<NodeAnchor> > paths;
+
+  vector<NodeAnchor> nodes = m_grid->nodesEndingAt(inLocation);
+
+  for (vector<NodeAnchor>::iterator ni = nodes.begin(); ni != nodes.end();
+       ++ni) {
+    if (!(*ni).node) {
+      continue;
     }
+
+    (*ni).accumulatedScore = inAccumulatedScore + (*ni).node->score();
+
+    vector<NodeAnchor> path =
+        reverseWalk(inLocation - (*ni).spanningLength, (*ni).accumulatedScore);
+    path.insert(path.begin(), *ni);
+
+    paths.push_back(path);
+  }
+
+  if (!paths.size()) {
+    return vector<NodeAnchor>();
+  }
+
+  vector<NodeAnchor>* result = &*(paths.begin());
+  for (vector<vector<NodeAnchor> >::iterator pi = paths.begin();
+       pi != paths.end(); ++pi) {
+    if ((*pi).back().accumulatedScore > result->back().accumulatedScore) {
+      result = &*pi;
+    }
+  }
+
+  return *result;
 }
+}  // namespace Gramambular
+}  // namespace Formosa
 
 #endif
