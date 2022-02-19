@@ -32,7 +32,7 @@ using namespace std;
 using namespace McBopomofo;
 
 static const int kUserOverrideModelCapacity = 500;
-static const double kObservedOverrideHalflife = 5400.0;  // 1.5 hr.
+static const double kObservedOverrideHalflife = 5400.0; // 1.5 hr.
 
 static McBopomofoLM gLanguageModelMcBopomofo;
 static McBopomofoLM gLanguageModelPlainBopomofo;
@@ -104,7 +104,7 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
 
 + (void)setupDataModelValueConverter
 {
-    auto converter = [] (string input) {
+    auto converter = [](string input) {
         if (!Preferences.chineseConversionEnabled) {
             return input;
         }
@@ -116,8 +116,7 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
         NSString *text = [NSString stringWithUTF8String:input.c_str()];
         if (Preferences.chineseConversionEngine == 1) {
             text = [VXHanConvert convertToSimplifiedFrom:text];
-        }
-        else {
+        } else {
             text = [OpenCCBridge convertToSimplified:text];
         }
         return string(text.UTF8String);
@@ -198,7 +197,7 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
     string unigramKey = string(key.UTF8String);
     vector<Unigram> unigrams = gLanguageModelMcBopomofo.unigramsForKey(unigramKey);
     string userPhraseString = string(userPhrase.UTF8String);
-    for (auto unigram: unigrams) {
+    for (auto unigram : unigrams) {
         if (unigram.keyValue.value == userPhraseString) {
             return YES;
         }
@@ -249,9 +248,9 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
     [writeFile writeData:data];
     [writeFile closeFile];
 
-//  We use FSEventStream to monitor the change of the user phrase folder,
-//  so we don't have to load data here.
-//  [self loadUserPhrases];
+    //  We use FSEventStream to monitor the change of the user phrase folder,
+    //  so we don't have to load data here.
+    //  [self loadUserPhrases];
     return YES;
 }
 
@@ -283,7 +282,7 @@ static void LTLoadAssociatedPhrases(McBopomofoLM &lm)
     return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
 }
 
- + (McBopomofoLM *)languageModelMcBopomofo
++ (McBopomofoLM *)languageModelMcBopomofo
 {
     return &gLanguageModelMcBopomofo;
 }

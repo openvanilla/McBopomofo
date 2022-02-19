@@ -29,25 +29,27 @@ extern unsigned short vxSC2TCTable[];
 const size_t vxTC2SCTableSize = 3059;
 extern unsigned short vxTC2SCTable[];
 
-struct VXHCData
-{
+struct VXHCData {
     unsigned short key, value;
 };
 
 int VXHCCompare(const void *a, const void *b)
 {
-    unsigned short x=((const struct VXHCData*)a)->key, y=((const struct VXHCData*)b)->key;
-    if (x==y) return 0;
-    if (x<y) return -1;
+    unsigned short x = ((const struct VXHCData *)a)->key, y = ((const struct VXHCData *)b)->key;
+    if (x == y)
+        return 0;
+    if (x < y)
+        return -1;
     return 1;
 }
 
 unsigned short VXHCFind(unsigned key, unsigned short *table, size_t size)
 {
     struct VXHCData k;
-    k.key=key;
-    struct VXHCData *d=(struct VXHCData*)bsearch(&k, table, size, sizeof(struct VXHCData), VXHCCompare);
-    if (!d) return 0;
+    k.key = key;
+    struct VXHCData *d = (struct VXHCData *)bsearch(&k, table, size, sizeof(struct VXHCData), VXHCCompare);
+    if (!d)
+        return 0;
     return d->value;
 }
 
@@ -66,8 +68,8 @@ unsigned short VXUCS2SimpToTradChinese(unsigned short c)
 + (NSString *)convertToSimplifiedFrom:(NSString *)string NS_SWIFT_NAME(convertToSimplified(from:))
 {
     NSData *utf16Data = [string dataUsingEncoding:NSUTF16StringEncoding];
-    unsigned short * bytes = (unsigned short *)utf16Data.bytes;
-    for(NSInteger i = 0; i < utf16Data.length; i++) {
+    unsigned short *bytes = (unsigned short *)utf16Data.bytes;
+    for (NSInteger i = 0; i < utf16Data.length; i++) {
         unsigned short c = bytes[i];
         unsigned short value = VXUCS2TradToSimpChinese(c);
         bytes[i] = value ? value : c;
@@ -79,8 +81,8 @@ unsigned short VXUCS2SimpToTradChinese(unsigned short c)
 + (NSString *)convertToTraditionalFrom:(NSString *)string NS_SWIFT_NAME(convertToTraditional(from:))
 {
     NSData *utf16Data = [string dataUsingEncoding:NSUTF16StringEncoding];
-    unsigned short * bytes = (unsigned short *)utf16Data.bytes;
-    for(NSInteger i = 0; i < utf16Data.length; i++) {
+    unsigned short *bytes = (unsigned short *)utf16Data.bytes;
+    for (NSInteger i = 0; i < utf16Data.length; i++) {
         unsigned short c = bytes[i];
         unsigned short value = VXUCS2SimpToTradChinese(c);
         bytes[i] = value ? value : c;
