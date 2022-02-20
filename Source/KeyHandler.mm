@@ -21,30 +21,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#import "Mandarin.h"
+#import "KeyHandler.h"
 #import "Gramambular.h"
+#import "LanguageModelManager+Privates.h"
+#import "Mandarin.h"
+#import "McBopomofo-Swift.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
-#import "LanguageModelManager+Privates.h"
-#import "KeyHandler.h"
-#import "McBopomofo-Swift.h"
 #import <string>
 
 @import CandidateUI;
 @import NSStringUtils;
-
-// C++ namespace usages
-using namespace std;
-using namespace Formosa::Mandarin;
-using namespace Formosa::Gramambular;
-using namespace McBopomofo;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
 
 static const double kEpsilon = 0.000001;
 
-static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) {
+static double FindHighestScore(const std::vector<Formosa::Gramambular::NodeAnchor> &nodes, double epsilon)
+{
     double highestScore = 0.0;
     for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
         double score = ni->node->highestUnigramScore();
@@ -56,10 +51,10 @@ static double FindHighestScore(const vector<NodeAnchor> &nodes, double epsilon) 
 }
 
 // sort helper
-class NodeAnchorDescendingSorter
-{
+class NodeAnchorDescendingSorter {
 public:
-    bool operator()(const NodeAnchor &a, const NodeAnchor &b) const {
+    bool operator()(const Formosa::Gramambular::NodeAnchor &a, const Formosa::Gramambular::NodeAnchor &b) const
+    {
         return a.node->key().length() > b.node->key().length();
     }
 };
@@ -70,9 +65,7 @@ public:
 static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot";
 #endif
 
-
-@implementation KeyHandler
-{
+@implementation KeyHandler {
     // the reading buffer that takes user input
     Formosa::Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
 
@@ -102,7 +95,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (void)setInputMode:(NSString *)value
 {
     NSString *newInputMode;
-    McBopomofoLM *newLanguageModel;
+    McBopomofo::McBopomofoLM *newLanguageModel;
 
     if ([value isKindOfClass:[NSString class]] && [value isEqual:InputModePlainBopomofo]) {
         newInputMode = InputModePlainBopomofo;
@@ -122,7 +115,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         if (_builder) {
             delete _builder;
-            _builder = new BlockReadingBuilder(_languageModel);
+            _builder = new Formosa::Gramambular::BlockReadingBuilder(_languageModel);
             _builder->setJoinSeparator("-");
         }
 
@@ -148,14 +141,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 {
     self = [super init];
     if (self) {
-        _bpmfReadingBuffer = new BopomofoReadingBuffer(BopomofoKeyboardLayout::StandardLayout());
+        _bpmfReadingBuffer = new Formosa::Mandarin::BopomofoReadingBuffer(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
 
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
-        _builder = new BlockReadingBuilder(_languageModel);
+        _builder = new Formosa::Gramambular::BlockReadingBuilder(_languageModel);
 
         // each Mandarin syllable is separated by a hyphen
         _builder->setJoinSeparator("-");
@@ -168,27 +161,27 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 {
     NSInteger layout = Preferences.keyboardLayout;
     switch (layout) {
-        case KeyboardLayoutStandard:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
-            break;
-        case KeyboardLayoutEten:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETenLayout());
-            break;
-        case KeyboardLayoutHsu:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HsuLayout());
-            break;
-        case KeyboardLayoutEten26:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::ETen26Layout());
-            break;
-        case KeyboardLayoutHanyuPinyin:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::HanyuPinyinLayout());
-            break;
-        case KeyboardLayoutIBM:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::IBMLayout());
-            break;
-        default:
-            _bpmfReadingBuffer->setKeyboardLayout(BopomofoKeyboardLayout::StandardLayout());
-            Preferences.keyboardLayout = KeyboardLayoutStandard;
+    case KeyboardLayoutStandard:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+        break;
+    case KeyboardLayoutEten:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::ETenLayout());
+        break;
+    case KeyboardLayoutHsu:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::HsuLayout());
+        break;
+    case KeyboardLayoutEten26:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::ETen26Layout());
+        break;
+    case KeyboardLayoutHanyuPinyin:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
+        break;
+    case KeyboardLayoutIBM:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::IBMLayout());
+        break;
+    default:
+        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+        Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
@@ -196,8 +189,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (void)fixNodeWithValue:(NSString *)value
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
-    string stringValue = [value UTF8String];
-    NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
+    std::string stringValue(value.UTF8String);
+    Formosa::Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
     if (_inputMode != InputModePlainBopomofo) {
         // If the length of the readings and the characters do not match,
         // it often means it is a special symbol and it should not be stored
@@ -218,10 +211,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
     [self _walk];
 
-    if (Preferences.selectPhraseAfterCursorAsCandidate &&
-        Preferences.moveCursorAfterSelectingCandidate) {
+    if (Preferences.selectPhraseAfterCursorAsCandidate && Preferences.moveCursorAfterSelectingCandidate) {
         size_t nextPosition = 0;
-        for (auto node: _walkedNodes) {
+        for (auto node : _walkedNodes) {
             if (nextPosition >= cursorIndex) {
                 break;
             }
@@ -240,10 +232,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     _walkedNodes.clear();
 }
 
-- (string)_currentLayout
+- (std::string)_currentLayout
 {
     NSString *keyboardLayoutName = Preferences.keyboardLayoutName;
-    string layout = string(keyboardLayoutName.UTF8String) + string("_");
+    std::string layout = std::string(keyboardLayoutName.UTF8String) + "_";
     return layout;
 }
 
@@ -260,9 +252,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
-    if (![state isKindOfClass:[InputStateNotEmpty class]] &&
-        ![state isKindOfClass:[InputStateAssociatedPhrases class]] &&
-        isFunctionKey) {
+    if (![state isKindOfClass:[InputStateNotEmpty class]] && ![state isKindOfClass:[InputStateAssociatedPhrases class]] && isFunctionKey) {
         return NO;
     }
 
@@ -321,8 +311,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
-        InputStateMarking *marking = (InputStateMarking *) state;
-        if ([self _handleMarkingState:(InputStateMarking *) state input:input stateCallback:stateCallback  errorCallback:errorCallback]) {
+        InputStateMarking *marking = (InputStateMarking *)state;
+        if ([self _handleMarkingState:(InputStateMarking *)state input:input stateCallback:stateCallback errorCallback:errorCallback]) {
             return YES;
         }
         state = [marking convertToInputting];
@@ -335,8 +325,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Handle BPMF Keys
 
     // see if it's valid BPMF reading
-    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char) charCode)) {
-        _bpmfReadingBuffer->combineKey((char) charCode);
+    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char)charCode)) {
+        _bpmfReadingBuffer->combineKey((char)charCode);
 
         // if we have a tone marker, we have to insert the reading to the
         // builder in other words, if we don't have a tone marker, we just
@@ -354,7 +344,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     composeReading |= (!_bpmfReadingBuffer->isEmpty() && (charCode == 32 || charCode == 13));
     if (composeReading) {
         // combine the reading
-        string reading = _bpmfReadingBuffer->syllable().composedString();
+        std::string reading = _bpmfReadingBuffer->syllable().composedString();
 
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
@@ -371,12 +361,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
 
         // get user override model suggestion
-        string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" :
-                _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        std::string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" : _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
             size_t cursorIndex = [self _actualCandidateCursorIndex];
-            vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+            std::vector<Formosa::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
             double highestScore = FindHighestScore(nodes, kEpsilon);
             _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, static_cast<float>(highestScore));
         }
@@ -420,16 +409,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Space and Down
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
-            [state isKindOfClass:[InputStateNotEmpty class]] &&
-            ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
+        [state isKindOfClass:[InputStateNotEmpty class]] && ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
-                    NSString *composingBuffer = [(InputStateNotEmpty*) state composingBuffer];
+                    NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
                     if (composingBuffer.length) {
                         InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-                        stateCallback (committing);
+                        stateCallback(committing);
                     }
                     [self clear];
                     InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:@" "];
@@ -444,10 +432,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                     stateCallback(inputting);
                 }
                 return YES;
-
             }
         }
-        InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:(InputStateNotEmpty *) state useVerticalMode:input.useVerticalMode];
+        InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:(InputStateNotEmpty *)state useVerticalMode:input.useVerticalMode];
         stateCallback(choosingCandidates);
         return YES;
     }
@@ -501,10 +488,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // MARK: Punctuation list
-    if ((char) charCode == '`') {
-        if (_languageModel->hasUnigramsForKey(string("_punctuation_list"))) {
+    if ((char)charCode == '`') {
+        if (_languageModel->hasUnigramsForKey("_punctuation_list")) {
             if (_bpmfReadingBuffer->isEmpty()) {
-                _builder->insertReadingAtCursor(string("_punctuation_list"));
+                _builder->insertReadingAtCursor("_punctuation_list");
                 NSString *poppedText = [self _popOverflowComposingTextAndWalk];
                 InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
                 inputting.poppedText = poppedText;
@@ -521,28 +508,28 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Punctuation
     // if nothing is matched, see if it's a punctuation key for current layout.
 
-    string punctuationNamePrefix;
+    std::string punctuationNamePrefix;
     if ([input isControlHold]) {
-        punctuationNamePrefix = string("_ctrl_punctuation_");
+        punctuationNamePrefix = "_ctrl_punctuation_";
     } else if (Preferences.halfWidthPunctuationEnabled) {
-        punctuationNamePrefix = string("_half_punctuation_");
+        punctuationNamePrefix = "_half_punctuation_";
     } else {
-        punctuationNamePrefix = string("_punctuation_");
+        punctuationNamePrefix = "_punctuation_";
     }
-    string layout = [self _currentLayout];
-    string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
+    std::string layout = [self _currentLayout];
+    std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char)charCode);
     if ([self _handlePunctuation:customPunctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
     }
 
     // if nothing is matched, see if it's a punctuation key.
-    string punctuation = punctuationNamePrefix + string(1, (char) charCode);
+    std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
     if ([self _handlePunctuation:punctuation state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
         return YES;
     }
 
-    if ([state isKindOfClass:[InputStateNotEmpty class]] && (char) charCode >= 'A' && (char) charCode <= 'Z') {
-        string letter = string("_letter_") + string(1, (char) charCode);
+    if ([state isKindOfClass:[InputStateNotEmpty class]] && (char)charCode >= 'A' && (char)charCode <= 'Z') {
+        std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
         if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
             return YES;
         }
@@ -607,7 +594,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    InputStateInputting *currentState = (InputStateInputting *) state;
+    InputStateInputting *currentState = (InputStateInputting *)state;
 
     if ([input isShiftHold]) {
         // Shift + left
@@ -645,7 +632,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    InputStateInputting *currentState = (InputStateInputting *) state;
+    InputStateInputting *currentState = (InputStateInputting *)state;
 
     if ([input isShiftHold]) {
         // Shift + Right
@@ -809,7 +796,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return YES;
 }
 
-
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
@@ -818,7 +804,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     [self clear];
 
-    InputStateInputting *current = (InputStateInputting *) state;
+    InputStateInputting *current = (InputStateInputting *)state;
     NSString *composingBuffer = current.composingBuffer;
     InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
     stateCallback(committing);
@@ -827,7 +813,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return YES;
 }
 
-- (BOOL)_handlePunctuation:(string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handlePunctuation:(std::string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (!_languageModel->hasUnigramsForKey(customPunctuation)) {
         return NO;
@@ -863,7 +849,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return YES;
 }
 
-
 - (BOOL)_handleMarkingState:(InputStateMarking *)state
                       input:(KeyHandlerInput *)input
               stateCallback:(void (^)(InputState *))stateCallback
@@ -890,7 +875,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // Shift + left
     if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
-            && ([input isShiftHold])) {
+        && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index > 0) {
             index = [state.composingBuffer previousUtf16PositionFor:index];
@@ -912,7 +897,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // Shift + Right
     if (([input isCursorForward] || input.emacsKey == McBopomofoEmacsKeyForward)
-            && ([input isShiftHold])) {
+        && ([input isShiftHold])) {
         NSUInteger index = state.markerIndex;
         if (index < state.composingBuffer.length) {
             index = [state.composingBuffer nextUtf16PositionFor:index];
@@ -933,7 +918,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     return NO;
 }
 
-
 - (BOOL)_handleCandidateState:(InputState *)state
                         input:(KeyHandlerInput *)input
                 stateCallback:(void (^)(InputState *))stateCallback
@@ -946,12 +930,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
     if (cancelCandidateKey) {
-        if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
-        }
-        else if (_inputMode == InputModePlainBopomofo) {
+        } else if (_inputMode == InputModePlainBopomofo) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -963,7 +946,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     if (charCode == 13 || [input isEnter]) {
-        if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1077,9 +1060,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     NSArray *candidates;
 
-    if ([state isKindOfClass: [InputStateChoosingCandidate class]]) {
+    if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
         candidates = [(InputStateChoosingCandidate *)state candidates];
-    } else if ([state isKindOfClass: [InputStateAssociatedPhrases class]]) {
+    } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         candidates = [(InputStateAssociatedPhrases *)state candidates];
     }
 
@@ -1131,23 +1114,22 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     if (_inputMode == InputModePlainBopomofo) {
-        string layout = [self _currentLayout];
-        string punctuationNamePrefix;
+        std::string layout = [self _currentLayout];
+        std::string punctuationNamePrefix;
         if ([input isControlHold]) {
-            punctuationNamePrefix = string("_ctrl_punctuation_");
+            punctuationNamePrefix = "_ctrl_punctuation_";
         } else if (Preferences.halfWidthPunctuationEnabled) {
-            punctuationNamePrefix = string("_half_punctuation_");
+            punctuationNamePrefix = "_half_punctuation_";
         } else {
-            punctuationNamePrefix = string("_punctuation_");
+            punctuationNamePrefix = "_punctuation_";
         }
-        string customPunctuation = punctuationNamePrefix + layout + string(1, (char) charCode);
-        string punctuation = punctuationNamePrefix + string(1, (char) charCode);
+        std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char)charCode);
+        std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
 
-        BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char) charCode) || _languageModel->hasUnigramsForKey(customPunctuation) ||
-                _languageModel->hasUnigramsForKey(punctuation);
+        BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) || _languageModel->hasUnigramsForKey(punctuation);
 
-        if (!shouldAutoSelectCandidate && (char) charCode >= 'A' && (char) charCode <= 'Z') {
-            string letter = string("_letter_") + string(1, (char) charCode);
+        if (!shouldAutoSelectCandidate && (char)charCode >= 'A' && (char)charCode <= 'Z') {
+            std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
             if (_languageModel->hasUnigramsForKey(letter)) {
                 shouldAutoSelectCandidate = YES;
             }
@@ -1187,9 +1169,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // we must do some Unicode codepoint counting to find the actual cursor location for the client
     // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
     // locations
-    for (vector<NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
+    for (std::vector<Formosa::Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
         if ((*wi).node) {
-            string nodeStr = (*wi).node->currentKeyValue().value;
+            std::string nodeStr = (*wi).node->currentKeyValue().value;
             NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
             [composingBuffer appendString:valueString];
 
@@ -1221,14 +1203,14 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                         }
                         if (builderCursorIndex == 0) {
                             tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is before \"%@\".", @""),
-                                       [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
+                                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
                         } else if (builderCursorIndex >= _builder->readings().size()) {
                             tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is after \"%@\".", @""),
-                                       [NSString stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()]];
+                                                [NSString stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()]];
                         } else {
                             tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is between \"%@\" and \"%@\".", @""),
-                                       [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()],
-                                       [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
+                                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()],
+                                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
                         }
                     }
                 }
@@ -1255,7 +1237,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
     // of the best possible Mandarain characters given the input syllables,
     // using the Viterbi algorithm implemented in the Gramambular library
-    Walker walker(&_builder->grid());
+    Formosa::Gramambular::Walker walker(&_builder->grid());
 
     // the reverse walk traces the trellis from the end
     _walkedNodes = walker.reverseWalk(_builder->grid().width());
@@ -1265,7 +1247,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
 #if DEBUG
-    string dotDump = _builder->grid().dumpDOT();
+    std::string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
 
@@ -1286,9 +1268,9 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     NSString *poppedText = @"";
     NSInteger composingBufferSize = Preferences.composingBufferSize;
 
-    if (_builder->grid().width() > (size_t) composingBufferSize) {
+    if (_builder->grid().width() > (size_t)composingBufferSize) {
         if (_walkedNodes.size() > 0) {
-            NodeAnchor &anchor = _walkedNodes[0];
+            Formosa::Gramambular::NodeAnchor &anchor = _walkedNodes[0];
             poppedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
             _builder->removeHeadReadings(anchor.spanningLength);
         }
@@ -1303,15 +1285,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     NSMutableArray *candidatesArray = [[NSMutableArray alloc] init];
 
     size_t cursorIndex = [self _actualCandidateCursorIndex];
-    vector<NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
+    std::vector<Formosa::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
 
     // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
     stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
 
     // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
-    for (vector<NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const vector<KeyValuePair> &candidates = (*ni).node->candidates();
-        for (vector<KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
+    for (std::vector<Formosa::Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
+        const std::vector<Formosa::Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
+        for (std::vector<Formosa::Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
             [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
         }
     }
@@ -1340,8 +1322,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 - (NSArray *)_currentReadings
 {
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    vector<std::string> v = _builder->readings();
-    for (vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i) {
+    std::vector<std::string> v = _builder->readings();
+    for (std::vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i) {
         [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
     }
     return readingsArray;
@@ -1349,11 +1331,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
 {
-    string cppKey = string(key.UTF8String);
+    std::string cppKey(key.UTF8String);
     if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
-        vector<string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
-        NSMutableArray <NSString *> *array = [NSMutableArray array];
-        for (auto phrase: phrases) {
+        std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
+        NSMutableArray<NSString *> *array = [NSMutableArray array];
+        for (auto phrase : phrases) {
             NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
             [array addObject:item];
         }
