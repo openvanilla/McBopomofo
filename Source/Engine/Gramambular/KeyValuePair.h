@@ -25,47 +25,43 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef KeyValuePair_h
-#define KeyValuePair_h
+#ifndef KEYVALUEPAIR_H_
+#define KEYVALUEPAIR_H_
 
 #include <ostream>
 #include <string>
 
 namespace Formosa {
-  namespace Gramambular {
-      using namespace std;
-      
-      class KeyValuePair {
-      public:
-          string key;
-          string value;
+namespace Gramambular {
 
-          bool operator==(const KeyValuePair& inAnother) const;
-          bool operator<(const KeyValuePair& inAnother) const;
-      };
+class KeyValuePair {
+ public:
+  std::string key;
+  std::string value;
 
-      inline ostream& operator<<(ostream& inStream, const KeyValuePair& inPair)
-      {
-          inStream << "(" << inPair.key << "," << inPair.value << ")";
-          return inStream;
-      }
-      
-      inline bool KeyValuePair::operator==(const KeyValuePair& inAnother) const
-      {
-          return key == inAnother.key && value == inAnother.value;
-      }
+  bool operator==(const KeyValuePair& another) const;
+  bool operator<(const KeyValuePair& another) const;
+};
 
-      inline bool KeyValuePair::operator<(const KeyValuePair& inAnother) const
-      {
-          if (key < inAnother.key) {
-              return true;
-          }
-          else if (key == inAnother.key) {
-              return value < inAnother.value;
-          }
-          return false;
-      }      
-  }
+inline std::ostream& operator<<(std::ostream& stream,
+                                const KeyValuePair& pair) {
+  stream << "(" << pair.key << "," << pair.value << ")";
+  return stream;
 }
+
+inline bool KeyValuePair::operator==(const KeyValuePair& another) const {
+  return key == another.key && value == another.value;
+}
+
+inline bool KeyValuePair::operator<(const KeyValuePair& another) const {
+  if (key < another.key) {
+    return true;
+  } else if (key == another.key) {
+    return value < another.value;
+  }
+  return false;
+}
+}  // namespace Gramambular
+}  // namespace Formosa
 
 #endif

@@ -24,6 +24,12 @@ jobs:
       - name: Run MandarinTest
         run: make runTest
         working-directory: Source/Engine/Mandarin/build
+      - name: Build GramambularTest
+        run: cmake -S . -B build
+        working-directory: Source/Engine/Gramambular
+      - name: Run GramambularTest
+        run: make runTest
+        working-directory: Source/Engine/Gramambular/build
       - name: Test McBopomofo App Bundle
         run: xcodebuild -scheme McBopomofo -configuration Debug test
       - name: Test CandidateUI

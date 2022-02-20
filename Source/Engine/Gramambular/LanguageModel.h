@@ -25,28 +25,28 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef LanguageModel_h
-#define LanguageModel_h
+#ifndef LANGUAGEMODEL_H_
+#define LANGUAGEMODEL_H_
 
+#include <string>
 #include <vector>
+
 #include "Bigram.h"
 #include "Unigram.h"
 
 namespace Formosa {
-    namespace Gramambular {
-        
-        using namespace std;
-        
-        class LanguageModel {
-        public:
-            virtual ~LanguageModel() {}
+namespace Gramambular {
 
-            virtual const vector<Bigram> bigramsForKeys(const string &preceedingKey, const string& key) = 0;
-            virtual const vector<Unigram> unigramsForKey(const string &key) = 0;
-            virtual bool hasUnigramsForKey(const string& key) = 0;
-        };
-    }
-}
+class LanguageModel {
+ public:
+  virtual ~LanguageModel() {}
 
+  virtual const std::vector<Bigram> bigramsForKeys(
+      const std::string& preceedingKey, const std::string& key) = 0;
+  virtual const std::vector<Unigram> unigramsForKey(const std::string& key) = 0;
+  virtual bool hasUnigramsForKey(const std::string& key) = 0;
+};
+}  // namespace Gramambular
+}  // namespace Formosa
 
 #endif
