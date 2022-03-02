@@ -51,7 +51,7 @@ class McBopomofoInputMethodController: IMKInputController {
 
     // MARK: -
 
-    private var currentCandidateClient: Any?
+    private var currentClient: Any?
 
     private var keyHandler: KeyHandler = KeyHandler()
     private var state: InputState = InputState.Empty()
@@ -117,7 +117,7 @@ class McBopomofoInputMethodController: IMKInputController {
         // Override the keyboard layout. Use US if not set.
         (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
         // reset the state
-        currentCandidateClient = nil
+        currentClient = client
 
         keyHandler.clear()
         keyHandler.syncWithPreferences()
@@ -126,6 +126,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     override func deactivateServer(_ client: Any!) {
+        currentClient = nil
         keyHandler.clear()
         self.handle(state: .Empty(), client: client)
         self.handle(state: .Deactivated(), client: client)
@@ -193,11 +194,19 @@ class McBopomofoInputMethodController: IMKInputController {
     @objc func toggleChineseConverter(_ sender: Any?) {
         let enabled = Preferences.toggleChineseConversionEnabled()
         NotifierController.notify(message: enabled ? NSLocalizedString("Chinese conversion on", comment: "") : NSLocalizedString("Chinese conversion off", comment: ""))
+        if let currentClient = currentClient {
+            keyHandler.clear()
+            self.handle(state: InputState.Empty(), client: currentClient)
+        }
     }
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
         let enabled = Preferences.toggleHalfWidthPunctuationEnabled()
         NotifierController.notify(message: enabled ? NSLocalizedString("Half-Width Punctuation On", comment: "") : NSLocalizedString("Half-Width Punctuation Off", comment: ""))
+        if let currentClient = currentClient {
+            keyHandler.clear()
+            self.handle(state: InputState.Empty(), client: currentClient)
+        }
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
@@ -305,7 +314,7 @@ extension McBopomofoInputMethodController {
     }
 
     private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
-        currentCandidateClient = nil
+        currentClient = nil
 
         gCurrentCandidateController?.delegate = nil
         gCurrentCandidateController?.visible = false
@@ -482,7 +491,7 @@ extension McBopomofoInputMethodController {
 
         gCurrentCandidateController?.delegate = self
         gCurrentCandidateController?.reloadData()
-        currentCandidateClient = client
+        currentClient = client
 
         gCurrentCandidateController?.visible = true
 
@@ -573,7 +582,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
     }
 
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
-        let client = currentCandidateClient
+        let client = currentClient
 
         if let state = state as? InputState.ChoosingCandidate {
             let selectedValue = state.candidates[Int(index)]
@@ -598,7 +607,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             }
         } else if let state = state as? InputState.AssociatedPhrases {
             let selectedValue = state.candidates[Int(index)]
-            handle(state: .Committing(poppedText: selectedValue), client: currentCandidateClient)
+            handle(state: .Committing(poppedText: selectedValue), client: currentClient)
             if Preferences.associatedPhrasesEnabled,
                let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
                 self.handle(state: associatePhrases, client: client)
