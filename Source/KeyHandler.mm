@@ -528,10 +528,20 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if ([state isKindOfClass:[InputStateNotEmpty class]] && (char)charCode >= 'A' && (char)charCode <= 'Z') {
-        std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
-        if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
-            return YES;
+    if ((char)charCode >= 'A' && (char)charCode <= 'Z') {
+        if (Preferences.letterBehavior == 1) {
+            std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
+            if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
+                return YES;
+            }
+        }
+        else {
+            if ([state isKindOfClass:[InputStateNotEmpty class]]) {
+                [self clear];
+                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                stateCallback(empty);
+                state = empty;
+            }
         }
     }
 

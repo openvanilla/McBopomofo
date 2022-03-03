@@ -47,7 +47,9 @@ private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
+private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
+
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinCandidateListTextSize: CGFloat = 12
@@ -221,7 +223,8 @@ class Preferences: NSObject {
          kPhraseReplacementEnabledKey,
          kChineseConversionEngineKey,
          kChineseConversionStyleKey,
-         kAssociatedPhrasesEnabledKey]
+         kAssociatedPhrasesEnabledKey,
+         kControlEnterOutputKey]
     }
 
 
@@ -384,6 +387,17 @@ class Preferences: NSObject {
         return associatedPhrasesEnabled
     }
 
+    /// The behavior of pressing letter keys.
+    ///
+    /// - 0: Output upper-cased letters directly.
+    /// - 1: Output lower-cased letters in the composing buffer.
+    @UserDefault(key: kLetterBehaviorKey, defaultValue: 0)
+    @objc static var letterBehavior: Int
+
+    /// The behavior of pressing Ctrl + Enter.
+    ///
+    /// - 0: Disabled.
+    /// - 1: Output BPMF readings.
     @UserDefault(key: kControlEnterOutputKey, defaultValue: 0)
     @objc static var controlEnterOutput: Int
 }
