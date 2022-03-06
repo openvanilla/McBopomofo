@@ -37,12 +37,16 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:));
 + (BOOL)writeUserPhrase:(NSString *)userPhrase;
 
++ (void)setEmojiInputEnabled:(BOOL)emojiInputEnabled;
+
 @property (class, readonly, nonatomic) NSString *dataFolderPath;
 @property (class, readonly, nonatomic) NSString *userPhrasesDataPathMcBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathMcBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathPlainBopomofo;
 @property (class, readonly, nonatomic) NSString *phraseReplacementDataPathMcBopomofo;
+@property (class, readonly, nonatomic) NSString *emojiModelDataPathMcBopomofo;
 @property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
+@property (class, assign, nonatomic) BOOL emojiInputEnabled;
 
 @end
 

@@ -76,6 +76,9 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
         if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
         }
+        if (!gLanguageModelMcBopomofo.isEmojiModelLoaded()) {
+            gLanguageModelMcBopomofo.loadEmojiModel([[self emojiModelDataPathMcBopomofo] UTF8String]);
+        }
     }
 
     if ([mode isEqualToString:InputModePlainBopomofo]) {
@@ -279,6 +282,13 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
     return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
 }
 
++ (NSString *)emojiModelDataPathMcBopomofo
+{
+    Class cls = NSClassFromString(@"ctlInputMethod");
+    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"Symbols" ofType:@"txt"];
+    return dataPath;
+}
+
 + (McBopomofo::McBopomofoLM *)languageModelMcBopomofo
 {
     return &gLanguageModelMcBopomofo;
@@ -303,5 +313,16 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
 {
     gLanguageModelMcBopomofo.setPhraseReplacementEnabled(phraseReplacementEnabled);
 }
+
++ (BOOL)emojiInputEnabled
+{
+    return gLanguageModelMcBopomofo.emojiInputEnabled();
+}
+
++ (void)setEmojiInputEnabled:(BOOL)emojiInputEnabled
+{
+    gLanguageModelMcBopomofo.setEmojiInputEnabled(emojiInputEnabled);
+}
+
 
 @end
