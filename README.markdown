@@ -6,7 +6,7 @@
 
 - macOS 10.15.4 Catalina 以上版本
 - Xcode 12.4 以上版本
-- Python 3.8 (可使用 macOS 內附的，或是使用 homebrew 等方式安裝)
+- Python 3.8 (可使用 macOS 內附的，或是使用 homebrew / macports / 官方 pkg 等方式安裝)
 
 由於小麥注音輸入法開始使用 SPM（Swift Package Manager）管理相依套件，因此必須使用 Xcode 12 開發。
 
@@ -16,7 +16,7 @@
 
 第一次安裝完，日後程式碼或詞庫有任何修改，只要重複上述流程，再次安裝小麥注音即可。
 
-要注意的是 macOS 可能會限制同一次 login session 能 kill 同一個輸入法 process 的次數（安裝程式透過 kill input method process 來讓新版的輸入法生效）。如果安裝若干次後，發現程式修改的結果並沒有出現，或甚至輸入法已無法再選用，只要登出目前帳號再重新登入即可。
+要注意的是，在使用終端機腳本編譯輸入法主程式的情況下，macOS 可能會限制同一次 login session 能 kill 同一個輸入法 process 的次數（安裝程式透過 kill input method process 來讓新版的輸入法生效）。如果安裝若干次後，發現程式修改的結果並沒有出現，或甚至輸入法已無法再選用，只要登出目前帳號再重新登入即可。直接使用目前的 Xcode 編譯的話，不會出現該問題（推測是因為這樣會被本地 codesigning 處理）。
 
 ## 社群公約
 
