@@ -131,12 +131,22 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
         let shouldWaitForTranslocationRemoval = appBundleTranslocatedToARandomizedPath(kTargetPartialPath) && (window?.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:))) ?? false)
 
-        // http://www.cocoadev.com/index.pl?MoveToTrash
-        let sourceDir = (kDestinationPartial as NSString).expandingTildeInPath
-        let trashDir = (NSHomeDirectory() as NSString).appendingPathComponent(".Trash")
-        var tag = 0
+        do {
+            let dirSource = (kDestinationPartial as NSString).expandingTildeInPath
+            let mgrFile = FileManager.default
+            let strFileURL = String(format: "%@/%@", dirSource, kTargetBundle)
+            let urlFile = URL(fileURLWithPath: strFileURL)
 
-        NSWorkspace.shared.performFileOperation(.recycleOperation, source: sourceDir, destination: trashDir, files: [kTargetBundle], tag: &tag)
+            if mgrFile.fileExists(atPath: strFileURL) {
+                try mgrFile.trashItem(at: urlFile, resultingItemURL: nil)
+            } else {
+                NSLog("McBopomofo Installer: File not found.")
+            }
+
+        }
+        catch let error as NSError {
+            NSLog("An error took place: \(error)")
+        }
 
         let killTask = Process()
         killTask.launchPath = "/usr/bin/killall"
