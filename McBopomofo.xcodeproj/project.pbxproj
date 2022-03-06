@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B4227A927D4C6A1007F983E /* Symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4227A827D4C6A1007F983E /* Symbols.txt */; };
+		5B4227AA27D4C6A1007F983E /* Symbols.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B4227A827D4C6A1007F983E /* Symbols.txt */; };
 		6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */; };
 		6A0D4F0915FC0DA600ABF4B3 /* Bopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */; };
 		6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A0D4F2015FC0EB100ABF4B3 /* Mandarin.cpp */; };
@@ -98,6 +100,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5B4227A727D4C66A007F983E /* EmojiLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmojiLM.h; sourceTree = "<group>"; };
+		5B4227A827D4C6A1007F983E /* Symbols.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Symbols.txt; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EEF15FC0DA600ABF4B3 /* Bopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bopomofo.tiff; sourceTree = "<group>"; };
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
@@ -132,7 +136,7 @@
 		6A6ED170279765140012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6A6ED171279765170012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases.txt"; sourceTree = "<group>"; };
 		6A6ED1722797651A0012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-phrases-replacement.txt"; sourceTree = "<group>"; };
-		6A74B14827C16845001988F4 /* Grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Grid.cpp; path = Grid.cpp; sourceTree = "<group>"; };
+		6A74B14827C16845001988F4 /* Grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Grid.cpp; sourceTree = "<group>"; };
 		6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -309,6 +313,7 @@
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
 				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
 				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
+				5B4227A727D4C66A007F983E /* EmojiLM.h */,
 				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
 				6ACC3D432793701600F1B140 /* ParselessLM.h */,
 				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
@@ -375,6 +380,7 @@
 				D47D73A727A6C84F00255A50 /* associated-phrases.txt */,
 				6A38BBF615FC117A00A8A51F /* data.txt */,
 				6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */,
+				5B4227A827D4C6A1007F983E /* Symbols.txt */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -592,6 +598,7 @@
 				6A38BC1515FC117A00A8A51F /* data.txt in Resources */,
 				6A6ED16B2797650A0012872E /* template-phrases-replacement.txt in Resources */,
 				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
+				5B4227A927D4C6A1007F983E /* Symbols.txt in Resources */,
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
 				D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */,
 				6A6ED16C2797650A0012872E /* template-data.txt in Resources */,
@@ -622,6 +629,7 @@
 			files = (
 				D4E569E527A414CB00AC2CEF /* data.txt in Resources */,
 				D4E569E427A414CB00AC2CEF /* data-plain-bpmf.txt in Resources */,
+				5B4227AA27D4C6A1007F983E /* Symbols.txt in Resources */,
 				D47D73A927A6C84F00255A50 /* associated-phrases.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
