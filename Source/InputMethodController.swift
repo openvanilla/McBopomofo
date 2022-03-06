@@ -66,6 +66,10 @@ class McBopomofoInputMethodController: IMKInputController {
     override func menu() -> NSMenu! {
         let menu = NSMenu(title: "Input Method Menu")
 
+        let toggleEmojiInputItem = menu.addItem(withTitle: NSLocalizedString("Emoji Input Mode", comment: ""), action: #selector(toggleEmojiEnabled(_:)), keyEquivalent: "e")
+        toggleEmojiInputItem.keyEquivalentModifierMask = [.command, .control]
+        toggleEmojiInputItem.state = Preferences.emojiInputEnabled.state
+
         let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Chinese Conversion", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "g")
         chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
         chineseConversionItem.state = Preferences.chineseConversionEnabled.state
@@ -196,6 +200,11 @@ class McBopomofoInputMethodController: IMKInputController {
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
         NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Half-Width Punctuations", comment: ""), "\n", Preferences.toggleHalfWidthPunctuationEnabled() ? NSLocalizedString("is Enabled", comment: "") : NSLocalizedString("is Disabled", comment: "")))
+    }
+
+    @objc func toggleEmojiEnabled(_ sender: Any?) {
+        LanguageModelManager.emojiInputEnabled = Preferences.toggleEmojiInputEnabled()
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Emoji Input Mode", comment: ""), "\n", Preferences.emojiInputEnabled ? NSLocalizedString("is Enabled", comment: "") : NSLocalizedString("is Disabled", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
