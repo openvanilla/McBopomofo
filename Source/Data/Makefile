@@ -8,9 +8,9 @@ data-plain-bpmf.txt: bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt
 	bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
 
 data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
-          PhraseFreq.txt phrase.occ Symbols.txt \
+          PhraseFreq.txt phrase.occ \
           heterophony1.list heterophony2.list  heterophony3.list
-	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt BPMFPunctuations.txt Symbols.txt $@
+	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt BPMFPunctuations.txt $@
 
 PhraseFreq.txt: bin/buildFreq.py phrase.occ exclusion.txt
 	bin/buildFreq.py

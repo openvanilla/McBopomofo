@@ -21,8 +21,8 @@ bpmf_hetero = {}
 
 if __name__ == '__main__':
     """bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt data.txt"""
-    if len(sys.argv) < 7:
-        sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base punctuations symbols output')
+    if len(sys.argv) < 6:
+        sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base punctuations output')
     #  Read a list of heterophonic singulars and its estimated frequency
     #  not active yet
     # try:
@@ -192,12 +192,6 @@ if __name__ == '__main__':
         for line in punctuations_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3
-            output.append(tuple(row))
-
-    with open(sys.argv[5]) as symbols_file:
-        for line in symbols_file:
-            row = line.rstrip().split(" ")
-            assert len(row) == 3, row
             output.append(tuple(row))
 
     output = convert_vks_rows_to_sorted_kvs_rows(output)
