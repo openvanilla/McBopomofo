@@ -25,7 +25,8 @@ import Cocoa
 
 enum KeyCode: UInt16 {
     case none = 0
-    case enter = 76
+    case enterCR = 36
+    case enterLF = 76
     case up = 126
     case down = 125
     case left = 123
@@ -35,6 +36,10 @@ enum KeyCode: UInt16 {
     case home = 115
     case end = 119
     case delete = 117
+    case space = 49
+    case bksp = 51
+    case escapeKey = 53
+    case symbolPallete = 50
 }
 
 class KeyHandlerInput: NSObject {
@@ -130,7 +135,19 @@ class KeyHandlerInput: NSObject {
     }
 
     @objc var isEnter: Bool {
-        KeyCode(rawValue: keyCode) == KeyCode.enter
+        KeyCode(rawValue: keyCode) == KeyCode.enterCR || KeyCode(rawValue: keyCode) == KeyCode.enterLF
+    }
+
+    @objc var isSpace: Bool {
+        KeyCode(rawValue: keyCode) == KeyCode.space
+    }
+
+    @objc var isBksp: Bool {
+        KeyCode(rawValue: keyCode) == KeyCode.bksp
+    }
+
+    @objc var isEscapeKey: Bool {
+        KeyCode(rawValue: keyCode) == KeyCode.escapeKey
     }
 
     @objc var isUp: Bool {
@@ -187,6 +204,10 @@ class KeyHandlerInput: NSObject {
 
     @objc var isVerticalModeOnlyChooseCandidateKey: Bool {
         KeyCode(rawValue: keyCode) == verticalModeOnlyChooseCandidateKey
+    }
+
+    @objc var isSymbolPalleteKey: Bool {
+        KeyCode(rawValue: keyCode) == KeyCode.symbolPallete
     }
 
 }

@@ -257,7 +257,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
-    if (charCode == 8 || charCode == 13 || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isCursorForward] || [input isCursorBackward]) {
+    if ([input isEnter] || [input isBksp] || [input isAbsorbedArrowKey] || [input isExtraChooseCandidateKey] || [input isCursorForward] || [input isCursorBackward]) {
         // do nothing if backspace is pressed -- we ignore the key
     } else if ([input isCapsLockOn]) {
         // process all possible combination, we hope.
@@ -341,7 +341,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
-    composeReading |= (!_bpmfReadingBuffer->isEmpty() && (charCode == 32 || charCode == 13));
+    composeReading |= (!_bpmfReadingBuffer->isEmpty() && ([input isEnter] || [input isSpace]));
     if (composeReading) {
         // combine the reading
         std::string reading = _bpmfReadingBuffer->syllable().composedString();
@@ -409,8 +409,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // MARK: Space and Down
     // keyCode 125 = Down, charCode 32 = Space
     if (_bpmfReadingBuffer->isEmpty() &&
-        [state isKindOfClass:[InputStateNotEmpty class]] && ([input isExtraChooseCandidateKey] || charCode == 32 || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
-        if (charCode == 32) {
+        [state isKindOfClass:[InputStateNotEmpty class]] && ([input isExtraChooseCandidateKey] || [input isSpace] || (input.useVerticalMode && ([input isVerticalModeOnlyChooseCandidateKey])))) {
+        if ([input isSpace]) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
                 if (_builder->cursorIndex() >= _builder->length()) {
@@ -440,7 +440,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // MARK: Esc
-    if (charCode == 27) {
+    if ([input isEscapeKey]) {
         return [self _handleEscWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -470,7 +470,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // MARK: Backspace
-    if (charCode == 8) {
+    if ([input isBksp]) {
         return [self _handleBackspaceWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -480,7 +480,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // MARK: Enter
-    if (charCode == 13) {
+    if ([input isEnter]) {
         if ([input isControlHold] && Preferences.controlEnterOutput != 0) {
             return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
         }
@@ -488,7 +488,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     // MARK: Punctuation list
-    if ((char)charCode == '`') {
+    if ([input isSymbolPalleteKey] && ![input isShiftHold]) {
         if (_languageModel->hasUnigramsForKey("_punctuation_list")) {
             if (_bpmfReadingBuffer->isEmpty()) {
                 _builder->insertReadingAtCursor("_punctuation_list");
@@ -854,16 +854,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
               stateCallback:(void (^)(InputState *))stateCallback
               errorCallback:(void (^)(void))errorCallback
 {
-    UniChar charCode = input.charCode;
 
-    if (charCode == 27) {
+    if ([input isEscapeKey]) {
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
         return YES;
     }
 
     // Enter
-    if (charCode == 13) {
+    if ([input isEnter]) {
         if (![self.delegate keyHandler:self didRequestWriteUserPhraseWithState:state]) {
             errorCallback();
             return YES;
@@ -927,7 +926,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
+    BOOL cancelCandidateKey = ([input isEscapeKey]) || ([input isBksp]) || [input isDelete];
 
     if (cancelCandidateKey) {
         if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
@@ -945,7 +944,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if (charCode == 13 || [input isEnter]) {
+    if ([input isEnter]) {
         if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -956,7 +955,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if (charCode == 32 || [input isPageDown] || input.emacsKey == McBopomofoEmacsKeyNextPage) {
+    if ([input isSpace] || [input isPageDown] || input.emacsKey == McBopomofoEmacsKeyNextPage) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             errorCallback();
