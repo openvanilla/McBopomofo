@@ -127,7 +127,7 @@ const std::vector<Formosa::Gramambular::Unigram> UserPhrasesLM::unigramsForKey(c
             Formosa::Gramambular::Unigram g;
             g.keyValue.key = row.key;
             g.keyValue.value = row.value;
-            g.score = 0.0;
+            g.score = valScoreOverride();
             v.push_back(g);
         }
     }
