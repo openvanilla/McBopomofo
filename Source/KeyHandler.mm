@@ -146,6 +146,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        _languageModel->setEmojiInputEnabled(Preferences.emojiInputEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
         _builder = new Formosa::Gramambular::BlockReadingBuilder(_languageModel);
