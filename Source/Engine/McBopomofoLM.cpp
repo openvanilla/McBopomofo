@@ -34,6 +34,7 @@ McBopomofoLM::McBopomofoLM()
 McBopomofoLM::~McBopomofoLM()
 {
     m_languageModel.close();
+    m_emojiModel.close();
     m_userPhrases.close();
     m_excludedPhrases.close();
     m_phraseReplacement.close();
@@ -53,6 +54,20 @@ bool McBopomofoLM::isDataModelLoaded()
     return m_languageModel.isLoaded();
 }
 
+bool McBopomofoLM::isEmojiModelLoaded()
+{
+    return m_emojiModel.isLoaded();
+}
+
+void McBopomofoLM::setEmojiInputEnabled(bool enabled)
+{
+    m_emojiInputEnabled = enabled;
+}
+bool McBopomofoLM::emojiInputEnabled()
+{
+    return m_emojiInputEnabled;
+}
+
 void McBopomofoLM::loadAssociatedPhrases(const char* associatedPhrasesPath)
 {
     if (associatedPhrasesPath) {
@@ -64,6 +79,14 @@ void McBopomofoLM::loadAssociatedPhrases(const char* associatedPhrasesPath)
 bool McBopomofoLM::isAssociatedPhrasesLoaded()
 {
     return m_associatedPhrases.isLoaded();
+}
+
+void McBopomofoLM::loadEmojiModel(const char* emojiModelPath)
+{
+    if (emojiModelPath) {
+        m_emojiModel.close();
+        m_emojiModel.open(emojiModelPath);
+    }
 }
 
 void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
@@ -105,6 +128,7 @@ const std::vector<Formosa::Gramambular::Unigram> McBopomofoLM::unigramsForKey(co
     }
 
     std::vector<Formosa::Gramambular::Unigram> allUnigrams;
+    std::vector<Formosa::Gramambular::Unigram> emojiUnigrams;
     std::vector<Formosa::Gramambular::Unigram> userUnigrams;
 
     std::unordered_set<std::string> excludedValues;
@@ -122,12 +146,18 @@ const std::vector<Formosa::Gramambular::Unigram> McBopomofoLM::unigramsForKey(co
         userUnigrams = filterAndTransformUnigrams(rawUserUnigrams, excludedValues, insertedValues);
     }
 
+    if (m_emojiModel.hasUnigramsForKey(key) && m_emojiInputEnabled) {
+        std::vector<Formosa::Gramambular::Unigram> rawEmojiUnigrams = m_emojiModel.unigramsForKey(key);
+        emojiUnigrams = filterAndTransformUnigrams(rawEmojiUnigrams, excludedValues, insertedValues);
+    }
+
     if (m_languageModel.hasUnigramsForKey(key)) {
         std::vector<Formosa::Gramambular::Unigram> rawGlobalUnigrams = m_languageModel.unigramsForKey(key);
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
     allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+    allUnigrams.insert(allUnigrams.end(), emojiUnigrams.begin(), emojiUnigrams.end());
     return allUnigrams;
 }
 

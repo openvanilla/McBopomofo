@@ -25,6 +25,7 @@
 #define MCBOPOMOFOLM_H
 
 #include "AssociatedPhrases.h"
+#include "EmojiLM.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
 #include "UserPhrasesLM.h"
@@ -65,6 +66,17 @@ public:
     void loadLanguageModel(const char* languageModelPath);
     /// If the data model is already loaded.
     bool isDataModelLoaded();
+
+    /// Asks to load the emoji language model at the given path.
+    /// @param emojiModelPath The path of the language model.
+    void loadEmojiModel(const char* emojiModelPath);
+    /// If the data model is already loaded.
+    bool isEmojiModelLoaded();
+
+    /// Enables or disables emoji input.
+    void setEmojiInputEnabled(bool enabled);
+    /// If phrase replacement is enabled or not.
+    bool emojiInputEnabled();
 
     /// Asks to load the associated phrases at the given path.
     /// @param associatedPhrasesPath The path of the associated phrases.
@@ -118,11 +130,13 @@ protected:
         std::unordered_set<std::string>& insertedValues);
 
     ParselessLM m_languageModel;
+    EmojiLM m_emojiModel;
     UserPhrasesLM m_userPhrases;
     UserPhrasesLM m_excludedPhrases;
     PhraseReplacementMap m_phraseReplacement;
     AssociatedPhrases m_associatedPhrases;
     bool m_phraseReplacementEnabled;
+    bool m_emojiInputEnabled;
     bool m_externalConverterEnabled;
     std::function<std::string(std::string)> m_externalConverter;
 };
