@@ -169,7 +169,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         if opacity <= 0 {
             self.close()
         } else {
-            self.window?.alphaValue = opacity - 0.2
+            self.window?.alphaValue = opacity - 0.1
         }
     }
 
@@ -177,7 +177,7 @@ public class NotifierController: NSWindowController, NotifierWindowDelegate {
         waitTimer?.invalidate()
         waitTimer = nil
         NotifierController.decreaseInstanceCount()
-        fadeTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(doFadeOut(_:)), userInfo: nil, repeats: true)
+        fadeTimer = Timer.scheduledTimer(timeInterval: 0.005, target: self, selector: #selector(doFadeOut(_:)), userInfo: nil, repeats: true)
     }
 
     public override func close() {
