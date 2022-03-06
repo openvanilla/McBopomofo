@@ -191,13 +191,11 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     @objc func toggleChineseConverter(_ sender: Any?) {
-        let enabled = Preferences.toggleChineseConversionEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Chinese conversion on", comment: "") : NSLocalizedString("Chinese conversion off", comment: ""))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Chinese Conversion", comment: ""), "\n", Preferences.toggleChineseConversionEnabled() ? NSLocalizedString("is Enabled", comment: "") : NSLocalizedString("is Disabled", comment: "")))
     }
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
-        let enabled = Preferences.toggleHalfWidthPunctuationEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Half-Width Punctuation On", comment: "") : NSLocalizedString("Half-Width Punctuation Off", comment: ""))
+        NotifierController.notify(message: String(format: "%@%@%@", NSLocalizedString("Use Half-Width Punctuations", comment: ""), "\n", Preferences.toggleHalfWidthPunctuationEnabled() ? NSLocalizedString("is Enabled", comment: "") : NSLocalizedString("is Disabled", comment: "")))
     }
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {

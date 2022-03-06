@@ -53,10 +53,6 @@
 
 "The phrase being marked \"%@\" is longer than the allowed %d characters." = "您目前選擇了「%@」。自訂詞彙不能超過 %d 個字元。";
 
-"Chinese conversion on" = "已經切換到簡體中文模式";
-
-"Chinese conversion off" = "已經切換到繁體中文模式";
-
 "Edit Phrase Replacement Table" = "編輯詞彙替換表格";
 
 "Use Phrase Replacement" = "使用詞彙替換";
@@ -77,10 +73,6 @@
 
 "Model-based Chinese conversion is on. Not recommended to add user phrases." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
 
-"Half-Width Punctuation On" = "已經切換到半型標點模式";
-
-"Half-Width Punctuation Off" = "已經切回到全型標點模式";
-
 "Associated Phrases" = "聯想詞";
 
 "Certain Unicode symbols or characters not supported as user phrases." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";
@@ -92,3 +84,7 @@
 "Cursor is between \"%@\" and \"%@\"." = "游標正在「%@」與「%@」之間";
 
 "The phrase being marked \"%@\" already exists." = "您目前選擇了「%@」，這個詞彙已經存在了";
+
+"is Enabled" = "已啟用";
+
+"is Disabled" = "已停用";

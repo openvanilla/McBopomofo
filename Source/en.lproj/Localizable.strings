@@ -77,9 +77,7 @@
 
 "Model-based Chinese conversion is on. Not recommended to add user phrases." = "Model-based Chinese conversion is on. Not recommended to add user phrases.";
 
-"Half-Width Punctuation On" = "Half-Width Punctuation On";
-
-"Half-Width Punctuation Off" = "Half-Width Punctuation Off";
+"Half-Width Punctuation" = "Half-Width Punctuation";
 
 "Associated Phrases" = "Associated Phrases";
 
@@ -93,3 +91,6 @@
 
 "The phrase being marked \"%@\" already exists." = "The phrase being marked \"%@\" already exists.";
 
+"is Enabled" = "is Enabled";
+
+"is Disabled" = "is Disabled";

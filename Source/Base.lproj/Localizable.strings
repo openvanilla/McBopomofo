@@ -53,10 +53,6 @@
 
 "The phrase being marked \"%@\" is longer than the allowed %d characters." = "The phrase being marked \"%@\" is longer than the allowed %d characters.";
 
-"Chinese conversion on" = "Chinese conversion on";
-
-"Chinese conversion off" = "Chinese conversion off";
-
 "Edit Phrase Replacement Table" = "Edit Phrase Replacement Table";
 
 "Use Phrase Replacement" = "Use Phrase Replacement";
@@ -77,10 +73,6 @@
 
 "Model-based Chinese conversion is on. Not recommended to add user phrases." = "Model-based Chinese conversion is on. Not recommended to add user phrases.";
 
-"Half-Width Punctuation On" = "Half-Width Punctuation On";
-
-"Half-Width Punctuation Off" = "Half-Width Punctuation Off";
-
 "Associated Phrases" = "Associated Phrases";
 
 "Certain Unicode symbols or characters not supported as user phrases." = "Certain Unicode symbols or characters not supported as user phrases.";
@@ -92,3 +84,7 @@
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
 
 "The phrase being marked \"%@\" already exists." = "The phrase being marked \"%@\" already exists.";
+
+"is Enabled" = "is Enabled";
+
+"is Disabled" = "is Disabled";
