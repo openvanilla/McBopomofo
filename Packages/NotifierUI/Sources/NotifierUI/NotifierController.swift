@@ -35,7 +35,7 @@ private class NotifierWindow: NSWindow {
     }
 }
 
-private let kWindowWidth: CGFloat = 160.0
+private let kWindowWidth: CGFloat = 200.0
 private let kWindowHeight: CGFloat = 80.0
 
 public class NotifierController: NSWindowController, NotifierWindowDelegate {
