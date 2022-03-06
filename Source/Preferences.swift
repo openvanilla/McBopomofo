@@ -46,6 +46,7 @@ private let kCandidateKeys = "CandidateKeys"
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
+private let kEmojiInputEnabledKey = "EmojiInputEnabled"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kControlEnterOutputKey = "ControlEnterOutput"
 
@@ -213,6 +214,7 @@ class Preferences: NSObject {
          kComposingBufferSizePreferenceKey,
          kChooseCandidateUsingSpaceKey,
          kChineseConversionEnabledKey,
+         kEmojiInputEnabledKey,
          kHalfWidthPunctuationEnabledKey,
          kEscToCleanInputBufferKey,
          kCandidateTextFontName,
@@ -265,6 +267,14 @@ class Preferences: NSObject {
     @objc static func toggleChineseConversionEnabled() -> Bool {
         chineseConversionEnabled = !chineseConversionEnabled
         return chineseConversionEnabled
+    }
+
+    @UserDefault(key: kEmojiInputEnabledKey, defaultValue: false)
+    @objc static var emojiInputEnabled: Bool
+
+    @objc static func toggleEmojiInputEnabled() -> Bool {
+        emojiInputEnabled = !emojiInputEnabled
+        return emojiInputEnabled
     }
 
     @UserDefault(key: kHalfWidthPunctuationEnabledKey, defaultValue: false)
