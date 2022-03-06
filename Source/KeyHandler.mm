@@ -201,7 +201,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         }
         if (addToOverrideModel) {
             double score = selectedNode.node->scoreForCandidate(stringValue);
-            if (score <= -8) {
+            if (score <= -100) {
                 addToOverrideModel = NO;
             }
         }
