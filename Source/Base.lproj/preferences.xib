@@ -328,7 +328,6 @@
                         </buttonCell>
                         <connections>
                             <binding destination="32" name="value" keyPath="values.MoveCursorAfterSelectingCandidate" id="o5h-nT-3PL"/>
-                            <binding destination="32" name="enabled" keyPath="values.SelectPhraseAfterCursorAsCandidate" id="GZB-gK-2JZ"/>
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uPC-3C-1uz">

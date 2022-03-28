@@ -73,7 +73,7 @@
                         <rect key="frame" x="28" y="391" width="150" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="選字時，候選詞起點在：" id="14">
-                            <font key="font" size="13" name=".PingFangTC-Regular"/>
+                            <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -330,7 +330,6 @@
                         </buttonCell>
                         <connections>
                             <binding destination="32" name="value" keyPath="values.MoveCursorAfterSelectingCandidate" id="2Dc-Ap-QWt"/>
-                            <binding destination="32" name="enabled" keyPath="values.SelectPhraseAfterCursorAsCandidate" id="4vY-3d-hrt"/>
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wff-5H-duP">
