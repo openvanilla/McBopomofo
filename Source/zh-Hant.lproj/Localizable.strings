@@ -92,3 +92,7 @@
 "Cursor is between \"%@\" and \"%@\"." = "游標正在「%@」與「%@」之間";
 
 "The phrase being marked \"%@\" already exists." = "您目前選擇了「%@」，這個詞彙已經存在了";
+
+"Basic" = "基本";
+
+"Advanced" = "進階";
