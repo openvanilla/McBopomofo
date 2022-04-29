@@ -92,3 +92,7 @@
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
 
 "The phrase being marked \"%@\" already exists." = "The phrase being marked \"%@\" already exists.";
+
+"Basic" = "Basic";
+
+"Advanced" = "Advanced";

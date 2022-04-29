@@ -211,7 +211,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
     [self _walk];
 
-    if (Preferences.selectPhraseAfterCursorAsCandidate && Preferences.moveCursorAfterSelectingCandidate) {
+    if (Preferences.moveCursorAfterSelectingCandidate) {
         size_t nextPosition = 0;
         for (auto node : _walkedNodes) {
             if (nextPosition >= cursorIndex) {

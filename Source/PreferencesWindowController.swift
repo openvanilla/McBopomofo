@@ -24,6 +24,14 @@
 import Cocoa
 import Carbon
 
+fileprivate extension NSToolbarItem.Identifier {
+    static let basic = NSToolbarItem.Identifier(rawValue: "basic")
+    static let advanced = NSToolbarItem.Identifier(rawValue: "advanced")
+}
+
+fileprivate let kWindowTitleHeight: CGFloat = 78
+
+
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
 // the "InputMethodServerPreferencesWindowControllerClass" in Info.plist.
@@ -31,8 +39,25 @@ import Carbon
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
+    @IBOutlet weak var basicSettingsView: NSView!
+    @IBOutlet weak var advancedSettingsView: NSView!
 
     override func awakeFromNib() {
+        let toolbar = NSToolbar(identifier: "preference toolbar")
+        toolbar.allowsUserCustomization = false
+        toolbar.autosavesConfiguration = false
+        toolbar.sizeMode = .default
+        toolbar.delegate = self
+        toolbar.selectedItemIdentifier = .basic
+        toolbar.showsBaselineSeparator = true
+        window?.titlebarAppearsTransparent = false
+        if #available(macOS 11.0, *) {
+            window?.toolbarStyle = .preference
+        }
+        window?.toolbar = toolbar
+        window?.title = NSLocalizedString("Basic", comment: "")
+        use(view: basicSettingsView)
+
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
         var usKeyboardLayoutItem: NSMenuItem? = nil
         var chosenItem: NSMenuItem? = nil
@@ -155,3 +180,73 @@ import Carbon
 
 }
 
+
+extension PreferencesWindowController: NSToolbarDelegate {
+    func use(view: NSView) {
+        guard let window = window else {
+            return
+        }
+        window.contentView?.subviews.first?.removeFromSuperview()
+        let viewFrame = view.frame
+        var windowRect = window.frame
+        windowRect.size.height = kWindowTitleHeight + viewFrame.height
+        windowRect.size.width = viewFrame.width
+        windowRect.origin.y = window.frame.maxY - (viewFrame.height + kWindowTitleHeight)
+        window.setFrame(windowRect, display: true, animate: true)
+        window.contentView?.frame = view.bounds
+        window.contentView?.addSubview(view)
+    }
+
+    @objc func showBasicView(_ sender: Any?) {
+        use(view: basicSettingsView)
+        window?.toolbar?.selectedItemIdentifier = .basic
+        window?.title = NSLocalizedString("Basic", comment: "")
+    }
+
+    @objc func showAdvancedView(_ sender: Any?) {
+        use(view: advancedSettingsView)
+        window?.toolbar?.selectedItemIdentifier = .advanced
+        window?.title = NSLocalizedString("Advanced", comment: "")
+    }
+
+    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.basic, .advanced]
+    }
+
+    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.basic, .advanced]
+    }
+
+    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.basic, .advanced]
+    }
+
+    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+        let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+        item.target = self
+        switch itemIdentifier {
+        case .basic:
+            let title = NSLocalizedString("Basic", comment: "")
+            item.label = title
+            if #available(macOS 11.0, *) {
+                item.image = NSImage(systemSymbolName: "switch.2", accessibilityDescription: title)
+            } else {
+                item.image = NSImage(named: NSImage.preferencesGeneralName)
+            }
+            item.action = #selector(showBasicView(_:))
+
+        case .advanced:
+            let title = NSLocalizedString("Advanced", comment: "")
+            item.label = title
+            if #available(macOS 11.0, *) {
+                item.image = NSImage(systemSymbolName: "gear", accessibilityDescription: title)
+            } else {
+                item.image = NSImage(named: NSImage.advancedName)
+            }
+            item.action = #selector(showAdvancedView(_:))
+        default:
+            return nil
+        }
+        return item
+    }
+}
