@@ -49,7 +49,8 @@ private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
-
+private let kUseCustomUserPhraseLocation = "UseCustomUserPhraseLocation"
+private let kCustomUserPhraseLocation = "CustomUserPhraseLocation"
 
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinCandidateListTextSize: CGFloat = 12
@@ -224,7 +225,9 @@ class Preferences: NSObject {
          kChineseConversionEngineKey,
          kChineseConversionStyleKey,
          kAssociatedPhrasesEnabledKey,
-         kControlEnterOutputKey]
+         kControlEnterOutputKey,
+         kUseCustomUserPhraseLocation,
+         kCustomUserPhraseLocation]
     }
 
 
@@ -400,4 +403,39 @@ class Preferences: NSObject {
     /// - 1: Output BPMF readings.
     @UserDefault(key: kControlEnterOutputKey, defaultValue: 0)
     @objc static var controlEnterOutput: Int
+}
+
+@objc class UserPhraseLocationHelper: NSObject {
+    @objc static var defaultUserPhraseLocation: String {
+        let paths = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
+        let appSupportPath = paths.first!
+        return (appSupportPath as NSString).appendingPathComponent("McBopomofo")
+    }
+}
+
+extension NSNotification.Name {
+    static var useCustomUserPhraseLocationDidChange = NSNotification.Name(rawValue: "PreferencesUseCustomUserPhraseLocationDidChangeNotification")
+    static var customUserPhraseLocationDidChange = NSNotification.Name(rawValue: "PreferencesCustomUserPhraseLocationNotification")
+}
+
+extension Preferences {
+
+    @UserDefault(key: kUseCustomUserPhraseLocation, defaultValue: false)
+    @objc static var useCustomUserPhraseLocation: Bool {
+        didSet {
+            if useCustomUserPhraseLocation == false {
+                customUserPhraseLocation = nil
+            } else if customUserPhraseLocation == nil || customUserPhraseLocation == "" {
+                customUserPhraseLocation = UserPhraseLocationHelper.defaultUserPhraseLocation
+            }
+            NotificationCenter.default.post(name: .useCustomUserPhraseLocationDidChange, object: useCustomUserPhraseLocation)
+        }
+    }
+
+    @UserDefault(key: kCustomUserPhraseLocation, defaultValue: nil)
+    @objc static var customUserPhraseLocation: String? {
+        didSet {
+            NotificationCenter.default.post(name: .customUserPhraseLocationDidChange, object: useCustomUserPhraseLocation)
+        }
+    }
 }

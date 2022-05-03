@@ -26,6 +26,7 @@ import Carbon
 
 fileprivate extension NSToolbarItem.Identifier {
     static let basic = NSToolbarItem.Identifier(rawValue: "basic")
+    static let userPhrases = NSToolbarItem.Identifier(rawValue: "user_phrases")
     static let advanced = NSToolbarItem.Identifier(rawValue: "advanced")
 }
 
@@ -39,7 +40,12 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
+    @IBOutlet weak var userPhrasesTextField: NSTextField!
+    @IBOutlet weak var chooseUserPhrasesFolderButton: NSButton!
+    @IBOutlet weak var openUserPhrasesFolderButton: NSButton!
+
     @IBOutlet weak var basicSettingsView: NSView!
+    @IBOutlet weak var userPhrasesSettingsView: NSView!
     @IBOutlet weak var advancedSettingsView: NSView!
 
     override func awakeFromNib() {
@@ -149,6 +155,7 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         }
 
         selectionKeyComboBox.stringValue = candidateSelectionKeys
+        updateUserPhraseLocation()
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {
@@ -178,6 +185,68 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         }
     }
 
+    func updateUserPhraseLocation() {
+        if Preferences.useCustomUserPhraseLocation {
+            userPhrasesTextField.stringValue = Preferences.customUserPhraseLocation ?? ""
+            openUserPhrasesFolderButton.title = Preferences.customUserPhraseLocation ?? ""
+        } else {
+            userPhrasesTextField.stringValue = ""
+            openUserPhrasesFolderButton.title = UserPhraseLocationHelper.defaultUserPhraseLocation
+        }
+    }
+
+    @IBAction func changeUserPhraseEnabledAction(_ sender: Any) {
+        guard let control = sender as? NSControl else {
+            return
+        }
+        let enabled = control.integerValue > 0
+        if enabled {
+            if Preferences.customUserPhraseLocation == nil || Preferences.customUserPhraseLocation == "" {
+                Preferences.customUserPhraseLocation = UserPhraseLocationHelper.defaultUserPhraseLocation
+            } else {
+                Preferences.customUserPhraseLocation = Preferences.customUserPhraseLocation
+            }
+        } else {
+            Preferences.customUserPhraseLocation = nil
+        }
+        updateUserPhraseLocation()
+    }
+
+    @IBAction func changeUserPhraseLocationAction(_ sender: Any) {
+        guard let control = sender as? NSControl else {
+            return
+        }
+        let path = control.stringValue.trimmingCharacters(in: .whitespaces)
+        if FileManager.default.fileExists(atPath: path) == false {
+            try? FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+        }
+        Preferences.customUserPhraseLocation = path
+        updateUserPhraseLocation()
+    }
+
+    @IBAction func openUserPhrasedFolderAction(_ sender: Any) {
+        let path =
+         (Preferences.useCustomUserPhraseLocation ?
+            Preferences.customUserPhraseLocation :
+            UserPhraseLocationHelper.defaultUserPhraseLocation) ??
+            UserPhraseLocationHelper.defaultUserPhraseLocation
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.open(url)
+    }
+
+    @IBAction func changeUserPhraseLocationFromPanelAction(_ sender: Any) {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        let result = panel.runModal()
+
+        if result == .OK, let url = panel.urls.first {
+            let path = url.path
+            Preferences.customUserPhraseLocation = path
+            updateUserPhraseLocation()
+        }
+    }
 }
 
 
@@ -203,6 +272,12 @@ extension PreferencesWindowController: NSToolbarDelegate {
         window?.title = NSLocalizedString("Basic", comment: "")
     }
 
+    @objc func showUserPhrasesView(_ sender: Any?) {
+        use(view: userPhrasesSettingsView)
+        window?.toolbar?.selectedItemIdentifier = .userPhrases
+        window?.title = NSLocalizedString("User Phrases", comment: "")
+    }
+
     @objc func showAdvancedView(_ sender: Any?) {
         use(view: advancedSettingsView)
         window?.toolbar?.selectedItemIdentifier = .advanced
@@ -210,15 +285,15 @@ extension PreferencesWindowController: NSToolbarDelegate {
     }
 
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.basic, .advanced]
+        [.basic, .userPhrases, .advanced]
     }
 
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.basic, .advanced]
+        [.basic, .userPhrases, .advanced]
     }
 
     func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.basic, .advanced]
+        [.basic, .userPhrases, .advanced]
     }
 
     func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
@@ -234,7 +309,15 @@ extension PreferencesWindowController: NSToolbarDelegate {
                 item.image = NSImage(named: NSImage.preferencesGeneralName)
             }
             item.action = #selector(showBasicView(_:))
-
+        case .userPhrases:
+            let title = NSLocalizedString("User Phrases", comment: "")
+            item.label = title
+            if #available(macOS 11.0, *) {
+                item.image = NSImage(systemSymbolName: "folder", accessibilityDescription: title)
+            } else {
+                item.image = NSImage(named: NSImage.folderName)
+            }
+            item.action = #selector(showUserPhrasesView(_:))
         case .advanced:
             let title = NSLocalizedString("Advanced", comment: "")
             item.label = title

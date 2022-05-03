@@ -151,19 +151,33 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var preferencesWindowController: PreferencesWindowController?
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
-    private var fsStreamHelper = FSEventStreamHelper(path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+    private var fsStreamHelper: FSEventStreamHelper?
+
+    func updateUserPhases() {
+        NSLog("updateUserPhases called \(LanguageModelManager.dataFolderPath)")
+        LanguageModelManager.loadUserPhrases()
+        LanguageModelManager.loadUserPhraseReplacement()
+
+        fsStreamHelper?.delegate = nil
+        fsStreamHelper?.stop()
+        fsStreamHelper = FSEventStreamHelper(path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+        fsStreamHelper?.delegate = self
+        _ = fsStreamHelper?.start()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.setupDataModelValueConverter()
-        LanguageModelManager.loadUserPhrases()
-        LanguageModelManager.loadUserPhraseReplacement()
-        fsStreamHelper.delegate = self
-        _ = fsStreamHelper.start()
+        updateUserPhases()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
             UserDefaults.standard.synchronize()
         }
+
+        NotificationCenter.default.addObserver(forName: .customUserPhraseLocationDidChange, object: nil, queue: OperationQueue.main) { notification in
+            self.updateUserPhases()
+        }
+
         checkForUpdate()
     }
 
