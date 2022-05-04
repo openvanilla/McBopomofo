@@ -40,6 +40,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
     @IBOutlet weak var fontSizePopUpButton: NSPopUpButton!
     @IBOutlet weak var basisKeyboardLayoutButton: NSPopUpButton!
     @IBOutlet weak var selectionKeyComboBox: NSComboBox!
+
+    @IBOutlet weak var customUserPhraseLocationEnabledButton: NSPopUpButton!
     @IBOutlet weak var userPhrasesTextField: NSTextField!
     @IBOutlet weak var chooseUserPhrasesFolderButton: NSButton!
     @IBOutlet weak var openUserPhrasesFolderButton: NSButton!
@@ -153,8 +155,13 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         if candidateSelectionKeys.isEmpty {
             candidateSelectionKeys = Preferences.defaultCandidateKeys
         }
-
         selectionKeyComboBox.stringValue = candidateSelectionKeys
+
+        if #available(macOS 11.0, *) {
+            chooseUserPhrasesFolderButton.image = NSImage(systemSymbolName: "folder", accessibilityDescription: "Folder")
+        }
+        let index = Preferences.useCustomUserPhraseLocation ? 1 : 0
+        customUserPhraseLocationEnabledButton.selectItem(at: index)
         updateUserPhraseLocation()
     }
 
@@ -187,27 +194,24 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
 
     func updateUserPhraseLocation() {
         if Preferences.useCustomUserPhraseLocation {
-            userPhrasesTextField.stringValue = Preferences.customUserPhraseLocation ?? ""
-            openUserPhrasesFolderButton.title = Preferences.customUserPhraseLocation ?? ""
+            userPhrasesTextField.stringValue = Preferences.customUserPhraseLocation
+            openUserPhrasesFolderButton.title = Preferences.customUserPhraseLocation
         } else {
             userPhrasesTextField.stringValue = ""
             openUserPhrasesFolderButton.title = UserPhraseLocationHelper.defaultUserPhraseLocation
         }
     }
 
-    @IBAction func changeUserPhraseEnabledAction(_ sender: Any) {
-        guard let control = sender as? NSControl else {
+    @IBAction func changeCustomUserPhraseLocationEnabledAction(_ sender: Any) {
+        guard let control = sender as? NSPopUpButton else {
             return
         }
-        let enabled = control.integerValue > 0
+        let enabled = control.selectedTag() > 0
+        Preferences.useCustomUserPhraseLocation = enabled
         if enabled {
-            if Preferences.customUserPhraseLocation == nil || Preferences.customUserPhraseLocation == "" {
+            if Preferences.customUserPhraseLocation.isEmpty {
                 Preferences.customUserPhraseLocation = UserPhraseLocationHelper.defaultUserPhraseLocation
-            } else {
-                Preferences.customUserPhraseLocation = Preferences.customUserPhraseLocation
             }
-        } else {
-            Preferences.customUserPhraseLocation = nil
         }
         updateUserPhraseLocation()
     }

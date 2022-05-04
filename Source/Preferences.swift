@@ -414,28 +414,39 @@ class Preferences: NSObject {
 }
 
 extension NSNotification.Name {
-    static var useCustomUserPhraseLocationDidChange = NSNotification.Name(rawValue: "PreferencesUseCustomUserPhraseLocationDidChangeNotification")
-    static var customUserPhraseLocationDidChange = NSNotification.Name(rawValue: "PreferencesCustomUserPhraseLocationNotification")
+    static var userPhraseLocationDidChange = NSNotification.Name(rawValue: "UserPhraseLocationDidChangeNotification")
 }
 
 extension Preferences {
 
+    static func postUserPhraseLocationNotification() {
+        let location: String = {
+            if !useCustomUserPhraseLocation {
+                return UserPhraseLocationHelper.defaultUserPhraseLocation
+            }
+            if customUserPhraseLocation.isEmpty {
+                return UserPhraseLocationHelper.defaultUserPhraseLocation
+            }
+            return customUserPhraseLocation
+        }()
+        let notification = Notification(name: .userPhraseLocationDidChange, object: self, userInfo:  [
+            "location": location
+        ])
+        NotificationQueue.default.dequeueNotifications(matching: notification, coalesceMask: 0)
+        NotificationQueue.default.enqueue(notification, postingStyle: .now)
+    }
+
     @UserDefault(key: kUseCustomUserPhraseLocation, defaultValue: false)
     @objc static var useCustomUserPhraseLocation: Bool {
         didSet {
-            if useCustomUserPhraseLocation == false {
-                customUserPhraseLocation = nil
-            } else if customUserPhraseLocation == nil || customUserPhraseLocation == "" {
-                customUserPhraseLocation = UserPhraseLocationHelper.defaultUserPhraseLocation
-            }
-            NotificationCenter.default.post(name: .useCustomUserPhraseLocationDidChange, object: useCustomUserPhraseLocation)
+            postUserPhraseLocationNotification()
         }
     }
 
-    @UserDefault(key: kCustomUserPhraseLocation, defaultValue: nil)
-    @objc static var customUserPhraseLocation: String? {
+    @UserDefault(key: kCustomUserPhraseLocation, defaultValue: "")
+    @objc static var customUserPhraseLocation: String {
         didSet {
-            NotificationCenter.default.post(name: .customUserPhraseLocationDidChange, object: useCustomUserPhraseLocation)
+            postUserPhraseLocationNotification()
         }
     }
 }

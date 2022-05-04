@@ -12,6 +12,7 @@
                 <outlet property="basicSettingsView" destination="eWf-pC-0Bt" id="IHt-cQ-iV8"/>
                 <outlet property="basisKeyboardLayoutButton" destination="6eT-rC-gVz" id="CCy-tX-eCP"/>
                 <outlet property="chooseUserPhrasesFolderButton" destination="Nf4-gN-42Y" id="chL-PA-nAW"/>
+                <outlet property="customUserPhraseLocationEnabledButton" destination="b15-I3-wDL" id="PUy-eF-NmW"/>
                 <outlet property="fontSizePopUpButton" destination="YF3-dA-BAc" id="Le4-ge-hZ1"/>
                 <outlet property="openUserPhrasesFolderButton" destination="Ibr-mk-lwr" id="qs6-94-i9P"/>
                 <outlet property="selectionKeyComboBox" destination="gtY-jT-2F6" id="oWz-wL-72Z"/>
@@ -440,13 +441,13 @@
             <point key="canvasLocation" x="652" y="-326"/>
         </view>
         <customView id="M7i-Af-lNp">
-            <rect key="frame" x="0.0" y="0.0" width="436" height="177"/>
+            <rect key="frame" x="0.0" y="0.0" width="439" height="177"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uPv-37-dOi">
-                    <rect key="frame" x="18" y="141" width="108" height="16"/>
+                    <rect key="frame" x="18" y="141" width="111" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="使用者詞彙位置：" id="ulY-l0-tqg">
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -461,21 +462,18 @@
                                 <menuItem title="標準" state="on" id="WPo-X9-YuK">
                                     <modifierMask key="keyEquivalentModifierMask"/>
                                 </menuItem>
-                                <menuItem title="自訂" id="8T2-1X-M00"/>
+                                <menuItem title="自訂" tag="1" id="8T2-1X-M00"/>
                             </items>
                         </menu>
                         <connections>
-                            <binding destination="32" name="selectedIndex" keyPath="values.UseCustomUserPhraseLocation" id="W8D-eo-uw8"/>
+                            <action selector="changeCustomUserPhraseLocationEnabledAction:" target="-2" id="3V3-s9-Kr6"/>
                         </connections>
                     </popUpButtonCell>
-                    <connections>
-                        <action selector="changeUserPhraseEnabledAction:" target="-2" id="P1n-vy-EZX"/>
-                    </connections>
                 </popUpButton>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aAf-VY-6CO">
-                    <rect key="frame" x="87" y="104" width="289" height="20"/>
+                    <rect key="frame" x="87" y="104" width="298" height="20"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="289" id="dzx-DY-miQ"/>
+                        <constraint firstAttribute="width" constant="298" id="dzx-DY-miQ"/>
                     </constraints>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Ooe-Ve-njT">
                         <font key="font" metaFont="system"/>
@@ -494,7 +492,7 @@
                         <constraint firstAttribute="height" constant="28" id="hry-rk-ODp"/>
                     </constraints>
                     <textFieldCell key="cell" title="您可以將使用者詞彙放在 Google Drive 或是 DropBox 等服務的目錄下，如此一來，就可以備份以及同步詞庫。" id="JNA-x3-YbS">
-                        <font key="font" size="11" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -538,7 +536,7 @@
                 <constraint firstItem="Ibr-mk-lwr" firstAttribute="top" secondItem="aAf-VY-6CO" secondAttribute="bottom" constant="8" symbolic="YES" id="Z88-xO-93p"/>
                 <constraint firstItem="Ibr-mk-lwr" firstAttribute="centerX" secondItem="pb0-gR-J2p" secondAttribute="centerX" constant="33" id="aON-hW-9Cu"/>
                 <constraint firstItem="uPv-37-dOi" firstAttribute="leading" secondItem="M7i-Af-lNp" secondAttribute="leading" constant="20" symbolic="YES" id="agf-wk-afk"/>
-                <constraint firstItem="Nf4-gN-42Y" firstAttribute="leading" secondItem="aAf-VY-6CO" secondAttribute="trailing" constant="11" id="elS-jW-Bk9"/>
+                <constraint firstItem="Nf4-gN-42Y" firstAttribute="leading" secondItem="aAf-VY-6CO" secondAttribute="trailing" constant="2" id="elS-jW-Bk9"/>
                 <constraint firstAttribute="trailing" secondItem="uPv-37-dOi" secondAttribute="trailing" constant="312" id="k6W-Zy-0ga"/>
                 <constraint firstItem="Nf4-gN-42Y" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Ibr-mk-lwr" secondAttribute="trailing" id="meO-YN-eag"/>
                 <constraint firstAttribute="bottom" secondItem="pb0-gR-J2p" secondAttribute="bottom" constant="20" symbolic="YES" id="peX-ew-Mfa"/>
@@ -546,7 +544,7 @@
                 <constraint firstItem="aAf-VY-6CO" firstAttribute="top" secondItem="Nf4-gN-42Y" secondAttribute="top" id="txR-uZ-BDU"/>
                 <constraint firstItem="uPv-37-dOi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="b15-I3-wDL" secondAttribute="leading" id="vy6-nT-6d3"/>
             </constraints>
-            <point key="canvasLocation" x="652" y="-524.5"/>
+            <point key="canvasLocation" x="651.5" y="-524.5"/>
         </customView>
     </objects>
     <resources>

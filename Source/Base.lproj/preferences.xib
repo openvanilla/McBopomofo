@@ -12,6 +12,7 @@
                 <outlet property="basicSettingsView" destination="YEO-Nr-Xri" id="pdk-Lp-WUQ"/>
                 <outlet property="basisKeyboardLayoutButton" destination="cb1-du-5Jn" id="y2z-Ft-2tt"/>
                 <outlet property="chooseUserPhrasesFolderButton" destination="dY1-Wz-mrw" id="SFY-RV-lcM"/>
+                <outlet property="customUserPhraseLocationEnabledButton" destination="z8D-qk-sAN" id="XqP-Sm-HPo"/>
                 <outlet property="fontSizePopUpButton" destination="AvT-mU-HNg" id="L4K-3Z-bRO"/>
                 <outlet property="openUserPhrasesFolderButton" destination="OKJ-84-kIv" id="Xk5-Zk-fMU"/>
                 <outlet property="selectionKeyComboBox" destination="8Kb-9o-Czh" id="m6b-DJ-r5a"/>
@@ -488,16 +489,17 @@
                         <font key="font" metaFont="menu"/>
                         <menu key="menu" id="WPe-Ie-ipP">
                             <items>
-                                <menuItem title="Default" state="on" id="avu-Uo-JGI"/>
-                                <menuItem title="Custom" id="kWI-eV-0x0"/>
+                                <menuItem title="Default" state="on" id="avu-Uo-JGI">
+                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                </menuItem>
+                                <menuItem title="Custom" tag="1" id="kWI-eV-0x0">
+                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                </menuItem>
                             </items>
                         </menu>
-                        <connections>
-                            <binding destination="32" name="selectedIndex" keyPath="values.UseCustomUserPhraseLocation" id="kyT-dQ-emI"/>
-                        </connections>
                     </popUpButtonCell>
                     <connections>
-                        <action selector="changeUserPhraseEnabledAction:" target="-2" id="mvb-Mi-dw7"/>
+                        <action selector="changeCustomUserPhraseLocationEnabledAction:" target="-2" id="fUI-Z1-8Cg"/>
                     </connections>
                 </popUpButton>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEv-3b-PV4">

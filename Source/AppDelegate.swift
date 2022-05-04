@@ -174,7 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
             UserDefaults.standard.synchronize()
         }
 
-        NotificationCenter.default.addObserver(forName: .customUserPhraseLocationDidChange, object: nil, queue: OperationQueue.main) { notification in
+        NotificationCenter.default.addObserver(forName: .userPhraseLocationDidChange, object: nil, queue: OperationQueue.main) { notification in
             self.updateUserPhases()
         }
 
