@@ -319,7 +319,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         stateCallback(state);
     }
 
-    bool composeReading = false;
+
+    BOOL keyConsumedByReading = NO;
     BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold];
 
     // MARK: Handle BPMF Keys
@@ -327,17 +328,18 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // see if it's valid BPMF reading
     if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char)charCode)) {
         _bpmfReadingBuffer->combineKey((char)charCode);
+        keyConsumedByReading = YES;
 
         // if we have a tone marker, we have to insert the reading to the
         // builder in other words, if we don't have a tone marker, we just
         // update the composing buffer
-        composeReading = _bpmfReadingBuffer->hasToneMarker();
-        if (!composeReading) {
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
+        if (!_bpmfReadingBuffer->hasToneMarker()) {
+            stateCallback([self buildInputtingState]);
             return YES;
         }
     }
+
+    BOOL composeReading = _bpmfReadingBuffer->hasToneMarker() && !_bpmfReadingBuffer->hasToneMarkerOnly();
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
@@ -349,8 +351,12 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // see if we have a unigram for this
         if (!_languageModel->hasUnigramsForKey(reading)) {
             errorCallback();
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
+            _bpmfReadingBuffer->clear();
+            if (!_builder->length()) {
+                stateCallback([[InputStateEmptyIgnoringPreviousState alloc] init]);
+            } else {
+                stateCallback([self buildInputtingState]);
+            }
             return YES;
         }
 
@@ -404,6 +410,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         // and tells the client that the key is consumed
         return YES;
+    }
+
+    // The only possibility for this to be true is that the Bopomofo reading
+    // already has a tone marker but the last key is *not* a tone marker key. An
+    // example is the sequence "6u" with the Standard layout, which produces "ㄧˊ"
+    // but does not compose. Only sequences such as "u6", "6u6", "6u3", or "6u "
+    // would compose.
+    if (keyConsumedByReading) {
+        stateCallback([self buildInputtingState]);
+        return true;
     }
 
     // MARK: Space and Down
@@ -578,10 +594,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // Bopomofo reading, in odds with the expectation of users from
         // other platforms
 
-        if (!_bpmfReadingBuffer->isEmpty()) {
+        if (!_bpmfReadingBuffer->isEmpty() || _bpmfReadingBuffer->hasToneMarkerOnly()) {
             _bpmfReadingBuffer->clear();
             if (!_builder->length()) {
-                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);
             } else {
                 InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
@@ -736,7 +752,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return NO;
     }
 
-    if (_bpmfReadingBuffer->isEmpty()) {
+    if (_bpmfReadingBuffer->hasToneMarkerOnly()) {
+        _bpmfReadingBuffer->clear();
+    }
+    else if (_bpmfReadingBuffer->isEmpty()) {
         if (_builder->cursorIndex()) {
             _builder->deleteReadingBeforeCursor();
             [self _walk];
