@@ -253,10 +253,11 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
 
 + (NSString *)dataFolderPath
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES);
-    NSString *appSupportPath = paths[0];
-    NSString *userDictPath = [appSupportPath stringByAppendingPathComponent:@"McBopomofo"];
-    return userDictPath;
+    BOOL useCustomLocation = Preferences.useCustomUserPhraseLocation;
+    if (!useCustomLocation) {
+        return [UserPhraseLocationHelper defaultUserPhraseLocation];
+    }
+    return Preferences.customUserPhraseLocation;
 }
 
 + (NSString *)userPhrasesDataPathMcBopomofo

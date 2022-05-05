@@ -84,7 +84,7 @@ public class FSEventStreamHelper : NSObject {
         return true
     }
 
-    func stop() {
+    public func stop() {
         guard let stream = stream else {
             return
         }
