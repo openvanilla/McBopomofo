@@ -594,7 +594,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         // Bopomofo reading, in odds with the expectation of users from
         // other platforms
 
-        if (!_bpmfReadingBuffer->isEmpty() || _bpmfReadingBuffer->hasToneMarkerOnly()) {
+        if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
             if (!_builder->length()) {
                 InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
