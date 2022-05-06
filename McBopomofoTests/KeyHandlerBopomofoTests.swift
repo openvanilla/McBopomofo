@@ -493,10 +493,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
             } errorCallback: {
             }
         }
-        XCTAssertTrue(state is InputState.Inputting, "\(state)")
-        if let state = state as? InputState.Inputting {
-            XCTAssertEqual(state.composingBuffer, "ㄙㄛˋ")
-        }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
     }
 
     func testInputting() {
@@ -1484,7 +1481,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        XCTAssertTrue(state is InputState.Empty, "\(state)")
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
         Preferences.escToCleanInputBuffer = enabled
     }
 
