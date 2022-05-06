@@ -556,6 +556,56 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
             return false
         }
         LanguageModelManager.writeUserPhrase(state.userPhrase)
+
+        if !Preferences.gitCommitAfterAddingNewPhrase {
+            return true
+        }
+        NSLog("starting git")
+
+        var git = Preferences.gitPath.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        if git.isEmpty {
+            git = "/usr/bin/git"
+        }
+
+        func run(_ arguments: [String]) {
+            let process = Process()
+            process.launchPath = git
+            process.arguments = arguments
+            // Some user may sign the git commits with gpg, and gpg is often
+            // installed by homebrew, so we add the path of homebrew here.
+            process.environment = ["PATH": "/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin"]
+
+            let path = LanguageModelManager.dataFolderPath
+            if #available(macOS 10.13, *) {
+                process.currentDirectoryURL = URL(fileURLWithPath: path)
+            } else {
+                FileManager.default.changeCurrentDirectoryPath(path)
+            }
+
+            #if DEBUG
+            let pipe = Pipe()
+            process.standardError = pipe
+            #endif
+            process.launch()
+            process.waitUntilExit()
+            #if DEBUG
+            let read = pipe.fileHandleForReading
+            let data = read.readDataToEndOfFile()
+            let s = String(data: data, encoding: .utf8)
+            NSLog("result \(String(describing: s))")
+            #endif
+        }
+
+        DispatchQueue.global().async {
+            run(["init", "-b", "master"])
+            run(["add", "."])
+            run(["commit", "-m", "Add \(state.selectedText)"])
+            if Preferences.gitPushAfterAddingNewPhrase {
+                run(["pull", "--rebase", "origin", "master"])
+                run(["push", "origin", "master"])
+            }
+        }
+
         return true
     }
 }

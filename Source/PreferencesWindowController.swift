@@ -50,6 +50,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
     @IBOutlet weak var userPhrasesSettingsView: NSView!
     @IBOutlet weak var advancedSettingsView: NSView!
 
+    @IBOutlet weak var gitPathField: NSTextField!
+
     override func awakeFromNib() {
         let toolbar = NSToolbar(identifier: "preference toolbar")
         toolbar.allowsUserCustomization = false
@@ -163,6 +165,7 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         let index = Preferences.useCustomUserPhraseLocation ? 1 : 0
         customUserPhraseLocationEnabledButton.selectItem(at: index)
         updateUserPhraseLocation()
+        gitPathField.stringValue = Preferences.gitPath
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {

@@ -68,6 +68,10 @@ private let kMaxComposingBufferSize = 20
 private let kDefaultKeys = "123456789"
 private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 
+private let kGitPathKey = "GitPath"
+private let kGitCommitEnabledKey = "GitCommitEnabled"
+private let kGitPushEnabledKey = "GitPushEndabled"
+
 // MARK: Property wrappers
 
 @propertyWrapper
@@ -352,14 +356,9 @@ class Preferences: NSObject {
 
     }
 
-    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
-    @objc static var phraseReplacementEnabled: Bool
+}
 
-    @objc static func togglePhraseReplacementEnabled() -> Bool {
-        phraseReplacementEnabled = !phraseReplacementEnabled
-        return phraseReplacementEnabled
-    }
-
+extension Preferences {
     /// The conversion engine.
     ///
     /// - 0: OpenCC
@@ -381,6 +380,17 @@ class Preferences: NSObject {
     @objc static var chineseConversionStyleName: String? {
         ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
     }
+}
+
+extension Preferences {
+
+    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
+    @objc static var phraseReplacementEnabled: Bool
+
+    @objc static func togglePhraseReplacementEnabled() -> Bool {
+        phraseReplacementEnabled = !phraseReplacementEnabled
+        return phraseReplacementEnabled
+    }
 
     @UserDefault(key: kAssociatedPhrasesEnabledKey, defaultValue: false)
     @objc static var associatedPhrasesEnabled: Bool
@@ -389,6 +399,9 @@ class Preferences: NSObject {
         associatedPhrasesEnabled = !associatedPhrasesEnabled
         return associatedPhrasesEnabled
     }
+}
+
+extension Preferences {
 
     /// The behavior of pressing letter keys.
     ///
@@ -449,4 +462,18 @@ extension Preferences {
             postUserPhraseLocationNotification()
         }
     }
+}
+
+
+extension Preferences {
+
+    @UserDefault(key: kGitPathKey, defaultValue: "/usr/bin/git")
+    @objc static var gitPath: String
+
+    @UserDefault(key: kGitCommitEnabledKey, defaultValue: false)
+    @objc static var gitCommitAfterAddingNewPhrase: Bool
+
+    @UserDefault(key: kGitPushEnabledKey, defaultValue: false)
+    @objc static var gitPushAfterAddingNewPhrase: Bool
+
 }
