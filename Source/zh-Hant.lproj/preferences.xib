@@ -40,7 +40,7 @@
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BSi-pH-F8f">
-                    <rect key="frame" x="181" y="426" width="99" height="25"/>
+                    <rect key="frame" x="185" y="426" width="95" height="25"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="iXH-DJ-dBb">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -70,7 +70,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6eT-rC-gVz">
-                    <rect key="frame" x="181" y="396" width="236" height="25"/>
+                    <rect key="frame" x="185" y="396" width="232" height="25"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="M0n-R9-S5B">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -444,7 +444,7 @@
             <rect key="frame" x="0.0" y="0.0" width="439" height="177"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uPv-37-dOi">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="107" translatesAutoresizingMaskIntoConstraints="NO" id="uPv-37-dOi">
                     <rect key="frame" x="18" y="141" width="111" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="使用者詞彙位置：" id="ulY-l0-tqg">
                         <font key="font" metaFont="system"/>
@@ -485,7 +485,7 @@
                         <binding destination="32" name="enabled" keyPath="values.UseCustomUserPhraseLocation" id="KRZ-JC-JCe"/>
                     </connections>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pb0-gR-J2p">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pb0-gR-J2p">
                     <rect key="frame" x="19" y="20" width="401" height="28"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="397" id="PDr-LU-81S"/>

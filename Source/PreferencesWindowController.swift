@@ -230,9 +230,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
 
     @IBAction func openUserPhrasedFolderAction(_ sender: Any) {
         let path =
-         (Preferences.useCustomUserPhraseLocation ?
+         Preferences.useCustomUserPhraseLocation ?
             Preferences.customUserPhraseLocation :
-            UserPhraseLocationHelper.defaultUserPhraseLocation) ??
             UserPhraseLocationHelper.defaultUserPhraseLocation
         let url = URL(fileURLWithPath: path)
         NSWorkspace.shared.open(url)

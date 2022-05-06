@@ -471,7 +471,7 @@
             <rect key="frame" x="0.0" y="0.0" width="477" height="175"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jIf-hP-5m5">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jIf-hP-5m5">
                     <rect key="frame" x="18" y="139" width="137" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="User Phrase Location:" id="Sc6-Rd-pOy">
                         <font key="font" usesAppearanceFont="YES"/>
@@ -517,7 +517,7 @@
                         <binding destination="32" name="enabled" keyPath="values.UseCustomUserPhraseLocation" id="liS-L1-RTD"/>
                     </connections>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="svr-IJ-6mz">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="svr-IJ-6mz">
                     <rect key="frame" x="20" y="20" width="439" height="28"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="435" id="5et-IU-3aG"/>
@@ -562,6 +562,7 @@
                 <constraint firstItem="VEv-3b-PV4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="z8D-qk-sAN" secondAttribute="trailing" constant="8" symbolic="YES" id="9tO-41-XBh"/>
                 <constraint firstItem="z8D-qk-sAN" firstAttribute="top" secondItem="jIf-hP-5m5" secondAttribute="bottom" constant="17" id="KKk-Ye-xfr"/>
                 <constraint firstItem="VEv-3b-PV4" firstAttribute="centerY" secondItem="dY1-Wz-mrw" secondAttribute="centerY" id="KQJ-fm-UVm"/>
+                <constraint firstAttribute="trailing" secondItem="svr-IJ-6mz" secondAttribute="trailing" constant="20" symbolic="YES" id="MR7-Fg-Auy"/>
                 <constraint firstItem="jIf-hP-5m5" firstAttribute="leading" secondItem="z8D-qk-sAN" secondAttribute="leading" id="Y2f-Ms-Jkv"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jIf-hP-5m5" secondAttribute="trailing" constant="20" symbolic="YES" id="aC6-ep-0LG"/>
                 <constraint firstItem="dY1-Wz-mrw" firstAttribute="leading" secondItem="VEv-3b-PV4" secondAttribute="trailing" constant="8" symbolic="YES" id="ali-13-uRi"/>

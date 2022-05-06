@@ -466,6 +466,13 @@ class BopomofoReadingBuffer {
 
   bool hasToneMarker() const { return syllable_.hasToneMarker(); }
 
+  bool hasToneMarkerOnly() const {
+    return syllable_.hasToneMarker() &&
+          !(syllable_.hasConsonant() || syllable_.hasMiddleVowel() ||
+            syllable_.hasVowel());
+  }
+
+
  protected:
   const BopomofoKeyboardLayout* layout_;
   BPMF syllable_;

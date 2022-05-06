@@ -45,6 +45,8 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
 
     // Regression test for #292.
     func testUppercaseLetterWhenEmpty() {
+        let tmp = Preferences.letterBehavior
+        Preferences.letterBehavior = 0
         let input = KeyHandlerInput(inputText: "A", keyCode: KeyCode.enter.rawValue, charCode: charCode("A"), flags: [], isVerticalMode: false)
         var state: InputState = InputState.Empty()
         let result = handler.handle(input: input, state: state) { newState in
@@ -52,6 +54,7 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
         } errorCallback: {
         }
         XCTAssertFalse(result)
+        Preferences.letterBehavior = tmp
     }
 
     func testPunctuationTable() {
