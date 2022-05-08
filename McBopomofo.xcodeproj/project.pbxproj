@@ -48,6 +48,7 @@
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
 		D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
+		D476CB492827DB6300F48552 /* add-phrase-hook.sh in Resources */ = {isa = PBXBuildFile; fileRef = D476CB482827DB6300F48552 /* add-phrase-hook.sh */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */; };
 		D47D73A827A6C84F00255A50 /* associated-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.txt */; };
@@ -132,7 +133,7 @@
 		6A6ED170279765140012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6A6ED171279765170012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases.txt"; sourceTree = "<group>"; };
 		6A6ED1722797651A0012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-phrases-replacement.txt"; sourceTree = "<group>"; };
-		6A74B14827C16845001988F4 /* Grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Grid.cpp; path = Grid.cpp; sourceTree = "<group>"; };
+		6A74B14827C16845001988F4 /* Grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Grid.cpp; sourceTree = "<group>"; };
 		6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -173,6 +174,7 @@
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
 		D461B791279DAC010070E734 /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
+		D476CB482827DB6300F48552 /* add-phrase-hook.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "add-phrase-hook.sh"; sourceTree = "<group>"; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerBopomofoTests.swift; sourceTree = "<group>"; };
 		D47D73A727A6C84F00255A50 /* associated-phrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "associated-phrases.txt"; sourceTree = "<group>"; };
@@ -356,6 +358,7 @@
 		6A0D4F4715FC0EB900ABF4B3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D476CB482827DB6300F48552 /* add-phrase-hook.sh */,
 				D4F0BBE9279B14C20071253C /* Credits.rtf */,
 				6A6ED162279764CD0012872E /* Custom Phrase Templates */,
 				6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */,
@@ -594,6 +597,7 @@
 				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
 				D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */,
+				D476CB492827DB6300F48552 /* add-phrase-hook.sh in Resources */,
 				6A6ED16C2797650A0012872E /* template-data.txt in Resources */,
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
 				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,

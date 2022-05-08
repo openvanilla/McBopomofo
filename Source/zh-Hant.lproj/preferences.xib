@@ -8,13 +8,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencesWindowController">
             <connections>
+                <outlet property="addPhraseHookPathField" destination="VKE-yo-TdG" id="Fsn-nc-LMM"/>
                 <outlet property="advancedSettingsView" destination="L2Q-IX-SXc" id="eYt-OU-iGv"/>
                 <outlet property="basicSettingsView" destination="eWf-pC-0Bt" id="IHt-cQ-iV8"/>
                 <outlet property="basisKeyboardLayoutButton" destination="6eT-rC-gVz" id="CCy-tX-eCP"/>
                 <outlet property="chooseUserPhrasesFolderButton" destination="Nf4-gN-42Y" id="chL-PA-nAW"/>
                 <outlet property="customUserPhraseLocationEnabledButton" destination="b15-I3-wDL" id="PUy-eF-NmW"/>
                 <outlet property="fontSizePopUpButton" destination="YF3-dA-BAc" id="Le4-ge-hZ1"/>
-                <outlet property="gitPathField" destination="VKE-yo-TdG" id="Fsn-nc-LMM"/>
                 <outlet property="openUserPhrasesFolderButton" destination="Ibr-mk-lwr" id="qs6-94-i9P"/>
                 <outlet property="selectionKeyComboBox" destination="gtY-jT-2F6" id="oWz-wL-72Z"/>
                 <outlet property="userPhrasesSettingsView" destination="M7i-Af-lNp" id="1Hd-xc-cPN"/>
@@ -484,12 +484,12 @@
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" preferredMaxLayoutWidth="405" translatesAutoresizingMaskIntoConstraints="NO" id="pb0-gR-J2p">
-                    <rect key="frame" x="18" y="177" width="403" height="28"/>
+                    <rect key="frame" x="18" y="177" width="400" height="28"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="8wn-XD-VFx"/>
                     </constraints>
                     <textFieldCell key="cell" title="您可以將使用者詞彙放在 Google Drive 或是 DropBox 等服務的目錄下，自動備份或同步詞庫。" id="JNA-x3-YbS">
-                        <font key="font" size="11" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -505,8 +505,8 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="bHQ-bR-nHc">
-                    <rect key="frame" x="18" y="120" width="400" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="使用 Git 管理使用者詞彙：" id="Yhg-pv-SyV">
+                    <rect key="frame" x="18" y="120" width="396" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="在手動加入使用者詞彙之後:" id="Yhg-pv-SyV">
                         <font key="font" size="13" name=".PingFangTC-Regular"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -514,36 +514,38 @@
                 </textField>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="u6i-rg-gq3">
                     <rect key="frame" x="18" y="86" width="398" height="18"/>
-                    <buttonCell key="cell" type="check" title="在新增詞彙時執行 git commit" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="bkX-1g-jGL">
+                    <buttonCell key="cell" type="check" title="執行特定的 Shell Script" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="bkX-1g-jGL">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" size="13" name=".PingFangTC-Regular"/>
                     </buttonCell>
-                </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="Dg7-xd-toC">
-                    <rect key="frame" x="20" y="60" width="201" height="18"/>
-                    <buttonCell key="cell" type="check" title="在新增詞彙時同時執行 git push" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6nf-0v-xSZ">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
-                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.AddPhraseHookEnabled" id="aI7-Rc-u4x"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VKE-yo-TdG">
-                    <rect key="frame" x="78" y="20" width="338" height="21"/>
+                    <rect key="frame" x="71" y="58" width="346" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="346" id="62p-rx-Sp1"/>
+                    </constraints>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="wEV-no-bpP">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.AddPhraseHookPath" id="KtP-IE-zum"/>
+                    </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="8ku-Pt-FIH">
-                    <rect key="frame" x="20" y="22" width="52" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Git 路徑" id="2Ox-BG-OqC">
-                        <font key="font" usesAppearanceFont="YES"/>
+                    <rect key="frame" x="21" y="60" width="44" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="路徑：" id="2Ox-BG-OqC">
+                        <font key="font" size="13" name=".PingFangTC-Regular"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="LVR-3l-T11">
-                    <rect key="frame" x="20" y="154" width="396" height="5"/>
+                    <rect key="frame" x="20" y="154" width="393" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Nf4-gN-42Y">
                     <rect key="frame" x="384" y="262" width="32" height="20"/>
@@ -556,43 +558,53 @@
                         <binding destination="32" name="enabled" keyPath="values.UseCustomUserPhraseLocation" id="v3f-1L-haF"/>
                     </connections>
                 </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" preferredMaxLayoutWidth="405" translatesAutoresizingMaskIntoConstraints="NO" id="kxZ-N1-Oph">
+                    <rect key="frame" x="19" y="20" width="399" height="28"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="28" id="NbE-2C-xvN"/>
+                        <constraint firstAttribute="width" constant="395" id="OnT-jP-bLz"/>
+                    </constraints>
+                    <textFieldCell key="cell" title="您可以在加詞之後，透過這個 Shell Script 執行指定的工作，像是使用 git 備份詞庫。這個 script 會在你的使用者詞彙資料夾下執行。" id="V5g-gd-giX">
+                        <font key="font" size="11" name=".PingFangTC-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <constraints>
                 <constraint firstItem="aAf-VY-6CO" firstAttribute="top" secondItem="uPv-37-dOi" secondAttribute="bottom" constant="16" id="1n5-Ax-1o3"/>
-                <constraint firstItem="8ku-Pt-FIH" firstAttribute="leading" secondItem="M7i-Af-lNp" secondAttribute="leading" constant="22" id="2Vy-gg-ABx"/>
+                <constraint firstItem="8ku-Pt-FIH" firstAttribute="leading" secondItem="M7i-Af-lNp" secondAttribute="leading" constant="23" id="2Vy-gg-ABx"/>
                 <constraint firstItem="aAf-VY-6CO" firstAttribute="leading" secondItem="b15-I3-wDL" secondAttribute="trailing" constant="8" symbolic="YES" id="2xx-MO-vFL"/>
-                <constraint firstItem="LVR-3l-T11" firstAttribute="trailing" secondItem="bHQ-bR-nHc" secondAttribute="trailing" id="3ff-sp-gk8"/>
-                <constraint firstItem="8ku-Pt-FIH" firstAttribute="baseline" secondItem="VKE-yo-TdG" secondAttribute="baseline" id="5gG-7V-4pM"/>
+                <constraint firstItem="LVR-3l-T11" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bHQ-bR-nHc" secondAttribute="trailing" id="3ff-sp-gk8"/>
+                <constraint firstAttribute="trailing" secondItem="VKE-yo-TdG" secondAttribute="trailing" constant="19" id="4cr-1c-bXw"/>
                 <constraint firstItem="uPv-37-dOi" firstAttribute="top" secondItem="M7i-Af-lNp" secondAttribute="top" constant="20" symbolic="YES" id="61j-pT-WP0"/>
                 <constraint firstItem="bHQ-bR-nHc" firstAttribute="top" secondItem="LVR-3l-T11" secondAttribute="bottom" constant="20" id="6UW-mX-xRg"/>
-                <constraint firstItem="u6i-rg-gq3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Dg7-xd-toC" secondAttribute="leading" constant="-2" id="6Yh-Mu-LOs"/>
+                <constraint firstItem="kxZ-N1-Oph" firstAttribute="leading" secondItem="M7i-Af-lNp" secondAttribute="leading" constant="21" id="6Vf-Ld-TKh"/>
                 <constraint firstItem="b15-I3-wDL" firstAttribute="top" secondItem="Nf4-gN-42Y" secondAttribute="top" constant="1" id="8qw-89-loy"/>
                 <constraint firstAttribute="trailing" secondItem="u6i-rg-gq3" secondAttribute="trailing" constant="20" id="9Le-ho-7R4"/>
                 <constraint firstItem="pb0-gR-J2p" firstAttribute="top" secondItem="b15-I3-wDL" secondAttribute="bottom" constant="56" id="9nb-xg-rRs"/>
                 <constraint firstItem="pb0-gR-J2p" firstAttribute="leading" secondItem="M7i-Af-lNp" secondAttribute="leading" constant="20" symbolic="YES" id="AOA-8e-Cc7"/>
-                <constraint firstAttribute="bottom" secondItem="VKE-yo-TdG" secondAttribute="bottom" constant="20" symbolic="YES" id="Bq4-yJ-tdS"/>
-                <constraint firstItem="Dg7-xd-toC" firstAttribute="leading" secondItem="8ku-Pt-FIH" secondAttribute="leading" id="Dvp-kK-Lf0"/>
+                <constraint firstItem="kxZ-N1-Oph" firstAttribute="centerX" secondItem="bHQ-bR-nHc" secondAttribute="centerX" constant="2.5" id="HR2-JX-BWK"/>
                 <constraint firstItem="uPv-37-dOi" firstAttribute="leading" secondItem="b15-I3-wDL" secondAttribute="leading" id="ICE-xS-Oo7"/>
                 <constraint firstItem="Ibr-mk-lwr" firstAttribute="top" secondItem="aAf-VY-6CO" secondAttribute="bottom" constant="8" symbolic="YES" id="Iyo-mY-xh6"/>
                 <constraint firstItem="aAf-VY-6CO" firstAttribute="leading" secondItem="Ibr-mk-lwr" secondAttribute="leading" id="Jgh-BG-sf8"/>
                 <constraint firstAttribute="trailing" secondItem="Nf4-gN-42Y" secondAttribute="trailing" constant="20" id="KIa-Um-g7T"/>
-                <constraint firstItem="LVR-3l-T11" firstAttribute="leading" secondItem="bHQ-bR-nHc" secondAttribute="leading" id="MzM-SS-Xoe"/>
+                <constraint firstItem="LVR-3l-T11" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bHQ-bR-nHc" secondAttribute="leading" id="MzM-SS-Xoe"/>
                 <constraint firstItem="pb0-gR-J2p" firstAttribute="leading" secondItem="LVR-3l-T11" secondAttribute="leading" id="PC7-nO-eHU"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="uPv-37-dOi" secondAttribute="trailing" constant="20" symbolic="YES" id="Sut-lJ-H8U"/>
-                <constraint firstAttribute="trailing" secondItem="VKE-yo-TdG" secondAttribute="trailing" constant="20" symbolic="YES" id="VH8-r9-hix"/>
-                <constraint firstItem="VKE-yo-TdG" firstAttribute="leading" secondItem="8ku-Pt-FIH" secondAttribute="trailing" constant="8" id="XLP-1J-iJe"/>
+                <constraint firstItem="VKE-yo-TdG" firstAttribute="leading" secondItem="8ku-Pt-FIH" secondAttribute="trailing" constant="8" symbolic="YES" id="Tzj-Go-2kj"/>
+                <constraint firstItem="VKE-yo-TdG" firstAttribute="top" secondItem="u6i-rg-gq3" secondAttribute="bottom" constant="8" symbolic="YES" id="UWA-sC-S5u"/>
                 <constraint firstItem="Nf4-gN-42Y" firstAttribute="leading" secondItem="aAf-VY-6CO" secondAttribute="trailing" constant="3" id="aln-Ec-yVf"/>
                 <constraint firstItem="Ibr-mk-lwr" firstAttribute="leading" secondItem="M7i-Af-lNp" secondAttribute="leading" constant="90" id="bDa-M4-MgR"/>
-                <constraint firstItem="bHQ-bR-nHc" firstAttribute="leading" secondItem="u6i-rg-gq3" secondAttribute="leading" id="eeu-Ug-VkD"/>
-                <constraint firstItem="Nf4-gN-42Y" firstAttribute="trailing" secondItem="VKE-yo-TdG" secondAttribute="trailing" id="fBU-7U-FVB"/>
+                <constraint firstItem="bHQ-bR-nHc" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="u6i-rg-gq3" secondAttribute="leading" id="eeu-Ug-VkD"/>
+                <constraint firstItem="VKE-yo-TdG" firstAttribute="baseline" secondItem="8ku-Pt-FIH" secondAttribute="baseline" id="fS3-u6-eon"/>
                 <constraint firstItem="Ibr-mk-lwr" firstAttribute="top" secondItem="Nf4-gN-42Y" secondAttribute="bottom" constant="9" id="goy-0f-pXW"/>
+                <constraint firstAttribute="bottom" secondItem="kxZ-N1-Oph" secondAttribute="bottom" constant="20" symbolic="YES" id="grf-mQ-HWe"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Ibr-mk-lwr" secondAttribute="trailing" constant="20" symbolic="YES" id="jDb-2v-wey"/>
-                <constraint firstItem="Dg7-xd-toC" firstAttribute="top" secondItem="u6i-rg-gq3" secondAttribute="bottom" constant="10" id="may-FC-63N"/>
                 <constraint firstItem="u6i-rg-gq3" firstAttribute="top" secondItem="bHQ-bR-nHc" secondAttribute="bottom" constant="17" id="u2J-Ll-gO3"/>
                 <constraint firstItem="aAf-VY-6CO" firstAttribute="baseline" secondItem="b15-I3-wDL" secondAttribute="firstBaseline" id="ved-KU-bXV"/>
                 <constraint firstItem="LVR-3l-T11" firstAttribute="top" secondItem="pb0-gR-J2p" secondAttribute="bottom" constant="20" id="vr6-KU-y6e"/>
                 <constraint firstItem="pb0-gR-J2p" firstAttribute="top" secondItem="Ibr-mk-lwr" secondAttribute="bottom" constant="27" id="wi4-Nb-WPT"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Dg7-xd-toC" secondAttribute="trailing" constant="20" symbolic="YES" id="xML-Hl-f7Q"/>
                 <constraint firstItem="b15-I3-wDL" firstAttribute="baseline" secondItem="aAf-VY-6CO" secondAttribute="baseline" id="ydz-Cc-Zmx"/>
                 <constraint firstItem="pb0-gR-J2p" firstAttribute="trailing" secondItem="LVR-3l-T11" secondAttribute="trailing" constant="3" id="z6Y-vX-c2v"/>
             </constraints>

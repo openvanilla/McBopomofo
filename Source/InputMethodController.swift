@@ -557,19 +557,13 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
         }
         LanguageModelManager.writeUserPhrase(state.userPhrase)
 
-        if !Preferences.gitCommitAfterAddingNewPhrase {
+        if !Preferences.addPhraseHookEnabled {
             return true
         }
-        NSLog("starting git")
 
-        var git = Preferences.gitPath.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        if git.isEmpty {
-            git = "/usr/bin/git"
-        }
-
-        func run(_ arguments: [String]) {
+        func run(_ script: String, arguments: [String]) {
             let process = Process()
-            process.launchPath = git
+            process.launchPath = script
             process.arguments = arguments
             // Some user may sign the git commits with gpg, and gpg is often
             // installed by homebrew, so we add the path of homebrew here.
@@ -596,14 +590,10 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
             #endif
         }
 
+        let script = Preferences.addPhraseHookPath
+
         DispatchQueue.global().async {
-            run(["init", "-b", "master"])
-            run(["add", "."])
-            run(["commit", "-m", "Add \(state.selectedText)"])
-            if Preferences.gitPushAfterAddingNewPhrase {
-                run(["pull", "--rebase", "origin", "master"])
-                run(["push", "origin", "master"])
-            }
+            run("/bin/sh", arguments: [script, state.selectedText])
         }
 
         return true

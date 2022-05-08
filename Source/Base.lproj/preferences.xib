@@ -8,13 +8,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencesWindowController">
             <connections>
+                <outlet property="addPhraseHookPathField" destination="FMN-EJ-wzd" id="e14-8c-nZJ"/>
                 <outlet property="advancedSettingsView" destination="S2Y-nP-nn8" id="oyt-cm-zZ1"/>
                 <outlet property="basicSettingsView" destination="YEO-Nr-Xri" id="pdk-Lp-WUQ"/>
                 <outlet property="basisKeyboardLayoutButton" destination="cb1-du-5Jn" id="y2z-Ft-2tt"/>
                 <outlet property="chooseUserPhrasesFolderButton" destination="dY1-Wz-mrw" id="SFY-RV-lcM"/>
                 <outlet property="customUserPhraseLocationEnabledButton" destination="z8D-qk-sAN" id="XqP-Sm-HPo"/>
                 <outlet property="fontSizePopUpButton" destination="AvT-mU-HNg" id="L4K-3Z-bRO"/>
-                <outlet property="gitPathField" destination="FMN-EJ-wzd" id="e14-8c-nZJ"/>
                 <outlet property="openUserPhrasesFolderButton" destination="OKJ-84-kIv" id="Xk5-Zk-fMU"/>
                 <outlet property="selectionKeyComboBox" destination="8Kb-9o-Czh" id="m6b-DJ-r5a"/>
                 <outlet property="userPhrasesSettingsView" destination="7EY-3X-sVm" id="HhQ-j8-3fG"/>
@@ -469,11 +469,11 @@
             <point key="canvasLocation" x="130" y="-137"/>
         </view>
         <customView id="7EY-3X-sVm">
-            <rect key="frame" x="0.0" y="0.0" width="477" height="324"/>
+            <rect key="frame" x="0.0" y="0.0" width="477" height="329"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jIf-hP-5m5">
-                    <rect key="frame" x="18" y="288" width="137" height="16"/>
+                    <rect key="frame" x="18" y="293" width="137" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="User Phrase Location:" id="Sc6-Rd-pOy">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -481,7 +481,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z8D-qk-sAN">
-                    <rect key="frame" x="17" y="247" width="86" height="25"/>
+                    <rect key="frame" x="17" y="252" width="86" height="25"/>
                     <popUpButtonCell key="cell" type="push" title="Default" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="avu-Uo-JGI" id="Kln-Ca-WBd">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -501,7 +501,7 @@
                     </connections>
                 </popUpButton>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEv-3b-PV4">
-                    <rect key="frame" x="111" y="251" width="306" height="21"/>
+                    <rect key="frame" x="111" y="256" width="306" height="21"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="6kS-fE-Kz7">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -513,7 +513,7 @@
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="svr-IJ-6mz">
-                    <rect key="frame" x="20" y="169" width="439" height="28"/>
+                    <rect key="frame" x="20" y="174" width="439" height="28"/>
                     <textFieldCell key="cell" id="Vz3-KS-1rk">
                         <font key="font" metaFont="smallSystem"/>
                         <string key="title">You can specify the folder to store user phrases to the folder of Google Drive, DropBox and so on so you can backup the phrases.</string>
@@ -522,7 +522,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dY1-Wz-mrw">
-                    <rect key="frame" x="425" y="251" width="32" height="20"/>
+                    <rect key="frame" x="425" y="256" width="32" height="20"/>
                     <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="NSFolder" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="cyL-Sf-xhj">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -533,7 +533,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="249" verticalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="OKJ-84-kIv">
-                    <rect key="frame" x="111" y="226" width="346" height="21"/>
+                    <rect key="frame" x="111" y="231" width="346" height="21"/>
                     <buttonCell key="cell" type="bevel" title="Button" bezelStyle="rounded" imagePosition="overlaps" alignment="left" controlSize="small" imageScaling="proportionallyDown" inset="2" id="wCH-YR-bl5">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -543,51 +543,49 @@
                     </connections>
                 </button>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5ce-rm-tsn">
-                    <rect key="frame" x="20" y="146" width="433" height="5"/>
+                    <rect key="frame" x="20" y="151" width="433" height="5"/>
                 </box>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="HkV-PJ-yTW">
-                    <rect key="frame" x="18" y="112" width="437" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Use Git to Manage User Phrases" id="wGR-0A-cqv">
+                    <rect key="frame" x="18" y="117" width="437" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="After Adding a New Phrase:" id="wGR-0A-cqv">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="LVc-PG-N32">
-                    <rect key="frame" x="18" y="81" width="251" height="18"/>
-                    <buttonCell key="cell" type="check" title="Create commit when adding pheases" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="DaH-1b-AEw">
+                    <rect key="frame" x="18" y="86" width="251" height="18"/>
+                    <buttonCell key="cell" type="check" title="Run a shell script" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="DaH-1b-AEw">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <binding destination="32" name="value" keyPath="values.GitCommitEnabled" id="rVE-vE-eaP"/>
-                    </connections>
-                </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="Ygk-Rf-cPa">
-                    <rect key="frame" x="18" y="55" width="234" height="18"/>
-                    <buttonCell key="cell" type="check" title="Also push to remote Git repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="W37-4G-48Z">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="32" name="value" keyPath="values.GitPushEndabled" id="Tgs-QT-iQy"/>
+                        <binding destination="32" name="value" keyPath="values.AddPhraseHookEnabled" id="DFg-tK-bEf"/>
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FMN-EJ-wzd">
-                    <rect key="frame" x="86" y="20" width="367" height="20"/>
+                    <rect key="frame" x="62" y="57" width="391" height="21"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Sbq-JE-A4U">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
-                        <binding destination="32" name="value" keyPath="values.GitPath" id="075-lZ-q4q"/>
+                        <binding destination="32" name="value" keyPath="values.AddPhraseHookPath" id="IJd-KL-Ytn"/>
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jl3-q4-Fg4">
-                    <rect key="frame" x="20" y="22" width="53" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Git Path" id="ZY3-98-BrK">
+                    <rect key="frame" x="20" y="57" width="36" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Path:" id="ZY3-98-BrK">
                         <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="0R5-DI-uXK">
+                    <rect key="frame" x="20" y="20" width="439" height="28"/>
+                    <textFieldCell key="cell" title="You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder." id="byk-Br-x2Z">
+                        <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -596,24 +594,21 @@
             <constraints>
                 <constraint firstItem="HkV-PJ-yTW" firstAttribute="top" secondItem="5ce-rm-tsn" secondAttribute="bottom" constant="20" id="06I-WV-FLG"/>
                 <constraint firstItem="LVc-PG-N32" firstAttribute="top" secondItem="HkV-PJ-yTW" secondAttribute="bottom" constant="14" id="1SR-4j-JkW"/>
-                <constraint firstItem="FMN-EJ-wzd" firstAttribute="leading" secondItem="jl3-q4-Fg4" secondAttribute="trailing" constant="15" id="2ZY-ZP-oPj"/>
+                <constraint firstItem="0R5-DI-uXK" firstAttribute="trailing" secondItem="svr-IJ-6mz" secondAttribute="trailing" id="1mo-gD-wK7"/>
+                <constraint firstItem="FMN-EJ-wzd" firstAttribute="leading" secondItem="jl3-q4-Fg4" secondAttribute="trailing" constant="8" id="2ZY-ZP-oPj"/>
                 <constraint firstItem="svr-IJ-6mz" firstAttribute="leading" secondItem="7EY-3X-sVm" secondAttribute="leading" constant="22" id="2fV-iM-WFx"/>
                 <constraint firstItem="dY1-Wz-mrw" firstAttribute="trailing" secondItem="OKJ-84-kIv" secondAttribute="trailing" id="2k9-Yz-4kD"/>
                 <constraint firstItem="svr-IJ-6mz" firstAttribute="top" secondItem="z8D-qk-sAN" secondAttribute="bottom" constant="54" id="2r2-xi-AGU"/>
-                <constraint firstItem="FMN-EJ-wzd" firstAttribute="top" secondItem="Ygk-Rf-cPa" secondAttribute="bottom" constant="16" id="5ID-er-QT0"/>
                 <constraint firstItem="dY1-Wz-mrw" firstAttribute="leading" secondItem="VEv-3b-PV4" secondAttribute="trailing" constant="8" symbolic="YES" id="63e-ll-Z4g"/>
-                <constraint firstItem="jl3-q4-Fg4" firstAttribute="top" secondItem="Ygk-Rf-cPa" secondAttribute="bottom" constant="18" id="6kk-pp-RbK"/>
-                <constraint firstAttribute="trailing" secondItem="Ygk-Rf-cPa" secondAttribute="trailing" constant="225" id="A6w-gd-ulj"/>
                 <constraint firstAttribute="trailing" secondItem="jIf-hP-5m5" secondAttribute="trailing" constant="324" id="EqX-xp-Pp2"/>
                 <constraint firstItem="HkV-PJ-yTW" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="LVc-PG-N32" secondAttribute="leading" id="Jzb-8v-qz6"/>
-                <constraint firstItem="LVc-PG-N32" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ygk-Rf-cPa" secondAttribute="leading" id="KIo-81-mPC"/>
                 <constraint firstItem="z8D-qk-sAN" firstAttribute="leading" secondItem="5ce-rm-tsn" secondAttribute="leading" id="Kev-zn-gth"/>
-                <constraint firstItem="Ygk-Rf-cPa" firstAttribute="top" secondItem="LVc-PG-N32" secondAttribute="bottom" constant="10" id="RV1-Tv-qLH"/>
                 <constraint firstItem="5ce-rm-tsn" firstAttribute="leading" secondItem="HkV-PJ-yTW" secondAttribute="leading" id="RdF-Js-KNF"/>
                 <constraint firstItem="svr-IJ-6mz" firstAttribute="top" secondItem="OKJ-84-kIv" secondAttribute="bottom" constant="29" id="TcZ-gE-8La"/>
                 <constraint firstItem="VEv-3b-PV4" firstAttribute="baseline" secondItem="z8D-qk-sAN" secondAttribute="firstBaseline" id="WI7-c9-fvS"/>
                 <constraint firstAttribute="trailing" secondItem="5ce-rm-tsn" secondAttribute="trailing" constant="24" id="WTE-Hw-KyE"/>
                 <constraint firstItem="jIf-hP-5m5" firstAttribute="top" secondItem="7EY-3X-sVm" secondAttribute="top" constant="20" symbolic="YES" id="YoQ-xS-NO8"/>
+                <constraint firstAttribute="bottom" secondItem="0R5-DI-uXK" secondAttribute="bottom" constant="20" symbolic="YES" id="ZZG-uT-K7d"/>
                 <constraint firstAttribute="trailing" secondItem="LVc-PG-N32" secondAttribute="trailing" constant="208" id="aO1-Kh-lo1"/>
                 <constraint firstAttribute="trailing" secondItem="dY1-Wz-mrw" secondAttribute="trailing" constant="20" symbolic="YES" id="cth-lR-zne"/>
                 <constraint firstItem="5ce-rm-tsn" firstAttribute="top" secondItem="svr-IJ-6mz" secondAttribute="bottom" constant="20" id="d4Z-Er-O3v"/>
@@ -627,13 +622,14 @@
                 <constraint firstItem="VEv-3b-PV4" firstAttribute="leading" secondItem="z8D-qk-sAN" secondAttribute="trailing" constant="12" id="o7A-sm-Ikd"/>
                 <constraint firstItem="VEv-3b-PV4" firstAttribute="top" secondItem="dY1-Wz-mrw" secondAttribute="top" constant="-1" id="sux-hY-TMm"/>
                 <constraint firstItem="z8D-qk-sAN" firstAttribute="top" secondItem="jIf-hP-5m5" secondAttribute="bottom" constant="17" id="u6V-1k-RCG"/>
-                <constraint firstItem="jl3-q4-Fg4" firstAttribute="centerY" secondItem="FMN-EJ-wzd" secondAttribute="centerY" id="uvh-30-rhr"/>
+                <constraint firstItem="0R5-DI-uXK" firstAttribute="leading" secondItem="jl3-q4-Fg4" secondAttribute="leading" id="urR-wb-H71"/>
+                <constraint firstItem="jl3-q4-Fg4" firstAttribute="centerY" secondItem="FMN-EJ-wzd" secondAttribute="centerY" constant="2.5" id="uvh-30-rhr"/>
                 <constraint firstItem="jIf-hP-5m5" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="7EY-3X-sVm" secondAttribute="leading" constant="20" symbolic="YES" id="vZq-lZ-Eak"/>
                 <constraint firstItem="z8D-qk-sAN" firstAttribute="top" secondItem="VEv-3b-PV4" secondAttribute="top" constant="1" id="wev-88-kVx"/>
                 <constraint firstAttribute="trailing" secondItem="HkV-PJ-yTW" secondAttribute="trailing" constant="24" id="wr7-oo-1RE"/>
-                <constraint firstAttribute="bottom" secondItem="FMN-EJ-wzd" secondAttribute="bottom" constant="20" id="yeJ-6o-0MZ"/>
+                <constraint firstAttribute="bottom" secondItem="FMN-EJ-wzd" secondAttribute="bottom" constant="57" id="yeJ-6o-0MZ"/>
             </constraints>
-            <point key="canvasLocation" x="129.5" y="-458.5"/>
+            <point key="canvasLocation" x="129.5" y="-456.5"/>
         </customView>
     </objects>
     <resources>

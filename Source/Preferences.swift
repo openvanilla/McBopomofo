@@ -68,9 +68,8 @@ private let kMaxComposingBufferSize = 20
 private let kDefaultKeys = "123456789"
 private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 
-private let kGitPathKey = "GitPath"
-private let kGitCommitEnabledKey = "GitCommitEnabled"
-private let kGitPushEnabledKey = "GitPushEndabled"
+private let kAddPhraseHookEnabledKey = "AddPhraseHookEnabled"
+private let kAddPhraseHookPath = "AddPhraseHookPath"
 
 // MARK: Property wrappers
 
@@ -83,6 +82,22 @@ struct UserDefault<Value> {
     var wrappedValue: Value {
         get {
             container.object(forKey: key) as? Value ?? defaultValue
+        }
+        set {
+            container.set(newValue, forKey: key)
+        }
+    }
+}
+
+@propertyWrapper
+struct UserDefaultWithFunction<Value> {
+    let key: String
+    let defaultValueFunction: () -> Value
+    var container: UserDefaults = .standard
+
+    var wrappedValue: Value {
+        get {
+            container.object(forKey: key) as? Value ?? defaultValueFunction()
         }
         set {
             container.set(newValue, forKey: key)
@@ -466,14 +481,15 @@ extension Preferences {
 
 
 extension Preferences {
+    static func defaultAddPhraseHookPath() -> String {
+        let bundle = Bundle.main
+        let hookPath = bundle.path(forResource: "add-phrase-hook", ofType: "sh")
+        return hookPath!
+    }
 
-    @UserDefault(key: kGitPathKey, defaultValue: "/usr/bin/git")
-    @objc static var gitPath: String
+    @UserDefault(key: kAddPhraseHookEnabledKey, defaultValue: false)
+    @objc static var addPhraseHookEnabled: Bool
 
-    @UserDefault(key: kGitCommitEnabledKey, defaultValue: false)
-    @objc static var gitCommitAfterAddingNewPhrase: Bool
-
-    @UserDefault(key: kGitPushEnabledKey, defaultValue: false)
-    @objc static var gitPushAfterAddingNewPhrase: Bool
-
+    @UserDefaultWithFunction(key: kAddPhraseHookPath, defaultValueFunction: defaultAddPhraseHookPath)
+    @objc static var addPhraseHookPath: String
 }
