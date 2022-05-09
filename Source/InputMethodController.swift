@@ -556,6 +556,46 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
             return false
         }
         LanguageModelManager.writeUserPhrase(state.userPhrase)
+
+        if !Preferences.addPhraseHookEnabled {
+            return true
+        }
+
+        func run(_ script: String, arguments: [String]) {
+            let process = Process()
+            process.launchPath = script
+            process.arguments = arguments
+            // Some user may sign the git commits with gpg, and gpg is often
+            // installed by homebrew, so we add the path of homebrew here.
+            process.environment = ["PATH": "/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin"]
+
+            let path = LanguageModelManager.dataFolderPath
+            if #available(macOS 10.13, *) {
+                process.currentDirectoryURL = URL(fileURLWithPath: path)
+            } else {
+                FileManager.default.changeCurrentDirectoryPath(path)
+            }
+
+            #if DEBUG
+            let pipe = Pipe()
+            process.standardError = pipe
+            #endif
+            process.launch()
+            process.waitUntilExit()
+            #if DEBUG
+            let read = pipe.fileHandleForReading
+            let data = read.readDataToEndOfFile()
+            let s = String(data: data, encoding: .utf8)
+            NSLog("result \(String(describing: s))")
+            #endif
+        }
+
+        let script = Preferences.addPhraseHookPath
+
+        DispatchQueue.global().async {
+            run("/bin/sh", arguments: [script, state.selectedText])
+        }
+
         return true
     }
 }

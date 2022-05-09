@@ -262,6 +262,10 @@ class InputState: NSObject {
             return LanguageModelManager.checkIfExist(userPhrase: text, key: joined) == false
         }
 
+        @objc var selectedText: String {
+            (composingBuffer as NSString).substring(with: markedRange)
+        }
+
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
             let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)

@@ -68,6 +68,9 @@ private let kMaxComposingBufferSize = 20
 private let kDefaultKeys = "123456789"
 private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 
+private let kAddPhraseHookEnabledKey = "AddPhraseHookEnabled"
+private let kAddPhraseHookPath = "AddPhraseHookPath"
+
 // MARK: Property wrappers
 
 @propertyWrapper
@@ -79,6 +82,22 @@ struct UserDefault<Value> {
     var wrappedValue: Value {
         get {
             container.object(forKey: key) as? Value ?? defaultValue
+        }
+        set {
+            container.set(newValue, forKey: key)
+        }
+    }
+}
+
+@propertyWrapper
+struct UserDefaultWithFunction<Value> {
+    let key: String
+    let defaultValueFunction: () -> Value
+    var container: UserDefaults = .standard
+
+    var wrappedValue: Value {
+        get {
+            container.object(forKey: key) as? Value ?? defaultValueFunction()
         }
         set {
             container.set(newValue, forKey: key)
@@ -352,14 +371,9 @@ class Preferences: NSObject {
 
     }
 
-    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
-    @objc static var phraseReplacementEnabled: Bool
+}
 
-    @objc static func togglePhraseReplacementEnabled() -> Bool {
-        phraseReplacementEnabled = !phraseReplacementEnabled
-        return phraseReplacementEnabled
-    }
-
+extension Preferences {
     /// The conversion engine.
     ///
     /// - 0: OpenCC
@@ -381,6 +395,17 @@ class Preferences: NSObject {
     @objc static var chineseConversionStyleName: String? {
         ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
     }
+}
+
+extension Preferences {
+
+    @UserDefault(key: kPhraseReplacementEnabledKey, defaultValue: false)
+    @objc static var phraseReplacementEnabled: Bool
+
+    @objc static func togglePhraseReplacementEnabled() -> Bool {
+        phraseReplacementEnabled = !phraseReplacementEnabled
+        return phraseReplacementEnabled
+    }
 
     @UserDefault(key: kAssociatedPhrasesEnabledKey, defaultValue: false)
     @objc static var associatedPhrasesEnabled: Bool
@@ -389,6 +414,9 @@ class Preferences: NSObject {
         associatedPhrasesEnabled = !associatedPhrasesEnabled
         return associatedPhrasesEnabled
     }
+}
+
+extension Preferences {
 
     /// The behavior of pressing letter keys.
     ///
@@ -449,4 +477,19 @@ extension Preferences {
             postUserPhraseLocationNotification()
         }
     }
+}
+
+
+extension Preferences {
+    static func defaultAddPhraseHookPath() -> String {
+        let bundle = Bundle.main
+        let hookPath = bundle.path(forResource: "add-phrase-hook", ofType: "sh")
+        return hookPath!
+    }
+
+    @UserDefault(key: kAddPhraseHookEnabledKey, defaultValue: false)
+    @objc static var addPhraseHookEnabled: Bool
+
+    @UserDefaultWithFunction(key: kAddPhraseHookPath, defaultValueFunction: defaultAddPhraseHookPath)
+    @objc static var addPhraseHookPath: String
 }
