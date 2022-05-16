@@ -159,11 +159,6 @@ class SimpleLM : public LanguageModel {
     }
   }
 
-  const std::vector<Bigram> bigramsForKeys(const std::string& preceedingKey,
-                                           const std::string& key) override {
-    return std::vector<Bigram>();
-  }
-
   const std::vector<Unigram> unigramsForKey(const std::string& key) override {
     std::map<std::string, std::vector<Unigram> >::const_iterator f =
         m_db.find(key);
