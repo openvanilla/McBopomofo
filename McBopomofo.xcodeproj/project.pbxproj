@@ -103,7 +103,6 @@
 		6A0D4EF015FC0DA600ABF4B3 /* Bopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "Bopomofo@2x.tiff"; sourceTree = "<group>"; };
 		6A0D4EF515FC0DA600ABF4B3 /* McBopomofo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "McBopomofo-Info.plist"; sourceTree = "<group>"; };
 		6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Prefix.pch"; sourceTree = "<group>"; };
-		6A0D4F1415FC0EB100ABF4B3 /* Bigram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bigram.h; sourceTree = "<group>"; };
 		6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockReadingBuilder.h; sourceTree = "<group>"; };
 		6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gramambular.h; sourceTree = "<group>"; };
 		6A0D4F1715FC0EB100ABF4B3 /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Grid.h; sourceTree = "<group>"; };
@@ -132,7 +131,7 @@
 		6A6ED170279765140012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6A6ED171279765170012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases.txt"; sourceTree = "<group>"; };
 		6A6ED1722797651A0012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-phrases-replacement.txt"; sourceTree = "<group>"; };
-		6A74B14827C16845001988F4 /* Grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Grid.cpp; path = Grid.cpp; sourceTree = "<group>"; };
+		6A74B14827C16845001988F4 /* Grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Grid.cpp; sourceTree = "<group>"; };
 		6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -328,7 +327,6 @@
 		6A0D4F1315FC0EB100ABF4B3 /* Gramambular */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4F1415FC0EB100ABF4B3 /* Bigram.h */,
 				6A0D4F1515FC0EB100ABF4B3 /* BlockReadingBuilder.h */,
 				6A0D4F1615FC0EB100ABF4B3 /* Gramambular.h */,
 				6A74B14827C16845001988F4 /* Grid.cpp */,

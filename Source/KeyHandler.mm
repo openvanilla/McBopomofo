@@ -75,7 +75,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // user override model
     McBopomofo::UserOverrideModel *_userOverrideModel;
 
-    // the grid (lattice) builder for the unigrams (and bigrams)
+    // the grid (lattice) builder for the unigrams
     Formosa::Gramambular::BlockReadingBuilder *_builder;
 
     // latest walked path (trellis) using the Viterbi algorithm

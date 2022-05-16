@@ -41,8 +41,6 @@ public:
     bool open(const std::string_view& path);
     void close();
 
-    const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(
-        const std::string& preceedingKey, const std::string& key) override;
     const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(
         const std::string& key) override;
     bool hasUnigramsForKey(const std::string& key) override;

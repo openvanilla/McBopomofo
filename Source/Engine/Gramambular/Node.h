@@ -41,13 +41,11 @@ namespace Gramambular {
 class Node {
  public:
   Node();
-  Node(const std::string& key, const std::vector<Unigram>& unigrams,
-       const std::vector<Bigram>& bigrams);
+  Node(const std::string& key, const std::vector<Unigram>& unigrams);
 
   void primeNodeWithPreceedingKeyValues(
       const std::vector<KeyValuePair>& keyValues);
 
-  bool isCandidateFixed() const;
   const std::vector<KeyValuePair>& candidates() const;
   void selectCandidateAtIndex(size_t index = 0, bool fix = true);
   void resetCandidate();
@@ -60,17 +58,12 @@ class Node {
   double highestUnigramScore() const;
 
  protected:
-  const LanguageModel* m_LM;
-
   std::string m_key;
   double m_score;
 
   std::vector<Unigram> m_unigrams;
   std::vector<KeyValuePair> m_candidates;
   std::map<std::string, size_t> m_valueUnigramIndexMap;
-  std::map<KeyValuePair, std::vector<Bigram> > m_preceedingGramBigramMap;
-
-  bool m_candidateFixed;
   size_t m_selectedUnigramIndex;
 
   friend std::ostream& operator<<(std::ostream& stream, const Node& node);
@@ -78,20 +71,17 @@ class Node {
 
 inline std::ostream& operator<<(std::ostream& stream, const Node& node) {
   stream << "(node,key:" << node.m_key
-         << ",fixed:" << (node.m_candidateFixed ? "true" : "false")
          << ",selected:" << node.m_selectedUnigramIndex << ","
          << node.m_unigrams << ")";
   return stream;
 }
 
 inline Node::Node()
-    : m_candidateFixed(false), m_selectedUnigramIndex(0), m_score(0.0) {}
+    : m_selectedUnigramIndex(0), m_score(0.0) {}
 
-inline Node::Node(const std::string& key, const std::vector<Unigram>& unigrams,
-                  const std::vector<Bigram>& bigrams)
+inline Node::Node(const std::string& key, const std::vector<Unigram>& unigrams)
     : m_key(key),
       m_unigrams(unigrams),
-      m_candidateFixed(false),
       m_selectedUnigramIndex(0),
       m_score(0.0) {
   stable_sort(m_unigrams.begin(), m_unigrams.end(), Unigram::ScoreCompare);
@@ -108,52 +98,7 @@ inline Node::Node(const std::string& key, const std::vector<Unigram>& unigrams,
 
     m_candidates.push_back((*ui).keyValue);
   }
-
-  for (std::vector<Bigram>::const_iterator bi = bigrams.begin();
-       bi != bigrams.end(); ++bi) {
-    m_preceedingGramBigramMap[(*bi).preceedingKeyValue].push_back(*bi);
-  }
 }
-
-inline void Node::primeNodeWithPreceedingKeyValues(
-    const std::vector<KeyValuePair>& keyValues) {
-  size_t newIndex = m_selectedUnigramIndex;
-  double max = m_score;
-
-  if (!isCandidateFixed()) {
-    for (std::vector<KeyValuePair>::const_iterator kvi = keyValues.begin();
-         kvi != keyValues.end(); ++kvi) {
-      std::map<KeyValuePair, std::vector<Bigram> >::const_iterator f =
-          m_preceedingGramBigramMap.find(*kvi);
-      if (f != m_preceedingGramBigramMap.end()) {
-        const std::vector<Bigram>& bigrams = (*f).second;
-
-        for (std::vector<Bigram>::const_iterator bi = bigrams.begin();
-             bi != bigrams.end(); ++bi) {
-          const Bigram& bigram = *bi;
-          if (bigram.score > max) {
-            std::map<std::string, size_t>::const_iterator uf =
-                m_valueUnigramIndexMap.find((*bi).keyValue.value);
-            if (uf != m_valueUnigramIndexMap.end()) {
-              newIndex = (*uf).second;
-              max = bigram.score;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  if (m_score != max) {
-    m_score = max;
-  }
-
-  if (newIndex != m_selectedUnigramIndex) {
-    m_selectedUnigramIndex = newIndex;
-  }
-}
-
-inline bool Node::isCandidateFixed() const { return m_candidateFixed; }
 
 inline const std::vector<KeyValuePair>& Node::candidates() const {
   return m_candidates;
@@ -166,13 +111,11 @@ inline void Node::selectCandidateAtIndex(size_t index, bool fix) {
     m_selectedUnigramIndex = index;
   }
 
-  m_candidateFixed = fix;
   m_score = 99;
 }
 
 inline void Node::resetCandidate() {
   m_selectedUnigramIndex = 0;
-  m_candidateFixed = 0;
   if (m_unigrams.size()) {
     m_score = m_unigrams[0].score;
   }
@@ -184,7 +127,6 @@ inline void Node::selectFloatingCandidateAtIndex(size_t index, double score) {
   } else {
     m_selectedUnigramIndex = index;
   }
-  m_candidateFixed = false;
   m_score = score;
 }
 

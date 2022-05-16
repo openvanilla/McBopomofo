@@ -79,9 +79,6 @@ public:
     /// Asks to load th phrase replacement table at the given path.
     /// @param phraseReplacementPath The path of the phrase replacement table.
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
-
-    /// Not implemented since we do not have data to provide bigram function.
-    const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
     /// Returns a list of available unigram for the given key.
     /// @param key A string represents the BPMF reading or a symbol key. For
     ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.

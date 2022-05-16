@@ -42,7 +42,6 @@ public:
     void close();
     void dump();
     
-    virtual const std::vector<Formosa::Gramambular::Bigram> bigramsForKeys(const std::string& preceedingKey, const std::string& key);
     virtual const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(const std::string& key);
     virtual bool hasUnigramsForKey(const std::string& key);
     

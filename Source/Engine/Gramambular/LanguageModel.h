@@ -31,7 +31,6 @@
 #include <string>
 #include <vector>
 
-#include "Bigram.h"
 #include "Unigram.h"
 
 namespace Formosa {
@@ -41,8 +40,6 @@ class LanguageModel {
  public:
   virtual ~LanguageModel() {}
 
-  virtual const std::vector<Bigram> bigramsForKeys(
-      const std::string& preceedingKey, const std::string& key) = 0;
   virtual const std::vector<Unigram> unigramsForKey(const std::string& key) = 0;
   virtual bool hasUnigramsForKey(const std::string& key) = 0;
 };

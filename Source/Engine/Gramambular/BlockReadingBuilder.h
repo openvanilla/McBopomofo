@@ -186,7 +186,7 @@ inline void BlockReadingBuilder::build() {
         std::vector<Unigram> unigrams = m_LM->unigramsForKey(combinedReading);
 
         if (unigrams.size() > 0) {
-          Node n(combinedReading, unigrams, std::vector<Bigram>());
+          Node n(combinedReading, unigrams);
           m_grid.insertNode(n, p, q);
         }
       }

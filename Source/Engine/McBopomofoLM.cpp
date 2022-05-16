@@ -87,11 +87,6 @@ void McBopomofoLM::loadPhraseReplacementMap(const char* phraseReplacementPath)
     }
 }
 
-const std::vector<Formosa::Gramambular::Bigram> McBopomofoLM::bigramsForKeys(const std::string& preceedingKey, const std::string& key)
-{
-    return std::vector<Formosa::Gramambular::Bigram>();
-}
-
 const std::vector<Formosa::Gramambular::Unigram> McBopomofoLM::unigramsForKey(const std::string& key)
 {
     if (key == " ") {
