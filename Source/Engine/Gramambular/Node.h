@@ -47,7 +47,7 @@ class Node {
       const std::vector<KeyValuePair>& keyValues);
 
   const std::vector<KeyValuePair>& candidates() const;
-  void selectCandidateAtIndex(size_t index = 0, bool fix = true);
+  void selectCandidateAtIndex(size_t index = 0);
   void resetCandidate();
   void selectFloatingCandidateAtIndex(size_t index, double score);
 
@@ -104,7 +104,7 @@ inline const std::vector<KeyValuePair>& Node::candidates() const {
   return m_candidates;
 }
 
-inline void Node::selectCandidateAtIndex(size_t index, bool fix) {
+inline void Node::selectCandidateAtIndex(size_t index) {
   if (index >= m_unigrams.size()) {
     m_selectedUnigramIndex = 0;
   } else {
