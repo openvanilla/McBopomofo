@@ -28,7 +28,6 @@
 #ifndef GRAMAMBULAR_H_
 #define GRAMAMBULAR_H_
 
-#include "Bigram.h"
 #include "BlockReadingBuilder.h"
 #include "Grid.h"
 #include "KeyValuePair.h"

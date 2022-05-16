@@ -3,7 +3,7 @@ project(Gramambular)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(GramambularLib Bigram.h BlockReadingBuilder.h Gramambular.h Grid.h Grid.cpp KeyValuePair.h LanguageModel.h Node.h NodeAnchor.h Span.h Unigram.h Walker.h)
+add_library(GramambularLib BlockReadingBuilder.h Gramambular.h Grid.h Grid.cpp KeyValuePair.h LanguageModel.h Node.h NodeAnchor.h Span.h Unigram.h Walker.h)
 
 # Let CMake fetch Google Test for us.
 # https://github.com/google/googletest/tree/main/googletest#incorporating-into-an-existing-cmake-project
