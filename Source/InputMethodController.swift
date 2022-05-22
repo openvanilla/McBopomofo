@@ -147,6 +147,11 @@ class McBopomofoInputMethodController: IMKInputController {
 
     // MARK: - IMKServerInput protocol methods
 
+    override func commitComposition(_ sender: Any!) {
+        keyHandler.clear()
+        self.handle(state: .Empty(), client: sender)
+    }
+
     override func recognizedEvents(_ sender: Any!) -> Int {
         let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged]
         return Int(events.rawValue)
