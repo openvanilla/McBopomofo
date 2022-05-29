@@ -186,7 +186,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
 
-- (void)fixNodeWithValue:(NSString *)value
+- (void)fixNodeWithValue:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag
 {
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     std::string stringValue(value.UTF8String);
@@ -211,7 +211,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
     [self _walk];
 
-    if (Preferences.moveCursorAfterSelectingCandidate) {
+    if (flag && Preferences.moveCursorAfterSelectingCandidate) {
         size_t nextPosition = 0;
         for (auto node : _walkedNodes) {
             if (nextPosition >= cursorIndex) {
@@ -460,6 +460,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return [self _handleEscWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
+    // MARK: Tab
+    if ([input isTab]) {
+        return [self _handleTabState:state shiftIsHold:[input isShiftHold] stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
     // MARK: Cursor backward
     if ([input isCursorBackward] || emacsKey == McBopomofoEmacsKeyBackward) {
         return [self _handleBackwardWithState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
@@ -571,6 +576,83 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     return NO;
+}
+
+- (BOOL)_handleTabState:(InputState *)state shiftIsHold:(BOOL)shiftIsHold stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+{
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        errorCallback();
+        return YES;
+    }
+    if (!_bpmfReadingBuffer->isEmpty()) {
+        errorCallback();
+        return YES;
+    }
+    // zonble
+    NSArray *candidates = [[self _buildCandidateState:(InputStateInputting *)state useVerticalMode:NO] candidates];
+    if ([candidates count] == 0) {
+        errorCallback();
+        return YES;
+    }
+
+    size_t cursorIndex = [self _actualCandidateCursorIndex];
+    size_t length = 0;
+    Formosa::Gramambular::NodeAnchor currentNode;
+
+    for (auto node : _walkedNodes) {
+        length += node.spanningLength;
+        if (length >= cursorIndex) {
+            currentNode = node;
+            break;
+        }
+    }
+
+    NSString *currentValue = [[NSString alloc] initWithUTF8String:currentNode.node->currentKeyValue().value.c_str()];
+
+    size_t currentIndex = 0;
+    if (currentNode.node->score() <
+        Formosa::Gramambular::kSelectedCandidateScore) {
+        // Once the user never select a candidate for the node, we start from the
+        // first candidate, so the user has a chance to use the unigram with two or
+        // more characters when type the tab key for the first time.
+        //
+        // In other words, if a user type two BPMF readings, but the score of seeing
+        // them as two unigrams is higher than a phrase with two characters, the
+        // user can just use the longer phrase by typing the tab key.
+        if ([candidates[0] isEqualToString:currentValue]) {
+            // If the first candidate is the value of the current node, we use next
+            // one.
+            if (shiftIsHold) {
+                currentIndex = candidates.count - 1;
+            } else {
+                currentIndex = 1;
+            }
+        }
+    } else {
+        for (NSString * candidate in candidates) {
+            if ([candidate isEqualToString:currentValue]) {
+                if (shiftIsHold) {
+                    currentIndex == 0 ? currentIndex = candidates.count - 1
+                    : currentIndex--;
+                } else {
+                    currentIndex++;
+                }
+                break;
+            }
+            currentIndex++;
+        }
+    }
+
+    if (currentIndex >= candidates.count) {
+        currentIndex = 0;
+    }
+
+    NSString *candidate = candidates[currentIndex];
+    [self fixNodeWithValue:candidate useMoveCursorAfterSelectionSetting:NO];
+
+    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+    stateCallback(inputting);
+    return YES;
 }
 
 - (BOOL)_handleEscWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback

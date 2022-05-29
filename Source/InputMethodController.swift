@@ -181,6 +181,7 @@ class McBopomofoInputMethodController: IMKInputController {
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
+        NSLog("event \(String(describing: event.keyCode))")
 
         let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
@@ -631,7 +632,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
 
         if let state = state as? InputState.ChoosingCandidate {
             let selectedValue = state.candidates[Int(index)]
-            keyHandler.fixNode(value: selectedValue)
+            keyHandler.fixNode(value: selectedValue, useMoveCursorAfterSelectionSetting: true)
 
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return
