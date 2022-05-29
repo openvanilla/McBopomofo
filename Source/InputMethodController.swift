@@ -181,7 +181,6 @@ class McBopomofoInputMethodController: IMKInputController {
         let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
         let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
-        NSLog("event \(String(describing: event.keyCode))")
 
         let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
