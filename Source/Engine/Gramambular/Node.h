@@ -38,26 +38,28 @@
 namespace Formosa {
 namespace Gramambular {
 
+constexpr int kSelectedCandidateScore = 99;
+
 class Node {
- public:
+public:
   Node();
-  Node(const std::string& key, const std::vector<Unigram>& unigrams);
+  Node(const std::string &key, const std::vector<Unigram> &unigrams);
 
-  void primeNodeWithPreceedingKeyValues(
-      const std::vector<KeyValuePair>& keyValues);
+  void
+  primeNodeWithPreceedingKeyValues(const std::vector<KeyValuePair> &keyValues);
 
-  const std::vector<KeyValuePair>& candidates() const;
+  const std::vector<KeyValuePair> &candidates() const;
   void selectCandidateAtIndex(size_t index = 0);
   void resetCandidate();
   void selectFloatingCandidateAtIndex(size_t index, double score);
 
-  const std::string& key() const;
+  const std::string &key() const;
   double score() const;
-  double scoreForCandidate(const std::string& candidate) const;
+  double scoreForCandidate(const std::string &candidate) const;
   const KeyValuePair currentKeyValue() const;
   double highestUnigramScore() const;
 
- protected:
+protected:
   std::string m_key;
   double m_score;
 
@@ -66,23 +68,20 @@ class Node {
   std::map<std::string, size_t> m_valueUnigramIndexMap;
   size_t m_selectedUnigramIndex;
 
-  friend std::ostream& operator<<(std::ostream& stream, const Node& node);
+  friend std::ostream &operator<<(std::ostream &stream, const Node &node);
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const Node& node) {
+inline std::ostream &operator<<(std::ostream &stream, const Node &node) {
   stream << "(node,key:" << node.m_key
          << ",selected:" << node.m_selectedUnigramIndex << ","
          << node.m_unigrams << ")";
   return stream;
 }
 
-inline Node::Node()
-    : m_selectedUnigramIndex(0), m_score(0.0) {}
+inline Node::Node() : m_selectedUnigramIndex(0), m_score(0.0) {}
 
-inline Node::Node(const std::string& key, const std::vector<Unigram>& unigrams)
-    : m_key(key),
-      m_unigrams(unigrams),
-      m_selectedUnigramIndex(0),
+inline Node::Node(const std::string &key, const std::vector<Unigram> &unigrams)
+    : m_key(key), m_unigrams(unigrams), m_selectedUnigramIndex(0),
       m_score(0.0) {
   stable_sort(m_unigrams.begin(), m_unigrams.end(), Unigram::ScoreCompare);
 
@@ -100,7 +99,7 @@ inline Node::Node(const std::string& key, const std::vector<Unigram>& unigrams)
   }
 }
 
-inline const std::vector<KeyValuePair>& Node::candidates() const {
+inline const std::vector<KeyValuePair> &Node::candidates() const {
   return m_candidates;
 }
 
@@ -111,7 +110,7 @@ inline void Node::selectCandidateAtIndex(size_t index) {
     m_selectedUnigramIndex = index;
   }
 
-  m_score = 99;
+  m_score = kSelectedCandidateScore;
 }
 
 inline void Node::resetCandidate() {
@@ -130,11 +129,11 @@ inline void Node::selectFloatingCandidateAtIndex(size_t index, double score) {
   m_score = score;
 }
 
-inline const std::string& Node::key() const { return m_key; }
+inline const std::string &Node::key() const { return m_key; }
 
 inline double Node::score() const { return m_score; }
 
-inline double Node::scoreForCandidate(const std::string& candidate) const {
+inline double Node::scoreForCandidate(const std::string &candidate) const {
   for (auto unigram : m_unigrams) {
     if (unigram.keyValue.value == candidate) {
       return unigram.score;
@@ -157,7 +156,7 @@ inline const KeyValuePair Node::currentKeyValue() const {
     return m_candidates[m_selectedUnigramIndex];
   }
 }
-}  // namespace Gramambular
-}  // namespace Formosa
+} // namespace Gramambular
+} // namespace Formosa
 
 #endif

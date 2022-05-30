@@ -631,7 +631,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
 
         if let state = state as? InputState.ChoosingCandidate {
             let selectedValue = state.candidates[Int(index)]
-            keyHandler.fixNode(value: selectedValue)
+            keyHandler.fixNode(value: selectedValue, useMoveCursorAfterSelectionSetting: true)
 
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return

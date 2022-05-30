@@ -48,7 +48,7 @@ extern InputMode InputModePlainBopomofo;
       errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
 - (void)syncWithPreferences;
-- (void)fixNodeWithValue:(NSString *)value NS_SWIFT_NAME(fixNode(value:));
+- (void)fixNodeWithValue:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(value:useMoveCursorAfterSelectionSetting:));
 - (void)clear;
 
 - (InputState *)buildInputtingState;

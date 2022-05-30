@@ -13,6 +13,7 @@
                 <outlet property="basicSettingsView" destination="eWf-pC-0Bt" id="IHt-cQ-iV8"/>
                 <outlet property="basisKeyboardLayoutButton" destination="6eT-rC-gVz" id="CCy-tX-eCP"/>
                 <outlet property="chooseUserPhrasesFolderButton" destination="Nf4-gN-42Y" id="chL-PA-nAW"/>
+                <outlet property="composingBufferSizeTextField" destination="QeV-8m-dqa" id="IFB-HW-Pjq"/>
                 <outlet property="customUserPhraseLocationEnabledButton" destination="b15-I3-wDL" id="PUy-eF-NmW"/>
                 <outlet property="fontSizePopUpButton" destination="YF3-dA-BAc" id="Le4-ge-hZ1"/>
                 <outlet property="openUserPhrasesFolderButton" destination="Ibr-mk-lwr" id="qs6-94-i9P"/>
@@ -33,7 +34,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="433" height="575"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
-            <point key="canvasLocation" x="654" y="101"/>
+            <point key="canvasLocation" x="1156" y="-304"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="eWf-pC-0Bt">
@@ -357,7 +358,7 @@
             <point key="canvasLocation" x="168" y="-377"/>
         </view>
         <view id="L2Q-IX-SXc">
-            <rect key="frame" x="0.0" y="0.0" width="436" height="124"/>
+            <rect key="frame" x="0.0" y="0.0" width="436" height="177"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jAZ-sE-wLZ">
@@ -401,6 +402,14 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l5V-0i-S3o">
+                    <rect key="frame" x="67" y="141" width="111" height="16"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="輸入緩衝區大小：" id="nIZ-Qn-l1K">
+                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
                 <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PuO-lM-5fF">
                     <rect key="frame" x="184" y="66" width="206" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -426,20 +435,56 @@
                         <binding destination="32" name="selectedTag" keyPath="values.ChineseConversionStyle" id="l0X-2P-QrT"/>
                     </connections>
                 </matrix>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="JeD-t3-gxq">
+                    <rect key="frame" x="20" y="122" width="396" height="5"/>
+                </box>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QeV-8m-dqa">
+                    <rect key="frame" x="184" y="141" width="96" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="96" id="KOU-vH-6Ck"/>
+                    </constraints>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Phb-jV-95J">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.ComposingBufferSize" id="I85-zE-CYU"/>
+                    </connections>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FDO-I5-77h">
+                    <rect key="frame" x="286" y="144" width="45" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="(4-30)" id="tju-6y-kBY">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <constraints>
                 <constraint firstItem="jAZ-sE-wLZ" firstAttribute="top" secondItem="weE-qL-B2N" secondAttribute="top" id="3y8-9T-Nr6"/>
+                <constraint firstAttribute="trailing" secondItem="FDO-I5-77h" secondAttribute="trailing" constant="107" id="7Jr-k0-ur4"/>
+                <constraint firstItem="l5V-0i-S3o" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="90n-wN-hCJ"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="top" secondItem="PuO-lM-5fF" secondAttribute="top" id="9f0-yl-Lcg"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="BcQ-48-gwy"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="BiS-LY-BQX"/>
-                <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="NoS-nF-SDm"/>
+                <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="73" id="NoS-nF-SDm"/>
+                <constraint firstItem="JeD-t3-gxq" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="ObK-Qf-Ur5"/>
+                <constraint firstItem="l5V-0i-S3o" firstAttribute="bottom" secondItem="QeV-8m-dqa" secondAttribute="bottom" id="Pib-kd-vfX"/>
                 <constraint firstItem="weE-qL-B2N" firstAttribute="top" secondItem="PuO-lM-5fF" secondAttribute="bottom" constant="8" symbolic="YES" id="QIb-oU-fsb"/>
                 <constraint firstAttribute="trailing" secondItem="cks-CZ-m7g" secondAttribute="trailing" constant="260" id="QRN-hI-wWF"/>
                 <constraint firstItem="jAZ-sE-wLZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="T5t-oz-400"/>
+                <constraint firstItem="QeV-8m-dqa" firstAttribute="leading" secondItem="l5V-0i-S3o" secondAttribute="trailing" constant="8" symbolic="YES" id="TBh-F0-j7y"/>
+                <constraint firstAttribute="trailing" secondItem="JeD-t3-gxq" secondAttribute="trailing" constant="20" symbolic="YES" id="Z4L-Mc-y35"/>
+                <constraint firstItem="JeD-t3-gxq" firstAttribute="top" secondItem="l5V-0i-S3o" secondAttribute="bottom" constant="16" id="kf3-LW-W8v"/>
+                <constraint firstItem="QeV-8m-dqa" firstAttribute="baseline" secondItem="FDO-I5-77h" secondAttribute="baseline" id="lRK-BZ-NMp"/>
                 <constraint firstItem="weE-qL-B2N" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="lRo-g5-LoD"/>
+                <constraint firstItem="l5V-0i-S3o" firstAttribute="trailing" secondItem="cks-CZ-m7g" secondAttribute="trailing" id="mVx-hp-0Lb"/>
+                <constraint firstItem="l5V-0i-S3o" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="69" id="qaA-QU-xIe"/>
+                <constraint firstItem="FDO-I5-77h" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="QeV-8m-dqa" secondAttribute="trailing" constant="8" symbolic="YES" id="qsU-lT-gUf"/>
                 <constraint firstAttribute="trailing" secondItem="jAZ-sE-wLZ" secondAttribute="trailing" constant="260" id="zlq-Sd-uCb"/>
             </constraints>
-            <point key="canvasLocation" x="652" y="-326"/>
+            <point key="canvasLocation" x="651" y="-138.5"/>
         </view>
         <customView id="M7i-Af-lNp">
             <rect key="frame" x="0.0" y="0.0" width="436" height="334"/>
@@ -507,7 +552,7 @@
                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="bHQ-bR-nHc">
                     <rect key="frame" x="18" y="120" width="396" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="在手動加入使用者詞彙之後:" id="Yhg-pv-SyV">
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -516,7 +561,7 @@
                     <rect key="frame" x="18" y="86" width="398" height="18"/>
                     <buttonCell key="cell" type="check" title="執行特定的 Shell Script" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="bkX-1g-jGL">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <binding destination="32" name="value" keyPath="values.AddPhraseHookEnabled" id="aI7-Rc-u4x"/>
@@ -539,7 +584,7 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="8ku-Pt-FIH">
                     <rect key="frame" x="21" y="60" width="44" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="路徑：" id="2Ox-BG-OqC">
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -565,7 +610,7 @@
                         <constraint firstAttribute="width" constant="395" id="OnT-jP-bLz"/>
                     </constraints>
                     <textFieldCell key="cell" title="您可以在加詞之後，透過這個 Shell Script 執行指定的工作，像是使用 git 備份詞庫。這個 script 會在你的使用者詞彙資料夾下執行。" id="V5g-gd-giX">
-                        <font key="font" size="11" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

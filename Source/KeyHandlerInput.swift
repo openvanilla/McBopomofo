@@ -25,6 +25,7 @@ import Cocoa
 
 enum KeyCode: UInt16 {
     case none = 0
+    case tab = 48
     case enter = 76
     case up = 126
     case down = 125
@@ -131,6 +132,10 @@ class KeyHandlerInput: NSObject {
 
     @objc var isEnter: Bool {
         KeyCode(rawValue: keyCode) == KeyCode.enter
+    }
+
+    @objc var isTab: Bool {
+        KeyCode(rawValue: keyCode) == KeyCode.tab
     }
 
     @objc var isUp: Bool {
