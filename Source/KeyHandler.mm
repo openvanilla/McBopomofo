@@ -588,7 +588,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         errorCallback();
         return YES;
     }
-    // zonble
+
     NSArray *candidates = [[self _buildCandidateState:(InputStateInputting *)state useVerticalMode:NO] candidates];
     if ([candidates count] == 0) {
         errorCallback();
@@ -1358,11 +1358,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
 #if DEBUG
-//    std::string dotDump = _builder->grid().dumpDOT();
-//    NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
-//    NSError *error = nil;
-//
-//    BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
+    std::string dotDump = _builder->grid().dumpDOT();
+    NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
+    NSError *error = nil;
+
+    BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
 #endif
 }
 
