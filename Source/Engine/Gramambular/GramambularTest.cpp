@@ -160,19 +160,19 @@ class SimpleLM : public LanguageModel {
   }
 
   const std::vector<Unigram> unigramsForKey(const std::string& key) override {
-    std::map<std::string, std::vector<Unigram> >::const_iterator f =
+    std::map<std::string, std::vector<Unigram>>::const_iterator f =
         m_db.find(key);
     return f == m_db.end() ? std::vector<Unigram>() : (*f).second;
   }
 
   bool hasUnigramsForKey(const std::string& key) override {
-    std::map<std::string, std::vector<Unigram> >::const_iterator f =
+    std::map<std::string, std::vector<Unigram>>::const_iterator f =
         m_db.find(key);
     return f != m_db.end();
   }
 
  protected:
-  std::map<std::string, std::vector<Unigram> > m_db;
+  std::map<std::string, std::vector<Unigram>> m_db;
 };
 
 TEST(GramambularTest, InputTest) {
@@ -197,9 +197,7 @@ TEST(GramambularTest, InputTest) {
 
   Walker walker(&builder.grid());
 
-  std::vector<NodeAnchor> walked =
-      walker.reverseWalk(builder.grid().width(), 0.0);
-  reverse(walked.begin(), walked.end());
+  std::vector<NodeAnchor> walked = walker.walk(0, 0.0);
 
   std::vector<std::string> composed;
   for (std::vector<NodeAnchor>::iterator wi = walked.begin();
@@ -225,9 +223,7 @@ TEST(GramambularTest, WordSegmentationTest) {
   builder2.insertReadingAtCursor("金");
   Walker walker2(&builder2.grid());
 
-  std::vector<NodeAnchor> walked =
-      walker2.reverseWalk(builder2.grid().width(), 0.0);
-  reverse(walked.begin(), walked.end());
+  std::vector<NodeAnchor> walked = walker2.walk(0, 0.0);
 
   std::vector<std::string> segmented;
   for (std::vector<NodeAnchor>::iterator wi = walked.begin();

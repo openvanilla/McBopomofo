@@ -37,6 +37,8 @@ InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo"
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
 
 static const double kEpsilon = 0.000001;
+static const size_t kMaxComposingBufferNeedsToWalkSize = 10;
+
 
 static double FindHighestScore(const std::vector<Formosa::Gramambular::NodeAnchor> &nodes, double epsilon)
 {
@@ -365,6 +367,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         // then walk the lattice
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
+        [self fixNodesIfRequired];
 
         // get user override model suggestion
         std::string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" : _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
@@ -1350,14 +1353,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // using the Viterbi algorithm implemented in the Gramambular library
     Formosa::Gramambular::Walker walker(&_builder->grid());
 
-    // the reverse walk traces the trellis from the end
-    _walkedNodes = walker.reverseWalk(_builder->grid().width());
-
-    // then we reverse the nodes so that we get the forward-walked nodes
-    reverse(_walkedNodes.begin(), _walkedNodes.end());
+    // the walker traces the trellis from the end
+    _walkedNodes = walker.walk(0);
 
     // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
-#if DEBUG
+#if 0
     std::string dotDump = _builder->grid().dumpDOT();
     NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
     NSError *error = nil;
@@ -1390,6 +1390,25 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     [self _walk];
     return poppedText;
 }
+
+- (void)fixNodesIfRequired
+{
+    size_t width = _builder->grid().width();
+    if (width > kMaxComposingBufferNeedsToWalkSize) {
+        size_t index = 0;
+        for (auto node : _walkedNodes) {
+            if (index >= width - kMaxComposingBufferNeedsToWalkSize) {
+                break;
+            }
+            if (node.node->score() < Formosa::Gramambular::kSelectedCandidateScore) {
+                auto candidate = node.node->currentKeyValue().value;
+                _builder->grid().fixNodeSelectedCandidate(index + 1, candidate);
+            }
+            index += node.spanningLength;
+        }
+    }
+}
+
 
 - (InputStateChoosingCandidate *)_buildCandidateState:(InputStateNotEmpty *)currentState useVerticalMode:(BOOL)useVerticalMode
 {

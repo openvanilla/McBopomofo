@@ -170,9 +170,9 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         let composingBufferSizeFormatter = NumberFormatter()
         composingBufferSizeFormatter.numberStyle = .decimal
         composingBufferSizeFormatter.generatesDecimalNumbers = true
-        composingBufferSizeFormatter.maximumIntegerDigits = 2
+        composingBufferSizeFormatter.maximumIntegerDigits = 3
         composingBufferSizeFormatter.maximumFractionDigits = 0
-        composingBufferSizeFormatter.maximum = 30
+        composingBufferSizeFormatter.maximum = 100
         composingBufferSizeFormatter.minimum = 4
         composingBufferSizeTextField.cell?.formatter = composingBufferSizeFormatter
     }
