@@ -405,7 +405,7 @@
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l5V-0i-S3o">
                     <rect key="frame" x="67" y="141" width="111" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="輸入緩衝區大小：" id="nIZ-Qn-l1K">
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -454,7 +454,7 @@
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FDO-I5-77h">
                     <rect key="frame" x="286" y="144" width="45" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="(4-30)" id="tju-6y-kBY">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="(4-100)" id="tju-6y-kBY">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

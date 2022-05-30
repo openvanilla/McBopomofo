@@ -50,7 +50,7 @@ class Grid {
   void shrinkGridByOneAtLocation(size_t location);
 
   size_t width() const;
-  std::vector<NodeAnchor> nodesEndingAt(size_t location);
+  std::vector<NodeAnchor> nodesAt(size_t location);
   std::vector<NodeAnchor> nodesCrossingOrEndingAt(size_t location);
 
   // "Freeze" the node with the unigram that represents the selected candidate
@@ -130,28 +130,27 @@ inline void Grid::shrinkGridByOneAtLocation(size_t location) {
 
 inline size_t Grid::width() const { return m_spans.size(); }
 
-inline std::vector<NodeAnchor> Grid::nodesEndingAt(size_t location) {
+inline std::vector<NodeAnchor> Grid::nodesAt(size_t location) {
   std::vector<NodeAnchor> result;
 
-  if (m_spans.size() && location <= m_spans.size()) {
-    for (size_t i = 0; i < location; i++) {
-      Span& span = m_spans[i];
-      if (i + span.maximumLength() >= location) {
-        Node* np = span.nodeOfLength(location - i);
-        if (np) {
-          NodeAnchor na;
-          na.node = np;
-          na.location = i;
-          na.spanningLength = location - i;
+  size_t spanSize = m_spans.size();
+  if (m_spans.size() && location < spanSize) {
+    Span& span = m_spans[location];
 
-          result.push_back(na);
-        }
+    for (size_t i = 1; i <= 6; i++) {
+      Node* np = span.nodeOfLength(i);
+      if (np) {
+        NodeAnchor na;
+        na.node = np;
+        na.location = location;
+        na.spanningLength = i;
+        result.push_back(na);
       }
     }
   }
 
   return result;
-}
+};
 
 inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t location) {
   std::vector<NodeAnchor> result;

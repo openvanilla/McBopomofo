@@ -63,7 +63,7 @@ private let kMaxCandidateListTextSize: CGFloat = 196
 // of the Viterbi algorithm used in the builder library (at O(N^2))
 private let kDefaultComposingBufferSize = 10
 private let kMinComposingBufferSize = 4
-private let kMaxComposingBufferSize = 30
+private let kMaxComposingBufferSize = 100
 
 private let kDefaultKeys = "123456789"
 private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("

@@ -131,8 +131,8 @@ class PreferencesTests: XCTestCase {
         XCTAssert(Preferences.composingBufferSize == 20)
         Preferences.composingBufferSize = 3
         XCTAssert(Preferences.composingBufferSize == 4)
-        Preferences.composingBufferSize = 31
-        XCTAssert(Preferences.composingBufferSize == 30)
+        Preferences.composingBufferSize = 101
+        XCTAssert(Preferences.composingBufferSize == 100)
         Preferences.composingBufferSize = 5
         XCTAssert(Preferences.composingBufferSize == 5)
         Preferences.composingBufferSize = 19

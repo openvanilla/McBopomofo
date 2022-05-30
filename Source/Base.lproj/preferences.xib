@@ -481,8 +481,8 @@
                     <rect key="frame" x="20" y="121" width="437" height="5"/>
                 </box>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="B2X-Mt-o7B">
-                    <rect key="frame" x="336" y="146" width="45" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="(4-30)" id="SJy-vV-O5m">
+                    <rect key="frame" x="330" y="146" width="51" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="(4-100)" id="SJy-vV-O5m">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
