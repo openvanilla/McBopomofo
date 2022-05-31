@@ -52,6 +52,7 @@ class Grid {
   size_t width() const;
   std::vector<NodeAnchor> nodesAt(size_t location);
   std::vector<NodeAnchor> nodesCrossingOrEndingAt(size_t location);
+  std::vector<NodeAnchor> nodesInRange(size_t begin, size_t end);
 
   // "Freeze" the node with the unigram that represents the selected candidate
   // value. After this, the node that contains the unigram will always be
@@ -182,46 +183,96 @@ inline std::vector<NodeAnchor> Grid::nodesCrossingOrEndingAt(size_t location) {
   return result;
 }
 
-// For nodes found at the location, fix their currently-selected candidate using
-// the supplied string value.
+inline std::vector<NodeAnchor> Grid::nodesInRange(size_t begin, size_t end) {
+  std::vector<NodeAnchor> result;
+
+  if (m_spans.size() && end <= m_spans.size()) {
+    for (size_t i = 0; i < end; i++) {
+      Span& span = m_spans[i];
+
+      if (i + span.maximumLength() > begin) {
+        for (size_t j = 1, m = span.maximumLength(); j <= m; j++) {
+          if (i + j <= begin) {
+            continue;
+          }
+
+          Node* np = span.nodeOfLength(j);
+          if (np) {
+            NodeAnchor na;
+            na.node = np;
+            na.location = i;
+            na.spanningLength = j;
+
+            result.push_back(na);
+          }
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+// For nodes found at the location, fix their currently-selected candidate
+// using the supplied string value.
 inline NodeAnchor Grid::fixNodeSelectedCandidate(size_t location,
                                                  const std::string& value) {
   std::vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
   NodeAnchor node;
+  size_t selectedIndex;
   for (auto nodeAnchor : nodes) {
     auto candidates = nodeAnchor.node->candidates();
 
-    // Reset the candidate-fixed state of every node at the location.
-    const_cast<Node*>(nodeAnchor.node)->resetCandidate();
-
     for (size_t i = 0, c = candidates.size(); i < c; ++i) {
       if (candidates[i].value == value) {
-        const_cast<Node*>(nodeAnchor.node)->selectCandidateAtIndex(i);
+        selectedIndex = i;
         node = nodeAnchor;
         break;
       }
     }
   }
+
+  if (node.node == nullptr) {
+    return node;
+  }
+
+  nodes = nodesInRange(location - node.spanningLength, location);
+  for (auto nodeAnchor : nodes) {
+    const_cast<Node*>(nodeAnchor.node)->resetCandidate();
+  }
+
+  const_cast<Node*>(node.node)->selectCandidateAtIndex(selectedIndex);
   return node;
 }
 
 inline void Grid::overrideNodeScoreForSelectedCandidate(
     size_t location, const std::string& value, float overridingScore) {
   std::vector<NodeAnchor> nodes = nodesCrossingOrEndingAt(location);
+  NodeAnchor node;
+  size_t selectedIndex;
   for (auto nodeAnchor : nodes) {
     auto candidates = nodeAnchor.node->candidates();
 
-    // Reset the candidate-fixed state of every node at the location.
-    const_cast<Node*>(nodeAnchor.node)->resetCandidate();
-
     for (size_t i = 0, c = candidates.size(); i < c; ++i) {
       if (candidates[i].value == value) {
-        const_cast<Node*>(nodeAnchor.node)
-            ->selectFloatingCandidateAtIndex(i, overridingScore);
+        selectedIndex = i;
+        node = nodeAnchor;
         break;
       }
     }
   }
+
+  if (node.node == nullptr) {
+    return;
+  }
+
+  nodes = nodesInRange(location - node.spanningLength, location);
+  for (auto nodeAnchor : nodes) {
+    const_cast<Node*>(nodeAnchor.node)->resetCandidate();
+  }
+
+  const_cast<Node*>(node.node)->selectFloatingCandidateAtIndex(selectedIndex,
+                                                               overridingScore);
 }
 
 }  // namespace Gramambular
