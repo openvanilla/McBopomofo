@@ -367,7 +367,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         // then walk the lattice
         NSString *poppedText = [self _popOverflowComposingTextAndWalk];
-        [self fixNodesIfRequired];
 
         // get user override model suggestion
         std::string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" : _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
@@ -378,6 +377,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             double highestScore = FindHighestScore(nodes, kEpsilon);
             _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, static_cast<float>(highestScore));
         }
+
+        [self fixNodesIfRequired];
 
         // then update the text
         _bpmfReadingBuffer->clear();
@@ -1407,7 +1408,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             }
             if (node.node->score() < Formosa::Gramambular::kSelectedCandidateScore) {
                 auto candidate = node.node->currentKeyValue().value;
-                _builder->grid().fixNodeSelectedCandidate(index + 1, candidate);
+                _builder->grid().fixNodeSelectedCandidate(index + node.spanningLength, candidate);
             }
             index += node.spanningLength;
         }
