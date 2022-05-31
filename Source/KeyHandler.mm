@@ -583,10 +583,15 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleTabState:(InputState *)state shiftIsHold:(BOOL)shiftIsHold stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
+    if (!_builder->length()) {
+        return NO;
+    }
+
     if (![state isKindOfClass:[InputStateInputting class]]) {
         errorCallback();
         return YES;
     }
+
     if (!_bpmfReadingBuffer->isEmpty()) {
         errorCallback();
         return YES;
