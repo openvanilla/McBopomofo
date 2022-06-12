@@ -1,4 +1,4 @@
-# Custom Exculded Characters or Symbols (for Plain Bopomofo).
+# Custom Excluded Characters or Symbols (for Plain Bopomofo).
 #
 # See https://github.com/openvanilla/McBopomofo/wiki/使用手冊#手動刪詞 for usage.
 #
