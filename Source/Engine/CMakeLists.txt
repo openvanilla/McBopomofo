@@ -41,10 +41,10 @@ include(GoogleTest)
 gtest_discover_tests(McBopomofoLMLibTest)
 
 add_custom_target(
-        runTest
+        runMcBopomofoLMLibTest
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/McBopomofoLMLibTest
 )
-add_dependencies(runTest McBopomofoLMLibTest)
+add_dependencies(runMcBopomofoLMLibTest McBopomofoLMLibTest)
 
 # Benchmark target; to run, manually uncomment the lines below.
 #

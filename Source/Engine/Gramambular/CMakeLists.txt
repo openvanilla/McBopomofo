@@ -25,7 +25,7 @@ include(GoogleTest)
 gtest_discover_tests(GramambularTest)
 
 add_custom_target(
-        runTest
+        runGramambularTest
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/GramambularTest
 )
-add_dependencies(runTest GramambularTest)
+add_dependencies(runGramambularTest GramambularTest)
