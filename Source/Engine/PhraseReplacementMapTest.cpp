@@ -33,8 +33,7 @@ namespace McBopomofo {
 TEST(PhraseReplacementMapTest, LenientReading)
 {
     std::string tmp_name
-        = std::string(std::filesystem::temp_directory_path()) + "test.txt";
-
+        = std::string(std::filesystem::temp_directory_path() / "test.txt");
     FILE* f = fopen(tmp_name.c_str(), "w");
     ASSERT_NE(f, nullptr);
 
