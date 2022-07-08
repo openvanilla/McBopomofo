@@ -192,10 +192,10 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
 + (BOOL)checkIfUserPhraseExist:(NSString *)userPhrase key:(NSString *)key NS_SWIFT_NAME(checkIfExist(userPhrase:key:))
 {
     std::string unigramKey(key.UTF8String);
-    std::vector<Formosa::Gramambular::Unigram> unigrams = gLanguageModelMcBopomofo.unigramsForKey(unigramKey);
+    auto unigrams = gLanguageModelMcBopomofo.getUnigrams(unigramKey);
     std::string userPhraseString(userPhrase.UTF8String);
-    for (auto unigram : unigrams) {
-        if (unigram.keyValue.value == userPhraseString) {
+    for (const auto& unigram : unigrams) {
+        if (unigram.value() == userPhraseString) {
             return YES;
         }
     }

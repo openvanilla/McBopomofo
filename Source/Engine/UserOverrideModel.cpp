@@ -27,6 +27,7 @@
 
 #include "UserOverrideModel.h"
 
+#include "gramambular2/reading_grid.h"
 #include <cassert>
 #include <cmath>
 #include <sstream>
@@ -41,8 +42,7 @@ static double Score(size_t eventCount,
     double eventTimestamp,
     double timestamp,
     double lambda);
-static bool IsEndingPunctuation(const std::string& value);
-static std::string WalkedNodesToKey(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+static std::string WalkedNodesToKey(const std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr>& walkedNodes,
     size_t cursorIndex);
 
 UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
@@ -52,12 +52,16 @@ UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
     m_decayExponent = log(0.5) / decayConstant;
 }
 
-void UserOverrideModel::observe(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+void UserOverrideModel::observe(const std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr>& walkedNodes,
     size_t cursorIndex,
     const std::string& candidate,
     double timestamp)
 {
     std::string key = WalkedNodesToKey(walkedNodes, cursorIndex);
+    if (key.empty()) {
+        return;
+    }
+
     auto mapIter = m_lruMap.find(key);
     if (mapIter == m_lruMap.end()) {
         auto keyValuePair = KeyObservationPair(key, Observation());
@@ -86,11 +90,15 @@ void UserOverrideModel::observe(const std::vector<Formosa::Gramambular::NodeAnch
     }
 }
 
-std::string UserOverrideModel::suggest(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+std::string UserOverrideModel::suggest(const std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr>& walkedNodes,
     size_t cursorIndex,
     double timestamp)
 {
     std::string key = WalkedNodesToKey(walkedNodes, cursorIndex);
+    if (key.empty()) {
+        return std::string();
+    }
+
     auto mapIter = m_lruMap.find(key);
     if (mapIter == m_lruMap.end()) {
         return std::string();
@@ -147,48 +155,51 @@ static double Score(size_t eventCount,
     return prob * decay;
 }
 
-static bool IsEndingPunctuation(const std::string& value)
+static bool IsPunctuation(const Formosa::Gramambular2::ReadingGrid::NodePtr node)
 {
-    return value == "，" || value == "。" || value == "！" || value == "？" || value == "」" || value == "』" || value == "”" || value == "”";
+    const std::string& reading = node->reading();
+    return !reading.empty() && reading[0] == '_';
 }
-static std::string WalkedNodesToKey(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+
+static std::string WalkedNodesToKey(const std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr>& walkedNodes,
     size_t cursorIndex)
 {
     std::stringstream s;
-    std::vector<Formosa::Gramambular::NodeAnchor> n;
+    std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr> n;
     size_t ll = 0;
-    for (std::vector<Formosa::Gramambular::NodeAnchor>::const_iterator i = walkedNodes.begin();
-         i != walkedNodes.end();
-         ++i) {
-        const auto& nn = *i;
-        n.push_back(nn);
-        ll += nn.spanningLength;
-        if (ll >= cursorIndex) {
+    for (auto i = walkedNodes.cbegin(); i != walkedNodes.cend(); ++i) {
+        n.push_back(*i);
+        ll += (*i)->spanningLength();
+        if (ll > cursorIndex) {
             break;
         }
     }
 
-    std::vector<Formosa::Gramambular::NodeAnchor>::const_reverse_iterator r = n.rbegin();
-
-    if (r == n.rend()) {
+    auto r = n.crbegin();
+    if (r == n.crend()) {
         return "";
     }
 
-    std::string current = (*r).node->currentKeyValue().key;
+    if ((*r)->unigrams().empty()) {
+        return "";
+    }
+
+    std::string current = (*r)->unigrams()[0].value();
+
     ++r;
 
     s.clear();
     s.str(std::string());
-    if (r != n.rend()) {
-        std::string value = (*r).node->currentKeyValue().value;
-        if (IsEndingPunctuation(value)) {
+    if (r != n.crend()) {
+        if (IsPunctuation(*r)) {
+            // Ignore punctuation.
             s << "()";
             r = n.rend();
         } else {
             s << "("
-              << (*r).node->currentKeyValue().key
+              << (*r)->reading()
               << ","
-              << value
+              << (*r)->value()
               << ")";
             ++r;
         }
@@ -200,15 +211,15 @@ static std::string WalkedNodesToKey(const std::vector<Formosa::Gramambular::Node
     s.clear();
     s.str(std::string());
     if (r != n.rend()) {
-        std::string value = (*r).node->currentKeyValue().value;
-        if (IsEndingPunctuation(value)) {
+        if (IsPunctuation(*r)) {
+            // Ignore punctuation.
             s << "()";
             r = n.rend();
         } else {
             s << "("
-              << (*r).node->currentKeyValue().key
+              << (*r)->reading()
               << ","
-              << value
+              << (*r)->value()
               << ")";
             ++r;
         }

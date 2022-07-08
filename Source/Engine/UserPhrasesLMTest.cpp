@@ -46,11 +46,11 @@ TEST(UserPhreasesLMTest, LenientReading)
 
     UserPhrasesLM lm;
     lm.open(tmp_name.c_str());
-    ASSERT_TRUE(lm.hasUnigramsForKey("reading1"));
-    ASSERT_FALSE(lm.hasUnigramsForKey("value2"));
+    ASSERT_TRUE(lm.hasUnigrams("reading1"));
+    ASSERT_FALSE(lm.hasUnigrams("value2"));
 
     // Anything after the error won't be parsed, so reading2 won't be found.
-    ASSERT_FALSE(lm.hasUnigramsForKey("reading2"));
+    ASSERT_FALSE(lm.hasUnigrams("reading2"));
 
     r = remove(tmp_name.c_str());
     ASSERT_EQ(r, 0);

@@ -132,7 +132,6 @@ class InputState: NSObject {
     /// Represents that the user is inputting text.
     @objc (InputStateInputting)
     class Inputting: NotEmpty {
-        @objc var poppedText: String = ""
         @objc var tooltip: String = ""
 
         @objc override init(composingBuffer: String, cursorIndex: UInt) {
@@ -148,7 +147,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, poppedText:\(poppedText)>"
+            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
     }
 

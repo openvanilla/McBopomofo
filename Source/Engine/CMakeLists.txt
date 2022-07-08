@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.6)
 project(McBopomofoLMLib)
 
 set(CMAKE_CXX_STANDARD 17)
+
+add_subdirectory(gramambular2)
 
 include_directories("Gramambular")
 add_library(McBopomofoLMLib

@@ -40,17 +40,17 @@ TEST(ParselessLMTest, SanityCheckTest)
     bool status = lm.open(data_path);
     ASSERT_TRUE(status);
 
-    ASSERT_TRUE(lm.hasUnigramsForKey("ㄕ"));
-    ASSERT_TRUE(lm.hasUnigramsForKey("ㄕˋ-ㄕˊ"));
-    ASSERT_TRUE(lm.hasUnigramsForKey("_punctuation_list"));
+    ASSERT_TRUE(lm.hasUnigrams("ㄕ"));
+    ASSERT_TRUE(lm.hasUnigrams("ㄕˋ-ㄕˊ"));
+    ASSERT_TRUE(lm.hasUnigrams("_punctuation_list"));
 
-    auto unigrams = lm.unigramsForKey("ㄕ");
+    auto unigrams = lm.getUnigrams("ㄕ");
     ASSERT_GT(unigrams.size(), 0);
 
-    unigrams = lm.unigramsForKey("ㄕˋ-ㄕˊ");
+    unigrams = lm.getUnigrams("ㄕˋ-ㄕˊ");
     ASSERT_GT(unigrams.size(), 0);
 
-    unigrams = lm.unigramsForKey("_punctuation_list");
+    unigrams = lm.getUnigrams("_punctuation_list");
     ASSERT_GT(unigrams.size(), 0);
 
     lm.close();

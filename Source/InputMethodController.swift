@@ -379,11 +379,6 @@ extension McBopomofoInputMethodController {
             return
         }
 
-        let poppedText = state.poppedText
-        if !poppedText.isEmpty {
-            commit(text: poppedText, client: client)
-        }
-
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
         client.setMarkedText(state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))

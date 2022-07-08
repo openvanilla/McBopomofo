@@ -1,9 +1,9 @@
 #include "PhraseReplacementMap.h"
 
-#include <sys/mman.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "KeyValueBlobReader.h"
@@ -13,9 +13,9 @@ namespace McBopomofo {
 using std::string;
 
 PhraseReplacementMap::PhraseReplacementMap()
-: fd(-1)
-, data(0)
-, length(0)
+    : fd(-1)
+    , data(0)
+    , length(0)
 {
 }
 
@@ -26,7 +26,7 @@ PhraseReplacementMap::~PhraseReplacementMap()
     }
 }
 
-bool PhraseReplacementMap::open(const char *path)
+bool PhraseReplacementMap::open(const char* path)
 {
     if (data) {
         return false;
@@ -77,10 +77,9 @@ const std::string PhraseReplacementMap::valueForKey(const std::string& key)
     auto iter = keyValueMap.find(key);
     if (iter != keyValueMap.end()) {
         const std::string_view v = iter->second;
-        return {v.data(), v.size()};
+        return { v.data(), v.size() };
     }
     return string("");
 }
-
 
 }

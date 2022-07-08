@@ -28,7 +28,7 @@
 #include <map>
 #include <string>
 
-#include "Gramambular.h"
+#include "gramambular2/reading_grid.h"
 
 namespace McBopomofo {
 
@@ -36,12 +36,12 @@ class UserOverrideModel {
 public:
     UserOverrideModel(size_t capacity, double decayConstant);
 
-    void observe(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+    void observe(const std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr>& walkedNodes,
         size_t cursorIndex,
         const std::string& candidate,
         double timestamp);
 
-    std::string suggest(const std::vector<Formosa::Gramambular::NodeAnchor>& walkedNodes,
+    std::string suggest(const std::vector<Formosa::Gramambular2::ReadingGrid::NodePtr>& walkedNodes,
         size_t cursorIndex,
         double timestamp);
 

@@ -28,12 +28,12 @@
 #include <string>
 #include <vector>
 
-#include "LanguageModel.h"
 #include "ParselessPhraseDB.h"
+#include "gramambular2/language_model.h"
 
 namespace McBopomofo {
 
-class ParselessLM : public Formosa::Gramambular::LanguageModel {
+class ParselessLM : public Formosa::Gramambular2::LanguageModel {
 public:
     ~ParselessLM() override;
 
@@ -41,9 +41,9 @@ public:
     bool open(const std::string_view& path);
     void close();
 
-    const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(
+    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
         const std::string& key) override;
-    bool hasUnigramsForKey(const std::string& key) override;
+    bool hasUnigrams(const std::string& key) override;
 
 private:
     int fd_ = -1;
