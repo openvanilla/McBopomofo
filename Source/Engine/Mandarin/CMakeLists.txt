@@ -25,7 +25,7 @@ include(GoogleTest)
 gtest_discover_tests(MandarinTest)
 
 add_custom_target(
-        runTest
+        runMandarinTest
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/MandarinTest
 )
-add_dependencies(runTest MandarinTest)
+add_dependencies(runMandarinTest MandarinTest)

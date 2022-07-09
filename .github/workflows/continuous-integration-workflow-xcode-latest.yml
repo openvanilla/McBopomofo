@@ -16,19 +16,19 @@ jobs:
         run: cmake -S . -B build
         working-directory: Source/Engine
       - name: Run McBopomofoLMLibTest
-        run: make runTest
+        run: make runMcBopomofoLMLibTest
         working-directory: Source/Engine/build
       - name: Build MandarinTest
         run: cmake -S . -B build
         working-directory: Source/Engine/Mandarin
       - name: Run MandarinTest
-        run: make runTest
+        run: make runMandarinTest
         working-directory: Source/Engine/Mandarin/build
       - name: Build GramambularTest
         run: cmake -S . -B build
         working-directory: Source/Engine/Gramambular
       - name: Run GramambularTest
-        run: make runTest
+        run: make runGramambularTest
         working-directory: Source/Engine/Gramambular/build
       - name: Test McBopomofo App Bundle
         run: xcodebuild -scheme McBopomofo -configuration Debug test
