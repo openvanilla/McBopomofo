@@ -31,6 +31,7 @@
 
 #import <codecvt>
 #import <locale>
+#import <unordered_map>
 #import <string>
 #import <utility>
 
@@ -171,11 +172,11 @@ static std::string ToU8(const std::u32string& s) {
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
 
-- (void)fixNodeWithValue:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag
+- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag
 {
     size_t actualCursor = [self _actualCandidateCursorIndex];
-    std::string candidateValue(std::string(value.UTF8String));
-    if (!_grid->overrideCandidate(actualCursor, candidateValue)) {
+    Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
+    if (!_grid->overrideCandidate(actualCursor, candidate)) {
         return;
     }
     [self _walk];
@@ -192,7 +193,7 @@ static std::string ToU8(const std::u32string& s) {
     }
 
     if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
-        _userOverrideModel->observe(_latestWalk.nodes, actualCursor, candidateValue, [[NSDate date] timeIntervalSince1970]);
+        _userOverrideModel->observe(_latestWalk.nodes, actualCursor, candidate.value, [[NSDate date] timeIntervalSince1970]);
     }
 
     if (currentNode != nullptr && flag && Preferences.moveCursorAfterSelectingCandidate) {
@@ -355,7 +356,7 @@ static std::string ToU8(const std::u32string& s) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
-                NSString *text = choosingCandidates.candidates.firstObject;
+                NSString *text = choosingCandidates.candidates.firstObject.value;
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text];
                 stateCallback(committing);
 
@@ -594,7 +595,8 @@ static std::string ToU8(const std::u32string& s) {
         // In other words, if a user type two BPMF readings, but the score of seeing
         // them as two unigrams is higher than a phrase with two characters, the
         // user can just use the longer phrase by typing the tab key.
-        if (currentNode->value() == [candidates[0] UTF8String]) {
+        InputStateCandidate* candidate = candidates[0];
+        if (currentNode->reading() == candidate.reading.UTF8String && currentNode->value() == candidate.value.UTF8String) {
             // If the first candidate is the value of the current node, we use next
             // one.
             if (shiftIsHold) {
@@ -604,8 +606,8 @@ static std::string ToU8(const std::u32string& s) {
             }
         }
     } else {
-        for (NSString* candidate : candidates) {
-            if (currentNode->value() == candidate.UTF8String) {
+        for (InputStateCandidate* candidate : candidates) {
+            if (currentNode->reading() == candidate.reading.UTF8String && currentNode->value() == candidate.value.UTF8String) {
                 if (shiftIsHold) {
                     currentIndex == 0 ? currentIndex = candidates.count - 1 : currentIndex--;
                 } else {
@@ -621,7 +623,8 @@ static std::string ToU8(const std::u32string& s) {
         currentIndex = 0;
     }
 
-    [self fixNodeWithValue:candidates[currentIndex] useMoveCursorAfterSelectionSetting:NO];
+    InputStateCandidate* candidate = candidates[currentIndex];
+    [self fixNodeWithReading:candidate.reading value:candidate.value useMoveCursorAfterSelectionSetting:NO];
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     stateCallback(inputting);
     return YES;
@@ -919,7 +922,7 @@ static std::string ToU8(const std::u32string& s) {
 
         if ([candidateState.candidates count] == 1) {
             [self clear];
-            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
@@ -1323,9 +1326,28 @@ static std::string ToU8(const std::u32string& s) {
 - (InputStateChoosingCandidate *)_buildCandidateState:(InputStateNotEmpty *)currentState useVerticalMode:(BOOL)useVerticalMode
 {
     auto candidates = _grid->candidatesAt([self _actualCandidateCursorIndex]);
+
+    std::unordered_map<std::string, size_t> valueCountMap;
+    for (const auto& c : candidates) {
+        ++valueCountMap[c.value];
+    }
+
     NSMutableArray *candidatesArray = [[NSMutableArray alloc] init];
     for (const auto& c : candidates) {
-        [candidatesArray addObject:[NSString stringWithUTF8String:c.value.c_str()]];
+        std::string displayText = c.value;
+        if (valueCountMap[displayText] > 1) {
+            displayText += " (";
+            std::string reading = c.reading;
+            std::replace(reading.begin(), reading.end(), '-', ' ');
+            displayText += reading;
+            displayText += ")";
+        }
+
+        NSString *r = [NSString stringWithUTF8String:c.reading.c_str()];
+        NSString *v = [NSString stringWithUTF8String:c.value.c_str()];
+        NSString *dt = [NSString stringWithUTF8String:displayText.c_str()];
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt];
+        [candidatesArray addObject:candidate];
     }
 
     InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];

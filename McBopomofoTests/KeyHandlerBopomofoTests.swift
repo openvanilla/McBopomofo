@@ -364,7 +364,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
 
         XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
         if let state = state as? InputState.ChoosingCandidate {
-            XCTAssertTrue(state.candidates.contains("，"))
+            XCTAssertTrue(state.candidates.map { $0.value }.contains("，"))
         }
         Preferences.halfWidthPunctuationEnabled = enabled
     }
@@ -967,7 +967,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.composingBuffer, "你")
             XCTAssertEqual(state.cursorIndex, 1)
             let candidates = state.candidates
-            XCTAssertTrue(candidates.contains("你"))
+            XCTAssertTrue(candidates.map { $0.value }.contains("你"))
         }
     }
 
@@ -1002,7 +1002,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.composingBuffer, "你")
             XCTAssertEqual(state.cursorIndex, 1)
             let candidates = state.candidates
-            XCTAssertTrue(candidates.contains("你"))
+            XCTAssertTrue(candidates.map { $0.value }.contains("你"))
         }
         Preferences.chooseCandidateUsingSpace = enabled
     }

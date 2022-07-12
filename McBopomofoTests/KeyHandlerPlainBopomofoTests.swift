@@ -67,7 +67,7 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
 
         XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
         if let state = state as? InputState.ChoosingCandidate {
-            XCTAssertTrue(state.candidates.contains("，"))
+            XCTAssertTrue(state.candidates.map { $0.value }.contains("，"))
         }
     }
 
@@ -218,7 +218,7 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
 
         XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
         if let state = state as? InputState.ChoosingCandidate {
-            XCTAssertTrue(state.candidates.contains("你"))
+            XCTAssertTrue(state.candidates.map { $0.value }.contains("你"))
         }
     }
 
