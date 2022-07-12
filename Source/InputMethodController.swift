@@ -450,7 +450,7 @@ extension McBopomofoInputMethodController {
                 return true
             }
             candidates.sort {
-                return $0.value.count > $1.value.count
+                return $0.displayText.count > $1.displayText.count
             }
             // If there is a candidate which is too long, we use the vertical
             // candidate list window automatically.
