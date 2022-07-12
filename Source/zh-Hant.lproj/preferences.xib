@@ -13,7 +13,6 @@
                 <outlet property="basicSettingsView" destination="eWf-pC-0Bt" id="IHt-cQ-iV8"/>
                 <outlet property="basisKeyboardLayoutButton" destination="6eT-rC-gVz" id="CCy-tX-eCP"/>
                 <outlet property="chooseUserPhrasesFolderButton" destination="Nf4-gN-42Y" id="chL-PA-nAW"/>
-                <outlet property="composingBufferSizeTextField" destination="QeV-8m-dqa" id="IFB-HW-Pjq"/>
                 <outlet property="customUserPhraseLocationEnabledButton" destination="b15-I3-wDL" id="PUy-eF-NmW"/>
                 <outlet property="fontSizePopUpButton" destination="YF3-dA-BAc" id="Le4-ge-hZ1"/>
                 <outlet property="openUserPhrasesFolderButton" destination="Ibr-mk-lwr" id="qs6-94-i9P"/>
@@ -29,7 +28,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="489" y="334" width="433" height="575"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="433" height="575"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -42,7 +41,7 @@
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BSi-pH-F8f">
-                    <rect key="frame" x="181" y="426" width="99" height="25"/>
+                    <rect key="frame" x="185" y="426" width="95" height="25"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="iXH-DJ-dBb">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -64,7 +63,7 @@
                     </popUpButtonCell>
                 </popUpButton>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KRC-Qj-X94">
-                    <rect key="frame" x="78" y="434" width="100" height="16"/>
+                    <rect key="frame" x="78" y="434" width="95" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="注音鍵盤配置：" id="pgD-ZY-ctk">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -72,7 +71,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6eT-rC-gVz">
-                    <rect key="frame" x="181" y="396" width="236" height="25"/>
+                    <rect key="frame" x="185" y="396" width="224" height="25"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="M0n-R9-S5B">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -83,7 +82,7 @@
                     </connections>
                 </popUpButton>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0tK-14-8hw">
-                    <rect key="frame" x="28" y="307" width="150" height="16"/>
+                    <rect key="frame" x="28" y="307" width="137" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="選字時，候選詞起點在：" id="NxU-Db-NGM">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -91,7 +90,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KMh-qe-ZAb">
-                    <rect key="frame" x="67" y="237" width="111" height="16"/>
+                    <rect key="frame" x="67" y="237" width="101" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="候選詞呈現方式：" id="bgn-gs-kBm">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -99,7 +98,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hlp-hI-9WY">
-                    <rect key="frame" x="64" y="179" width="111" height="16"/>
+                    <rect key="frame" x="64" y="179" width="101" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="選字窗文字大小：" id="Rqe-kZ-F9v">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -154,7 +153,7 @@
                     </connections>
                 </popUpButton>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="2Nx-PK-HCb">
-                    <rect key="frame" x="182" y="330" width="119" height="18"/>
+                    <rect key="frame" x="190" y="330" width="111" height="18"/>
                     <buttonCell key="cell" type="check" title="使用空白鍵選字" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="viN-E3-CpO">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -164,7 +163,7 @@
                     </connections>
                 </button>
                 <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gtY-jT-2F6">
-                    <rect key="frame" x="184" y="351" width="232" height="25"/>
+                    <rect key="frame" x="192" y="351" width="216" height="25"/>
                     <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="SQ9-Pr-yQD">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -180,7 +179,7 @@
                     </connections>
                 </comboBox>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8MO-3w-gC1">
-                    <rect key="frame" x="120" y="358" width="58" height="16"/>
+                    <rect key="frame" x="120" y="358" width="53" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="選字鍵：" id="8xt-it-NRD">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -199,7 +198,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c1b-KP-F28">
-                    <rect key="frame" x="67" y="404" width="111" height="16"/>
+                    <rect key="frame" x="67" y="404" width="101" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="英數字鍵盤配置：" id="LAM-Fg-sIT">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -207,7 +206,7 @@
                     </textFieldCell>
                 </textField>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="hvF-32-Zw1">
-                    <rect key="frame" x="182" y="24" width="146" height="18"/>
+                    <rect key="frame" x="182" y="24" width="135" height="18"/>
                     <buttonCell key="cell" type="check" title="定期檢查是否有新版" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="k9r-ii-fdD">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -220,7 +219,7 @@
                     <rect key="frame" x="20" y="164" width="396" height="5"/>
                 </box>
                 <box horizontalHuggingPriority="249" verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="uuQ-a9-JKn">
-                    <rect key="frame" x="20" y="389" width="393" height="5"/>
+                    <rect key="frame" x="20" y="389" width="385" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" id="qLt-o2-oPl">
                     <rect key="frame" x="182" y="260" width="186" height="18"/>
@@ -358,11 +357,11 @@
             <point key="canvasLocation" x="168" y="-377"/>
         </view>
         <view id="L2Q-IX-SXc">
-            <rect key="frame" x="0.0" y="0.0" width="436" height="177"/>
+            <rect key="frame" x="0.0" y="0.0" width="436" height="124"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jAZ-sE-wLZ">
-                    <rect key="frame" x="54" y="42" width="124" height="16"/>
+                    <rect key="frame" x="65" y="42" width="113" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="中文簡繁轉換引擎：" id="8mX-v8-X1y">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -395,16 +394,8 @@
                     </connections>
                 </matrix>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cks-CZ-m7g">
-                    <rect key="frame" x="54" y="88" width="124" height="16"/>
+                    <rect key="frame" x="65" y="88" width="113" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="中文簡繁轉換模式：" id="bX9-g7-U8G">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l5V-0i-S3o">
-                    <rect key="frame" x="67" y="141" width="111" height="16"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="輸入緩衝區大小：" id="nIZ-Qn-l1K">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -435,63 +426,27 @@
                         <binding destination="32" name="selectedTag" keyPath="values.ChineseConversionStyle" id="l0X-2P-QrT"/>
                     </connections>
                 </matrix>
-                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="JeD-t3-gxq">
-                    <rect key="frame" x="20" y="122" width="396" height="5"/>
-                </box>
-                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QeV-8m-dqa">
-                    <rect key="frame" x="184" y="141" width="96" height="21"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="96" id="KOU-vH-6Ck"/>
-                    </constraints>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Phb-jV-95J">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <binding destination="32" name="value" keyPath="values.ComposingBufferSize" id="I85-zE-CYU"/>
-                    </connections>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FDO-I5-77h">
-                    <rect key="frame" x="286" y="144" width="45" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="(4-100)" id="tju-6y-kBY">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
             </subviews>
             <constraints>
                 <constraint firstItem="jAZ-sE-wLZ" firstAttribute="top" secondItem="weE-qL-B2N" secondAttribute="top" id="3y8-9T-Nr6"/>
-                <constraint firstAttribute="trailing" secondItem="FDO-I5-77h" secondAttribute="trailing" constant="107" id="7Jr-k0-ur4"/>
-                <constraint firstItem="l5V-0i-S3o" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="90n-wN-hCJ"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="top" secondItem="PuO-lM-5fF" secondAttribute="top" id="9f0-yl-Lcg"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="BcQ-48-gwy"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="BiS-LY-BQX"/>
-                <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="73" id="NoS-nF-SDm"/>
-                <constraint firstItem="JeD-t3-gxq" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="ObK-Qf-Ur5"/>
-                <constraint firstItem="l5V-0i-S3o" firstAttribute="bottom" secondItem="QeV-8m-dqa" secondAttribute="bottom" id="Pib-kd-vfX"/>
+                <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="NoS-nF-SDm"/>
                 <constraint firstItem="weE-qL-B2N" firstAttribute="top" secondItem="PuO-lM-5fF" secondAttribute="bottom" constant="8" symbolic="YES" id="QIb-oU-fsb"/>
                 <constraint firstAttribute="trailing" secondItem="cks-CZ-m7g" secondAttribute="trailing" constant="260" id="QRN-hI-wWF"/>
                 <constraint firstItem="jAZ-sE-wLZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="T5t-oz-400"/>
-                <constraint firstItem="QeV-8m-dqa" firstAttribute="leading" secondItem="l5V-0i-S3o" secondAttribute="trailing" constant="8" symbolic="YES" id="TBh-F0-j7y"/>
-                <constraint firstAttribute="trailing" secondItem="JeD-t3-gxq" secondAttribute="trailing" constant="20" symbolic="YES" id="Z4L-Mc-y35"/>
-                <constraint firstItem="JeD-t3-gxq" firstAttribute="top" secondItem="l5V-0i-S3o" secondAttribute="bottom" constant="16" id="kf3-LW-W8v"/>
-                <constraint firstItem="QeV-8m-dqa" firstAttribute="baseline" secondItem="FDO-I5-77h" secondAttribute="baseline" id="lRK-BZ-NMp"/>
                 <constraint firstItem="weE-qL-B2N" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="lRo-g5-LoD"/>
-                <constraint firstItem="l5V-0i-S3o" firstAttribute="trailing" secondItem="cks-CZ-m7g" secondAttribute="trailing" id="mVx-hp-0Lb"/>
-                <constraint firstItem="l5V-0i-S3o" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="69" id="qaA-QU-xIe"/>
-                <constraint firstItem="FDO-I5-77h" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="QeV-8m-dqa" secondAttribute="trailing" constant="8" symbolic="YES" id="qsU-lT-gUf"/>
                 <constraint firstAttribute="trailing" secondItem="jAZ-sE-wLZ" secondAttribute="trailing" constant="260" id="zlq-Sd-uCb"/>
             </constraints>
-            <point key="canvasLocation" x="651" y="-138.5"/>
+            <point key="canvasLocation" x="651" y="-165"/>
         </view>
         <customView id="M7i-Af-lNp">
             <rect key="frame" x="0.0" y="0.0" width="436" height="334"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="107" translatesAutoresizingMaskIntoConstraints="NO" id="uPv-37-dOi">
-                    <rect key="frame" x="21" y="298" width="111" height="16"/>
+                    <rect key="frame" x="23" y="298" width="101" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="使用者詞彙位置：" id="ulY-l0-tqg">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -499,7 +454,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b15-I3-wDL">
-                    <rect key="frame" x="20" y="257" width="66" height="25"/>
+                    <rect key="frame" x="22" y="257" width="64" height="25"/>
                     <popUpButtonCell key="cell" type="push" title="標準" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="WPo-X9-YuK" id="zEZ-0A-2Df">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
@@ -529,7 +484,7 @@
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" preferredMaxLayoutWidth="405" translatesAutoresizingMaskIntoConstraints="NO" id="pb0-gR-J2p">
-                    <rect key="frame" x="18" y="177" width="400" height="28"/>
+                    <rect key="frame" x="18" y="177" width="404" height="28"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="8wn-XD-VFx"/>
                     </constraints>
@@ -540,7 +495,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ibr-mk-lwr">
-                    <rect key="frame" x="90" y="232" width="40" height="21"/>
+                    <rect key="frame" x="90" y="232" width="39" height="21"/>
                     <buttonCell key="cell" type="bevel" title="Button" bezelStyle="rounded" imagePosition="overlaps" alignment="left" controlSize="small" imageScaling="proportionallyDown" inset="2" id="QMk-FM-cgo">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -590,7 +545,7 @@
                     </textFieldCell>
                 </textField>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="LVR-3l-T11">
-                    <rect key="frame" x="20" y="154" width="393" height="5"/>
+                    <rect key="frame" x="20" y="154" width="397" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Nf4-gN-42Y">
                     <rect key="frame" x="384" y="262" width="32" height="20"/>

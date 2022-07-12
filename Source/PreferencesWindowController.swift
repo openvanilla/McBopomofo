@@ -51,7 +51,6 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
     @IBOutlet weak var advancedSettingsView: NSView!
 
     @IBOutlet weak var addPhraseHookPathField: NSTextField!
-    @IBOutlet weak var composingBufferSizeTextField: NSTextField!
 
     override func awakeFromNib() {
         let toolbar = NSToolbar(identifier: "preference toolbar")
@@ -167,14 +166,6 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         customUserPhraseLocationEnabledButton.selectItem(at: index)
         updateUserPhraseLocation()
         addPhraseHookPathField.stringValue = Preferences.addPhraseHookPath
-        let composingBufferSizeFormatter = NumberFormatter()
-        composingBufferSizeFormatter.numberStyle = .decimal
-        composingBufferSizeFormatter.generatesDecimalNumbers = true
-        composingBufferSizeFormatter.maximumIntegerDigits = 3
-        composingBufferSizeFormatter.maximumFractionDigits = 0
-        composingBufferSizeFormatter.maximum = 100
-        composingBufferSizeFormatter.minimum = 4
-        composingBufferSizeTextField.cell?.formatter = composingBufferSizeFormatter
     }
 
     @IBAction func updateBasisKeyboardLayoutAction(_ sender: Any) {

@@ -34,7 +34,6 @@ private let kCandidateListTextSizeKey = "CandidateListTextSize"
 private let kSelectPhraseAfterCursorAsCandidateKey = "SelectPhraseAfterCursorAsCandidate"
 private let kMoveCursorAfterSelectingCandidateKey = "MoveCursorAfterSelectingCandidate"
 private let kUseHorizontalCandidateListPreferenceKey = "UseHorizontalCandidateList"
-private let kComposingBufferSizePreferenceKey = "ComposingBufferSize"
 private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
@@ -55,15 +54,6 @@ private let kCustomUserPhraseLocation = "CustomUserPhraseLocation"
 private let kDefaultCandidateListTextSize: CGFloat = 16
 private let kMinCandidateListTextSize: CGFloat = 12
 private let kMaxCandidateListTextSize: CGFloat = 196
-
-// default, min and max composing buffer size (in codepoints)
-// modern Macs can usually work up to 16 codepoints when the builder still
-// walks the grid with good performance; slower Macs (like old PowerBooks)
-// will start to sputter beyond 12; such is the algorithmatic complexity
-// of the Viterbi algorithm used in the builder library (at O(N^2))
-private let kDefaultComposingBufferSize = 10
-private let kMinComposingBufferSize = 4
-private let kMaxComposingBufferSize = 100
 
 private let kDefaultKeys = "123456789"
 private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
@@ -129,36 +119,6 @@ struct CandidateListTextSize {
                 value = kMinCandidateListTextSize
             } else if value > kMaxCandidateListTextSize {
                 value = kMaxCandidateListTextSize
-            }
-            container.wrappedValue = value
-        }
-    }
-}
-
-@propertyWrapper
-struct ComposingBufferSize {
-    let key: String
-    let defaultValue: Int = kDefaultComposingBufferSize
-    lazy var container: UserDefault = {
-        UserDefault(key: key, defaultValue: defaultValue)
-    }()
-
-    var wrappedValue: Int {
-        mutating get {
-            let currentValue = container.wrappedValue
-            if currentValue < kMinComposingBufferSize {
-                return kMinComposingBufferSize
-            } else if currentValue > kMaxComposingBufferSize {
-                return kMaxComposingBufferSize
-            }
-            return currentValue
-        }
-        set {
-            var value = newValue
-            if value < kMinComposingBufferSize {
-                value = kMinComposingBufferSize
-            } else if value > kMaxComposingBufferSize {
-                value = kMaxComposingBufferSize
             }
             container.wrappedValue = value
         }
@@ -232,7 +192,6 @@ class Preferences: NSObject {
          kCandidateListTextSizeKey,
          kSelectPhraseAfterCursorAsCandidateKey,
          kUseHorizontalCandidateListPreferenceKey,
-         kComposingBufferSizePreferenceKey,
          kChooseCandidateUsingSpaceKey,
          kChineseConversionEnabledKey,
          kHalfWidthPunctuationEnabledKey,
@@ -277,9 +236,6 @@ class Preferences: NSObject {
 
     @UserDefault(key: kUseHorizontalCandidateListPreferenceKey, defaultValue: false)
     @objc static var useHorizontalCandidateList: Bool
-
-    @ComposingBufferSize(key: kComposingBufferSizePreferenceKey)
-    @objc static var composingBufferSize: Int
 
     @UserDefault(key: kChooseCandidateUsingSpaceKey, defaultValue: true)
     @objc static var chooseCandidateUsingSpace: Bool
