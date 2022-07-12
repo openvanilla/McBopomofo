@@ -22,13 +22,18 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "KeyHandler.h"
-#import "Gramambular.h"
+#import "reading_grid.h"
 #import "LanguageModelManager+Privates.h"
 #import "Mandarin.h"
 #import "McBopomofo-Swift.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
+
+#import <codecvt>
+#import <locale>
+#import <unordered_map>
 #import <string>
+#import <utility>
 
 @import CandidateUI;
 @import NSStringUtils;
@@ -36,38 +41,19 @@
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
 
-static const double kEpsilon = 0.000001;
-static const size_t kMaxComposingBufferNeedsToWalkSize = 10;
-
-
-static double FindHighestScore(const std::vector<Formosa::Gramambular::NodeAnchor> &nodes, double epsilon)
-{
-    double highestScore = 0.0;
-    for (auto ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        double score = ni->node->highestUnigramScore();
-        if (score > highestScore) {
-            highestScore = score;
-        }
-    }
-    return highestScore + epsilon;
+static std::u32string ToU32(const std::string& s) {
+  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+  return conv.from_bytes(s);
 }
 
-// sort helper
-class NodeAnchorDescendingSorter {
-public:
-    bool operator()(const Formosa::Gramambular::NodeAnchor &a, const Formosa::Gramambular::NodeAnchor &b) const
-    {
-        return a.node->key().length() > b.node->key().length();
-    }
-};
-
-// if DEBUG is defined, a DOT file (GraphViz format) will be written to the
-// specified path every time the grid is walked
-#if DEBUG
-static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot";
-#endif
+static std::string ToU8(const std::u32string& s) {
+  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+  return conv.to_bytes(s);
+}
 
 @implementation KeyHandler {
+    std::shared_ptr<Formosa::Gramambular2::LanguageModel> _emptySharedPtr;
+
     // the reading buffer that takes user input
     Formosa::Mandarin::BopomofoReadingBuffer *_bpmfReadingBuffer;
 
@@ -77,11 +63,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     // user override model
     McBopomofo::UserOverrideModel *_userOverrideModel;
 
-    // the grid (lattice) builder for the unigrams
-    Formosa::Gramambular::BlockReadingBuilder *_builder;
-
-    // latest walked path (trellis) using the Viterbi algorithm
-    std::vector<Formosa::Gramambular::NodeAnchor> _walkedNodes;
+    Formosa::Gramambular2::ReadingGrid *_grid;
+    Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk;
 
     NSString *_inputMode;
 }
@@ -115,10 +98,16 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _inputMode = newInputMode;
         _languageModel = newLanguageModel;
 
-        if (_builder) {
-            delete _builder;
-            _builder = new Formosa::Gramambular::BlockReadingBuilder(_languageModel);
-            _builder->setJoinSeparator("-");
+        if (_grid == nullptr) {
+            NSLog(@"used after release????");
+        }
+
+        if (_grid != nullptr) {
+            delete _grid;
+            // This returns a shared_ptr that in turn points to an unmanaged object.
+            std::shared_ptr<Formosa::Gramambular2::LanguageModel> lm(_emptySharedPtr, _languageModel);
+            _grid = new Formosa::Gramambular2::ReadingGrid(lm);
+            _grid->setReadingSeparator("-");
         }
 
         if (!_bpmfReadingBuffer->isEmpty()) {
@@ -129,14 +118,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (void)dealloc
 {
-    // clean up everything
-    if (_bpmfReadingBuffer) {
-        delete _bpmfReadingBuffer;
-    }
-
-    if (_builder) {
-        delete _builder;
-    }
+    delete _bpmfReadingBuffer;
+    delete _grid;
 }
 
 - (instancetype)init
@@ -150,10 +133,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
-        _builder = new Formosa::Gramambular::BlockReadingBuilder(_languageModel);
+        // This returns a shared_ptr that in turn points to an unmanaged object.
+        std::shared_ptr<Formosa::Gramambular2::LanguageModel> lm(_emptySharedPtr, _languageModel);
+        _grid = new Formosa::Gramambular2::ReadingGrid(lm);
+        _grid->setReadingSeparator("-");
 
-        // each Mandarin syllable is separated by a hyphen
-        _builder->setJoinSeparator("-");
         _inputMode = InputModeBopomofo;
     }
     return self;
@@ -188,50 +172,40 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
 
-- (void)fixNodeWithValue:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag
+- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag
 {
-    size_t cursorIndex = [self _actualCandidateCursorIndex];
-    std::string stringValue(value.UTF8String);
-    Formosa::Gramambular::NodeAnchor selectedNode = _builder->grid().fixNodeSelectedCandidate(cursorIndex, stringValue);
-    if (_inputMode != InputModePlainBopomofo) {
-        // If the length of the readings and the characters do not match,
-        // it often means it is a special symbol and it should not be stored
-        // in the user override model.
-        BOOL addToOverrideModel = YES;
-        if (selectedNode.spanningLength != [value count]) {
-            addToOverrideModel = NO;
-        }
-        if (addToOverrideModel) {
-            double score = selectedNode.node->scoreForCandidate(stringValue);
-            if (score <= -8) {
-                addToOverrideModel = NO;
-            }
-        }
-        if (addToOverrideModel) {
-            _userOverrideModel->observe(_walkedNodes, cursorIndex, stringValue, [[NSDate date] timeIntervalSince1970]);
-        }
+    size_t actualCursor = [self _actualCandidateCursorIndex];
+    Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
+    if (!_grid->overrideCandidate(actualCursor, candidate)) {
+        return;
     }
     [self _walk];
 
-    if (flag && Preferences.moveCursorAfterSelectingCandidate) {
-        size_t nextPosition = 0;
-        for (auto node : _walkedNodes) {
-            if (nextPosition >= cursorIndex) {
-                break;
-            }
-            nextPosition += node.spanningLength;
+    // Update the user override model if warranted.
+    size_t accumulatedCursor = 0;
+    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode;
+    for (const auto& node : _latestWalk.nodes) {
+        accumulatedCursor += node->spanningLength();
+        if (accumulatedCursor > actualCursor) {
+            currentNode = node;
+            break;
         }
-        if (nextPosition <= _builder->length()) {
-            _builder->setCursorIndex(nextPosition);
-        }
+    }
+
+    if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
+        _userOverrideModel->observe(_latestWalk.nodes, actualCursor, candidate.value, [[NSDate date] timeIntervalSince1970]);
+    }
+
+    if (currentNode != nullptr && flag && Preferences.moveCursorAfterSelectingCandidate) {
+        _grid->setCursor(accumulatedCursor);
     }
 }
 
 - (void)clear
 {
     _bpmfReadingBuffer->clear();
-    _builder->clear();
-    _walkedNodes.clear();
+    _grid->clear();
+    _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult{};
 }
 
 - (std::string)_currentLayout
@@ -351,10 +325,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         std::string reading = _bpmfReadingBuffer->syllable().composedString();
 
         // see if we have a unigram for this
-        if (!_languageModel->hasUnigramsForKey(reading)) {
+        if (!_languageModel->hasUnigrams(reading)) {
             errorCallback();
             _bpmfReadingBuffer->clear();
-            if (!_builder->length()) {
+            if (!_grid->length()) {
                 stateCallback([[InputStateEmptyIgnoringPreviousState alloc] init]);
             } else {
                 stateCallback([self buildInputtingState]);
@@ -362,36 +336,27 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             return YES;
         }
 
-        // and insert it into the lattice
-        _builder->insertReadingAtCursor(reading);
-
-        // then walk the lattice
-        NSString *poppedText = [self _popOverflowComposingTextAndWalk];
+        _grid->insertReading(reading);
+        [self _walk];
 
         // get user override model suggestion
-        std::string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" : _userOverrideModel->suggest(_walkedNodes, _builder->cursorIndex(), [[NSDate date] timeIntervalSince1970]);
+        std::string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" : _userOverrideModel->suggest(_latestWalk.nodes, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
 
         if (!overrideValue.empty()) {
-            size_t cursorIndex = [self _actualCandidateCursorIndex];
-            std::vector<Formosa::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-            double highestScore = FindHighestScore(nodes, kEpsilon);
-            _builder->grid().overrideNodeScoreForSelectedCandidate(cursorIndex, overrideValue, static_cast<float>(highestScore));
+            _grid->overrideCandidate([self _actualCandidateCursorIndex], overrideValue, Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram);
         }
-
-        [self fixNodesIfRequired];
 
         // then update the text
         _bpmfReadingBuffer->clear();
 
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-        inputting.poppedText = poppedText;
         stateCallback(inputting);
 
         if (_inputMode == InputModePlainBopomofo) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
-                NSString *text = choosingCandidates.candidates.firstObject;
+                NSString *text = choosingCandidates.candidates.firstObject.value;
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text];
                 stateCallback(committing);
 
@@ -433,7 +398,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         if (charCode == 32) {
             // if the spacebar is NOT set to be a selection key
             if ([input isShiftHold] || !Preferences.chooseCandidateUsingSpace) {
-                if (_builder->cursorIndex() >= _builder->length()) {
+                if (_grid->cursor() >= _grid->length()) {
                     NSString *composingBuffer = [(InputStateNotEmpty *)state composingBuffer];
                     if (composingBuffer.length) {
                         InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
@@ -444,11 +409,10 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
                     stateCallback(committing);
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
-                } else if (_languageModel->hasUnigramsForKey(" ")) {
-                    _builder->insertReadingAtCursor(" ");
-                    NSString *poppedText = [self _popOverflowComposingTextAndWalk];
+                } else if (_languageModel->hasUnigrams(" ")) {
+                    _grid->insertReading(" ");
+                    [self _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-                    inputting.poppedText = poppedText;
                     stateCallback(inputting);
                 }
                 return YES;
@@ -514,12 +478,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
     // MARK: Punctuation list
     if ((char)charCode == '`') {
-        if (_languageModel->hasUnigramsForKey("_punctuation_list")) {
+        if (_languageModel->hasUnigrams("_punctuation_list")) {
             if (_bpmfReadingBuffer->isEmpty()) {
-                _builder->insertReadingAtCursor("_punctuation_list");
-                NSString *poppedText = [self _popOverflowComposingTextAndWalk];
+                _grid->insertReading("_punctuation_list");
+                [self _walk];
                 InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-                inputting.poppedText = poppedText;
                 stateCallback(inputting);
                 InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
                 stateCallback(choosingCandidate);
@@ -584,7 +547,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handleTabState:(InputState *)state shiftIsHold:(BOOL)shiftIsHold stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (!_builder->length()) {
+    if (!_grid->length()) {
         return NO;
     }
 
@@ -599,50 +562,54 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     NSArray *candidates = [[self _buildCandidateState:(InputStateInputting *)state useVerticalMode:NO] candidates];
-    if ([candidates count] == 0) {
+    if (candidates.count == 0) {
         errorCallback();
         return YES;
     }
 
+
     size_t cursorIndex = [self _actualCandidateCursorIndex];
     size_t length = 0;
-    Formosa::Gramambular::NodeAnchor currentNode;
+    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode;
 
-    for (auto node : _walkedNodes) {
-        length += node.spanningLength;
-        if (length >= cursorIndex) {
+    for (const auto& node : _latestWalk.nodes) {
+        length += node->spanningLength();
+        if (length > cursorIndex) {
             currentNode = node;
             break;
         }
     }
 
-    NSString *currentValue = [[NSString alloc] initWithUTF8String:currentNode.node->currentKeyValue().value.c_str()];
+    if (currentNode == nullptr) {
+        // Shouldn't happen.
+        errorCallback();
+        return true;
+    }
 
     size_t currentIndex = 0;
-    if (currentNode.node->score() <
-        Formosa::Gramambular::kSelectedCandidateScore) {
-        // Once the user never select a candidate for the node, we start from the
+    if (!currentNode->isOverridden()) {
+        // If the user never selects a candidate for the node, we start from the
         // first candidate, so the user has a chance to use the unigram with two or
         // more characters when type the tab key for the first time.
         //
         // In other words, if a user type two BPMF readings, but the score of seeing
         // them as two unigrams is higher than a phrase with two characters, the
         // user can just use the longer phrase by typing the tab key.
-        if ([candidates[0] isEqualToString:currentValue]) {
+        InputStateCandidate* candidate = candidates[0];
+        if (currentNode->reading() == candidate.reading.UTF8String && currentNode->value() == candidate.value.UTF8String) {
             // If the first candidate is the value of the current node, we use next
             // one.
             if (shiftIsHold) {
-                currentIndex = candidates.count - 1;
+                currentIndex = [candidates count] - 1;
             } else {
                 currentIndex = 1;
             }
         }
     } else {
-        for (NSString * candidate in candidates) {
-            if ([candidate isEqualToString:currentValue]) {
+        for (InputStateCandidate* candidate : candidates) {
+            if (currentNode->reading() == candidate.reading.UTF8String && currentNode->value() == candidate.value.UTF8String) {
                 if (shiftIsHold) {
-                    currentIndex == 0 ? currentIndex = candidates.count - 1
-                    : currentIndex--;
+                    currentIndex == 0 ? currentIndex = candidates.count - 1 : currentIndex--;
                 } else {
                     currentIndex++;
                 }
@@ -656,9 +623,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         currentIndex = 0;
     }
 
-    NSString *candidate = candidates[currentIndex];
-    [self fixNodeWithValue:candidate useMoveCursorAfterSelectionSetting:NO];
-
+    InputStateCandidate* candidate = candidates[currentIndex];
+    [self fixNodeWithReading:candidate.reading value:candidate.value useMoveCursorAfterSelectionSetting:NO];
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     stateCallback(inputting);
     return YES;
@@ -687,7 +653,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         if (!_bpmfReadingBuffer->isEmpty()) {
             _bpmfReadingBuffer->clear();
-            if (!_builder->length()) {
+            if (!_grid->length()) {
                 InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);
             } else {
@@ -725,8 +691,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             stateCallback(state);
         }
     } else {
-        if (_builder->cursorIndex() > 0) {
-            _builder->setCursorIndex(_builder->cursorIndex() - 1);
+        if (_grid->cursor() > 0) {
+            _grid->setCursor(_grid->cursor() - 1);
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         } else {
@@ -763,8 +729,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
             stateCallback(state);
         }
     } else {
-        if (_builder->cursorIndex() < _builder->length()) {
-            _builder->setCursorIndex(_builder->cursorIndex() + 1);
+        if (_grid->cursor() < _grid->length()) {
+            _grid->setCursor(_grid->cursor() + 1);
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         } else {
@@ -788,8 +754,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if (_builder->cursorIndex()) {
-        _builder->setCursorIndex(0);
+    if (_grid->cursor()) {
+        _grid->setCursor(0);
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     } else {
@@ -812,8 +778,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         return YES;
     }
 
-    if (_builder->cursorIndex() != _builder->length()) {
-        _builder->setCursorIndex(_builder->length());
+    if (_grid->cursor() != _grid->length()) {
+        _grid->setCursor(_grid->length());
         InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
         stateCallback(inputting);
     } else {
@@ -847,8 +813,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _bpmfReadingBuffer->clear();
     }
     else if (_bpmfReadingBuffer->isEmpty()) {
-        if (_builder->cursorIndex()) {
-            _builder->deleteReadingBeforeCursor();
+        if (_grid->cursor()) {
+            _grid->deleteReadingBeforeCursor();
             [self _walk];
         } else {
             errorCallback();
@@ -859,7 +825,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         _bpmfReadingBuffer->backspace();
     }
 
-    if (_bpmfReadingBuffer->isEmpty() && !_builder->length()) {
+    if (_bpmfReadingBuffer->isEmpty() && !_grid->length()) {
         InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
         stateCallback(empty);
     } else {
@@ -876,8 +842,8 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     if (_bpmfReadingBuffer->isEmpty()) {
-        if (_builder->cursorIndex() != _builder->length()) {
-            _builder->deleteReadingAfterCursor();
+        if (_grid->cursor() != _grid->length()) {
+            _grid->deleteReadingAfterCursor();
             [self _walk];
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             if (!inputting.composingBuffer.length) {
@@ -935,14 +901,13 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (BOOL)_handlePunctuation:(std::string)customPunctuation state:(InputState *)state usingVerticalMode:(BOOL)useVerticalMode stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
-    if (!_languageModel->hasUnigramsForKey(customPunctuation)) {
+    if (!_languageModel->hasUnigrams(customPunctuation)) {
         return NO;
     }
 
-    NSString *poppedText;
     if (_bpmfReadingBuffer->isEmpty()) {
-        _builder->insertReadingAtCursor(customPunctuation);
-        poppedText = [self _popOverflowComposingTextAndWalk];
+        _grid->insertReading(customPunctuation);
+        [self _walk];
     } else { // If there is still unfinished bpmf reading, ignore the punctuation
         errorCallback();
         stateCallback(state);
@@ -950,7 +915,6 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
     }
 
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-    inputting.poppedText = poppedText;
     stateCallback(inputting);
 
     if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
@@ -958,7 +922,7 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
         if ([candidateState.candidates count] == 1) {
             [self clear];
-            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
@@ -1246,11 +1210,11 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
         std::string customPunctuation = punctuationNamePrefix + layout + std::string(1, (char)charCode);
         std::string punctuation = punctuationNamePrefix + std::string(1, (char)charCode);
 
-        BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigramsForKey(customPunctuation) || _languageModel->hasUnigramsForKey(punctuation);
+        BOOL shouldAutoSelectCandidate = _bpmfReadingBuffer->isValidKey((char)charCode) || _languageModel->hasUnigrams(customPunctuation) || _languageModel->hasUnigrams(punctuation);
 
         if (!shouldAutoSelectCandidate && (char)charCode >= 'A' && (char)charCode <= 'Z') {
             std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
-            if (_languageModel->hasUnigramsForKey(letter)) {
+            if (_languageModel->hasUnigrams(letter)) {
                 shouldAutoSelectCandidate = YES;
             }
         }
@@ -1276,77 +1240,79 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (InputStateInputting *)buildInputtingState
 {
-    // "updating the composing buffer" means to request the client to "refresh" the text input buffer
-    // with our "composing text"
-    NSMutableString *composingBuffer = [[NSMutableString alloc] init];
-    NSInteger composedStringCursorIndex = 0;
+    // To construct an Inputting state, we need to first retrieve the entire
+    // composing buffer from the current grid, then split the composed string
+    // into head and tail, so that we can insert the current reading (if
+    // not-empty) between them.
+    //
+    // We'll also need to compute the UTF-8 cursor index. The idea here is we
+    // use a "running" index that will eventually catch the cursor index in the
+    // builder. The tricky part is that if the spanning length of the node that
+    // the cursor is at does not agree with the actual codepoint count of the
+    // node's value, we'll need to move the cursor at the end of the node to
+    // avoid confusions.
+    size_t runningCursor = 0;  // spanning-length-based, like the builder cursor
 
-    size_t readingCursorIndex = 0;
-    size_t builderCursorIndex = _builder->cursorIndex();
-
+    std::string composed;
+    size_t builderCursor = _grid->cursor();
+    size_t composedCursor = 0;  // UTF-8 (so "byte") cursor per fcitx5 requirement.
     NSString *tooltip = @"";
 
-    // we must do some Unicode codepoint counting to find the actual cursor location for the client
-    // i.e. we need to take UTF-16 into consideration, for which a surrogate pair takes 2 UniChars
-    // locations
-    for (std::vector<Formosa::Gramambular::NodeAnchor>::iterator wi = _walkedNodes.begin(), we = _walkedNodes.end(); wi != we; ++wi) {
-        if ((*wi).node) {
-            std::string nodeStr = (*wi).node->currentKeyValue().value;
-            NSString *valueString = [NSString stringWithUTF8String:nodeStr.c_str()];
-            [composingBuffer appendString:valueString];
+    for (const auto& node : _latestWalk.nodes) {
+        std::string value = node->value();
+        composed += value;
 
-            NSArray *splited = [valueString split];
-            NSInteger codepointCount = splited.count;
+        // No work if runningCursor has already caught up with builderCursor.
+        if (runningCursor == builderCursor) {
+            continue;
+        }
+        size_t readingLength = node->spanningLength();
 
-            // this re-aligns the cursor index in the composed string
-            // (the actual cursor on the screen) with the builder's logical
-            // cursor (reading) cursor; each built node has a "spanning length"
-            // (e.g. two reading blocks has a spanning length of 2), and we
-            // accumulate those lengths to calculate the displayed cursor
-            // index
-            size_t spanningLength = (*wi).spanningLength;
-            if (readingCursorIndex + spanningLength <= builderCursorIndex) {
-                composedStringCursorIndex += [valueString length];
-                readingCursorIndex += spanningLength;
-            } else {
-                if (codepointCount == spanningLength) {
-                    for (size_t i = 0; i < codepointCount && readingCursorIndex < builderCursorIndex; i++) {
-                        composedStringCursorIndex += [splited[i] length];
-                        readingCursorIndex++;
-                    }
-                } else {
-                    if (readingCursorIndex < builderCursorIndex) {
-                        composedStringCursorIndex += [valueString length];
-                        readingCursorIndex += spanningLength;
-                        if (readingCursorIndex > builderCursorIndex) {
-                            readingCursorIndex = builderCursorIndex;
-                        }
-                        if (builderCursorIndex == 0) {
-                            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is before \"%@\".", @""),
-                                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
-                        } else if (builderCursorIndex >= _builder->readings().size()) {
-                            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is after \"%@\".", @""),
-                                                [NSString stringWithUTF8String:_builder->readings()[_builder->readings().size() - 1].c_str()]];
-                        } else {
-                            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is between \"%@\" and \"%@\".", @""),
-                                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex - 1].c_str()],
-                                                [NSString stringWithUTF8String:_builder->readings()[builderCursorIndex].c_str()]];
-                        }
-                    }
-                }
-            }
+        // Simple case: if the running cursor is behind, add the spanning length.
+        if (runningCursor + readingLength <= builderCursor) {
+            composedCursor += value.length();
+            runningCursor += readingLength;
+            continue;
+        }
+
+        // The builder cursor is in the middle of the node.
+        size_t distance = builderCursor - runningCursor;
+        std::u32string u32Value = ToU32(value);
+
+        // The actual partial value's code point length is the shorter of the
+        // distance and the value's code point count.
+        size_t cpLen = std::min(distance, u32Value.length());
+        std::u32string actualU32Value(u32Value.begin(), u32Value.begin() + static_cast<ptrdiff_t>(cpLen));
+        std::string actualValue = ToU8(actualU32Value);
+        composedCursor += actualValue.length();
+        runningCursor += distance;
+
+        // Create a tooltip to warn the user that their cursor is between two
+        // readings (syllables) even if the cursor is not in the middle of a
+        // composed string due to its being shorter than the number of readings.
+        if (u32Value.length() < readingLength) {
+            // builderCursor is guaranteed to be > 0. If it was 0, we wouldn't even
+            // reach here due to runningCursor having already "caught up" with
+            // builderCursor. It is also guaranteed to be less than the size of the
+            // builder's readings for the same reason: runningCursor would have
+            // already caught up.
+            const std::string& prevReading = _grid->readings()[builderCursor - 1];
+            const std::string& nextReading = _grid->readings()[builderCursor];
+
+            tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is between \"%@\" and \"%@\".", @""),
+                                [NSString stringWithUTF8String:prevReading.c_str()],
+                                [NSString stringWithUTF8String:nextReading.c_str()]];
         }
     }
 
-    // now we gather all the info, we separate the composing buffer to two parts, head and tail,
-    // and insert the reading text (the Mandarin syllable) in between them;
-    // the reading text is what the user is typing
-    NSString *head = [composingBuffer substringToIndex:composedStringCursorIndex];
-    NSString *reading = [NSString stringWithUTF8String:_bpmfReadingBuffer->composedString().c_str()];
-    NSString *tail = [composingBuffer substringFromIndex:composedStringCursorIndex];
-    NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
-    NSInteger cursorIndex = composedStringCursorIndex + [reading length];
+    std::string headStr = composed.substr(0, composedCursor);
+    std::string tailStr =composed.substr(composedCursor, composed.length() - composedCursor);
 
+    NSString *head = [NSString stringWithUTF8String:headStr.c_str()];
+    NSString *reading = [NSString stringWithUTF8String:_bpmfReadingBuffer->composedString().c_str()];
+    NSString *tail = [NSString stringWithUTF8String:tailStr.c_str()];
+    NSString *composedText = [head stringByAppendingString:[reading stringByAppendingString:tail]];
+    NSInteger cursorIndex = head.length + reading.length;
     InputStateInputting *newState = [[InputStateInputting alloc] initWithComposingBuffer:composedText cursorIndex:cursorIndex];
     newState.tooltip = tooltip;
     return newState;
@@ -1354,84 +1320,34 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (void)_walk
 {
-    // retrieve the most likely trellis, i.e. a Maximum Likelihood Estimation
-    // of the best possible Mandarain characters given the input syllables,
-    // using the Viterbi algorithm implemented in the Gramambular library
-    Formosa::Gramambular::Walker walker(&_builder->grid());
-
-    // the walker traces the trellis from the end
-    _walkedNodes = walker.walk(0);
-
-    // if DEBUG is defined, a GraphViz file is written to kGraphVizOutputfile
-#if 0
-    std::string dotDump = _builder->grid().dumpDOT();
-    NSString *dotStr = [NSString stringWithUTF8String:dotDump.c_str()];
-    NSError *error = nil;
-
-    BOOL __unused success = [dotStr writeToFile:kGraphVizOutputfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
-#endif
+    _latestWalk = _grid->walk();
 }
-
-- (NSString *)_popOverflowComposingTextAndWalk
-{
-    // in an ideal world, we can as well let the user type forever,
-    // but because the Viterbi algorithm has a complexity of O(N^2),
-    // the walk will become slower as the number of nodes increase,
-    // therefore we need to "pop out" overflown text -- they usually
-    // lose their influence over the whole MLE anyway -- so that when
-    // the user type along, the already composed text at front will
-    // be popped out
-
-    NSString *poppedText = @"";
-    NSInteger composingBufferSize = Preferences.composingBufferSize;
-
-    if (_builder->grid().width() > (size_t)composingBufferSize) {
-        if (_walkedNodes.size() > 0) {
-            Formosa::Gramambular::NodeAnchor &anchor = _walkedNodes[0];
-            poppedText = [NSString stringWithUTF8String:anchor.node->currentKeyValue().value.c_str()];
-            _builder->removeHeadReadings(anchor.spanningLength);
-        }
-    }
-
-    [self _walk];
-    return poppedText;
-}
-
-- (void)fixNodesIfRequired
-{
-    size_t width = _builder->grid().width();
-    if (width > kMaxComposingBufferNeedsToWalkSize) {
-        size_t index = 0;
-        for (auto node : _walkedNodes) {
-            if (index >= width - kMaxComposingBufferNeedsToWalkSize) {
-                break;
-            }
-            if (node.node->score() < Formosa::Gramambular::kSelectedCandidateScore) {
-                auto candidate = node.node->currentKeyValue().value;
-                _builder->grid().fixNodeSelectedCandidate(index + node.spanningLength, candidate);
-            }
-            index += node.spanningLength;
-        }
-    }
-}
-
 
 - (InputStateChoosingCandidate *)_buildCandidateState:(InputStateNotEmpty *)currentState useVerticalMode:(BOOL)useVerticalMode
 {
+    auto candidates = _grid->candidatesAt([self _actualCandidateCursorIndex]);
+
+    std::unordered_map<std::string, size_t> valueCountMap;
+    for (const auto& c : candidates) {
+        ++valueCountMap[c.value];
+    }
+
     NSMutableArray *candidatesArray = [[NSMutableArray alloc] init];
-
-    size_t cursorIndex = [self _actualCandidateCursorIndex];
-    std::vector<Formosa::Gramambular::NodeAnchor> nodes = _builder->grid().nodesCrossingOrEndingAt(cursorIndex);
-
-    // sort the nodes, so that longer nodes (representing longer phrases) are placed at the top of the candidate list
-    stable_sort(nodes.begin(), nodes.end(), NodeAnchorDescendingSorter());
-
-    // then use the C++ trick to retrieve the candidates for each node at/crossing the cursor
-    for (std::vector<Formosa::Gramambular::NodeAnchor>::iterator ni = nodes.begin(), ne = nodes.end(); ni != ne; ++ni) {
-        const std::vector<Formosa::Gramambular::KeyValuePair> &candidates = (*ni).node->candidates();
-        for (std::vector<Formosa::Gramambular::KeyValuePair>::const_iterator ci = candidates.begin(), ce = candidates.end(); ci != ce; ++ci) {
-            [candidatesArray addObject:[NSString stringWithUTF8String:(*ci).value.c_str()]];
+    for (const auto& c : candidates) {
+        std::string displayText = c.value;
+        if (valueCountMap[displayText] > 1) {
+            displayText += " (";
+            std::string reading = c.reading;
+            std::replace(reading.begin(), reading.end(), '-', ' ');
+            displayText += reading;
+            displayText += ")";
         }
+
+        NSString *r = [NSString stringWithUTF8String:c.reading.c_str()];
+        NSString *v = [NSString stringWithUTF8String:c.value.c_str()];
+        NSString *dt = [NSString stringWithUTF8String:displayText.c_str()];
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt];
+        [candidatesArray addObject:candidate];
     }
 
     InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
@@ -1440,27 +1356,33 @@ static NSString *const kGraphVizOutputfile = @"/tmp/McBopomofo-visualization.dot
 
 - (size_t)_actualCandidateCursorIndex
 {
-    size_t cursorIndex = _builder->cursorIndex();
-    if (Preferences.selectPhraseAfterCursorAsCandidate) {
-        // MS Phonetics IME style, phrase is *after* the cursor, i.e. cursor is always *before* the phrase
-        if (cursorIndex < _builder->length()) {
-            ++cursorIndex;
-        }
-    } else {
-        if (!cursorIndex) {
-            ++cursorIndex;
-        }
+    size_t cursor = _grid->cursor();
+
+    // If the cursor is at the end, always return cursor - 1. Even though
+    // ReadingGrid already handles this edge case, we want to use this value
+    // consistently. UserOverrideModel also requires the cursor to be this
+    // correct value.
+    if (cursor == _grid->length() && cursor > 0) {
+        return cursor - 1;
     }
 
-    return cursorIndex;
+    // ReadingGrid already makes the assumption that the cursor is always *at*
+    // the reading location, and when selectPhraseAfterCursorAsCandidate is true
+    // we don't need to do anything. Rather, it's when the flag is false (the
+    // default value), that we want to decrement the cursor by one.
+    if (!Preferences.selectPhraseAfterCursorAsCandidate && cursor > 0) {
+        return cursor - 1;
+    }
+
+    return cursor;
 }
 
 - (NSArray *)_currentReadings
 {
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
-    std::vector<std::string> v = _builder->readings();
-    for (std::vector<std::string>::iterator it_i = v.begin(); it_i != v.end(); ++it_i) {
-        [readingsArray addObject:[NSString stringWithUTF8String:it_i->c_str()]];
+    std::vector<std::string> v = _grid->readings();
+    for (const auto& reading : _grid->readings()) {
+        [readingsArray addObject:[NSString stringWithUTF8String:reading.c_str()]];
     }
     return readingsArray;
 }

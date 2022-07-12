@@ -24,6 +24,7 @@
 #include "ParselessLM.h"
 
 #include <fcntl.h>
+#include <string_view>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -85,16 +86,17 @@ void McBopomofo::ParselessLM::close()
     }
 }
 
-const std::vector<Formosa::Gramambular::Unigram>
-McBopomofo::ParselessLM::unigramsForKey(const std::string& key)
+std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+McBopomofo::ParselessLM::getUnigrams(const std::string& key)
 {
     if (db_ == nullptr) {
-        return std::vector<Formosa::Gramambular::Unigram>();
+        return std::vector<Formosa::Gramambular2::LanguageModel::Unigram>();
     }
 
-    std::vector<Formosa::Gramambular::Unigram> results;
+    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results;
     for (const auto& row : db_->findRows(key + " ")) {
-        Formosa::Gramambular::Unigram unigram;
+        std::string value;
+        double score = 0;
 
         // Move ahead until we encounter the first space. This is the key.
         auto it = row.begin();
@@ -102,7 +104,7 @@ McBopomofo::ParselessLM::unigramsForKey(const std::string& key)
             ++it;
         }
 
-        unigram.keyValue.key = std::string(row.begin(), it);
+        // The key is std::string(row.begin(), it), which we don't need.
 
         // Read past the space.
         if (it != row.end()) {
@@ -118,7 +120,7 @@ McBopomofo::ParselessLM::unigramsForKey(const std::string& key)
             while (it != row.end() && *it != ' ') {
                 ++it;
             }
-            unigram.keyValue.value = std::string(value_begin, it);
+            value = std::string(value_begin, it);
         }
 
         // Read past the space. The remainder, if it exists, is the score.
@@ -127,14 +129,14 @@ McBopomofo::ParselessLM::unigramsForKey(const std::string& key)
         }
 
         if (it != row.end()) {
-            unigram.score = std::stod(std::string(it, row.end()));
+            score = std::stod(std::string(it, row.end()));
         }
-        results.push_back(unigram);
+        results.emplace_back(std::move(value), score);
     }
     return results;
 }
 
-bool McBopomofo::ParselessLM::hasUnigramsForKey(const std::string& key)
+bool McBopomofo::ParselessLM::hasUnigrams(const std::string& key)
 {
     if (db_ == nullptr) {
         return false;

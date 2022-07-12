@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.17)
-project(Gramambular)
+cmake_minimum_required(VERSION 3.6)
+project(gramambular2)
 
 set(CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-add_library(GramambularLib BlockReadingBuilder.h Gramambular.h Grid.h Grid.cpp KeyValuePair.h LanguageModel.h Node.h NodeAnchor.h Span.h Unigram.h Walker.h)
+add_library(gramambular2_lib language_model.h reading_grid.h reading_grid.cpp)
 
 # Let CMake fetch Google Test for us.
 # https://github.com/google/googletest/tree/main/googletest#incorporating-into-an-existing-cmake-project
@@ -19,13 +20,14 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Test target declarations.
-add_executable(GramambularTest GramambularTest.cpp)
-target_link_libraries(GramambularTest gtest_main GramambularLib)
+add_executable(gramambular2_test reading_grid_test.cpp)
+target_include_directories(gramambular2_test PRIVATE "${GMOCK_INCLUDE_DIRS}" "${GTEST_INCLUDE_DIRS}")
+target_link_libraries(gramambular2_test gtest_main gramambular2_lib)
 include(GoogleTest)
-gtest_discover_tests(GramambularTest)
+gtest_discover_tests(gramambular2_test)
 
 add_custom_target(
-        runGramambularTest
-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/GramambularTest
+        runGramambular2Test
+        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gramambular2_test
 )
-add_dependencies(runGramambularTest GramambularTest)
+add_dependencies(runGramambular2Test gramambular2_test)

@@ -28,6 +28,8 @@
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
 #include "UserPhrasesLM.h"
+#include "gramambular2/language_model.h"
+#include <functional>
 #include <stdio.h>
 #include <unordered_set>
 
@@ -55,10 +57,10 @@ namespace McBopomofo {
 /// model while launching and to load the user phrases anytime if the custom
 /// files are modified. It does not keep the reference of the data pathes but
 /// you have to pass the paths when you ask it to do loading.
-class McBopomofoLM : public Formosa::Gramambular::LanguageModel {
+class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
 public:
     McBopomofoLM();
-    ~McBopomofoLM();
+    ~McBopomofoLM() override;
 
     /// Asks to load the primary language model at the given path.
     /// @param languageModelPath The path of the language model.
@@ -79,13 +81,14 @@ public:
     /// Asks to load th phrase replacement table at the given path.
     /// @param phraseReplacementPath The path of the phrase replacement table.
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
+
     /// Returns a list of available unigram for the given key.
     /// @param key A string represents the BPMF reading or a symbol key. For
     ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
-    const std::vector<Formosa::Gramambular::Unigram> unigramsForKey(const std::string& key);
+    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(const std::string& key) override;
     /// If the model has unigrams for the given key.
     /// @param key The key.
-    bool hasUnigramsForKey(const std::string& key);
+    bool hasUnigrams(const std::string& key) override;
 
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
@@ -110,7 +113,7 @@ protected:
     /// @param insertedValues The values for unigrams already in the results.
     ///   It helps to prevent duplicated unigrams. Please note that the method
     ///   has a side effect that it inserts values to `insertedValues`.
-    const std::vector<Formosa::Gramambular::Unigram> filterAndTransformUnigrams(const std::vector<Formosa::Gramambular::Unigram> unigrams,
+    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> filterAndTransformUnigrams(const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams,
         const std::unordered_set<std::string>& excludedValues,
         std::unordered_set<std::string>& insertedValues);
 

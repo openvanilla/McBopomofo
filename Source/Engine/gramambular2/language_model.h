@@ -1,7 +1,4 @@
-//
-// NodeAnchor.h
-//
-// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2022 and onwards Lukhnos Liu.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -23,50 +20,43 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-//
 
-#ifndef NODEANCHOR_H_
-#define NODEANCHOR_H_
+#ifndef LANGUAGE_MODEL_H_
+#define LANGUAGE_MODEL_H_
 
+#include <string>
+#include <utility>
 #include <vector>
 
-#include "Node.h"
+namespace Formosa::Gramambular2 {
 
-namespace Formosa {
-namespace Gramambular {
+// Represents an n-gram model. For our purposes, only unigrams are used.
+class LanguageModel {
+ public:
+  class Unigram;
 
-struct NodeAnchor {
-  const Node* node = nullptr;
-  size_t location = 0;
-  size_t spanningLength = 0;
-  double accumulatedScore = 0.0;
+  virtual ~LanguageModel() = default;
+
+  // Returns unigrams matching the reading, or an empty vector if none is found.
+  virtual std::vector<Unigram> getUnigrams(const std::string& reading) = 0;
+  virtual bool hasUnigrams(const std::string& reading) = 0;
+
+  // An immutable unigram with an actual value, along with a score, which is
+  // usually a log probability from a language model.
+  class Unigram {
+   public:
+    explicit Unigram(std::string val = "", double sc = 0)
+        : value_(std::move(val)), score_(sc) {}
+
+    [[nodiscard]] const std::string& value() const { return value_; }
+    [[nodiscard]] double score() const { return score_; }
+
+   private:
+    std::string value_;
+    double score_;
+  };
 };
 
-inline std::ostream& operator<<(std::ostream& stream,
-                                const NodeAnchor& anchor) {
-  stream << "{@(" << anchor.location << "," << anchor.spanningLength << "),";
-  if (anchor.node) {
-    stream << *(anchor.node);
-  } else {
-    stream << "null";
-  }
-  stream << "}";
-  return stream;
-}
-
-inline std::ostream& operator<<(std::ostream& stream,
-                                const std::vector<NodeAnchor>& anchor) {
-  for (std::vector<NodeAnchor>::const_iterator i = anchor.begin();
-       i != anchor.end(); ++i) {
-    stream << *i;
-    if (i + 1 != anchor.end()) {
-      stream << "<-";
-    }
-  }
-
-  return stream;
-}
-}  // namespace Gramambular
-}  // namespace Formosa
+}  // namespace Formosa::Gramambular2
 
 #endif

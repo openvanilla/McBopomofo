@@ -379,11 +379,6 @@ extension McBopomofoInputMethodController {
             return
         }
 
-        let poppedText = state.poppedText
-        if !poppedText.isEmpty {
-            commit(text: poppedText, client: client)
-        }
-
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
         client.setMarkedText(state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
@@ -441,23 +436,25 @@ extension McBopomofoInputMethodController {
     private func show(candidateWindowWith state: InputState, client: Any!) {
         let useVerticalMode: Bool = {
             var useVerticalMode = false
-            var candidates: [String] = []
+            var candidates: [InputState.Candidate] = []
             if let state = state as? InputState.ChoosingCandidate {
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
             } else if let state = state as? InputState.AssociatedPhrases {
                 useVerticalMode = state.useVerticalMode
-                candidates = state.candidates
+                candidates = state.candidates.map {
+                    InputState.Candidate(reading: "", value: $0, displayText: $0)
+                }
             }
             if useVerticalMode == true {
                 return true
             }
             candidates.sort {
-                return $0.count > $1.count
+                return $0.displayText.count > $1.displayText.count
             }
             // If there is a candidate which is too long, we use the vertical
             // candidate list window automatically.
-            if candidates.first?.count ?? 0 > 8 {
+            if candidates.first?.displayText.count ?? 0 > 8 {
                 return true
             }
             return false
@@ -619,7 +616,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
 
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
         if let state = state as? InputState.ChoosingCandidate {
-            return state.candidates[Int(index)]
+            return state.candidates[Int(index)].displayText
         } else if let state = state as? InputState.AssociatedPhrases {
             return state.candidates[Int(index)]
         }
@@ -630,8 +627,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         let client = currentClient
 
         if let state = state as? InputState.ChoosingCandidate {
-            let selectedValue = state.candidates[Int(index)]
-            keyHandler.fixNode(value: selectedValue, useMoveCursorAfterSelectionSetting: true)
+            let selectedCandidate = state.candidates[Int(index)]
+            keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, useMoveCursorAfterSelectionSetting: true)
 
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return

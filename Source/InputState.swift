@@ -132,7 +132,6 @@ class InputState: NSObject {
     /// Represents that the user is inputting text.
     @objc (InputStateInputting)
     class Inputting: NotEmpty {
-        @objc var poppedText: String = ""
         @objc var tooltip: String = ""
 
         @objc override init(composingBuffer: String, cursorIndex: UInt) {
@@ -148,7 +147,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>, poppedText:\(poppedText)>"
+            "<InputState.Inputting, composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
     }
 
@@ -278,13 +277,25 @@ class InputState: NSObject {
 
     // MARK: -
 
+    @objc (InputStateCandidate)
+    class Candidate: NSObject {
+        @objc private(set) var reading: String
+        @objc private(set) var value: String
+        @objc private(set) var displayText: String
+        @objc init(reading: String, value: String, displayText: String) {
+            self.reading = reading
+            self.value = value
+            self.displayText = displayText
+        }
+    }
+
     /// Represents that the user is choosing in a candidates list.
     @objc (InputStateChoosingCandidate)
     class ChoosingCandidate: NotEmpty {
-        @objc private(set) var candidates: [String]
+        @objc private(set) var candidates: [Candidate]
         @objc private(set) var useVerticalMode: Bool
 
-        @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [String], useVerticalMode: Bool) {
+        @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [Candidate], useVerticalMode: Bool) {
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
             super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
