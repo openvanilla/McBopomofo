@@ -31,8 +31,7 @@ namespace Mandarin {
 
 class PinyinParseHelper {
  public:
-  static const bool ConsumePrefix(std::string& target,
-                                  const std::string& prefix) {
+  static bool ConsumePrefix(std::string& target, const std::string& prefix) {
     if (target.length() < prefix.length()) {
       return false;
     }
@@ -601,10 +600,10 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
 const std::string BPMF::composedString() const {
   std::string result;
 #define APPEND(c)                                                         \
-  if (syllable_ & c)                                                     \
+  if (syllable_ & c)                                                      \
   result +=                                                               \
       (*BopomofoCharacterMap::SharedInstance().componentToCharacter.find( \
-           syllable_ & c))                                               \
+           syllable_ & c))                                                \
           .second
   APPEND(ConsonantMask);
   APPEND(MiddleVowelMask);
@@ -613,8 +612,6 @@ const std::string BPMF::composedString() const {
 #undef APPEND
   return result;
 }
-
-
 
 const BopomofoCharacterMap& BopomofoCharacterMap::SharedInstance() {
   static BopomofoCharacterMap* map = new BopomofoCharacterMap();

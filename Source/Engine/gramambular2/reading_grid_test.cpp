@@ -207,11 +207,13 @@ TEST(ReadingGridTest, Span) {
   ASSERT_EQ(span.maxLength(), 0);
   ASSERT_EQ(span.nodeOf(1), nullptr);
 
+#ifndef NDEBUG
   auto n10 = std::make_shared<ReadingGrid::Node>("", 10, lm.getUnigrams(""));
   ASSERT_DEATH({ (void)span.add(n10); }, "Assertion");
   ASSERT_DEATH({ (void)span.nodeOf(0); }, "Assertion");
   ASSERT_DEATH({ (void)span.nodeOf(ReadingGrid::kMaximumSpanLength + 1); },
                "Assertion");
+#endif
 }
 
 TEST(ReadingGridTest, ScoreRankedLanguageModel) {

@@ -27,10 +27,10 @@
 
 #include "AssociatedPhrases.h"
 
-#include <sys/mman.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "KeyValueBlobReader.h"
@@ -38,9 +38,9 @@
 namespace McBopomofo {
 
 AssociatedPhrases::AssociatedPhrases()
-: fd(-1)
-, data(0)
-, length(0)
+    : fd(-1)
+    , data(0)
+    , length(0)
 {
 }
 
@@ -51,7 +51,7 @@ AssociatedPhrases::~AssociatedPhrases()
     }
 }
 
-const bool AssociatedPhrases::isLoaded()
+bool AssociatedPhrases::isLoaded()
 {
     if (data) {
         return true;
@@ -59,7 +59,7 @@ const bool AssociatedPhrases::isLoaded()
     return false;
 }
 
-bool AssociatedPhrases::open(const char *path)
+bool AssociatedPhrases::open(const char* path)
 {
     if (data) {
         return false;
@@ -87,8 +87,7 @@ bool AssociatedPhrases::open(const char *path)
 
     KeyValueBlobReader reader(static_cast<char*>(data), length);
     KeyValueBlobReader::KeyValue keyValue;
-    KeyValueBlobReader::State state;
-    while ((state = reader.Next(&keyValue)) == KeyValueBlobReader::State::HAS_PAIR) {
+    while (reader.Next(&keyValue) == KeyValueBlobReader::State::HAS_PAIR) {
         keyRowMap[keyValue.key].emplace_back(keyValue.key, keyValue.value);
     }
     return true;
@@ -113,15 +112,15 @@ const std::vector<std::string> AssociatedPhrases::valuesForKey(const std::string
         const std::vector<Row>& rows = iter->second;
         for (const auto& row : rows) {
             std::string_view value = row.value;
-            v.push_back({value.data(), value.size()});
+            v.push_back({ value.data(), value.size() });
         }
     }
     return v;
 }
 
-const bool AssociatedPhrases::hasValuesForKey(const std::string& key)
+bool AssociatedPhrases::hasValuesForKey(const std::string& key)
 {
     return keyRowMap.find(key) != keyRowMap.end();
 }
 
-};  // namespace McBopomofo
+} // namespace McBopomofo

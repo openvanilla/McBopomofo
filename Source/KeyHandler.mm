@@ -179,21 +179,19 @@ static std::string ToU8(const std::u32string& s) {
     if (!_grid->overrideCandidate(actualCursor, candidate)) {
         return;
     }
+
+    Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk;
     [self _walk];
 
     // Update the user override model if warranted.
     size_t accumulatedCursor = 0;
-    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode;
-    for (const auto& node : _latestWalk.nodes) {
-        accumulatedCursor += node->spanningLength();
-        if (accumulatedCursor > actualCursor) {
-            currentNode = node;
-            break;
-        }
+    auto nodeIter = _latestWalk.findNodeAt([self _actualCandidateCursorIndex], &accumulatedCursor);
+    if (nodeIter == _latestWalk.nodes.cend()) {
+        return;
     }
-
+    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
     if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
-        _userOverrideModel->observe(_latestWalk.nodes, actualCursor, candidate.value, [[NSDate date] timeIntervalSince1970]);
+        _userOverrideModel->observe(prevWalk, _latestWalk, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
     }
 
     if (currentNode != nullptr && flag && Preferences.moveCursorAfterSelectingCandidate) {
@@ -340,10 +338,16 @@ static std::string ToU8(const std::u32string& s) {
         [self _walk];
 
         // get user override model suggestion
-        std::string overrideValue = (_inputMode == InputModePlainBopomofo) ? "" : _userOverrideModel->suggest(_latestWalk.nodes, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
-
-        if (!overrideValue.empty()) {
-            _grid->overrideCandidate([self _actualCandidateCursorIndex], overrideValue, Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram);
+        if (_inputMode != InputModePlainBopomofo) {
+            McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
+            if (!suggestion.empty()) {
+                Formosa::Gramambular2::ReadingGrid::Node::OverrideType type =
+                    suggestion.forceHighScoreOverride ?
+                    Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore :
+                    Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
+                _grid->overrideCandidate([self _actualCandidateCursorIndex], suggestion.candidate, type);
+                [self _walk];
+            }
         }
 
         // then update the text
@@ -568,23 +572,13 @@ static std::string ToU8(const std::u32string& s) {
     }
 
 
-    size_t cursorIndex = [self _actualCandidateCursorIndex];
-    size_t length = 0;
-    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode;
-
-    for (const auto& node : _latestWalk.nodes) {
-        length += node->spanningLength();
-        if (length > cursorIndex) {
-            currentNode = node;
-            break;
-        }
-    }
-
-    if (currentNode == nullptr) {
+    auto nodeIter = _latestWalk.findNodeAt([self _actualCandidateCursorIndex]);
+    if (nodeIter == _latestWalk.nodes.cend()) {
         // Shouldn't happen.
         errorCallback();
         return true;
     }
+    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
 
     size_t currentIndex = 0;
     if (!currentNode->isOverridden()) {
