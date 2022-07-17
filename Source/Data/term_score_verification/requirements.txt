@@ -1,0 +1,4 @@
+ipywidgets
+jupyterlab
+pandas
+tqdm
