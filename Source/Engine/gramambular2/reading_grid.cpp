@@ -209,7 +209,7 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   size_t vertices = 0;
   size_t edges = 0;
   for (size_t i = 0, len = spans_.size(); i < len; ++i) {
-    const ReadingGrid::Span span = spans_[i];
+    const ReadingGrid::Span& span = spans_[i];
     for (size_t j = 1, maxSpanLen = span.maxLength(); j <= maxSpanLen; ++j) {
       NodePtr p = span.nodeOf(j);
       if (p != nullptr) {
@@ -264,6 +264,7 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
 
   assert(totalReadingLen == readings_.size());
   assert(walked.size() >= 2);
+  result.totalReadings = totalReadingLen;
   result.nodes = std::vector<NodePtr>(walked.rbegin() + 1, walked.rend());
   result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
   return result;
@@ -547,7 +548,51 @@ bool ReadingGrid::Node::selectOverrideUnigram(
   }
   return false;
 }
-std::vector<std::string> ReadingGrid::WalkResult::valuesAsStrings() {
+
+std::vector<ReadingGrid::NodePtr>::const_iterator
+ReadingGrid::WalkResult::findNodeAt(size_t cursor,
+                                    size_t* outCursorPastNode) const {
+  if (nodes.empty()) {
+    return nodes.cend();
+  }
+
+  if (cursor > totalReadings) {
+    return nodes.cend();
+  }
+
+  if (cursor == 0) {
+    auto it = nodes.cbegin();
+    if (outCursorPastNode != nullptr) {
+      *outCursorPastNode = (*it)->spanningLength();
+    }
+    return it;
+  }
+
+  // Covers both the "cursor is right at end" and "cursor is one reading before
+  // the end" cases.
+  if (cursor >= totalReadings - 1) {
+    if (outCursorPastNode != nullptr) {
+      *outCursorPastNode = totalReadings;
+    }
+    return std::next(nodes.cbegin(), static_cast<ptrdiff_t>(nodes.size() - 1));
+  }
+
+  size_t accumulated = 0;
+  for (auto i = nodes.cbegin(); i != nodes.cend(); ++i) {
+    accumulated += (*i)->spanningLength();
+    if (accumulated > cursor) {
+      if (outCursorPastNode != nullptr) {
+        *outCursorPastNode = accumulated;
+      }
+      return i;
+    }
+  }
+
+  // Shouldn't happen.
+  return nodes.cend();
+}
+
+std::vector<std::string> ReadingGrid::WalkResult::valuesAsStrings() const {
   std::vector<std::string> result;
   for (const NodePtr& node : nodes) {
     result.emplace_back(node->value());
@@ -555,7 +600,7 @@ std::vector<std::string> ReadingGrid::WalkResult::valuesAsStrings() {
   return result;
 }
 
-std::vector<std::string> ReadingGrid::WalkResult::readingsAsStrings() {
+std::vector<std::string> ReadingGrid::WalkResult::readingsAsStrings() const {
   std::vector<std::string> result;
   for (const NodePtr& node : nodes) {
     result.emplace_back(node->reading());

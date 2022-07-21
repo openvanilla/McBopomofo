@@ -67,9 +67,7 @@ class BopomofoSyllable {
 
   Component consonantComponent() const { return syllable_ & ConsonantMask; }
 
-  Component middleVowelComponent() const {
-    return syllable_ & MiddleVowelMask;
-  }
+  Component middleVowelComponent() const { return syllable_ & MiddleVowelMask; }
 
   Component vowelComponent() const { return syllable_ & VowelMask; }
 
@@ -113,8 +111,8 @@ class BopomofoSyllable {
 
   const BopomofoSyllable operator+(const BopomofoSyllable& another) const {
     Component newSyllable = syllable_;
-#define OP_SOVER(mask) \
-  if (another.syllable_ & mask) { \
+#define OP_SOVER(mask)                                                \
+  if (another.syllable_ & mask) {                                     \
     newSyllable = (newSyllable & ~mask) | (another.syllable_ & mask); \
   }
     OP_SOVER(ConsonantMask);
@@ -126,8 +124,8 @@ class BopomofoSyllable {
   }
 
   BopomofoSyllable& operator+=(const BopomofoSyllable& another) {
-#define OPE_SOVER(mask) \
-  if (another.syllable_ & mask) { \
+#define OPE_SOVER(mask)                                           \
+  if (another.syllable_ & mask) {                                 \
     syllable_ = (syllable_ & ~mask) | (another.syllable_ & mask); \
   }
     OPE_SOVER(ConsonantMask);
@@ -183,7 +181,7 @@ class BopomofoKeyboardLayout {
 
   BopomofoKeyboardLayout(const BopomofoKeyToComponentMap& ktcm,
                          const std::string& name)
-      : m_keyToComponent(ktcm), m_name(name) {
+      : m_name(name), m_keyToComponent(ktcm) {
     for (BopomofoKeyToComponentMap::const_iterator miter =
              m_keyToComponent.begin();
          miter != m_keyToComponent.end(); ++miter)
@@ -382,6 +380,8 @@ class BopomofoReadingBuffer {
     }
   }
 
+  const BopomofoKeyboardLayout* keyboardLayout() const { return layout_; }
+
   bool isValidKey(char k) const {
     if (!pinyin_mode_) {
       return layout_ ? (layout_->keyToComponents(k)).size() > 0 : false;
@@ -468,10 +468,9 @@ class BopomofoReadingBuffer {
 
   bool hasToneMarkerOnly() const {
     return syllable_.hasToneMarker() &&
-          !(syllable_.hasConsonant() || syllable_.hasMiddleVowel() ||
-            syllable_.hasVowel());
+           !(syllable_.hasConsonant() || syllable_.hasMiddleVowel() ||
+             syllable_.hasVowel());
   }
-
 
  protected:
   const BopomofoKeyboardLayout* layout_;
