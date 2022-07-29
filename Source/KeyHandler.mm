@@ -298,7 +298,7 @@ static std::string ToU8(const std::u32string& s) {
 
 
     BOOL keyConsumedByReading = NO;
-    BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold];
+    BOOL skipBpmfHandling = [input isReservedKey] || [input isNumericPad] || [input isRealNumericPad] || [input isControlHold] || [input isOptionHold] || [input isShiftHold] || [input isCommandHold];
 
     // MARK: Handle BPMF Keys
 
