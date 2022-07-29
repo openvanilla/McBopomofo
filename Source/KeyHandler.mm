@@ -256,8 +256,11 @@ static std::string ToU8(const std::u32string& s) {
         return YES;
     }
 
-    if ([input isNumericPad]) {
-        if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
+    if ([input isRealNumericPad]) {
+        // There is no NumLock key in macOS. It is impossible to get signals of arrow keys / page flipper keys through real numeric pad inputs.
+        // We enable these inputs when the candidate window is shown up (only in certain states).
+        // In all other real numeric pad input cases, we simply don't handle the input.
+        if (![state isKindOfClass:[InputStateChoosingCandidate class]] && ![state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
             stateCallback(emptyState);

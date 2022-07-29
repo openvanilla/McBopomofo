@@ -119,8 +119,16 @@ class KeyHandlerInput: NSObject {
         flags.contains([.capsLock])
     }
 
+    // Note: the naming of this event mask is confusing. This event mask actually includes
+    // those home / page keys and arrow keys situated outside of the numeric pad area.
     @objc var isNumericPad: Bool {
         flags.contains([.numericPad])
+    }
+
+    // Here comes the real condition checker of numeric pad input,
+    // including the JIS-specific comma keyCode (95).
+    @objc var isRealNumericPad: Bool {
+        [65, 67, 69, 71, 75, 78, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 95].contains(keyCode)
     }
 
     @objc var isReservedKey: Bool {
