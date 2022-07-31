@@ -313,7 +313,7 @@ static std::string ToU8(const std::u32string& s) {
         }
     }
 
-    BOOL composeReading = _bpmfReadingBuffer->hasToneMarker() && !_bpmfReadingBuffer->hasToneMarkerOnly();
+    BOOL composeReading = _bpmfReadingBuffer->isValidKey((char)charCode) && _bpmfReadingBuffer->hasToneMarker() && !_bpmfReadingBuffer->hasToneMarkerOnly();
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
@@ -325,6 +325,12 @@ static std::string ToU8(const std::u32string& s) {
         // see if we have a unigram for this
         if (!_languageModel->hasUnigrams(reading)) {
             errorCallback();
+
+            if (Preferences.keepReadingUponCompositionError) {
+                stateCallback([self buildInputtingState]);
+                return YES;
+            }
+
             _bpmfReadingBuffer->clear();
             if (!_grid->length()) {
                 stateCallback([[InputStateEmptyIgnoringPreviousState alloc] init]);
@@ -385,11 +391,9 @@ static std::string ToU8(const std::u32string& s) {
         return YES;
     }
 
-    // The only possibility for this to be true is that the Bopomofo reading
-    // already has a tone marker but the last key is *not* a tone marker key. An
-    // example is the sequence "6u" with the Standard layout, which produces "ㄧˊ"
-    // but does not compose. Only sequences such as "u6", "6u6", "6u3", or "6u "
-    // would compose.
+    // Indicates that the Bopomofo reading is not-empty but also not composed.
+    // The only possibility for this to be true is that when the reading only
+    // contains tone markers.
     if (keyConsumedByReading) {
         stateCallback([self buildInputtingState]);
         return true;
