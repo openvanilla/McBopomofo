@@ -38,6 +38,7 @@ private let kChooseCandidateUsingSpaceKey = "ChooseCandidateUsingSpaceKey"
 private let kChineseConversionEnabledKey = "ChineseConversionEnabled"
 private let kHalfWidthPunctuationEnabledKey = "HalfWidthPunctuationEnable"
 private let kEscToCleanInputBufferKey = "EscToCleanInputBuffer"
+private let kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
 
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
@@ -196,6 +197,7 @@ class Preferences: NSObject {
          kChineseConversionEnabledKey,
          kHalfWidthPunctuationEnabledKey,
          kEscToCleanInputBufferKey,
+         kKeepReadingUponCompositionError,
          kCandidateTextFontName,
          kCandidateKeyLabelFontName,
          kCandidateKeys,
@@ -258,6 +260,9 @@ class Preferences: NSObject {
 
     @UserDefault(key: kEscToCleanInputBufferKey, defaultValue: false)
     @objc static var escToCleanInputBuffer: Bool
+
+    @UserDefault(key: kKeepReadingUponCompositionError, defaultValue: false)
+    @objc static var keepReadingUponCompositionError: Bool
 
     // MARK: Optional settings
 
