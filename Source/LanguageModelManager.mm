@@ -43,14 +43,14 @@ static NSString *const kTemplateExtension = @".txt";
 
 @implementation LanguageModelManager
 
-static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomofo::McBopomofoLM &lm)
+static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomofo::McBopomofoLM& lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
     lm.loadLanguageModel([dataPath UTF8String]);
 }
 
-static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM &lm)
+static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"txt"];

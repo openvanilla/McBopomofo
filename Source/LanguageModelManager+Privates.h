@@ -22,8 +22,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "LanguageModelManager.h"
-#import "UserOverrideModel.h"
 #import "McBopomofoLM.h"
+#import "UserOverrideModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
