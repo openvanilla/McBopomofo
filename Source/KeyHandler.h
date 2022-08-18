@@ -55,7 +55,7 @@ extern InputMode InputModePlainBopomofo;
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
 
 @property (strong, nonatomic) InputMode inputMode;
-@property (weak, nonatomic) id <KeyHandlerDelegate> delegate;
+@property (weak, nonatomic) id<KeyHandlerDelegate> delegate;
 @end
 
 NS_ASSUME_NONNULL_END

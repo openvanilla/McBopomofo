@@ -22,17 +22,17 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #import "KeyHandler.h"
-#import "reading_grid.h"
 #import "LanguageModelManager+Privates.h"
 #import "Mandarin.h"
 #import "McBopomofo-Swift.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
+#import "reading_grid.h"
 
 #import <codecvt>
 #import <locale>
-#import <unordered_map>
 #import <string>
+#import <unordered_map>
 #import <utility>
 
 @import CandidateUI;
@@ -41,14 +41,16 @@
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
 
-static std::u32string ToU32(const std::string& s) {
-  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-  return conv.from_bytes(s);
+static std::u32string ToU32(const std::string& s)
+{
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+    return conv.from_bytes(s);
 }
 
-static std::string ToU8(const std::u32string& s) {
-  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-  return conv.to_bytes(s);
+static std::string ToU8(const std::u32string& s)
+{
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+    return conv.to_bytes(s);
 }
 
 @implementation KeyHandler {
@@ -203,7 +205,7 @@ static std::string ToU8(const std::u32string& s) {
 {
     _bpmfReadingBuffer->clear();
     _grid->clear();
-    _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult{};
+    _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult {};
 }
 
 - (std::string)_currentLayout
@@ -293,7 +295,6 @@ static std::string ToU8(const std::u32string& s) {
         stateCallback(state);
     }
 
-
     BOOL keyConsumedByReading = NO;
     BOOL skipBpmfHandling = [input isReservedKey] || [input isControlHold];
 
@@ -347,10 +348,7 @@ static std::string ToU8(const std::u32string& s) {
         if (_inputMode != InputModePlainBopomofo) {
             McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
             if (!suggestion.empty()) {
-                Formosa::Gramambular2::ReadingGrid::Node::OverrideType type =
-                    suggestion.forceHighScoreOverride ?
-                    Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore :
-                    Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
+                Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = suggestion.forceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
                 _grid->overrideCandidate([self _actualCandidateCursorIndex], suggestion.candidate, type);
                 [self _walk];
             }
@@ -530,8 +528,7 @@ static std::string ToU8(const std::u32string& s) {
             if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {
                 return YES;
             }
-        }
-        else {
+        } else {
             if ([state isKindOfClass:[InputStateNotEmpty class]]) {
                 [self clear];
                 InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -575,7 +572,6 @@ static std::string ToU8(const std::u32string& s) {
         return YES;
     }
 
-
     auto nodeIter = _latestWalk.findNodeAt([self _actualCandidateCursorIndex]);
     if (nodeIter == _latestWalk.nodes.cend()) {
         // Shouldn't happen.
@@ -593,7 +589,7 @@ static std::string ToU8(const std::u32string& s) {
         // In other words, if a user type two BPMF readings, but the score of seeing
         // them as two unigrams is higher than a phrase with two characters, the
         // user can just use the longer phrase by typing the tab key.
-        InputStateCandidate* candidate = candidates[0];
+        InputStateCandidate *candidate = candidates[0];
         if (currentNode->reading() == candidate.reading.UTF8String && currentNode->value() == candidate.value.UTF8String) {
             // If the first candidate is the value of the current node, we use next
             // one.
@@ -604,7 +600,7 @@ static std::string ToU8(const std::u32string& s) {
             }
         }
     } else {
-        for (InputStateCandidate* candidate : candidates) {
+        for (InputStateCandidate *candidate : candidates) {
             if (currentNode->reading() == candidate.reading.UTF8String && currentNode->value() == candidate.value.UTF8String) {
                 if (shiftIsHold) {
                     currentIndex == 0 ? currentIndex = candidates.count - 1 : currentIndex--;
@@ -621,7 +617,7 @@ static std::string ToU8(const std::u32string& s) {
         currentIndex = 0;
     }
 
-    InputStateCandidate* candidate = candidates[currentIndex];
+    InputStateCandidate *candidate = candidates[currentIndex];
     [self fixNodeWithReading:candidate.reading value:candidate.value useMoveCursorAfterSelectionSetting:NO];
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     stateCallback(inputting);
@@ -809,8 +805,7 @@ static std::string ToU8(const std::u32string& s) {
 
     if (_bpmfReadingBuffer->hasToneMarkerOnly()) {
         _bpmfReadingBuffer->clear();
-    }
-    else if (_bpmfReadingBuffer->isEmpty()) {
+    } else if (_bpmfReadingBuffer->isEmpty()) {
         if (_grid->cursor()) {
             _grid->deleteReadingBeforeCursor();
             [self _walk];
@@ -1249,11 +1244,11 @@ static std::string ToU8(const std::u32string& s) {
     // the cursor is at does not agree with the actual codepoint count of the
     // node's value, we'll need to move the cursor at the end of the node to
     // avoid confusions.
-    size_t runningCursor = 0;  // spanning-length-based, like the builder cursor
+    size_t runningCursor = 0; // spanning-length-based, like the builder cursor
 
     std::string composed;
     size_t builderCursor = _grid->cursor();
-    size_t composedCursor = 0;  // UTF-8 (so "byte") cursor per fcitx5 requirement.
+    size_t composedCursor = 0; // UTF-8 (so "byte") cursor per fcitx5 requirement.
     NSString *tooltip = @"";
 
     for (const auto& node : _latestWalk.nodes) {
@@ -1304,7 +1299,7 @@ static std::string ToU8(const std::u32string& s) {
     }
 
     std::string headStr = composed.substr(0, composedCursor);
-    std::string tailStr =composed.substr(composedCursor, composed.length() - composedCursor);
+    std::string tailStr = composed.substr(composedCursor, composed.length() - composedCursor);
 
     NSString *head = [NSString stringWithUTF8String:headStr.c_str()];
     NSString *reading = [NSString stringWithUTF8String:_bpmfReadingBuffer->composedString().c_str()];
