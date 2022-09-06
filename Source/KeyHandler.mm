@@ -208,6 +208,17 @@ static std::string ToU8(const std::u32string& s)
     _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult {};
 }
 
+- (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
+{
+    // Upon force-commit, clear the BPMF reading, then "steal" the composing buffer text from the built inputting state.
+    _bpmfReadingBuffer->clear();
+    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+    [self clear];
+
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:inputting.composingBuffer];
+    stateCallback(committing);
+}
+
 - (std::string)_currentLayout
 {
     NSString *keyboardLayoutName = Preferences.keyboardLayoutName;
