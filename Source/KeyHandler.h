@@ -51,6 +51,9 @@ extern InputMode InputModePlainBopomofo;
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:useMoveCursorAfterSelectionSetting:));
 - (void)clear;
 
+- (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
+    NS_SWIFT_NAME(handleForceCommit(stateCallback:));
+
 - (InputState *)buildInputtingState;
 - (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
 

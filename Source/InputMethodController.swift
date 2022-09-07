@@ -147,9 +147,10 @@ class McBopomofoInputMethodController: IMKInputController {
 
     // MARK: - IMKServerInput protocol methods
 
-    override func commitComposition(_ sender: Any!) {
-        keyHandler.clear()
-        self.handle(state: .Empty(), client: sender)
+    override func commitComposition(_ client: Any!) {
+        keyHandler.handleForceCommit(stateCallback: { newState in
+            self.handle(state: newState, client: client)
+        })
     }
 
     override func recognizedEvents(_ sender: Any!) -> Int {
