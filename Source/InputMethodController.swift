@@ -158,7 +158,13 @@ class McBopomofoInputMethodController: IMKInputController {
         return Int(events.rawValue)
     }
 
-    override func handle(_ event: NSEvent!, client: Any!) -> Bool {
+    override func handle(_ maybeEvent: NSEvent!, client: Any!) -> Bool {
+        // nil may be passed, applefeedback://FB11472618
+        guard let event = maybeEvent else {
+            commitComposition(client)
+            return false
+        }
+
         if event.type == .flagsChanged {
             let functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout
             let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
