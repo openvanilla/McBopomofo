@@ -33,6 +33,7 @@
 "Abort" = "Abort";
 "Cannot register input source %@ at %@." = "Cannot register input source %@ at %@.";
 "Cannot find input source %@ after registration." = "Cannot find input source %@ after registration.";
+"Cannot remove the existing version at %@, error: %@" = "Cannot remove the existing version at %@, error: %@";
 
 "Warning" = "Warning";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.";
