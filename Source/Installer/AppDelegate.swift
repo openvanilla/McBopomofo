@@ -131,35 +131,42 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
         let shouldWaitForTranslocationRemoval = appBundleTranslocatedToARandomizedPath(kTargetPartialPath) && (window?.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:))) ?? false)
 
-        // http://www.cocoadev.com/index.pl?MoveToTrash
-        let sourceDir = (kDestinationPartial as NSString).expandingTildeInPath
-        let trashDir = (NSHomeDirectory() as NSString).appendingPathComponent(".Trash")
-        var tag = 0
+        let fullDir = (kDestinationPartial as NSString).expandingTildeInPath
+        let targetURL = NSURL.fileURL(withPath: fullDir).appendingPathComponent(kTargetBundle)
+        NSWorkspace.shared.recycle([targetURL]) { [self] (urls: [URL : URL], error: Error?) in
+            if let error = error {
+                let message = String(format: NSLocalizedString("Cannot remove the existing version at %@, error: %@", comment: ""), targetURL.path, String(describing: error))
+                runAlertPanel(title: NSLocalizedString("Install Failed", comment: ""),
+                              message: message,
+                              buttonTitle: NSLocalizedString("Cancel", comment: ""))
 
-        NSWorkspace.shared.performFileOperation(.recycleOperation, source: sourceDir, destination: trashDir, files: [kTargetBundle], tag: &tag)
-
-        let killTask = Process()
-        killTask.launchPath = "/usr/bin/killall"
-        killTask.arguments = ["-9", kTargetBin]
-        killTask.launch()
-        killTask.waitUntilExit()
-
-        if shouldWaitForTranslocationRemoval {
-            progressIndicator.startAnimation(self)
-            window?.beginSheet(progressSheet) { returnCode in
-                DispatchQueue.main.async {
-                    if returnCode == .continue {
-                        self.installInputMethod(previousExists: true, previousVersionNotFullyDeactivatedWarning: false)
-                    } else {
-                        self.installInputMethod(previousExists: true, previousVersionNotFullyDeactivatedWarning: true)
-                    }
-                }
+                endAppWithDelay()
+                return
             }
 
-            translocationRemovalStartTime = Date()
-            Timer.scheduledTimer(timeInterval: kTranslocationRemovalTickInterval, target: self, selector: #selector(timerTick(_:)), userInfo: nil, repeats: true)
-        } else {
-            self.installInputMethod(previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
+            let killTask = Process()
+            killTask.launchPath = "/usr/bin/killall"
+            killTask.arguments = ["-9", kTargetBin]
+            killTask.launch()
+            killTask.waitUntilExit()
+
+            if shouldWaitForTranslocationRemoval {
+                progressIndicator.startAnimation(self)
+                window?.beginSheet(progressSheet) { returnCode in
+                    DispatchQueue.main.async {
+                        if returnCode == .continue {
+                            self.installInputMethod(previousExists: true, previousVersionNotFullyDeactivatedWarning: false)
+                        } else {
+                            self.installInputMethod(previousExists: true, previousVersionNotFullyDeactivatedWarning: true)
+                        }
+                    }
+                }
+
+                translocationRemovalStartTime = Date()
+                Timer.scheduledTimer(timeInterval: kTranslocationRemovalTickInterval, target: self, selector: #selector(timerTick(_:)), userInfo: nil, repeats: true)
+            } else {
+                self.installInputMethod(previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
+            }
         }
     }
 

@@ -33,6 +33,7 @@
 "Abort" = "放棄安裝";
 "Cannot register input source %@ at %@." = "無法從檔案位置 %2$@ 安裝輸入法 \"%1$@\"。";
 "Cannot find input source %@ after registration." = "在註冊完輸入法 \"%@\" 仍然無法找到輸入法。";
+"Cannot remove the existing version at %@, error: %@" = "無法移除既有版本，檔案位置: %@, 錯誤訊息: %@";
 
 "Warning" = "安裝不完整";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "輸入法已經安裝好，但可能沒有完全啟用。請從「系統偏好設定」 > 「鍵盤」 > 「輸入方式」分頁加入輸入法。";
