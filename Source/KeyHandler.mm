@@ -210,6 +210,11 @@ static std::string ToU8(const std::u32string& s)
 
 - (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
 {
+    if (_bpmfReadingBuffer->isEmpty() && _grid->length() == 0) {
+        // No-op if both are empty.
+        return;
+    }
+
     // Upon force-commit, clear the BPMF reading, then "steal" the composing buffer text from the built inputting state.
     _bpmfReadingBuffer->clear();
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
