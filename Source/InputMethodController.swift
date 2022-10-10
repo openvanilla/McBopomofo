@@ -121,14 +121,13 @@ class McBopomofoInputMethodController: IMKInputController {
 
         keyHandler.clear()
         keyHandler.syncWithPreferences()
-        self.handle(state: .Empty(), client: client)
+
         (NSApp.delegate as? AppDelegate)?.checkForUpdate()
     }
 
     override func deactivateServer(_ client: Any!) {
         currentClient = nil
         keyHandler.clear()
-        self.handle(state: .Empty(), client: client)
         self.handle(state: .Deactivated(), client: client)
     }
 
@@ -289,6 +288,9 @@ extension McBopomofoInputMethodController {
 
         if let newState = newState as? InputState.Deactivated {
             handle(state: newState, previous: previous, client: client)
+            // Force transition to Empty, so that when activateServer is
+            // invoked again, the controller is already in the Empty state.
+            state = .Empty()
         } else if let newState = newState as? InputState.Empty {
             handle(state: newState, previous: previous, client: client)
         } else if let newState = newState as? InputState.EmptyIgnoringPreviousState {
@@ -332,10 +334,18 @@ extension McBopomofoInputMethodController {
         gCurrentCandidateController?.visible = false
         hideTooltip()
 
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        (client as? IMKTextInput)?.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+
+        // Unlike the Empty state handler, we don't call client.setMarkedText() here:
+        // there's no point calling setMarkedText() with an empty string as the session
+        // is being deactivated anyway, and we have found issues with how certains app
+        // could not handle setMarkedText() at this point (see GitHub issue #346).
     }
 
     private func handle(state: InputState.Empty, previous: InputState, client: Any?) {
