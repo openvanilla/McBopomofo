@@ -31,14 +31,10 @@
 {
 @protected
     NSString *_installingVersion;
-    BOOL _upgrading;
+    NSString *_currentVersion;
     NSButton *_installButton;
     NSButton *_cancelButton;
     NSTextView *_textView;
-    NSWindow *_progressSheet;
-    NSProgressIndicator *_progressIndicator;
-    NSDate *_translocationRemovalStartTime;
-    NSInteger _currentVersionNumber;
 }
 - (IBAction)agreeAndInstallAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
@@ -46,6 +42,4 @@
 @property (assign) IBOutlet NSButton *installButton;
 @property (assign) IBOutlet NSButton *cancelButton;    
 @property (assign) IBOutlet NSTextView *textView;
-@property (assign) IBOutlet NSWindow *progressSheet;
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
 @end
