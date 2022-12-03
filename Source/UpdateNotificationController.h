@@ -34,7 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface UpdateNotificationController : NSWindowController <NSWindowDelegate>
+@interface UpdateNotificationController : NSWindowController
 {
     NSButton *_visitButton;
     NSButton *_laterButton;

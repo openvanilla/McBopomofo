@@ -36,7 +36,7 @@ NS_INLINE CGFloat max(CGFloat a, CGFloat b) { return a > b ? a : b; }
 static const CGFloat kCandidateTextPadding = 24.0;
 static const CGFloat kCandidateTextLeftMargin = 8.0;
 
-@interface VTVerticalCandidateController (Private) <NSTableViewDataSource, NSTableViewDelegate>
+@interface VTVerticalCandidateController (Private)
 - (void)rowDoubleClicked:(id)sender;
 - (BOOL)scrollPageByOne:(BOOL)forward;
 - (BOOL)moveSelectionByOne:(BOOL)forward;

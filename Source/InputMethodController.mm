@@ -209,7 +209,7 @@ public:
 
     // If Option key is pressed, show the learning-related menu
 
-    #if DEBUG
+    #if 0
     //I think the following line is 10.6+ specific
     if ([[NSEvent class] respondsToSelector:@selector(modifierFlags)] && ([NSEvent modifierFlags] & NSAlternateKeyMask)) {
 

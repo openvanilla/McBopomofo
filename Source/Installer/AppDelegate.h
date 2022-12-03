@@ -27,7 +27,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface AppDelegate : NSWindowController <NSApplicationDelegate>
+@interface AppDelegate : NSWindowController
 {
 @protected
     NSString *_installingVersion;

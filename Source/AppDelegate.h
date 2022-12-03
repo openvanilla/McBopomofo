@@ -37,7 +37,7 @@
 @class PreferencesWindowController;
 @class UpdateNotificationController;
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject
 {
 @private
     NSWindow *_window;
