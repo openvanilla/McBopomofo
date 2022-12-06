@@ -6327,6 +6327,7 @@
 侮 ㄨˇ wu3 j3 big5
 伍 ㄨˇ wu3 j3 big5
 鵡 ㄨˇ wu3 j3 big5
+嘸 ㄨˇ wu3 j3 big5
 憮 ㄨˇ wu3 j3 big5
 嫵 ㄨˇ wu3 j3 big5
 潕 ㄨˇ wu3 j3 big5
@@ -13998,7 +13999,6 @@
 腑 ㄈㄨˇ fu3 zj3 big5
 莆 ㄈㄨˇ fu3 zj3 big5
 滏 ㄈㄨˇ fu3 zj3 big5
-嘸 ㄈㄨˇ fu3 zj3 big5
 拊 ㄈㄨˇ fu3 zj3 big5
 黼 ㄈㄨˇ fu3 zj3 big5
 簠 ㄈㄨˇ fu3 zj3 big5
