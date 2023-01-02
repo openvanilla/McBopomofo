@@ -31,13 +31,13 @@ sort:
 	@mv tmp phrase.occ
 	@sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
 	@mv tmp BPMFMappings.txt
-	@sort -k1 heterophony1.list|uniq>tmp
+	@env LANG=C sort -k1 heterophony1.list|uniq>tmp
 	@mv tmp heterophony1.list
-	@sort -k1 heterophony2.list|uniq>tmp
+	@env LANG=C sort -k1 heterophony2.list|uniq>tmp
 	@mv tmp heterophony2.list
-	@sort -k1 heterophony3.list|uniq>tmp
+	@env LANG=C sort -k1 heterophony3.list|uniq>tmp
 	@mv tmp heterophony3.list
-	@sort -k1 exclusion.txt|uniq>tmp
+	@env LANG=C sort -k1 exclusion.txt|uniq>tmp
 	@mv tmp exclusion.txt
 
 check:

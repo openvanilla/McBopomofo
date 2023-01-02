@@ -4675,6 +4675,7 @@
 暠 ㄍㄠˇ gao3 el3 big5
 檺 ㄍㄠˇ gao3 el3 big5
 筶 ㄍㄠˇ gao3 el3 big5
+鎬 ㄍㄠˇ gao3 el3 big5
 告 ㄍㄠˋ gao4 el4 big5
 誥 ㄍㄠˋ gao4 el4 big5
 郜 ㄍㄠˋ gao4 el4 big5
@@ -5024,7 +5025,6 @@
 情 ㄑㄧㄥˊ qing2 fu/6 big5
 晴 ㄑㄧㄥˊ qing2 fu/6 big5
 擎 ㄑㄧㄥˊ qing2 fu/6 big5
-傾 ㄑㄧㄥˊ qing2 fu/6 big5
 檠 ㄑㄧㄥˊ qing2 fu/6 big5
 勍 ㄑㄧㄥˊ qing2 fu/6 big5
 殑 ㄑㄧㄥˊ qing2 fu/6 big5
@@ -13739,6 +13739,7 @@
 繜 ㄗㄨㄣ zun yjp big5
 鷷 ㄗㄨㄣ zun yjp big5
 壿 ㄗㄨㄣ zun yjp big5
+鱒 ㄗㄨㄣ zun yjp big5
 撙 ㄗㄨㄣˇ zun3 yjp3 big5
 噂 ㄗㄨㄣˇ zun3 yjp3 big5
 墫 ㄗㄨㄣˇ zun3 yjp3 big5
