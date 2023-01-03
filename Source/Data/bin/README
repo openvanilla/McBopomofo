@@ -4,7 +4,7 @@
       bin/count.bash 詞詞詞
   For global counting according to a phrase list, use the python facility, e.g.:
       bin/count.occurrence.py mylist.txt > myphrase.occ
-- 
+-
 
 ----- Following was the readme file of original project,      -----
 
@@ -60,10 +60,10 @@ Phrases source:
            wordcount $a
          done ) | filter out zero occurrence > one_word.list
        ( for $a in $(one_word list); do
-             for $b in $(one_word list); do 
+             for $b in $(one_word list); do
                  wordcount $a$b
              done
-         done ) | filter out zero occurrence > two_word.list     
+         done ) | filter out zero occurrence > two_word.list
        ( for $ab in $(two_word list); do
              for $c in $(one_word list); do
                  wordcount $ab$c
@@ -92,7 +92,7 @@ Phrases source:
        #PBS -j oe
        #PBS -l nodes=1:p4:ppn=1
        . bash/wordcount.bash
-       
+
        if [ -z "$nPS" ]; then
           export nPS=1
           export PSn=1
@@ -100,14 +100,14 @@ Phrases source:
        if [ -z "$PSn" ]; then
           export PSn=1
        fi
-       
-       cd $PBS_O_WORKDIR   
+
+       cd $PBS_O_WORKDIR
        mkdir -p /tmp/mjgrep; rsync -ax --delete datafile /tmp/mjgrep/
-       
+
        export SEDRANGE=$(cat joblist | awk -v nPS=$nPS -v PSn=$PSn  \
                'function ceiling(x){return ((x > int(x)) ? int(x)+1 : int(x))} \
                 END{print (PSn-1)*ceiling(NR/nPS)+1","PSn*ceiling(NR/nPS)"p"}' )
-       
+
        myTEMP=$(mktemp)
        sed -n $SEDRANGE joblist > $myTEMP
        ( source $myTEMP )> ab.txt.$PSn
@@ -156,11 +156,11 @@ with this PERL subroutine:
    binmode(STDOUT, ":utf8") || die "can't binmode STDOUT";
    while (my $line = <STDIN>) {
        eval { $line = decode("UTF-8", $line, FB_CROAK()) };
-       if ($@) { 
+       if ($@) {
            $line = decode("big5-hkscs", $line, 0); # silent even if error
        }
        $line =~ s/\R\z/\n/;  # fix raw mode reads
-       print STDOUT $line;    
+       print STDOUT $line;
    }
    close(STDIN)  || die "can't close STDIN: $!";
    close(STDOUT) || die "can't close STDOUT: $!";
@@ -218,7 +218,7 @@ Mapping BPMF with libtabe (tsi.src)
    % vi BPMFMappings.txt.new
   #  manually fixed
   #     1. [] [] [] three expressions in a line
-  #     2. [xx,xx,xx] three elements in a expression 
+  #     2. [xx,xx,xx] three elements in a expression
   #     3. make it into a one-expression per line with only two elements
   #        in an expression if there is an expression.
    % grep -e '].*]' BPMFMappings.txt.new > multi2

@@ -40,11 +40,12 @@ sort:
 	@env LANG=C sort -k1 exclusion.txt|uniq>tmp
 	@mv tmp exclusion.txt
 
+check: SHELL:=/bin/bash
 check:
 	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
 	@awk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | awk '/一/'
-	awk '{print $$1}' BPMFMappings.txt|sort -u|wc -l
-	awk 'length($$1)>3{print $$1}' phrase.occ|sort -u|wc -l
+	@diff -u <(awk '{print $$1}' BPMFMappings.txt|sort -u) \
+                 <(awk 'length($$1)>3{print $$1}' phrase.occ|sort -u)
 
 tidy:
 	@sed -i '' -e 's/ //g' phrase.occ
