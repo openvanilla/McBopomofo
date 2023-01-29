@@ -505,6 +505,13 @@ static std::string ToU8(const std::u32string& s)
 
     // MARK: Enter Big5 code mode
     if ([input isControlHold] && (charCode == '`')) {
+        [self clear];
+        if ([state isKindOfClass:[InputStateInputting class]]) {
+            InputStateInputting *current = (InputStateInputting *)state;
+            NSString *composingBuffer = current.composingBuffer;
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+            stateCallback(committing);
+        }
         InputStateBig5 *big5 = [[InputStateBig5 alloc] initWithCode:@""];
         stateCallback(big5);
         return YES;
@@ -1264,14 +1271,14 @@ static std::string ToU8(const std::u32string& s)
 {
     InputStateBig5 *bigs = (InputStateBig5 *)state;
     UniChar charCode = input.charCode;
-    BOOL cancelKey = (charCode == 27) || (charCode == 8);
+    BOOL cancelKey = (charCode == 27);
     if (cancelKey) {
         InputStateEmpty *empty = [[InputStateEmpty alloc] init];
         stateCallback(empty);
         return YES;
     }
 
-    if ([input isDelete]) {
+    if ((charCode == 8) || [input isDelete]) {
         NSString *code = bigs.code;
         if (code.length > 0) {
             code = [code substringToIndex:code.length - 1];
