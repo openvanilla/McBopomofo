@@ -111,6 +111,24 @@ class InputState: NSObject {
 
     // MARK: -
 
+    @objc(InputStateBig5)
+    class Big5: InputState {
+        @objc private(set) var code: String
+        @objc init(code: String) {
+            self.code = code
+        }
+
+        override var description: String {
+            "<InputState.Big5, code:\(code)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[內碼] \(code)"
+        }
+    }
+
+    // MARK: -
+
     /// Represents that the composing buffer is not empty.
     @objc (InputStateNotEmpty)
     class NotEmpty: InputState {
