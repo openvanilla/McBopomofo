@@ -237,6 +237,11 @@ static std::string ToU8(const std::u32string& s)
     UniChar charCode = input.charCode;
     McBopomofoEmacsKey emacsKey = input.emacsKey;
 
+    // MARK: Handle Big5 Input
+    if ([state isKindOfClass:[InputStateBig5 class]]) {
+        return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
     // if the inputText is empty, it's a function key combination, we ignore it
     if (!input.inputText.length) {
         return NO;
@@ -299,11 +304,6 @@ static std::string ToU8(const std::u32string& s)
         }
         state = [[InputStateEmpty alloc] init];
         stateCallback(state);
-    }
-
-    // MARK: Handle Big5 Input
-    if ([state isKindOfClass:[InputStateBig5 class]]) {
-        return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Marking
