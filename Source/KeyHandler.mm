@@ -301,6 +301,11 @@ static std::string ToU8(const std::u32string& s)
         stateCallback(state);
     }
 
+    // MARK: Handle Big5 Input
+    if ([state isKindOfClass:[InputStateBig5 class]]) {
+        return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         InputStateMarking *marking = (InputStateMarking *)state;
@@ -496,6 +501,13 @@ static std::string ToU8(const std::u32string& s)
             return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+    // MARK: Enter Big5 code mode
+    if ([input isControlHold] && (charCode == '`')) {
+        InputStateBig5 *big5 = [[InputStateBig5 alloc] initWithCode:@""];
+        stateCallback(big5);
+        return YES;
     }
 
     // MARK: Punctuation list
@@ -1239,6 +1251,61 @@ static std::string ToU8(const std::u32string& s)
             }
             return YES;
         }
+    }
+
+    errorCallback();
+    return YES;
+}
+
+- (BOOL)_handleBig5State:(InputState *)state
+                        input:(KeyHandlerInput *)input
+                stateCallback:(void (^)(InputState *))stateCallback
+                errorCallback:(void (^)(void))errorCallback;
+{
+    InputStateBig5 *bigs = (InputStateBig5 *)state;
+    UniChar charCode = input.charCode;
+    BOOL cancelKey = (charCode == 27) || (charCode == 8);
+    if (cancelKey) {
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+
+    if ([input isDelete]) {
+        NSString *code = bigs.code;
+        if (code.length > 0) {
+            code = [code substringToIndex:code.length - 1];
+        }
+        InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:code];
+        stateCallback(newState);
+        return YES;
+    }
+
+    if ((charCode >= '0' && charCode <= '9') ||
+        (charCode >= 'a' && charCode <= 'f')) {
+        NSString *appneded = [NSString stringWithFormat:@"%@%c", bigs.code, toupper(charCode)];
+        if (appneded.length == 4) {
+            long big5Code = (long)strtol(appneded.UTF8String, NULL, 16);
+            char bytes[3] = {0};
+            bytes[0] = (big5Code >> CHAR_BIT) & 0xff;
+            bytes[1] = big5Code & 0xff;
+            CFStringRef string = CFStringCreateWithCString(NULL, bytes, kCFStringEncodingBig5);
+            if (string == NULL) {
+                errorCallback();
+                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                stateCallback(empty);
+                return YES;
+            }
+
+            InputStateCommitting *commiting = [[InputStateCommitting alloc] initWithPoppedText:(__bridge NSString *)string];
+            stateCallback(commiting);
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
+        } else {
+            InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appneded];
+            stateCallback(newState);
+        }
+        return YES;
     }
 
     errorCallback();

@@ -305,6 +305,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         } else if let newState = newState as? InputState.AssociatedPhrases {
             handle(state: newState, previous: previous, client: client)
+        } else if let newState = newState as? InputState.Big5 {
+            handle(state: newState, previous: previous, client: client)
         }
     }
 
@@ -443,6 +445,20 @@ extension McBopomofoInputMethodController {
         }
         client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
+    }
+
+    private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 }
 
