@@ -3799,6 +3799,7 @@
 埳 ㄎㄢˇ kan3 d03 big5
 凵 ㄎㄢˇ kan3 d03 big5
 顑 ㄎㄢˇ kan3 d03 big5
+嵌 ㄎㄢˇ kan3 d03 big5
 看 ㄎㄢˋ kan4 d04 big5
 瞰 ㄎㄢˋ kan4 d04 big5
 勘 ㄎㄢˋ kan4 d04 big5
@@ -5091,6 +5092,7 @@
 棈 ㄑㄧㄢˋ qian4 fu04 big5
 蒨 ㄑㄧㄢˋ qian4 fu04 big5
 輤 ㄑㄧㄢˋ qian4 fu04 big5
+嵌 ㄑㄧㄢˋ qian4 fu04 big5
 前 ㄑㄧㄢˊ qian2 fu06 big5
 錢 ㄑㄧㄢˊ qian2 fu06 big5
 乾 ㄑㄧㄢˊ qian2 fu06 big5
@@ -5408,7 +5410,6 @@
 箷 ㄕ shi g big5
 褷 ㄕ shi g big5
 襹 ㄕ shi g big5
-螄 ㄕ shi g big5
 收 ㄕㄡ shou g. big5
 荍 ㄕㄡ shou g. big5
 手 ㄕㄡˇ shou3 g.3 big5
@@ -5652,6 +5653,7 @@
 螪 ㄕㄤ shang g; big5
 謪 ㄕㄤ shang g; big5
 鬺 ㄕㄤ shang g; big5
+裳 ㄕㄤ shang g; big5
 賞 ㄕㄤˇ shang3 g;3 big5
 晌 ㄕㄤˇ shang3 g;3 big5
 上 ㄕㄤˇ shang3 g;3 big5
@@ -6006,6 +6008,7 @@
 呲 ㄘˊ ci2 h6 big5
 飺 ㄘˊ ci2 h6 big5
 薋 ㄘˊ ci2 h6 big5
+茲 ㄘˊ ci2 h6 big5
 擦 ㄘㄚ ca h8 big5
 搽 ㄘㄚ ca h8 big5
 嚓 ㄘㄚ ca h8 big5
@@ -7244,6 +7247,7 @@
 蟴 ㄙ si n big5
 鷈 ㄙ si n big5
 鼶 ㄙ si n big5
+螄 ㄙ si n big5
 搜 ㄙㄡ sou n. big5
 颼 ㄙㄡ sou n. big5
 鄋 ㄙㄡ sou n. big5
@@ -7278,6 +7282,7 @@
 鏾 ㄙㄢˇ san3 n03 big5
 散 ㄙㄢˋ san4 n04 big5
 閐 ㄙㄢˋ san4 n04 big5
+三 ㄙㄢˋ san4 n04 big5
 死 ㄙˇ si3 n3 big5
 四 ㄙˋ si4 n4 big5
 似 ㄙˋ si4 n4 big5
@@ -9300,6 +9305,7 @@
 蠥 ㄋㄧㄝˋ nie4 su,4 big5
 钀 ㄋㄧㄝˋ nie4 su,4 big5
 巕 ㄋㄧㄝˋ nie4 su,4 big5
+摰 ㄋㄧㄝˋ nie4 su,4 big5
 苶 ㄋㄧㄝˊ nie2 su,6 big5
 妞 ㄋㄧㄡ niu su. big5
 紐 ㄋㄧㄡˇ niu3 su.3 big5
@@ -9648,7 +9654,6 @@
 痸 ㄔˋ chi4 t4 big5
 懘 ㄔˋ chi4 t4 big5
 戠 ㄔˋ chi4 t4 big5
-摰 ㄔˋ chi4 t4 big5
 持 ㄔˊ chi2 t6 big5
 池 ㄔˊ chi2 t6 big5
 遲 ㄔˊ chi2 t6 big5
@@ -9709,6 +9714,7 @@
 臿 ㄔㄚˊ cha2 t86 big5
 垞 ㄔㄚˊ cha2 t86 big5
 秅 ㄔㄚˊ cha2 t86 big5
+茬 ㄔㄚˊ cha2 t86 big5
 拆 ㄔㄞ chai t9 big5
 釵 ㄔㄞ chai t9 big5
 差 ㄔㄞ chai t9 big5
@@ -10109,6 +10115,7 @@
 殗 ㄧㄝˋ ye4 u,4 big5
 嶪 ㄧㄝˋ ye4 u,4 big5
 擛 ㄧㄝˋ ye4 u,4 big5
+液 ㄧㄝˋ ye4 u,4 big5
 爺 ㄧㄝˊ ye2 u,6 big5
 耶 ㄧㄝˊ ye2 u,6 big5
 椰 ㄧㄝˊ ye2 u,6 big5
@@ -12768,6 +12775,7 @@
 纑 ㄌㄨˊ lu2 xj6 big5
 碌 ㄌㄨ˙ lu5 xj7 big5
 囉 ㄌㄨㄛ luo xji big5
+捋 ㄌㄨㄛ luo xji big5
 裸 ㄌㄨㄛˇ luo3 xji3 big5
 瘰 ㄌㄨㄛˇ luo3 xji3 big5
 臝 ㄌㄨㄛˇ luo3 xji3 big5
@@ -12924,6 +12932,7 @@
 慺 ㄌㄩˊ lv2 xm6 big5
 氀 ㄌㄩˊ lv2 xm6 big5
 膢 ㄌㄩˊ lv2 xm6 big5
+捋 ㄌㄩˇ lv3 xm3 big5
 勒 ㄌㄟ lei xo big5
 累 ㄌㄟˇ lei3 xo3 big5
 壘 ㄌㄟˇ lei3 xo3 big5
@@ -13496,6 +13505,7 @@
 崰 ㄗ zi y big5
 秶 ㄗ zi y big5
 蠀 ㄗ zi y big5
+齊 ㄗ zi y big5
 鄒 ㄗㄡ zou y. big5
 謅 ㄗㄡ zou y. big5
 鄹 ㄗㄡ zou y. big5
@@ -14135,6 +14145,7 @@
 騛 ㄈㄟ fei zo big5
 婓 ㄈㄟ fei zo big5
 裶 ㄈㄟ fei zo big5
+蜚 ㄈㄟ fei zo big5
 匪 ㄈㄟˇ fei3 zo3 big5
 翡 ㄈㄟˇ fei3 zo3 big5
 斐 ㄈㄟˇ fei3 zo3 big5
