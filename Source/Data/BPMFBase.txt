@@ -362,6 +362,7 @@
 笣 ㄅㄠ bao 1l big5
 蕔 ㄅㄠ bao 1l big5
 孢 ㄅㄠ bao 1l big5
+煲 ㄅㄠ bao 1l big5
 保 ㄅㄠˇ bao3 1l3 big5
 寶 ㄅㄠˇ bao3 1l3 big5
 飽 ㄅㄠˇ bao3 1l3 big5
@@ -386,7 +387,6 @@
 鑤 ㄅㄠˋ bao4 1l4 big5
 儤 ㄅㄠˋ bao4 1l4 big5
 菢 ㄅㄠˋ bao4 1l4 big5
-煲 ㄅㄠˋ bao4 1l4 big5
 袌 ㄅㄠˋ bao4 1l4 big5
 嚗 ㄅㄠˋ bao4 1l4 big5
 犦 ㄅㄠˋ bao4 1l4 big5
@@ -856,6 +856,7 @@
 畣 ㄉㄚˊ da2 286 big5
 炟 ㄉㄚˊ da2 286 big5
 鎝 ㄉㄚˊ da2 286 big5
+打 ㄉㄚˊ da2 286 big5
 呆 ㄉㄞ dai 29 big5
 待 ㄉㄞ dai 29 big5
 獃 ㄉㄞ dai 29 big5
@@ -2222,6 +2223,7 @@
 騃 ㄞˊ ai2 96 big5
 敳 ㄞˊ ai2 96 big5
 癌 ㄞˊ ai2 96 big5
+呆 ㄞˊ ai2 96 big5
 骯 ㄤ ang ; big5
 腌 ㄤ ang ; big5
 ㄤ ㄤ ang ; big5
@@ -2317,6 +2319,7 @@
 槾 ㄇㄢˊ man2 a06 big5
 鬘 ㄇㄢˊ man2 a06 big5
 鬗 ㄇㄢˊ man2 a06 big5
+埋 ㄇㄢˊ man2 a06 big5
 媽 ㄇㄚ ma a8 big5
 嗎 ㄇㄚ ma a8 big5
 嬤 ㄇㄚ ma a8 big5
@@ -3178,6 +3181,7 @@
 匢 ㄏㄨ hu cj big5
 淲 ㄏㄨ hu cj big5
 糊 ㄏㄨ hu cj big5
+虎 ㄏㄨ hu cj big5
 轟 ㄏㄨㄥ hong cj/ big5
 哄 ㄏㄨㄥ hong cj/ big5
 烘 ㄏㄨㄥ hong cj/ big5
@@ -3365,6 +3369,7 @@
 嘩 ㄏㄨㄚ hua cj8 big5
 鷨 ㄏㄨㄚ hua cj8 big5
 錵 ㄏㄨㄚ hua cj8 big5
+化 ㄏㄨㄚ hua cj8 big5
 話 ㄏㄨㄚˋ hua4 cj84 big5
 化 ㄏㄨㄚˋ hua4 cj84 big5
 畫 ㄏㄨㄚˋ hua4 cj84 big5
@@ -9170,6 +9175,7 @@
 奻 ㄋㄢˊ nan2 s06 big5
 萳 ㄋㄢˊ nan2 s06 big5
 莮 ㄋㄢˊ nan2 s06 big5
+那 ㄋㄚ na s8 big5
 那 ㄋㄚˇ na3 s83 big5
 哪 ㄋㄚˇ na3 s83 big5
 雫 ㄋㄚˇ na3 s83 utf8
@@ -9297,7 +9303,9 @@
 餒 ㄋㄟˇ nei3 so3 big5
 哪 ㄋㄟˇ nei3 so3 big5
 腇 ㄋㄟˇ nei3 so3 big5
+那 ㄋㄟˇ nei3 so3 big5
 內 ㄋㄟˋ nei4 so4 big5
+那 ㄋㄟˋ nei4 so4 big5
 嫩 ㄋㄣˋ nen4 sp4 big5
 捏 ㄋㄧㄝ nie su, big5
 踗 ㄋㄧㄝ nie su, big5
@@ -9379,6 +9387,7 @@
 粘 ㄋㄧㄢˊ nian2 su06 big5
 姩 ㄋㄧㄢˊ nian2 su06 big5
 哖 ㄋㄧㄢˊ nian2 su06 big5
+拈 ㄋㄧㄢˊ nian2 su06 big5
 你 ㄋㄧˇ ni3 su3 big5
 妳 ㄋㄧˇ ni3 su3 big5
 擬 ㄋㄧˇ ni3 su3 big5
@@ -10140,6 +10149,7 @@
 嶪 ㄧㄝˋ ye4 u,4 big5
 擛 ㄧㄝˋ ye4 u,4 big5
 液 ㄧㄝˋ ye4 u,4 big5
+腋 ㄧㄝˋ ye4 u,4 big5
 爺 ㄧㄝˊ ye2 u,6 big5
 耶 ㄧㄝˊ ye2 u,6 big5
 椰 ㄧㄝˊ ye2 u,6 big5
@@ -11072,6 +11082,7 @@
 選 ㄒㄩㄢˇ xuan3 vm03 big5
 咺 ㄒㄩㄢˇ xuan3 vm03 big5
 烜 ㄒㄩㄢˇ xuan3 vm03 big5
+癬 ㄒㄩㄢˇ xuan3 vm03 big5
 炫 ㄒㄩㄢˋ xuan4 vm04 big5
 絢 ㄒㄩㄢˋ xuan4 vm04 big5
 漩 ㄒㄩㄢˋ xuan4 vm04 big5
@@ -12014,6 +12025,7 @@
 迖 ㄊㄚˋ ta4 w84 big5
 濌 ㄊㄚˋ ta4 w84 big5
 龘 ㄊㄚˋ ta4 w84 big5
+拓 ㄊㄚˋ ta4 w84 big5
 遢 ㄊㄚ˙ ta5 w87 big5
 胎 ㄊㄞ tai w9 big5
 苔 ㄊㄞ tai w9 big5
@@ -12320,6 +12332,7 @@
 翢 ㄊㄠ tao wl big5
 嫍 ㄊㄠ tao wl big5
 蜪 ㄊㄠ tao wl big5
+叨 ㄊㄠ tao wl big5
 討 ㄊㄠˇ tao3 wl3 big5
 套 ㄊㄠˋ tao4 wl4 big5
 逃 ㄊㄠˊ tao2 wl6 big5
