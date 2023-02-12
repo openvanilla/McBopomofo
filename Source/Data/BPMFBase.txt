@@ -205,6 +205,7 @@
 罷 ㄅㄚ˙ ba5 187 big5
 琶 ㄅㄚ˙ ba5 187 big5
 杷 ㄅㄚ˙ ba5 187 big5
+爸 ㄅㄚ˙ ba5 187 big5
 掰 ㄅㄞ bai 19 big5
 百 ㄅㄞˇ bai3 193 big5
 擺 ㄅㄞˇ bai3 193 big5
@@ -1195,6 +1196,7 @@
 帄 ㄉㄧㄥ ding 2u/ big5
 靪 ㄉㄧㄥ ding 2u/ big5
 虰 ㄉㄧㄥ ding 2u/ big5
+町 ㄉㄧㄥ ding 2u/ big5
 頂 ㄉㄧㄥˇ ding3 2u/3 big5
 鼎 ㄉㄧㄥˇ ding3 2u/3 big5
 酊 ㄉㄧㄥˇ ding3 2u/3 big5
@@ -2300,6 +2302,7 @@
 澫 ㄇㄢˋ man4 a04 big5
 僈 ㄇㄢˋ man4 a04 big5
 獌 ㄇㄢˋ man4 a04 big5
+鰻 ㄇㄢˋ man4 a04 big5
 蠻 ㄇㄢˊ man2 a06 big5
 饅 ㄇㄢˊ man2 a06 big5
 瞞 ㄇㄢˊ man2 a06 big5
@@ -3174,6 +3177,7 @@
 謼 ㄏㄨ hu cj big5
 匢 ㄏㄨ hu cj big5
 淲 ㄏㄨ hu cj big5
+糊 ㄏㄨ hu cj big5
 轟 ㄏㄨㄥ hong cj/ big5
 哄 ㄏㄨㄥ hong cj/ big5
 烘 ㄏㄨㄥ hong cj/ big5
@@ -3243,6 +3247,7 @@
 澣 ㄏㄨㄢˇ huan3 cj03 big5
 睆 ㄏㄨㄢˇ huan3 cj03 big5
 輐 ㄏㄨㄢˇ huan3 cj03 big5
+浣 ㄏㄨㄢˇ huan3 cj03 big5
 換 ㄏㄨㄢˋ huan4 cj04 big5
 喚 ㄏㄨㄢˋ huan4 cj04 big5
 宦 ㄏㄨㄢˋ huan4 cj04 big5
@@ -3322,6 +3327,7 @@
 綔 ㄏㄨˋ hu4 cj4 big5
 謢 ㄏㄨˋ hu4 cj4 big5
 蔰 ㄏㄨˋ hu4 cj4 big5
+糊 ㄏㄨˋ hu4 cj4 big5
 胡 ㄏㄨˊ hu2 cj6 big5
 湖 ㄏㄨˊ hu2 cj6 big5
 壺 ㄏㄨˊ hu2 cj6 big5
@@ -4214,6 +4220,7 @@
 蜬 ㄍㄢ gan e0 big5
 鳱 ㄍㄢ gan e0 big5
 嵅 ㄍㄢ gan e0 big5
+苷 ㄍㄢ gan e0 big5e
 敢 ㄍㄢˇ gan3 e03 big5
 感 ㄍㄢˇ gan3 e03 big5
 趕 ㄍㄢˇ gan3 e03 big5
@@ -5031,6 +5038,7 @@
 殑 ㄑㄧㄥˊ qing2 fu/6 big5
 樈 ㄑㄧㄥˊ qing2 fu/6 big5
 殌 ㄑㄧㄥˊ qing2 fu/6 big5
+黥 ㄑㄧㄥˊ qing2 fu/6 big5
 千 ㄑㄧㄢ qian fu0 big5
 鉛 ㄑㄧㄢ qian fu0 big5
 遷 ㄑㄧㄢ qian fu0 big5
@@ -5076,6 +5084,8 @@
 撖 ㄑㄧㄢˇ qian3 fu03 big5
 忏 ㄑㄧㄢˇ qian3 fu03 big5
 蜸 ㄑㄧㄢˇ qian3 fu03 big5
+潛 ㄑㄧㄢˇ qian3 fu03 big5
+嗛 ㄑㄧㄢˇ qian3 fu03 big5
 欠 ㄑㄧㄢˋ qian4 fu04 big5
 歉 ㄑㄧㄢˋ qian4 fu04 big5
 倩 ㄑㄧㄢˋ qian4 fu04 big5
@@ -5361,6 +5371,7 @@
 沁 ㄑㄧㄣˋ qin4 fup4 big5
 撳 ㄑㄧㄣˋ qin4 fup4 big5
 唚 ㄑㄧㄣˋ qin4 fup4 big5
+親 ㄑㄧㄣˋ qin4 fup4 big5
 菣 ㄑㄧㄣˋ qin4 fup4 big5
 勤 ㄑㄧㄣˊ qin2 fup6 big5
 琴 ㄑㄧㄣˊ qin2 fup6 big5
@@ -5522,6 +5533,7 @@
 矢 ㄕˇ shi3 g3 big5
 屎 ㄕˇ shi3 g3 big5
 豕 ㄕˇ shi3 g3 big5
+弛 ㄕˇ shi3 g3 big5
 市 ㄕˋ shi4 g4 big5
 是 ㄕˋ shi4 g4 big5
 事 ㄕˋ shi4 g4 big5
@@ -5686,6 +5698,7 @@
 軗 ㄕㄨ shu gj big5
 鵨 ㄕㄨ shu gj big5
 藲 ㄕㄨ shu gj big5
+荼 ㄕㄨ shu gj big5
 栓 ㄕㄨㄢ shuan gj0 big5
 閂 ㄕㄨㄢ shuan gj0 big5
 拴 ㄕㄨㄢ shuan gj0 big5
@@ -6084,6 +6097,7 @@
 攛 ㄘㄨㄢ cuan hj0 big5
 躥 ㄘㄨㄢ cuan hj0 big5
 鋑 ㄘㄨㄢ cuan hj0 big5
+汆 ㄘㄨㄢ cuan hj0 big5
 竄 ㄘㄨㄢˋ cuan4 hj04 big5
 篡 ㄘㄨㄢˋ cuan4 hj04 big5
 爨 ㄘㄨㄢˋ cuan4 hj04 big5
@@ -6417,6 +6431,7 @@
 洖 ㄨˊ wu2 j6 big5
 瞴 ㄨˊ wu2 j6 big5
 譕 ㄨˊ wu2 j6 big5
+嘸 ㄨˊ wu2 j6 big5
 哇 ㄨㄚ wa j8 big5
 蛙 ㄨㄚ wa j8 big5
 挖 ㄨㄚ wa j8 big5
@@ -7488,6 +7503,7 @@
 旞 ㄙㄨㄟˋ sui4 njo4 big5
 繸 ㄙㄨㄟˋ sui4 njo4 big5
 鐆 ㄙㄨㄟˋ sui4 njo4 big5
+穂 ㄙㄨㄟˋ sui4 njo4 big5e
 隨 ㄙㄨㄟˊ sui2 njo6 big5
 隋 ㄙㄨㄟˊ sui2 njo6 big5
 雟 ㄙㄨㄟˊ sui2 njo6 big5
@@ -7722,6 +7738,7 @@
 醭 ㄆㄨ pu qj big5
 抪 ㄆㄨ pu qj big5
 瞨 ㄆㄨ pu qj big5
+舖 ㄆㄨ pu qj big5
 普 ㄆㄨˇ pu3 qj3 big5
 浦 ㄆㄨˇ pu3 qj3 big5
 埔 ㄆㄨˇ pu3 qj3 big5
@@ -8220,6 +8237,7 @@
 焣 ㄐㄩˋ ju4 rm4 big5
 壉 ㄐㄩˋ ju4 rm4 big5
 犋 ㄐㄩˋ ju4 rm4 big5
+沮 ㄐㄩˋ ju4 rm4 big5
 局 ㄐㄩˊ ju2 rm6 big5
 鞠 ㄐㄩˊ ju2 rm6 big5
 菊 ㄐㄩˊ ju2 rm6 big5
@@ -8251,6 +8269,7 @@
 鼳 ㄐㄩˊ ju2 rm6 big5
 陱 ㄐㄩˊ ju2 rm6 big5
 駶 ㄐㄩˊ ju2 rm6 big5
+鴃 ㄐㄩˊ ju2 rm6 big5
 軍 ㄐㄩㄣ jun rmp big5
 君 ㄐㄩㄣ jun rmp big5
 均 ㄐㄩㄣ jun rmp big5
@@ -8477,6 +8496,7 @@
 揂 ㄐㄧㄡ jiu ru. big5
 萛 ㄐㄧㄡ jiu ru. big5
 鬮 ㄐㄧㄡ jiu ru. big5
+赳 ㄐㄧㄡ jiu ru. big5
 九 ㄐㄧㄡˇ jiu3 ru.3 big5
 久 ㄐㄧㄡˇ jiu3 ru.3 big5
 酒 ㄐㄧㄡˇ jiu3 ru.3 big5
@@ -8895,6 +8915,7 @@
 徦 ㄐㄧㄚˇ jia3 ru83 big5
 椵 ㄐㄧㄚˇ jia3 ru83 big5
 夏 ㄐㄧㄚˇ jia3 ru83 big5
+舺 ㄐㄧㄚˇ jia3 ru83 big5
 價 ㄐㄧㄚˋ jia4 ru84 big5
 假 ㄐㄧㄚˋ jia4 ru84 big5
 架 ㄐㄧㄚˋ jia4 ru84 big5
@@ -8903,6 +8924,7 @@
 賈 ㄐㄧㄚˋ jia4 ru84 big5
 稼 ㄐㄧㄚˋ jia4 ru84 big5
 价 ㄐㄧㄚˋ jia4 ru84 big5
+夾 ㄐㄧㄚˋ jia4 ru84 big5
 夾 ㄐㄧㄚˊ jia2 ru86 big5
 挾 ㄐㄧㄚˊ jia2 ru86 big5
 頰 ㄐㄧㄚˊ jia2 ru86 big5
@@ -8961,6 +8983,7 @@
 彊 ㄐㄧㄤˋ jiang4 ru;4 big5
 弶 ㄐㄧㄤˋ jiang4 ru;4 big5
 袶 ㄐㄧㄤˋ jiang4 ru;4 big5
+漿 ㄐㄧㄤˋ jiang4 ru;4 big5
 教 ㄐㄧㄠ jiao rul big5
 交 ㄐㄧㄠ jiao rul big5
 膠 ㄐㄧㄠ jiao rul big5
@@ -9024,6 +9047,7 @@
 劋 ㄐㄧㄠˇ jiao3 rul3 big5
 譑 ㄐㄧㄠˇ jiao3 rul3 big5
 煍 ㄐㄧㄠˇ jiao3 rul3 big5
+徼 ㄐㄧㄠˇ jiao3 rul3 big5
 教 ㄐㄧㄠˋ jiao4 rul4 big5
 叫 ㄐㄧㄠˋ jiao4 rul4 big5
 校 ㄐㄧㄠˋ jiao4 rul4 big5
@@ -11044,6 +11068,7 @@
 蝖 ㄒㄩㄢ xuan vm0 big5
 蠉 ㄒㄩㄢ xuan vm0 big5
 矎 ㄒㄩㄢ xuan vm0 big5
+煊 ㄒㄩㄢ xuan vm0 big5e
 選 ㄒㄩㄢˇ xuan3 vm03 big5
 咺 ㄒㄩㄢˇ xuan3 vm03 big5
 烜 ㄒㄩㄢˇ xuan3 vm03 big5
@@ -11283,6 +11308,7 @@
 闟 ㄒㄧ xi vu big5
 誒 ㄒㄧ xi vu big5
 礂 ㄒㄧ xi vu big5
+螅 ㄒㄧ xi vu big5
 西 ㄒㄧ˙ xi5 vu7 big5
 些 ㄒㄧㄝ xie vu, big5
 歇 ㄒㄧㄝ xie vu, big5
@@ -11511,6 +11537,7 @@
 赻 ㄒㄧㄢˇ xian3 vu03 big5
 攇 ㄒㄧㄢˇ xian3 vu03 big5
 禒 ㄒㄧㄢˇ xian3 vu03 big5
+洗 ㄒㄧㄢˇ xian3 vu03 big5
 縣 ㄒㄧㄢˋ xian4 vu04 big5
 現 ㄒㄧㄢˋ xian4 vu04 big5
 線 ㄒㄧㄢˋ xian4 vu04 big5
@@ -13290,6 +13317,7 @@
 瓥 ㄌㄧˋ li4 xu4 big5
 鱱 ㄌㄧˋ li4 xu4 big5
 娳 ㄌㄧˋ li4 xu4 big5
+栃 ㄌㄧˋ li4 xu4 cns
 離 ㄌㄧˊ li2 xu6 big5
 璃 ㄌㄧˊ li2 xu6 big5
 黎 ㄌㄧˊ li2 xu6 big5
@@ -13584,6 +13612,7 @@
 矷 ㄗˇ zi3 y3 big5
 釨 ㄗˇ zi3 y3 big5
 訿 ㄗˇ zi3 y3 big5
+姊 ㄗˇ zi3 y3 big5
 自 ㄗˋ zi4 y4 big5
 字 ㄗˋ zi4 y4 big5
 恣 ㄗˋ zi4 y4 big5
@@ -14131,6 +14160,7 @@
 黻 ㄈㄨˊ fu2 zj6 big5
 鵩 ㄈㄨˊ fu2 zj6 big5
 鶝 ㄈㄨˊ fu2 zj6 big5
+沸 ㄈㄨˊ fu2 zj6 big5
 非 ㄈㄟ fei zo big5
 飛 ㄈㄟ fei zo big5
 菲 ㄈㄟ fei zo big5
@@ -14183,6 +14213,7 @@
 櫠 ㄈㄟˋ fei4 zo4 big5
 蟦 ㄈㄟˋ fei4 zo4 big5
 鐨 ㄈㄟˋ fei4 zo4 big5
+鯡 ㄈㄟˋ fei4 zo4 big5
 肥 ㄈㄟˊ fei2 zo6 big5
 淝 ㄈㄟˊ fei2 zo6 big5
 腓 ㄈㄟˊ fei2 zo6 big5
