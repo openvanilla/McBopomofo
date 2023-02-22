@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         i = 0
         phon = word
         while i < len(word):
-            phon = "%s %s" % (phon, bpmf["%s%s%s" % (word[i], word[i + 1], word[i + 2])])
-            i = i + 3
-        print phon
+            phon = "%s %s" % (phon, bpmf["%s" % (word[i])])
+            i = i + 1
+        print (phon)
     handle.close()

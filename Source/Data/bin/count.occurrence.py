@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
 import os
 import codecs
-import ConfigParser
+import configparser
 import multiprocessing
 
 __author__ = "Mengjuei Hsieh and The McBopomofo Authors"
@@ -14,7 +14,7 @@ __doc__ = """
    A facility to print a list of counts for substrings / phrases
    in a text pool file, given a list of phrases."""
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1]) + '/textpool.rc')
 corpus_path = config.get('data', 'corpus_path')
 if corpus_path[0] == '~':
@@ -60,10 +60,10 @@ if __name__ == '__main__':
     else:
         pass
     ncores = max_cores
-    if args.phraselist is '-':
+    if args.phraselist == '-':
         while True:
             try:
-                line = raw_input().decode("utf-8")
+                line = input()
                 if not line: break
                 if line[0] == '#': continue
                 elements = line.rstrip().split()
@@ -86,5 +86,5 @@ if __name__ == '__main__':
     outputs = [(phrase, count) for phrase, count, state in results if state is True]
     for phrase, count in outputs:
         outstring = u'%s	%d' % (phrase, count)
-        print outstring.encode('utf-8', 'ignore')
+        print(outstring)
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
