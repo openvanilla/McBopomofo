@@ -62,7 +62,7 @@ struct VersionUpdateApi {
     static func check(forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>) -> ()) -> URLSessionTask? {
         guard let infoDict = Bundle.main.infoDictionary,
               let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
-              let updateInfoURL = URL(string: updateInfoURLString) else {
+              let updateInfoURL = URL(string:(updateInfoURLString + (forced ? "?manual=yes" : ""))) else {
             return nil
         }
 
@@ -196,7 +196,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 
     @objc(checkForUpdateForced:)
     func checkForUpdate(forced: Bool) {
-
         if checkTask != nil {
             // busy
             return
@@ -233,7 +232,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                             report.remoteVersion,
                             report.versionDescription)
                     NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
-                case .noNeedToUpdate, .ignored:
+                case .noNeedToUpdate:
+                    NonModalAlertWindowController.shared.show(title:NSLocalizedString("Check for Update Completed", comment: ""), content:NSLocalizedString("McBopomofo is up to date.", comment: ""),  confirmButtonTitle:NSLocalizedString("OK", comment: ""), cancelButtonTitle:nil, cancelAsDefault: false, delegate: self)
+                case .ignored:
                     break
                 }
             case .failure(let error):
