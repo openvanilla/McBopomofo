@@ -45,7 +45,7 @@
 
 "Edit Excluded Phrases" = "編輯要排除的詞彙";
 
-"Use Half-Width Punctuations" = "使用半型標點符號";
+"Use Half-Width Punctuations" = "使用半形標點符號";
 
 "Marking \"%@\": add a custom phrase by selecting two or more characters." = "您目前選擇了「%@」。請選擇兩個字以上，才能加入使用者詞彙。";
 
@@ -63,7 +63,7 @@
 
 "Candidates keys cannot be empty." = "選字鍵不可為空。";
 
-"Candidate keys can only contain Latin characters and numbers." = "選字鍵只可包含英數與半型標點。";
+"Candidate keys can only contain Latin characters and numbers." = "選字鍵只可包含英數與半形標點。";
 
 "Candidate keys cannot contain space." = "選字鍵不可包含空白。";
 
@@ -77,9 +77,9 @@
 
 "Model-based Chinese conversion is on. Not recommended to add user phrases." = "您已開啟將語言模型轉為簡體中文，不建議在此模式下加詞。";
 
-"Half-Width Punctuation On" = "已經切換到半型標點模式";
+"Half-Width Punctuation On" = "已經切換到半形標點模式";
 
-"Half-Width Punctuation Off" = "已經切回到全型標點模式";
+"Half-Width Punctuation Off" = "已經切回到全形標點模式";
 
 "Associated Phrases" = "聯想詞";
 
