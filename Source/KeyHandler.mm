@@ -26,11 +26,10 @@
 #import "Mandarin.h"
 #import "McBopomofo-Swift.h"
 #import "McBopomofoLM.h"
+#import "UTF8Helper.h"
 #import "UserOverrideModel.h"
 #import "reading_grid.h"
 
-#import <codecvt>
-#import <locale>
 #import <string>
 #import <unordered_map>
 #import <utility>
@@ -40,18 +39,6 @@
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
-
-static std::u32string ToU32(const std::string& s)
-{
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-    return conv.from_bytes(s);
-}
-
-static std::string ToU8(const std::u32string& s)
-{
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-    return conv.to_bytes(s);
-}
 
 @implementation KeyHandler {
     std::shared_ptr<Formosa::Gramambular2::LanguageModel> _emptySharedPtr;
@@ -1360,20 +1347,19 @@ static std::string ToU8(const std::u32string& s)
 
         // The builder cursor is in the middle of the node.
         size_t distance = builderCursor - runningCursor;
-        std::u32string u32Value = ToU32(value);
+        size_t valueCodePointCount = McBopomofo::CodePointCount(value);
 
         // The actual partial value's code point length is the shorter of the
         // distance and the value's code point count.
-        size_t cpLen = std::min(distance, u32Value.length());
-        std::u32string actualU32Value(u32Value.begin(), u32Value.begin() + static_cast<ptrdiff_t>(cpLen));
-        std::string actualValue = ToU8(actualU32Value);
+        size_t cpLen = std::min(distance, valueCodePointCount);
+        std::string actualValue = McBopomofo::SubstringToCodePoints(value, cpLen);
         composedCursor += actualValue.length();
         runningCursor += distance;
 
         // Create a tooltip to warn the user that their cursor is between two
         // readings (syllables) even if the cursor is not in the middle of a
         // composed string due to its being shorter than the number of readings.
-        if (u32Value.length() < readingLength) {
+        if (valueCodePointCount < readingLength) {
             // builderCursor is guaranteed to be > 0. If it was 0, we wouldn't even
             // reach here due to runningCursor having already "caught up" with
             // builderCursor. It is also guaranteed to be less than the size of the
