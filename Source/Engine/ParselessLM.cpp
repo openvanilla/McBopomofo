@@ -144,3 +144,12 @@ bool McBopomofo::ParselessLM::hasUnigrams(const std::string& key)
 
     return db_->findFirstMatchingLine(key + " ") != nullptr;
 }
+
+std::vector<std::string_view> McBopomofo::ParselessLM::getPronounciations(const std::string_view& value)
+{
+    if (db_ == nullptr) {
+        return std::vector<std::string_view>();
+    }
+    
+    return db_->reverseFindRows(value);
+}

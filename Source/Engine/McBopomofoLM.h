@@ -105,6 +105,12 @@ public:
     const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
     bool hasAssociatedPhrasesForKey(const std::string& key);
 
+    /// Returns a list of pronounciations that match a given value.
+    /// @param value A string representing the text to look up pronounciation candidates for. For example,
+    ///     if you pass "說", it returns a list of records that include ㄕㄨㄛ, ㄕㄨㄟˋ, and ㄩㄝˋ.
+    /// @return An unsorted list of string records of the form "<key> <value> <score>" separated by spaces.
+    std::vector<std::string_view> getPronounciations(const std::string_view& value);
+
 protected:
     /// Filters and converts the input unigrams and return a new list of unigrams.
     ///

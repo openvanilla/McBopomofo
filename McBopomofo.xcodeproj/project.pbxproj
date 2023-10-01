@@ -34,6 +34,7 @@
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
 		6AE215112A2849BB005A6A02 /* UTF8Helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE215102A2849BB005A6A02 /* UTF8Helper.cpp */; };
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
+		B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */; };
 		D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* LanguageModelManager.mm */; };
 		D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
@@ -149,6 +150,7 @@
 		6AE2150F2A2849BB005A6A02 /* UTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTF8Helper.h; sourceTree = "<group>"; };
 		6AE215102A2849BB005A6A02 /* UTF8Helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTF8Helper.cpp; sourceTree = "<group>"; };
 		6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NonModalAlertWindowController.xib; sourceTree = "<group>"; };
+		B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
 		D41355D6278D7409005E5CBD /* LanguageModelManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LanguageModelManager.h; sourceTree = "<group>"; };
 		D41355D7278D7409005E5CBD /* LanguageModelManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LanguageModelManager.mm; sourceTree = "<group>"; };
 		D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = McBopomofoLM.cpp; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				D44FB74427915555003C80A6 /* Preferences.swift */,
 				D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */,
 				D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */,
+				B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
 				6A0D4EF615FC0DA600ABF4B3 /* McBopomofo-Prefix.pch */,
 				D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */,
@@ -665,6 +668,7 @@
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				6AE215112A2849BB005A6A02 /* UTF8Helper.cpp in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
+				B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */,
 				D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

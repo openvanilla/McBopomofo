@@ -153,8 +153,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var updateNextStepURL: URL?
     private var fsStreamHelper: FSEventStreamHelper?
 
-    func updateUserPhases() {
-        NSLog("updateUserPhases called \(LanguageModelManager.dataFolderPath)")
+    func updateUserPhrases() {
+        NSLog("updateUserPhrases called \(LanguageModelManager.dataFolderPath)")
         LanguageModelManager.loadUserPhrases()
         LanguageModelManager.loadUserPhraseReplacement()
 
@@ -167,7 +167,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.setupDataModelValueConverter()
-        updateUserPhases()
+        updateUserPhrases()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
@@ -175,8 +175,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         }
 
         NotificationCenter.default.addObserver(forName: .userPhraseLocationDidChange, object: nil, queue: OperationQueue.main) { notification in
-            self.updateUserPhases()
+            self.updateUserPhrases()
         }
+
+        NSApp.servicesProvider = ServiceProvider()
 
         checkForUpdate()
     }
@@ -269,5 +271,40 @@ extension AppDelegate: FSEventStreamHelperDelegate {
             LanguageModelManager.loadUserPhrases()
             LanguageModelManager.loadUserPhraseReplacement()
         }
+    }
+}
+
+extension AppDelegate {
+    private func open(userFileAt path: String) {
+        func checkIfUserFilesExist() -> Bool {
+            if !LanguageModelManager.checkIfUserLanguageModelFilesExist() {
+                let content = String(format: NSLocalizedString("Please check the permission of the path at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
+                NonModalAlertWindowController.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                return false
+            }
+            return true
+        }
+
+        if !checkIfUserFilesExist() {
+            return
+        }
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.open(url)
+    }
+
+    @objc func openUserPhrases(_ sender: Any?) {
+        open(userFileAt: LanguageModelManager.userPhrasesDataPathMcBopomofo)
+    }
+
+    @objc func openExcludedPhrasesPlainBopomofo(_ sender: Any?) {
+        open(userFileAt: LanguageModelManager.excludedPhrasesDataPathPlainBopomofo)
+    }
+
+    @objc func openExcludedPhrasesMcBopomofo(_ sender: Any?) {
+        open(userFileAt: LanguageModelManager.excludedPhrasesDataPathMcBopomofo)
+    }
+
+    @objc func openPhraseReplacementMcBopomofo(_ sender: Any?) {
+        open(userFileAt: LanguageModelManager.phraseReplacementDataPathMcBopomofo)
     }
 }

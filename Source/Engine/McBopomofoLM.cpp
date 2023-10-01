@@ -135,6 +135,11 @@ bool McBopomofoLM::hasUnigrams(const std::string& key)
     return getUnigrams(key).size() > 0;
 }
 
+std::vector<std::string_view> McBopomofoLM::getPronounciations(const std::string_view& value)
+{
+    return m_languageModel.getPronounciations(value);
+}
+
 void McBopomofoLM::setPhraseReplacementEnabled(bool enabled)
 {
     m_phraseReplacementEnabled = enabled;
