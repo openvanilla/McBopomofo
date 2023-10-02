@@ -302,7 +302,7 @@ extension McBopomofoInputMethodController {
             if Preferences.chineseConversionStyle == 1 {
                 return text
             }
-            return Preferences.chineseConversionEngine == 1 ? VXHanConvert.convertToSimplified(from: text) : OpenCCBridge.convertToSimplified(text) ?? ""
+            return Preferences.chineseConversionEngine == 1 ? VXHanConvert.convertToSimplified(from: text) : OpenCCBridge.shared.convertToSimplified(text) ?? ""
         }
 
         let buffer = convertToSimplifiedChineseIfRequired(text)
