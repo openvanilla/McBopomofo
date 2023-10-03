@@ -23,8 +23,8 @@
 
 #include "McBopomofoLM.h"
 #include <algorithm>
-#include <iterator>
 #include <float.h>
+#include <iterator>
 
 namespace McBopomofo {
 
@@ -139,7 +139,7 @@ bool McBopomofoLM::hasUnigrams(const std::string& key)
 std::string McBopomofoLM::getReading(const std::string_view& value)
 {
     std::vector<std::string> records = m_languageModel.getReadings(value);
-    
+
     double highScore = -DBL_MAX;
     std::string highScoringValue;
     for (std::string record : records) {
@@ -152,7 +152,7 @@ std::string McBopomofoLM::getReading(const std::string_view& value)
             }
         }
     }
-    
+
     return highScoringValue;
 }
 
@@ -222,7 +222,8 @@ bool McBopomofoLM::hasAssociatedPhrasesForKey(const std::string& key)
     return m_associatedPhrases.hasValuesForKey(key);
 }
 
-std::vector<std::string_view> McBopomofoLM::split(const std::string_view& str, char delim) {
+std::vector<std::string_view> McBopomofoLM::split(const std::string_view& str, char delim)
+{
     std::vector<std::string_view> strings;
     size_t start;
     size_t end = 0;

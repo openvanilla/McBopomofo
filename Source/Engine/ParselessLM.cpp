@@ -150,6 +150,6 @@ std::vector<std::string> McBopomofo::ParselessLM::getReadings(const std::string_
     if (db_ == nullptr) {
         return std::vector<std::string>();
     }
-    
+
     return db_->reverseFindRows(value);
 }
