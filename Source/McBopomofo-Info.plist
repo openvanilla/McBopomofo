@@ -128,5 +128,23 @@
 	</array>
 	<key>tsInputMethodIconFileKey</key>
 	<string>Bopomofo.tiff</string>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMessage</key>
+			<string>addUserPhrase</string>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Add to McBopomofo User Phrases</string>
+			</dict>
+			<key>NSSendTypes</key>
+			<array>
+				<string>NSStringPboardType</string>
+			</array>
+			<key>NSRequiredContext</key>
+			<dict/>
+		</dict>
+	</array>
 </dict>
 </plist>

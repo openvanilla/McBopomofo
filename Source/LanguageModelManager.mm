@@ -305,4 +305,13 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     gLanguageModelMcBopomofo.setPhraseReplacementEnabled(phraseReplacementEnabled);
 }
 
++ (nullable NSString *)readingFor:(NSString *)phrase {
+    if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
+        [self loadDataModel:InputModeBopomofo];
+    }
+    
+    std::string reading = gLanguageModelMcBopomofo.getReading(phrase.UTF8String);
+    return !reading.empty() ? [NSString stringWithCString:reading.c_str() encoding:NSUTF8StringEncoding] : nil;
+}
+
 @end

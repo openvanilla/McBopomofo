@@ -233,37 +233,20 @@ class McBopomofoInputMethodController: IMKInputController {
         (NSApp.delegate as? AppDelegate)?.checkForUpdate(forced: true)
     }
 
-    private func open(userFileAt path: String) {
-        func checkIfUserFilesExist() -> Bool {
-            if !LanguageModelManager.checkIfUserLanguageModelFilesExist() {
-                let content = String(format: NSLocalizedString("Please check the permission of the path at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
-                NonModalAlertWindowController.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
-                return false
-            }
-            return true
-        }
-
-        if !checkIfUserFilesExist() {
-            return
-        }
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.open(url)
-    }
-
     @objc func openUserPhrases(_ sender: Any?) {
-        open(userFileAt: LanguageModelManager.userPhrasesDataPathMcBopomofo)
+        (NSApp.delegate as? AppDelegate)?.openUserPhrases(sender)
     }
 
     @objc func openExcludedPhrasesPlainBopomofo(_ sender: Any?) {
-        open(userFileAt: LanguageModelManager.excludedPhrasesDataPathPlainBopomofo)
+        (NSApp.delegate as? AppDelegate)?.openExcludedPhrasesPlainBopomofo(sender)
     }
 
     @objc func openExcludedPhrasesMcBopomofo(_ sender: Any?) {
-        open(userFileAt: LanguageModelManager.excludedPhrasesDataPathMcBopomofo)
+        (NSApp.delegate as? AppDelegate)?.openExcludedPhrasesMcBopomofo(sender)
     }
 
     @objc func openPhraseReplacementMcBopomofo(_ sender: Any?) {
-        open(userFileAt: LanguageModelManager.phraseReplacementDataPathMcBopomofo)
+        (NSApp.delegate as? AppDelegate)?.openPhraseReplacementMcBopomofo(sender)
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {
