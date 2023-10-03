@@ -53,7 +53,7 @@ public:
     // Find the rows that (prefix-)match the value, useful for returning all the
     // ways a phrase or character can be pronounced. Note that this is a potentially-
     // slow linear search that cannot take advantage of the pre-sorting.
-    std::vector<std::string_view> reverseFindRows(const std::string_view& value);
+    std::vector<std::string> reverseFindRows(const std::string_view& value);
 
 private:
     const char* begin_;

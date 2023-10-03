@@ -45,8 +45,7 @@ public:
         const std::string& key) override;
     bool hasUnigrams(const std::string& key) override;
 
-    std::vector<std::string_view> getPronounciations(
-        const std::string_view& value);
+    std::vector<std::string> getReadings(const std::string_view& value);
 
 private:
     int fd_ = -1;

@@ -44,7 +44,7 @@ class ServiceProvider: NSObject {
             var drop = 0
             while drop < substringCount {
                 let candidate = String(substring.dropLast(drop))
-                if let match = LanguageModelManager.pronounciation(for: candidate) {
+                if let match = LanguageModelManager.reading(for: candidate) {
                     // append the match and skip over the matched portion
                     matches.append(match)
                     matchFrom = firstWord.index(matchFrom, offsetBy: substringCount - drop)
@@ -60,8 +60,8 @@ class ServiceProvider: NSObject {
             }
         }
         
-        let pronounciation = matches.joined(separator: "-")
-        LanguageModelManager.writeUserPhrase("\(firstWord) \(pronounciation)")
+        let reading = matches.joined(separator: "-")
+        LanguageModelManager.writeUserPhrase("\(firstWord) \(reading)")
         (NSApp.delegate as? AppDelegate)?.openUserPhrases(self)
     }
 }

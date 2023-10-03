@@ -163,10 +163,10 @@ const char* ParselessPhraseDB::findFirstMatchingLine(
     return nullptr;
 }
 
-std::vector<std::string_view> ParselessPhraseDB::reverseFindRows(
+std::vector<std::string> ParselessPhraseDB::reverseFindRows(
     const std::string_view& value)
 {
-    std::vector<std::string_view> rows;
+    std::vector<std::string> rows;
 
     const char* recordBegin = begin_;
 

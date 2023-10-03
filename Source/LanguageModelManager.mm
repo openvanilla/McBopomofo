@@ -305,28 +305,13 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     gLanguageModelMcBopomofo.setPhraseReplacementEnabled(phraseReplacementEnabled);
 }
 
-+ (nullable NSString *)pronounciationFor:(NSString *)phrase {
++ (nullable NSString *)readingFor:(NSString *)phrase {
     if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
         [self loadDataModel:InputModeBopomofo];
     }
-
-    std::vector<std::string_view> records = gLanguageModelMcBopomofo.getPronounciations(phrase.UTF8String);
-
-    double highScore = -DBL_MAX;
-    NSString *highScoringValue = nil;
-    for (std::string_view record : records) {
-        NSString *string = [NSString stringWithCString:std::string(record).c_str() encoding:NSUTF8StringEncoding];
-        NSArray<NSString *> *parts = [string componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        if (parts.count == 3) {
-            double score = parts[2].doubleValue;
-            if (score > highScore) {
-                highScoringValue = parts[0];
-                highScore = parts[2].doubleValue;
-            }
-        }
-    }
-
-    return highScoringValue;
+    
+    std::string reading = gLanguageModelMcBopomofo.getReading(phrase.UTF8String);
+    return !reading.empty() ? [NSString stringWithCString:reading.c_str() encoding:NSUTF8StringEncoding] : nil;
 }
 
 @end
