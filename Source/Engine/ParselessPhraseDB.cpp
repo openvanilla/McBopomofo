@@ -193,7 +193,7 @@ std::vector<std::string> ParselessPhraseDB::reverseFindRows(
             rows.emplace_back(recordBegin, recordEnd - recordBegin);
         }
 
-        // skip over the record separator. there should be just one, but loop just in case.
+        // skip over to the next line start
         recordBegin = recordEnd;
         while (recordBegin < end_ && *recordBegin == '\n') {
             ++recordBegin;

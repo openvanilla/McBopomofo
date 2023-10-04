@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <float.h>
 #include <iterator>
+#include <limits>
 
 namespace McBopomofo {
 
@@ -136,24 +137,18 @@ bool McBopomofoLM::hasUnigrams(const std::string& key)
     return getUnigrams(key).size() > 0;
 }
 
-std::string McBopomofoLM::getReading(const std::string_view& value)
+std::string McBopomofoLM::getReading(const std::string& value)
 {
-    std::vector<std::string> records = m_languageModel.getReadings(value);
-
-    double highScore = -DBL_MAX;
-    std::string highScoringValue;
-    for (std::string record : records) {
-        std::vector<std::string_view> parts = split(record, ' ');
-        if (parts.size() == 3) {
-            double score = std::stod(std::string(parts[2]));
-            if (score > highScore) {
-                highScoringValue = std::string(parts[0]);
-                highScore = score;
-            }
+    std::vector<ParselessLM::FoundReading> foundReadings = m_languageModel.getReadings(value);
+    double topScore = std::numeric_limits<double>::lowest();
+    std::string topValue;
+    for (const auto& foundReading : foundReadings) {
+        if (foundReading.score > topScore) {
+            topValue = foundReading.reading;
+            topScore = foundReading.score;
         }
     }
-
-    return highScoringValue;
+    return topValue;
 }
 
 void McBopomofoLM::setPhraseReplacementEnabled(bool enabled)
@@ -220,18 +215,6 @@ const std::vector<std::string> McBopomofoLM::associatedPhrasesForKey(const std::
 bool McBopomofoLM::hasAssociatedPhrasesForKey(const std::string& key)
 {
     return m_associatedPhrases.hasValuesForKey(key);
-}
-
-std::vector<std::string_view> McBopomofoLM::split(const std::string_view& str, char delim)
-{
-    std::vector<std::string_view> strings;
-    size_t start;
-    size_t end = 0;
-    while ((start = str.find_first_not_of(delim, end)) != std::string_view::npos) {
-        end = str.find(delim, start);
-        strings.push_back(std::string_view(str.substr(start, end - start)));
-    }
-    return strings;
 }
 
 } // namespace McBopomofo

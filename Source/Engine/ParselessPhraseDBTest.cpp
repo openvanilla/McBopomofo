@@ -195,4 +195,30 @@ TEST(ParselessPhraseDBTest, StressTest)
     }
 }
 
+TEST(ParselessPhraseDBTest, LookUpByValue)
+{
+    std::string data = "a 1\nb 1 \nc 2\nd 3";
+    ParselessPhraseDB db(data.c_str(), data.length());
+
+    std::vector<std::string> rows;
+    rows = db.reverseFindRows("1");
+    ASSERT_EQ(rows, (std::vector<std::string> { "a 1", "b 1 " }));
+
+    rows = db.reverseFindRows("2");
+    ASSERT_EQ(rows, (std::vector<std::string> { "c 2" }));
+
+    // This is a quirk of the function, but is actually valid.
+    rows = db.reverseFindRows("2\n");
+    ASSERT_EQ(rows, (std::vector<std::string> { "c 2" }));
+
+    rows = db.reverseFindRows("22");
+    ASSERT_TRUE(rows.empty());
+
+    rows = db.reverseFindRows("3\n");
+    ASSERT_TRUE(rows.empty());
+
+    rows = db.reverseFindRows("4");
+    ASSERT_TRUE(rows.empty());
+}
+
 }; // namespace McBopomofo
