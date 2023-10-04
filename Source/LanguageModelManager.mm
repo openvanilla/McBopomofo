@@ -114,7 +114,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         if (Preferences.chineseConversionEngine == 1) {
             text = [VXHanConvert convertToSimplifiedFrom:text];
         } else {
-            text = [OpenCCBridge convertToSimplified:text];
+            text = [[OpenCCBridge sharedInstance] convertToSimplified:text];
         }
         return std::string(text.UTF8String);
     };
