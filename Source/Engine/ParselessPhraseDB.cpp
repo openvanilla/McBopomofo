@@ -42,13 +42,6 @@ ParselessPhraseDB::ParselessPhraseDB(
         std::string_view header(buf, SORTED_PRAGMA_HEADER.length());
         assert(header == SORTED_PRAGMA_HEADER);
 
-        uint32_t x = 5381;
-        for (const auto& i : header) {
-            x = x * 33 + i;
-        }
-
-        assert(x == uint32_t { 3012373384 });
-
         begin_ += header.length();
     }
 }

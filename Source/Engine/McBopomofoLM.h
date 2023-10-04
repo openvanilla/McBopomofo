@@ -55,7 +55,7 @@ namespace McBopomofo {
 ///
 /// The controller can ask the model to load the primary input method language
 /// model while launching and to load the user phrases anytime if the custom
-/// files are modified. It does not keep the reference of the data pathes but
+/// files are modified. It does not keep the reference of the data paths but
 /// you have to pass the paths when you ask it to do loading.
 class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
 public:
@@ -64,7 +64,7 @@ public:
 
     /// Asks to load the primary language model at the given path.
     /// @param languageModelPath The path of the language model.
-    void loadLanguageModel(const char* languageModelPath);
+    void loadLanguageModel(const char* languageModelDataPath);
     /// If the data model is already loaded.
     bool isDataModelLoaded();
 
@@ -77,7 +77,7 @@ public:
     /// Asks to load the user phrases and excluded phrases at the given path.
     /// @param userPhrasesPath The path of user phrases.
     /// @param excludedPhrasesPath The path of excluded phrases.
-    void loadUserPhrases(const char* userPhrasesPath, const char* excludedPhrasesPath);
+    void loadUserPhrases(const char* userPhrasesDataPath, const char* excludedPhrasesDataPath);
     /// Asks to load th phrase replacement table at the given path.
     /// @param phraseReplacementPath The path of the phrase replacement table.
     void loadPhraseReplacementMap(const char* phraseReplacementPath);
@@ -93,12 +93,12 @@ public:
     /// Enables or disables phrase replacement.
     void setPhraseReplacementEnabled(bool enabled);
     /// If phrase replacement is enabled or not.
-    bool phraseReplacementEnabled();
+    bool phraseReplacementEnabled() const;
 
     /// Enables or disables the external converter.
     void setExternalConverterEnabled(bool enabled);
     /// If the external converted is enabled or not.
-    bool externalConverterEnabled();
+    bool externalConverterEnabled() const;
     /// Sets a lambda to let the values of unigrams could be converted by it.
     void setExternalConverter(std::function<std::string(std::string)> externalConverter);
 

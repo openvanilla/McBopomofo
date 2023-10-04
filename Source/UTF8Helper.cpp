@@ -24,6 +24,7 @@
 #include "UTF8Helper.h"
 
 namespace McBopomofo {
+// NOLINTBEGIN(readability-magic-numbers)
 
 // Adapted from https://github.com/lua/lua/blob/master/lutf8lib.c
 
@@ -117,4 +118,5 @@ std::string SubstringToCodePoints(const std::string& s, size_t cp) {
   return {s.cbegin(), i};
 }
 
+// NOLINTEND(readability-magic-numbers)
 }  // namespace McBopomofo

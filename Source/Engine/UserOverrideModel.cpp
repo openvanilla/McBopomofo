@@ -54,6 +54,7 @@ UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
     : m_capacity(capacity)
 {
     assert(m_capacity > 0);
+    // NOLINTNEXTLINE(readability-magic-numbers)
     m_decayExponent = log(0.5) / decayConstant;
 }
 
