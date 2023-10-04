@@ -45,7 +45,12 @@ public:
         const std::string& key) override;
     bool hasUnigrams(const std::string& key) override;
 
-    std::vector<std::string> getReadings(const std::string_view& value);
+    struct FoundReading {
+        std::string reading;
+        double score;
+    };
+    // Look up reading by value. This is specific to ParselessLM only.
+    std::vector<FoundReading> getReadings(const std::string& value);
 
 private:
     int fd_ = -1;

@@ -172,7 +172,7 @@ std::vector<std::string> ParselessPhraseDB::reverseFindRows(
 
     while (recordBegin < end_) {
         const char* ptr = recordBegin;
-        
+
         // skip over the key to find the field separator
         while (ptr < end_ && *ptr != ' ') {
             ++ptr;
@@ -181,19 +181,19 @@ std::vector<std::string> ParselessPhraseDB::reverseFindRows(
         while (ptr < end_ && *ptr == ' ') {
             ++ptr;
         }
-        
+
         // now walk to the end of this record
         const char* recordEnd = ptr;
         while (recordEnd < end_ && *recordEnd != '\n') {
             ++recordEnd;
         }
-        
+
         if (ptr + value.length() < end_ && memcmp(ptr, value.data(), value.length()) == 0) {
             // prefix match, add entire record to return value
             rows.emplace_back(recordBegin, recordEnd - recordBegin);
         }
-        
-        // skip over the record separator. there should be just one, but loop just in case.
+
+        // skip over to the next line start
         recordBegin = recordEnd;
         while (recordBegin < end_ && *recordBegin == '\n') {
             ++recordBegin;

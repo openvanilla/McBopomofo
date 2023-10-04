@@ -311,7 +311,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     }
     
     std::string reading = gLanguageModelMcBopomofo.getReading(phrase.UTF8String);
-    return !reading.empty() ? [NSString stringWithCString:reading.c_str() encoding:NSUTF8StringEncoding] : nil;
+    return !reading.empty() ? [NSString stringWithUTF8String:reading.c_str()] : nil;
 }
 
 @end

@@ -50,9 +50,12 @@ public:
 
     const char* findFirstMatchingLine(const std::string_view& key);
 
-    // Find the rows that (prefix-)match the value, useful for returning all the
-    // ways a phrase or character can be pronounced. Note that this is a potentially-
-    // slow linear search that cannot take advantage of the pre-sorting.
+    // Find the rows whose text past the key column plus the field separator
+    // is a prefix match of the given value. For example, if the row is
+    // "foo bar -1.00", the values "b", "ba", "bar", "bar ", "bar -1.00" are
+    // are valid prefix matches, where as the value "barr" isn't. This
+    // performs linear scan since, unlike lookup-by-key, it cannot take
+    // advantage of the fact that the underlying data is sorted by keys.
     std::vector<std::string> reverseFindRows(const std::string_view& value);
 
 private:

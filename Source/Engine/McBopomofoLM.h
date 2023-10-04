@@ -105,11 +105,8 @@ public:
     const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
     bool hasAssociatedPhrasesForKey(const std::string& key);
 
-    /// Returns a list of readings that match a given value.
-    /// @param value A string representing the text to look up reading candidates for. For example,
-    ///     if you pass "說", it returns a list of records that include ㄕㄨㄛ, ㄕㄨㄟˋ, and ㄩㄝˋ.
-    /// @return Best reading found for the string, or an empty string if no matches are found.
-    std::string getReading(const std::string_view& value);
+    /// Returns the top-scored reading from the base model, given the value.
+    std::string getReading(const std::string& value);
 
 protected:
     /// Filters and converts the input unigrams and return a new list of unigrams.
@@ -122,12 +119,6 @@ protected:
     std::vector<Formosa::Gramambular2::LanguageModel::Unigram> filterAndTransformUnigrams(const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams,
         const std::unordered_set<std::string>& excludedValues,
         std::unordered_set<std::string>& insertedValues);
-
-    /// Splits a string into parts
-    /// @param str The string to split.
-    /// @param delim Delimiter character in the string to split on.
-    /// @return vector of split-up strings
-    std::vector<std::string_view> split(const std::string_view& str, char delim);
 
     ParselessLM m_languageModel;
     UserPhrasesLM m_userPhrases;

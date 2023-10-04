@@ -53,6 +53,20 @@ TEST(ParselessLMTest, SanityCheckTest)
     unigrams = lm.getUnigrams("_punctuation_list");
     ASSERT_GT(unigrams.size(), 0);
 
+    std::vector<ParselessLM::FoundReading> found_readings;
+    found_readings = lm.getReadings("不存在的詞");
+    ASSERT_TRUE(found_readings.empty());
+
+    found_readings = lm.getReadings("讀音");
+    ASSERT_EQ(found_readings.size(), 1);
+
+    found_readings = lm.getReadings("鑰匙");
+    ASSERT_GT(found_readings.size(), 1);
+
+    found_readings = lm.getReadings("得");
+    ASSERT_GT(found_readings.size(), 1);
+    ASSERT_EQ(found_readings[0].reading, "ㄉㄜˊ");
+
     lm.close();
 }
 
