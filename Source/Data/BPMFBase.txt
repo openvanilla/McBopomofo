@@ -7900,6 +7900,7 @@
 荓 ㄆㄧㄥˊ ping2 qu/6 big5
 蓱 ㄆㄧㄥˊ ping2 qu/6 big5
 炾 ㄆㄧㄥˊ ping2 qu/6 big5
+聘 ㄆㄧㄥˋ ping4 qu/4 big5
 篇 ㄆㄧㄢ pian qu0 big5
 偏 ㄆㄧㄢ pian qu0 big5
 扁 ㄆㄧㄢ pian qu0 big5
