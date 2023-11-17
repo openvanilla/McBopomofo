@@ -30,7 +30,7 @@
 
 namespace McBopomofo {
 
-TEST(UserPhreasesLMTest, LenientReading)
+TEST(UserPhrasesLMTest, LenientReading)
 {
     std::string tmp_name
         = std::string(std::filesystem::temp_directory_path() / "test.txt");

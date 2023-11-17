@@ -24,6 +24,7 @@
 #ifndef MANDARIN_H_
 #define MANDARIN_H_
 
+#include <cstdint>
 #include <iostream>
 #include <map>
 #include <string>

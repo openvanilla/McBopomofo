@@ -53,10 +53,7 @@ AssociatedPhrases::~AssociatedPhrases()
 
 bool AssociatedPhrases::isLoaded()
 {
-    if (data) {
-        return true;
-    }
-    return false;
+    return data != nullptr;
 }
 
 bool AssociatedPhrases::open(const char* path)

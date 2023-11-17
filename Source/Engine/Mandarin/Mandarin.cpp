@@ -58,7 +58,7 @@ class BopomofoCharacterMap {
 };
 
 const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
-  if (!str.length()) {
+  if (str.length() == 0) {
     return BPMF();
   }
 
@@ -73,9 +73,11 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   // lookup consonants and consume them
   bool independentConsonant = false;
 
+  // disable this check for if-else/switch blocks below
+  // NOLINTBEGIN(bugprone-branch-clone)
+
   // the y exceptions fist
-  if (0) {
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, "yuan")) {
+  if (PinyinParseHelper::ConsumePrefix(pinyin, "yuan")) {
     secondComponent = BPMF::UE;
     thirdComponent = BPMF::AN;
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ying")) {
@@ -101,7 +103,7 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   }
 
   // try the first character
-  char c = pinyin.length() ? pinyin[0] : 0;
+  char c = pinyin.length() != 0 ? pinyin[0] : '\0';
   switch (c) {
     case 'b':
       firstComponent = BPMF::B;
@@ -160,7 +162,7 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
       pinyin = pinyin.substr(1);
       break;
 
-    // special hanlding for w and y
+    // special handling for w and y
     case 'w':
       secondComponent = BPMF::U;
       pinyin = pinyin.substr(1);
@@ -174,8 +176,7 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   }
 
   // then we try ZH, CH, SH, R, Z, C, S (in that order)
-  if (0) {
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, "zh")) {
+  if (PinyinParseHelper::ConsumePrefix(pinyin, "zh")) {
     firstComponent = BPMF::ZH;
     independentConsonant = true;
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ch")) {
@@ -200,8 +201,7 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
 
   // consume exceptions first: (ien, in), (iou, iu), (uen, un), (veng, iong),
   // (ven, vn), (uei, ui), ung but longer sequence takes precedence
-  if (0) {
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, "veng")) {
+  if (PinyinParseHelper::ConsumePrefix(pinyin, "veng")) {
     secondComponent = BPMF::UE;
     thirdComponent = BPMF::ENG;
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "iong")) {
@@ -269,8 +269,7 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   }
 
   // then consume the middle component...
-  if (0) {
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, "i")) {
+  if (PinyinParseHelper::ConsumePrefix(pinyin, "i")) {
     secondComponent = independentConsonant ? 0 : BPMF::I;
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "u")) {
     if (firstComponent == BPMF::J || firstComponent == BPMF::Q ||
@@ -284,8 +283,7 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   }
 
   // the vowels, longer sequence takes precedence
-  if (0) {
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ang")) {
+  if (PinyinParseHelper::ConsumePrefix(pinyin, "ang")) {
     thirdComponent = BPMF::ANG;
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "eng")) {
     thirdComponent = BPMF::ENG;
@@ -316,10 +314,10 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
       thirdComponent = BPMF::ER;
     }
   }
+  // NOLINTEND(bugprone-branch-clone)
 
   // at last!
-  if (0) {
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, "1")) {
+  if (PinyinParseHelper::ConsumePrefix(pinyin, "1")) {
     toneComponent = BPMF::Tone1;
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "2")) {
     toneComponent = BPMF::Tone2;
@@ -379,43 +377,63 @@ const std::string BPMF::HanyuPinyinString(bool includesTone,
       break;
     case J:
       consonant = "j";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case Q:
       consonant = "q";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case X:
       consonant = "x";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case ZH:
       consonant = "zh";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case CH:
       consonant = "ch";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case SH:
       consonant = "sh";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case R:
       consonant = "r";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case Z:
       consonant = "z";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case C:
       consonant = "c";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
     case S:
       consonant = "s";
-      if (hasNoMVCOrVC) middle = "i";
+      if (hasNoMVCOrVC) {
+        middle = "i";
+      }
       break;
   }
 
@@ -447,6 +465,7 @@ const std::string BPMF::HanyuPinyinString(bool includesTone,
       break;
   }
 
+  // NOLINTBEGIN(bugprone-branch-clone)
   switch (vc) {
     case A:
       vowel = "a";
@@ -488,6 +507,7 @@ const std::string BPMF::HanyuPinyinString(bool includesTone,
       vowel = "er";
       break;
   }
+  // NOLINTEND(bugprone-branch-clone)
 
   // combination rules
 
@@ -561,12 +581,15 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
     // the Bopomofo character map or to split the input by codepoints. This
     // suffices for now.
 
+    // disable for check for code points below
+    // NOLINTBEGIN(readability-magic-numbers)
+
     // Illegal.
     if (!(*iter & 0x80)) {
       break;
     }
 
-    size_t utf8_length = -1;
+    std::string::difference_type utf8_length = -1;
 
     // These are the code points for the tone markers.
     if ((*iter & (0x80 | 0x40)) && !(*iter & 0x20)) {
@@ -577,6 +600,7 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
       // Illegal.
       break;
     }
+    // NOLINTEND(readability-magic-numbers)
 
     if (iter + (utf8_length - 1) == str.end()) {
       break;
@@ -589,9 +613,8 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
         charToComp.find(component);
     if (result == charToComp.end()) {
       break;
-    } else {
-      syllable += BPMF((*result).second);
     }
+    syllable += BPMF((*result).second);
     iter += utf8_length;
   }
   return syllable;
@@ -600,10 +623,10 @@ const BPMF BPMF::FromComposedString(const std::string& str) {
 const std::string BPMF::composedString() const {
   std::string result;
 #define APPEND(c)                                                         \
-  if (syllable_ & c)                                                      \
+  if (syllable_ & (c))                                                    \
   result +=                                                               \
       (*BopomofoCharacterMap::SharedInstance().componentToCharacter.find( \
-           syllable_ & c))                                                \
+           syllable_ & (c)))                                              \
           .second
   APPEND(ConsonantMask);
   APPEND(MiddleVowelMask);
@@ -663,10 +686,13 @@ BopomofoCharacterMap::BopomofoCharacterMap() {
 
   for (std::map<std::string, BPMF::Component>::iterator iter =
            characterToComponent.begin();
-       iter != characterToComponent.end(); ++iter)
+       iter != characterToComponent.end(); ++iter) {
     componentToCharacter[(*iter).second] = (*iter).first;
+  }
 }
 
+// we don't need parentheses for these macros
+// NOLINTBEGIN(bugprone-macro-parentheses)
 #define ASSIGNKEY1(m, vec, k, val) \
   m[k] = (vec.clear(), vec.push_back((BPMF::Component)val), vec)
 #define ASSIGNKEY2(m, vec, k, val1, val2)                    \
@@ -676,6 +702,7 @@ BopomofoCharacterMap::BopomofoCharacterMap() {
   m[k] = (vec.clear(), vec.push_back((BPMF::Component)val1), \
           vec.push_back((BPMF::Component)val2),              \
           vec.push_back((BPMF::Component)val3), vec)
+// NOLINTEND(bugprone-macro-parentheses)
 
 static BopomofoKeyboardLayout* CreateStandardLayout() {
   std::vector<BPMF::Component> vec;

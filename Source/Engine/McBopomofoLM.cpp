@@ -134,7 +134,7 @@ bool McBopomofoLM::hasUnigrams(const std::string& key)
         return m_userPhrases.hasUnigrams(key) || m_languageModel.hasUnigrams(key);
     }
 
-    return getUnigrams(key).size() > 0;
+    return !getUnigrams(key).empty();
 }
 
 std::string McBopomofoLM::getReading(const std::string& value)
@@ -156,7 +156,7 @@ void McBopomofoLM::setPhraseReplacementEnabled(bool enabled)
     m_phraseReplacementEnabled = enabled;
 }
 
-bool McBopomofoLM::phraseReplacementEnabled()
+bool McBopomofoLM::phraseReplacementEnabled() const
 {
     return m_phraseReplacementEnabled;
 }
@@ -166,7 +166,7 @@ void McBopomofoLM::setExternalConverterEnabled(bool enabled)
     m_externalConverterEnabled = enabled;
 }
 
-bool McBopomofoLM::externalConverterEnabled()
+bool McBopomofoLM::externalConverterEnabled() const
 {
     return m_externalConverterEnabled;
 }
@@ -191,7 +191,7 @@ std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::filterA
         std::string value = originalValue;
         if (m_phraseReplacementEnabled) {
             std::string replacement = m_phraseReplacement.valueForKey(value);
-            if (replacement != "") {
+            if (!replacement.empty()) {
                 value = replacement;
             }
         }

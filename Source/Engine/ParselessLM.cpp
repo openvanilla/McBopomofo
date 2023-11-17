@@ -35,10 +35,7 @@ McBopomofo::ParselessLM::~ParselessLM() { close(); }
 
 bool McBopomofo::ParselessLM::isLoaded()
 {
-    if (data_) {
-        return true;
-    }
-    return false;
+    return data_ != nullptr;
 }
 
 bool McBopomofo::ParselessLM::open(const std::string_view& path)
@@ -70,7 +67,7 @@ bool McBopomofo::ParselessLM::open(const std::string_view& path)
     }
 
     db_ = std::unique_ptr<ParselessPhraseDB>(new ParselessPhraseDB(
-        static_cast<char*>(data_), length_, /*validate_pragme=*/
+        static_cast<char*>(data_), length_, /*validate_pragma=*/
         true));
     return true;
 }
@@ -99,7 +96,7 @@ McBopomofo::ParselessLM::getUnigrams(const std::string& key)
         double score = 0;
 
         // Move ahead until we encounter the first space. This is the key.
-        auto it = row.begin();
+        const auto* it = row.begin();
         while (it != row.end() && *it != ' ') {
             ++it;
         }
@@ -113,7 +110,7 @@ McBopomofo::ParselessLM::getUnigrams(const std::string& key)
 
         if (it != row.end()) {
             // Now it is the start of the value portion.
-            auto value_begin = it;
+            const auto* value_begin = it;
 
             // Move ahead until we encounter the second space. This is the
             // value.
