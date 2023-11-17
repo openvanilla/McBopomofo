@@ -440,7 +440,7 @@
                     </buttonCell>
                     <cells>
                         <column>
-                            <buttonCell type="radio" title="Convert ouput" imagePosition="left" alignment="left" state="on" inset="2" id="NOW-zL-Tnb">
+                            <buttonCell type="radio" title="Convert output" imagePosition="left" alignment="left" state="on" inset="2" id="NOW-zL-Tnb">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
