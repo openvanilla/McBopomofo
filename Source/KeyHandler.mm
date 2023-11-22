@@ -266,7 +266,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    if ([input isNumericPad]) {
+    if (!Preferences.selectCandidateWithNumericKeypad && [input isNumericPad]) {
         if (![input isLeft] && ![input isRight] && ![input isDown] && ![input isUp] && charCode != 32 && isprint(charCode)) {
             [self clear];
             InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];

@@ -62,6 +62,8 @@ private let kDefaultAssociatedPhrasesKeys = "!@#$%^&*("
 private let kAddPhraseHookEnabledKey = "AddPhraseHookEnabled"
 private let kAddPhraseHookPath = "AddPhraseHookPath"
 
+private let kSelectCandidateWithNumericKeypad = "SelectCandidateWithNumericKeypad"
+
 // MARK: Property wrappers
 
 @propertyWrapper
@@ -453,4 +455,10 @@ extension Preferences {
 
     @UserDefaultWithFunction(key: kAddPhraseHookPath, defaultValueFunction: defaultAddPhraseHookPath)
     @objc static var addPhraseHookPath: String
+}
+
+extension Preferences {
+    
+    @UserDefault(key: kSelectCandidateWithNumericKeypad, defaultValue: false)
+    @objc static var selectCandidateWithNumericKeypad: Bool
 }
