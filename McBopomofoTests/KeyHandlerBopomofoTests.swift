@@ -232,6 +232,9 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testisNumericPad() {
+        let current = Preferences.selectCandidateWithNumericKeypad
+        Preferences.selectCandidateWithNumericKeypad = false
+
         var input = KeyHandlerInput(inputText: "b", keyCode: 0, charCode: charCode("b"), flags: [], isVerticalMode: false)
         var state: InputState = InputState.Empty()
         handler.handle(input: input, state: state) { newState in
@@ -257,6 +260,9 @@ class KeyHandlerBopomofoTests: XCTestCase {
 
         } errorCallback: {
         }
+
+        Preferences.selectCandidateWithNumericKeypad = current
+
         XCTAssertEqual(count, 3)
         XCTAssertTrue(state is InputState.Empty, "\(state)")
         XCTAssertTrue(empty is InputState.Empty, "\(empty)")
@@ -276,8 +282,8 @@ class KeyHandlerBopomofoTests: XCTestCase {
             state = newState
         } errorCallback: {
         }
-        XCTAssertFalse(result)
         Preferences.letterBehavior = current
+        XCTAssertFalse(result)
     }
 
     func testUppercaseLetterWhenEmpty2() {
@@ -289,12 +295,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
             state = newState
         } errorCallback: {
         }
+        Preferences.letterBehavior = current
 
         XCTAssertTrue(state is InputState.Inputting, "\(state)")
         if let state = state as? InputState.Inputting {
             XCTAssertEqual(state.composingBuffer, "a")
         }
-        Preferences.letterBehavior = current
     }
 
     // Regression test for #292.
@@ -319,8 +325,8 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        XCTAssertFalse(result)
         Preferences.letterBehavior = current
+        XCTAssertFalse(result)
     }
 
     // Regression test for #292.
@@ -345,11 +351,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
+        Preferences.letterBehavior = current
+
         XCTAssertTrue(state is InputState.Inputting, "\(state)")
         if let state = state as? InputState.Inputting {
             XCTAssertEqual(state.composingBuffer, "一a")
         }
-        Preferences.letterBehavior = current
     }
 
     func testPunctuationTable() {
