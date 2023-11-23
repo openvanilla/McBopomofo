@@ -35,17 +35,12 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 
     override func draw(_ dirtyRect: NSRect) {
         let bounds = self.bounds
-        NSColor.white.setFill()
-        NSBezierPath.fill(bounds)
 
         let count = UInt(keyLabels.count)
         if count == 0 {
             return
         }
         let cellHeight: CGFloat = bounds.size.height / CGFloat(count)
-        let black = NSColor.black
-        let darkGray = NSColor(deviceWhite: 0.7, alpha: 1.0)
-        let lightGray = NSColor(deviceWhite: 0.8, alpha: 1.0)
 
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.setParagraphStyle(NSParagraphStyle.default)
@@ -53,20 +48,22 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 
         let textAttr: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,
-            .foregroundColor: black,
+            .foregroundColor: NSColor.secondaryLabelColor,
+            .paragraphStyle: paraStyle]
+        let textAttrHighlighted: [NSAttributedString.Key: AnyObject] = [
+            .font: keyLabelFont,
+            .foregroundColor: NSColor.selectedControlTextColor,
             .paragraphStyle: paraStyle]
         for index in 0..<count {
             let textRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight + labelOffsetY, width: bounds.size.width, height: cellHeight - labelOffsetY)
-            var cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight - 1)
+            let cellRect = NSRect(x: 0.0, y: CGFloat(index) * cellHeight, width: bounds.size.width, height: cellHeight)
 
-            if index + 1 >= count {
-                cellRect.size.height += 1.0
+            if index == highlightedIndex {
+                NSColor.selectedControlColor.setFill()
+                NSBezierPath.fill(cellRect)
             }
-
-            (index == highlightedIndex ? darkGray : lightGray).setFill()
-            NSBezierPath.fill(cellRect)
             let text = keyLabels[Int(index)]
-            (text as NSString).draw(in: textRect, withAttributes: textAttr)
+            (text as NSString).draw(in: textRect, withAttributes: (index == highlightedIndex) ? textAttrHighlighted : textAttr)
         }
     }
 }
@@ -84,13 +81,6 @@ private let kCandidateTextPadding: CGFloat = 24.0
 private let kCandidateTextLeftMargin: CGFloat = 8.0
 private let kCandidateTextPaddingWithMandatedTableViewPadding: CGFloat = 18.0
 private let kCandidateTextLeftMarginWithMandatedTableViewPadding: CGFloat = 0.0
-
-private class BackgroundView: NSView {
-    override func draw(_ dirtyRect: NSRect) {
-        NSColor.windowBackgroundColor.setFill()
-        NSBezierPath.fill(self.bounds)
-    }
-}
 
 @objc(VTVerticalCandidateController)
 public class VerticalCandidateController: CandidateController {
@@ -110,7 +100,19 @@ public class VerticalCandidateController: CandidateController {
         let panel = NSPanel(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
-        panel.contentView = BackgroundView()
+        panel.backgroundColor = .clear
+        panel.isOpaque = false
+
+        let effect = NSVisualEffectView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        effect.blendingMode = .behindWindow
+        if #available(macOS 10.14, *) {
+            effect.material = .contentBackground
+        } else {
+            effect.material = .appearanceBased
+        }
+        effect.wantsLayer = true
+        effect.maskImage = .mask(withCornerRadius: 4)
+        panel.contentView = effect
 
         tooltipView = NSTextField(frame: NSRect.zero)
         tooltipView.isEditable = false
@@ -130,6 +132,8 @@ public class VerticalCandidateController: CandidateController {
         scrollViewRect.size.width -= stripRect.size.width
         scrollView = NSScrollView(frame: scrollViewRect)
         scrollView.verticalScrollElasticity = .none
+        scrollView.drawsBackground = false
+        scrollView.contentView.drawsBackground = false
 
         tableView = NSTableView(frame: contentRect)
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "candidate"))
@@ -144,6 +148,7 @@ public class VerticalCandidateController: CandidateController {
         tableView.headerView = nil
         tableView.allowsMultipleSelection = false
         tableView.allowsEmptySelection = false
+        tableView.backgroundColor = .clear
 
         if #available(macOS 10.16, *) {
             tableView.style = .fullWidth
@@ -482,5 +487,20 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0, width: (windowWidth - stripWidth - 1), height: windowHeight - tooltipHeight)
         tooltipView.frame = NSRect(x: tooltipPadding, y: windowHeight - tooltipHeight + tooltipPadding, width: windowWidth, height: tooltipHeight)
         self.window?.setFrame(frameRect, display: false)
+    }
+}
+
+extension NSImage {
+    static func mask(withCornerRadius radius: CGFloat) -> NSImage {
+        let image = NSImage(size: NSSize(width: radius * 2, height: radius * 2), flipped: false) {
+            NSBezierPath(roundedRect: $0, xRadius: radius, yRadius: radius).fill()
+            NSColor.black.set()
+            return true
+        }
+        
+        image.capInsets = NSEdgeInsets(top: radius, left: radius, bottom: radius, right: radius)
+        image.resizingMode = .stretch
+        
+        return image
     }
 }
