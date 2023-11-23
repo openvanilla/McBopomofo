@@ -171,7 +171,6 @@ Gw
         <customObject id="494" customClass="AppDelegate">
             <connections>
                 <outlet property="cancelButton" destination="592" id="710"/>
-                <outlet property="installButton" destination="575" id="709"/>
                 <outlet property="progressIndicator" destination="4v9-yU-zek" id="W8M-2S-oXX"/>
                 <outlet property="progressSheet" destination="Pxv-O2-I1W" id="mp3-fA-PoS"/>
                 <outlet property="textView" destination="537" id="705"/>

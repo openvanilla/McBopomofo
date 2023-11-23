@@ -174,7 +174,6 @@ Gw
                 <outlet property="actionButton" destination="575" id="PpP-7z-w9u"/>
                 <outlet property="agreeText" destination="688" id="iFC-Cv-pu2"/>
                 <outlet property="cancelButton" destination="592" id="710"/>
-                <outlet property="installButton" destination="575" id="709"/>
                 <outlet property="progressIndicator" destination="deb-uT-yNv" id="Cpk-6Z-0rj"/>
                 <outlet property="progressSheet" destination="gHl-Hx-eQn" id="gD4-XO-YO1"/>
                 <outlet property="textView" destination="537" id="705"/>
