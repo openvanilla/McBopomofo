@@ -243,13 +243,13 @@ public class HorizontalCandidateController: CandidateController {
         contentRect.size = NSSize(width: 36.0, height: 20.0)
         nextPageButton = NSButton(frame: contentRect)
         nextPageButton.setButtonType(.momentaryLight)
-        nextPageButton.bezelStyle = .toolbar
+        nextPageButton.bezelStyle = .smallSquare
         nextPageButton.isBordered = false
         nextPageButton.attributedTitle = "»".withColor(.controlTextColor)
 
         prevPageButton = NSButton(frame: contentRect)
         prevPageButton.setButtonType(.momentaryLight)
-        prevPageButton.bezelStyle = .toolbar
+        prevPageButton.bezelStyle = .smallSquare
         prevPageButton.isBordered = false
         prevPageButton.attributedTitle = "«".withColor(.controlTextColor)
 
