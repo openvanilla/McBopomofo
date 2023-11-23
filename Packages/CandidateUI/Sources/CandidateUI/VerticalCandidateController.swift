@@ -106,11 +106,11 @@ public class VerticalCandidateController: CandidateController {
         let effect = NSVisualEffectView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
         effect.blendingMode = .behindWindow
         if #available(macOS 10.14, *) {
-            effect.material = .contentBackground
+            effect.material = .popover
         } else {
             effect.material = .appearanceBased
         }
-        effect.wantsLayer = true
+        effect.state = .active
         effect.maskImage = .mask(withCornerRadius: 4)
         panel.contentView = effect
 
