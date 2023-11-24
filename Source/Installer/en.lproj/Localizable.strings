@@ -1,5 +1,5 @@
 /* No comment provided by engineer. */
-"%@ (for version %@)" = "%1$@ (for version %2$@)";
+"%@ (for version %@, r%@)" = "%1$@ (for version %2$@, r%3$@)";
 
 /* No comment provided by engineer. */
 "Agree and Upgrade" = "Agree and Upgrade";
