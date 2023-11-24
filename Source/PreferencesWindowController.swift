@@ -68,6 +68,28 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         window?.title = NSLocalizedString("Basic", comment: "")
         use(view: basicSettingsView)
 
+        // When the `CandidateListTextSize` is not yet populated, the pop up
+        // button adds an empty item and selects that empty item. This code
+        // correctly sets the default text size, and removes the empty item
+        // at the end.
+        let selectedSizeTitle = fontSizePopUpButton.selectedItem?.title ?? ""
+        if selectedSizeTitle.isEmpty {
+            let intFontSizeStr = String.init(format: "%d", Int(Preferences.candidateListTextSize))
+            for item in fontSizePopUpButton.itemArray {
+                if item.title == intFontSizeStr {
+                    fontSizePopUpButton.select(item)
+                    break
+                }
+            }
+
+            let items = fontSizePopUpButton.itemArray
+            if let lastItem = items.last {
+                if lastItem.title.isEmpty {
+                    fontSizePopUpButton.removeItem(at: items.count - 1)
+                }
+            }
+        }
+
         let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
         var usKeyboardLayoutItem: NSMenuItem? = nil
         var chosenItem: NSMenuItem? = nil
