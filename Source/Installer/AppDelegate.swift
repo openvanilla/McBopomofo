@@ -37,12 +37,14 @@ private let kTranslocationRemovalDeadline: TimeInterval = 60.0
 @NSApplicationMain
 @objc (AppDelegate)
 class AppDelegate: NSWindowController, NSApplicationDelegate {
-    @IBOutlet weak private var installButton: NSButton!
+    @IBOutlet weak private var actionButton: NSButton!
     @IBOutlet weak private var cancelButton: NSButton!
     @IBOutlet private var textView: NSTextView!
     @IBOutlet weak private var progressSheet: NSWindow!
     @IBOutlet weak private var progressIndicator: NSProgressIndicator!
-
+    @IBOutlet weak var welcomeText: NSTextField!
+    @IBOutlet weak var agreeText: NSTextField!
+    
     private var archiveUtil: ArchiveUtil?
     private var installingVersion = ""
     private var upgrading = false
@@ -67,9 +69,9 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
         self.archiveUtil = ArchiveUtil(appName: kTargetBin, targetAppBundleName: kTargetBundle)
         _ = archiveUtil?.validateIfNotarizedArchiveExists()
 
-        cancelButton.nextKeyView = installButton
-        installButton.nextKeyView = cancelButton
-        if let cell = installButton.cell as? NSButtonCell {
+        cancelButton.nextKeyView = actionButton
+        actionButton.nextKeyView = cancelButton
+        if let cell = actionButton.cell as? NSButtonCell {
             window?.defaultButtonCell = cell
         }
 
@@ -97,7 +99,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
         }
 
         if upgrading {
-            installButton.title = NSLocalizedString("Agree and Upgrade", comment: "")
+            actionButton.title = NSLocalizedString("Agree and Upgrade", comment: "")
         }
 
         window?.center()
@@ -106,9 +108,15 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
     }
 
     @IBAction func agreeAndInstallAction(_ sender: AnyObject) {
-        cancelButton.isEnabled = false
-        installButton.isEnabled = false
-        removeThenInstallInputMethod()
+        if !agreeText.isHidden {
+            // user agreed to terms for install
+            cancelButton.isEnabled = false
+            actionButton.isEnabled = false
+            removeThenInstallInputMethod()
+        } else {
+            // installation was successful, user clicked [Ok]
+            endAppWithDelay()
+        }
     }
 
     @objc func timerTick(_ timer: Timer) {
@@ -239,15 +247,33 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
         if warning {
             runAlertPanel(title: NSLocalizedString("Attention", comment: ""), message: NSLocalizedString("McBopomofo is upgraded, but please log out or reboot for the new version to be fully functional.", comment: ""), buttonTitle: NSLocalizedString("OK", comment: ""))
+            endAppWithDelay()
         } else {
             if !mainInputSourceEnabled && !isMacOS12OrAbove {
                 runAlertPanel(title: NSLocalizedString("Warning", comment: ""), message: NSLocalizedString("Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.", comment: ""), buttonTitle: NSLocalizedString("Continue", comment: ""))
+                endAppWithDelay()
             } else {
-                runAlertPanel(title: NSLocalizedString("Installation Successful", comment: ""), message: NSLocalizedString("McBopomofo is ready to use.", comment: ""), buttonTitle: NSLocalizedString("OK", comment: ""))
+                let headlineAttr = [
+                    NSAttributedString.Key.font : NSFont.boldSystemFont(ofSize: NSFont.systemFontSize * 1.3),
+                    NSAttributedString.Key.foregroundColor : NSColor.textColor
+                ]
+                let bodyAttr = [
+                    NSAttributedString.Key.font : NSFont.systemFont(ofSize: NSFont.systemFontSize),
+                    NSAttributedString.Key.foregroundColor : NSColor.textColor
+                ]
+                let message = NSMutableAttributedString(string: NSLocalizedString("Installation Successful", comment: ""), attributes: headlineAttr)
+                let details = NSAttributedString(string: NSLocalizedString("McBopomofo is ready to use.", comment: ""), attributes: bodyAttr)
+                message.append(NSAttributedString(string: "\n\n"))
+                message.append(details)
+                textView.textStorage?.setAttributedString(message)
+                
+                welcomeText.isHidden = true
+                agreeText.isHidden = true
+                cancelButton.isHidden = true
+                actionButton.title = NSLocalizedString("OK", comment: "")
+                actionButton.isEnabled = true
             }
         }
-
-        endAppWithDelay()
     }
 
     func endAppWithDelay() {
