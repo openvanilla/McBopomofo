@@ -327,13 +327,6 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             }
 
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
-
-            // fix a subtle OS X "bug" that, since we force the scroller to appear,
-            // scrolling sometimes shows a temporarily "broken" scroll bar
-            // (but quickly disappears)
-            if scrollView.hasVerticalScroller {
-                scrollView.verticalScroller?.setNeedsDisplay()
-            }
         }
     }
 
@@ -450,8 +443,10 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             scrollView.hasVerticalScroller = true
             let verticalScroller = scrollView.verticalScroller
             verticalScroller?.controlSize = controlSize
-            verticalScroller?.scrollerStyle = .legacy
-            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: .legacy)
+            verticalScroller?.scrollerStyle = NSScroller.preferredScrollerStyle
+            if NSScroller.preferredScrollerStyle == .legacy {
+                scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: NSScroller.preferredScrollerStyle)
+            }
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
