@@ -74,14 +74,41 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         // at the end.
         let selectedSizeTitle = fontSizePopUpButton.selectedItem?.title ?? ""
         if selectedSizeTitle.isEmpty {
-            let intFontSizeStr = String.init(format: "%d", Int(Preferences.candidateListTextSize))
+            let intFontSize = Int(Preferences.candidateListTextSize)
+            let intFontSizeStr = String.init(format: "%d", intFontSize)
+
+            var selected = false
             for item in fontSizePopUpButton.itemArray {
                 if item.title == intFontSizeStr {
                     fontSizePopUpButton.select(item)
+                    selected = true
                     break
                 }
             }
 
+            // If not selecetd, Preferences.candidateListTextSize is not set to
+            // one of the options provided in the pop up button. Let's list the
+            // option for the user.
+            if !selected {
+                var insertIndex = 0
+
+                // Place the item in the right place. We take advantage of the
+                // fact that Int("") returns nil, and so if the custom font size
+                // is larger than the largest item in the list (say 96), this
+                // code guarantees to place the custom font size item right below
+                // that largest item and before the empty item (which will then
+                // be removed by the code below).
+                for (index, item) in fontSizePopUpButton.itemArray.enumerated() {
+                    if intFontSize < (Int(item.title) ?? Int.max) {
+                        insertIndex = index
+                        break
+                    }
+                }
+                fontSizePopUpButton.insertItem(withTitle: intFontSizeStr, at: insertIndex)
+                fontSizePopUpButton.selectItem(at: insertIndex)
+            }
+
+            // Remove the last item if it's empty
             let items = fontSizePopUpButton.itemArray
             if let lastItem = items.last {
                 if lastItem.title.isEmpty {
