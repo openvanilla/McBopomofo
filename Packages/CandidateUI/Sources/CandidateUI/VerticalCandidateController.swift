@@ -48,7 +48,7 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 
         let textAttr: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .foregroundColor: NSColor.labelColor,
             .paragraphStyle: paraStyle]
         let textAttrHighlighted: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,

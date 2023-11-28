@@ -97,7 +97,7 @@ fileprivate class HorizontalCandidateView: NSView {
 
         keyLabelAttrDict = [.font: labelFont,
                             .paragraphStyle: paraStyle,
-                            .foregroundColor: NSColor.secondaryLabelColor]
+                            .foregroundColor: NSColor.labelColor]
         candidateAttrDict = [.font: candidateFont,
                              .paragraphStyle: paraStyle,
                              .foregroundColor: NSColor.labelColor]
