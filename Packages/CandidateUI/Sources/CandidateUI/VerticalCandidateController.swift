@@ -48,7 +48,7 @@ fileprivate class VerticalKeyLabelStripView: NSView {
 
         let textAttr: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .foregroundColor: NSColor.labelColor,
             .paragraphStyle: paraStyle]
         let textAttrHighlighted: [NSAttributedString.Key: AnyObject] = [
             .font: keyLabelFont,
@@ -134,6 +134,7 @@ public class VerticalCandidateController: CandidateController {
         scrollView.verticalScrollElasticity = .none
         scrollView.drawsBackground = false
         scrollView.contentView.drawsBackground = false
+        scrollView.contentView.postsBoundsChangedNotifications = true
 
         tableView = NSTableView(frame: contentRect)
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "candidate"))
@@ -171,6 +172,11 @@ public class VerticalCandidateController: CandidateController {
         tableView.delegate = self
         tableView.doubleAction = #selector(rowDoubleClicked(_:))
         tableView.target = self
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(boundsChange),
+                                               name: NSView.boundsDidChangeNotification,
+                                               object: scrollView.contentView)
     }
 
     required init?(coder: NSCoder) {
@@ -254,6 +260,27 @@ public class VerticalCandidateController: CandidateController {
                 tableView.scrollRowToVisible(Int(lastVisibleRow))
             }
             tableView.selectRowIndexes(IndexSet(integer: Int(newIndex)), byExtendingSelection: false)
+        }
+    }
+
+    var scrollTimer: Timer?
+
+    @objc func boundsChange() {
+        let visibleRect = tableView.visibleRect
+        let visibleRowIndexes = tableView.rows(in: visibleRect)
+        let selected = selectedCandidateIndex
+
+        scrollTimer?.invalidate()
+        if visibleRowIndexes.contains(Int(selected)) == false {
+            selectedCandidateIndex = UInt(visibleRowIndexes.lowerBound)
+            tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
+        } else {
+            scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
+                self.tableView.reloadData()
+                self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
+                self.scrollTimer?.invalidate()
+                self.scrollTimer = nil
+            }
         }
     }
 }
@@ -414,7 +441,6 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             return
         }
 
-
         var tooltipHeight: CGFloat = 0
         var tooltipWidth: CGFloat = 0
 
@@ -483,6 +509,8 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         tooltipView.frame = NSRect(x: tooltipPadding, y: windowHeight - tooltipHeight + tooltipPadding, width: windowWidth, height: tooltipHeight)
         self.window?.setFrame(frameRect, display: false)
     }
+
+
 }
 
 extension NSImage {
