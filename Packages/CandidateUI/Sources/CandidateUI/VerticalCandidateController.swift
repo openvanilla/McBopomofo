@@ -265,6 +265,12 @@ public class VerticalCandidateController: CandidateController {
         if selected == UInt.max || visibleRowIndexes.contains(Int(selected)) == false {
             keyLabelStripView.highlightedIndex = -1
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
+            scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
+                self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
+                self.tableView.deselectAll(self)
+                self.scrollTimer?.invalidate()
+                self.scrollTimer = nil
+            }
         } else {
             scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
                 self.tableView.reloadData()
