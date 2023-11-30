@@ -458,8 +458,6 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         let keyLabelFontSize = ceil(keyLabelFont.pointSize)
         let fontSize = max(candidateFontSize, keyLabelFontSize)
 
-        let controlSize: NSControl.ControlSize = fontSize > 36.0 ? .regular : .small
-
         var keyLabelCount = UInt(keyLabels.count)
         var scrollerWidth: CGFloat = 0.0
         if count <= keyLabelCount {
@@ -467,10 +465,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             scrollView.hasVerticalScroller = false
         } else {
             scrollView.hasVerticalScroller = true
-            let verticalScroller = scrollView.verticalScroller
-            verticalScroller?.controlSize = controlSize
-            verticalScroller?.scrollerStyle = NSScroller.preferredScrollerStyle
-            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: NSScroller.preferredScrollerStyle)
+            scrollerWidth = NSScroller.scrollerWidth(for: .regular, scrollerStyle: NSScroller.preferredScrollerStyle)
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
