@@ -68,15 +68,6 @@ fileprivate class VerticalKeyLabelStripView: NSView {
     }
 }
 
-fileprivate class VerticalCandidateTableView: NSTableView {
-    override func adjustScroll(_ newVisible: NSRect) -> NSRect {
-        var scrollRect = newVisible
-        let rowHeightPlusSpacing = rowHeight + intercellSpacing.height
-        scrollRect.origin.y = (scrollRect.origin.y / rowHeightPlusSpacing) * rowHeightPlusSpacing
-        return scrollRect
-    }
-}
-
 private let kCandidateTextPadding: CGFloat = 24.0
 private let kCandidateTextLeftMargin: CGFloat = 8.0
 private let kCandidateTextPaddingWithMandatedTableViewPadding: CGFloat = 18.0
