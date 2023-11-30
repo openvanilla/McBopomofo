@@ -267,13 +267,11 @@ public class VerticalCandidateController: CandidateController {
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
             scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
                 self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
-                self.tableView.deselectAll(self)
                 self.scrollTimer?.invalidate()
                 self.scrollTimer = nil
             }
         } else {
             scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
-                self.tableView.reloadData()
                 self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
                 self.scrollTimer?.invalidate()
                 self.scrollTimer = nil
