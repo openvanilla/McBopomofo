@@ -271,7 +271,7 @@ public class VerticalCandidateController: CandidateController {
         let selected = selectedCandidateIndex
 
         scrollTimer?.invalidate()
-        if visibleRowIndexes.contains(Int(selected)) == false {
+        if selected == UInt.max || visibleRowIndexes.contains(Int(selected)) == false {
             selectedCandidateIndex = UInt(visibleRowIndexes.lowerBound)
             tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
         } else {
