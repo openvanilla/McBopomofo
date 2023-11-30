@@ -184,7 +184,7 @@ public class VerticalCandidateController: CandidateController {
     }
 
     public override func reloadData() {
-        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize * 2.0 + candidateTextPadding)
+        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize * 1.0 + candidateTextPadding)
         tableView.reloadData()
         layoutCandidateView()
         if delegate?.candidateCountForController(self) ?? 0 > 0 {
@@ -470,9 +470,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             let verticalScroller = scrollView.verticalScroller
             verticalScroller?.controlSize = controlSize
             verticalScroller?.scrollerStyle = NSScroller.preferredScrollerStyle
-            if NSScroller.preferredScrollerStyle == .legacy {
-                scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: NSScroller.preferredScrollerStyle)
-            }
+            scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: NSScroller.preferredScrollerStyle)
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
