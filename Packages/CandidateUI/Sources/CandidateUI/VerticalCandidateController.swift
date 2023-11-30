@@ -27,7 +27,7 @@ fileprivate class VerticalKeyLabelStripView: NSView {
     var keyLabelFont: NSFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     var labelOffsetY: CGFloat = 0
     var keyLabels: [String] = []
-    var highlightedIndex: UInt = UInt.max
+    var highlightedIndex: Int = -1
 
     override var isFlipped: Bool {
         true
@@ -333,7 +333,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             }
 
             if newHilightIndex != keyLabelStripView.highlightedIndex && newHilightIndex >= 0 {
-                keyLabelStripView.highlightedIndex = UInt(newHilightIndex)
+                keyLabelStripView.highlightedIndex = newHilightIndex
                 keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
             }
 
@@ -348,9 +348,9 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
             // firstVisibleRow cannot be larger than selectedRow.
             if selectedRow >= firstVisibleRow {
-                keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+                keyLabelStripView.highlightedIndex = selectedRow - firstVisibleRow
             } else {
-                keyLabelStripView.highlightedIndex = UInt.max
+                keyLabelStripView.highlightedIndex = -1
             }
 
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
