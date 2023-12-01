@@ -175,7 +175,7 @@ public class VerticalCandidateController: CandidateController {
     }
 
     public override func reloadData() {
-        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize * 1.0 + candidateTextPadding)
+        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize + candidateTextPadding)
         tableView.reloadData()
         layoutCandidateView()
         if delegate?.candidateCountForController(self) ?? 0 > 0 {
@@ -261,21 +261,16 @@ public class VerticalCandidateController: CandidateController {
         let visibleRowIndexes = tableView.rows(in: visibleRect)
         let selected = selectedCandidateIndex
 
-        scrollTimer?.invalidate()
         if selected == UInt.max || visibleRowIndexes.contains(Int(selected)) == false {
             keyLabelStripView.highlightedIndex = -1
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
-            scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
-                self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
-                self.scrollTimer?.invalidate()
-                self.scrollTimer = nil
-            }
-        } else {
-            scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
-                self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
-                self.scrollTimer?.invalidate()
-                self.scrollTimer = nil
-            }
+        }
+
+        scrollTimer?.invalidate()
+        scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
+            self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
+            self.scrollTimer?.invalidate()
+            self.scrollTimer = nil
         }
     }
 }
