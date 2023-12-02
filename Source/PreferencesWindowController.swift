@@ -185,7 +185,14 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
                     return newImage
                 }
 
-                menuItem.image = resize(image)
+                var resizedImage = resize(image)
+                // On newer version of macOS, the icons became black and white
+                // so we make them template images so it could look better
+                // on dark mode.
+                if #available(macOS 10.16, *) {
+                    resizedImage.isTemplate = true
+                }
+                menuItem.image = resizedImage
             }
 
             if sourceID == "com.apple.keylayout.US" {
