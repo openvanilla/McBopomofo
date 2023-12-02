@@ -27,7 +27,7 @@ fileprivate class VerticalKeyLabelStripView: NSView {
     var keyLabelFont: NSFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     var labelOffsetY: CGFloat = 0
     var keyLabels: [String] = []
-    var highlightedIndex: UInt = UInt.max
+    var highlightedIndex: Int = -1
 
     override var isFlipped: Bool {
         true
@@ -65,15 +65,6 @@ fileprivate class VerticalKeyLabelStripView: NSView {
             let text = keyLabels[Int(index)]
             (text as NSString).draw(in: textRect, withAttributes: (index == highlightedIndex) ? textAttrHighlighted : textAttr)
         }
-    }
-}
-
-fileprivate class VerticalCandidateTableView: NSTableView {
-    override func adjustScroll(_ newVisible: NSRect) -> NSRect {
-        var scrollRect = newVisible
-        let rowHeightPlusSpacing = rowHeight + intercellSpacing.height
-        scrollRect.origin.y = (scrollRect.origin.y / rowHeightPlusSpacing) * rowHeightPlusSpacing
-        return scrollRect
     }
 }
 
@@ -184,7 +175,7 @@ public class VerticalCandidateController: CandidateController {
     }
 
     public override func reloadData() {
-        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize * 2.0 + candidateTextPadding)
+        maxCandidateAttrStringWidth = ceil(candidateFont.pointSize + candidateTextPadding)
         tableView.reloadData()
         layoutCandidateView()
         if delegate?.candidateCountForController(self) ?? 0 > 0 {
@@ -270,17 +261,16 @@ public class VerticalCandidateController: CandidateController {
         let visibleRowIndexes = tableView.rows(in: visibleRect)
         let selected = selectedCandidateIndex
 
+        if selected == UInt.max || visibleRowIndexes.contains(Int(selected)) == false {
+            keyLabelStripView.highlightedIndex = -1
+            keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
+        }
+
         scrollTimer?.invalidate()
-        if visibleRowIndexes.contains(Int(selected)) == false {
-            selectedCandidateIndex = UInt(visibleRowIndexes.lowerBound)
-            tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
-        } else {
-            scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
-                self.tableView.reloadData()
-                self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
-                self.scrollTimer?.invalidate()
-                self.scrollTimer = nil
-            }
+        scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
+            self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
+            self.scrollTimer?.invalidate()
+            self.scrollTimer = nil
         }
     }
 }
@@ -333,7 +323,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             }
 
             if newHilightIndex != keyLabelStripView.highlightedIndex && newHilightIndex >= 0 {
-                keyLabelStripView.highlightedIndex = UInt(newHilightIndex)
+                keyLabelStripView.highlightedIndex = newHilightIndex
                 keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
             }
 
@@ -348,9 +338,9 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
             // firstVisibleRow cannot be larger than selectedRow.
             if selectedRow >= firstVisibleRow {
-                keyLabelStripView.highlightedIndex = UInt(selectedRow - firstVisibleRow)
+                keyLabelStripView.highlightedIndex = selectedRow - firstVisibleRow
             } else {
-                keyLabelStripView.highlightedIndex = UInt.max
+                keyLabelStripView.highlightedIndex = -1
             }
 
             keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
@@ -458,8 +448,6 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         let keyLabelFontSize = ceil(keyLabelFont.pointSize)
         let fontSize = max(candidateFontSize, keyLabelFontSize)
 
-        let controlSize: NSControl.ControlSize = fontSize > 36.0 ? .regular : .small
-
         var keyLabelCount = UInt(keyLabels.count)
         var scrollerWidth: CGFloat = 0.0
         if count <= keyLabelCount {
@@ -467,12 +455,7 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
             scrollView.hasVerticalScroller = false
         } else {
             scrollView.hasVerticalScroller = true
-            let verticalScroller = scrollView.verticalScroller
-            verticalScroller?.controlSize = controlSize
-            verticalScroller?.scrollerStyle = NSScroller.preferredScrollerStyle
-            if NSScroller.preferredScrollerStyle == .legacy {
-                scrollerWidth = NSScroller.scrollerWidth(for: controlSize, scrollerStyle: NSScroller.preferredScrollerStyle)
-            }
+            scrollerWidth = NSScroller.scrollerWidth(for: .regular, scrollerStyle: NSScroller.preferredScrollerStyle)
         }
 
         keyLabelStripView.keyLabelFont = keyLabelFont
