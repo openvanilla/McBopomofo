@@ -269,27 +269,28 @@ extension McBopomofoInputMethodController {
         let previous = state
         state = newState
 
-        if let newState = newState as? InputState.Deactivated {
+        switch newState {
+        case let newState as InputState.Deactivated:
             handle(state: newState, previous: previous, client: client)
-            // Force transition to Empty, so that when activateServer is
-            // invoked again, the controller is already in the Empty state.
             state = .Empty()
-        } else if let newState = newState as? InputState.Empty {
+        case let newState as InputState.Empty:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.EmptyIgnoringPreviousState {
+        case let newState as InputState.EmptyIgnoringPreviousState:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.Committing {
+        case let newState as InputState.Committing:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.Inputting {
+        case let newState as InputState.Inputting:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.Marking {
+        case let newState as InputState.Marking:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.ChoosingCandidate {
+        case let newState as InputState.ChoosingCandidate:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.AssociatedPhrases {
+        case let newState as InputState.AssociatedPhrases:
             handle(state: newState, previous: previous, client: client)
-        } else if let newState = newState as? InputState.Big5 {
+        case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
+        default:
+            break
         }
     }
 
