@@ -185,7 +185,7 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
                     return newImage
                 }
 
-                var resizedImage = resize(image)
+                let resizedImage = resize(image)
                 // On newer version of macOS, the icons became black and white
                 // so we make them template images so it could look better
                 // on dark mode.
