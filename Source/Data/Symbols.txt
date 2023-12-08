@@ -1,16 +1,3 @@
-今天日期 ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
-MACRO@DATE_TODAY_SHORT ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
-MACRO@DATE_TODAY_MEDIUEM ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
-MACRO@DATE_TODAY_MEDIUEM_ROC ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
-MACRO@DATE_TODAY_MEDIUEM_CHINESE ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
-現在時刻 ㄒㄧㄢˋ-ㄗㄞˋ-ㄕˊ-ㄎㄜˋ -8
-MACRO@TIME_NOW_SHORT ㄒㄧㄢˋ-ㄗㄞˋ-ㄕˊ-ㄎㄜˋ -8 
-MACRO@TIME_NOW_MEDIUM ㄒㄧㄢˋ-ㄗㄞˋ-ㄕˊ-ㄎㄜˋ -8 
-現在時刻 ㄒㄧㄢˋ-ㄗㄞˋ-ㄕˊ-ㄐㄧㄢ -8
-MACRO@TIME_NOW_SHORT ㄒㄧㄢˋ-ㄗㄞˋ-ㄕˊ-ㄐㄧㄢ -8 
-MACRO@TIME_NOW_MEDIUM ㄒㄧㄢˋ-ㄗㄞˋ-ㄕˊ-ㄐㄧㄢ -8 
-MACRO@TIMEZONE_STANDARD ㄇㄨˋ-ㄑㄧㄢˊ-ㄕˊ-ㄑㄩ -8
-MACRO@TIMEZONE_GENERIC_SHORT ㄇㄨˋ-ㄑㄧㄢˊ-ㄕˊ-ㄑㄩ -8
 ㏕ ㄅㄞˇ-ㄨㄢˋ -8
 © ㄅㄢˇ-ㄑㄩㄢˊ -8
 ⌬ ㄅㄣˇ-ㄏㄨㄢˊ -8

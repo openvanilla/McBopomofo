@@ -200,6 +200,12 @@ if __name__ == '__main__':
             assert len(row) == 3, row
             output.append(tuple(row))
 
+    with open(sys.argv[6]) as macro_file:
+        for line in macro_file:
+            row = line.rstrip().split(" ")
+            assert len(row) == 3, row
+            output.append(tuple(row))
+
     output = convert_vks_rows_to_sorted_kvs_rows(output)
     with open(sys.argv[-1], "w") as fout:
         fout.write(HEADER)

@@ -199,7 +199,7 @@ std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::filterA
             std::string replacement = m_externalConverter(value);
             value = replacement;
         }
-        if (insertedValues.find(value) == insertedValues.end()) {
+        if (!value.empty() && insertedValues.find(value) == insertedValues.end()) {
             results.emplace_back(value, unigram.score());
             insertedValues.insert(value);
         }

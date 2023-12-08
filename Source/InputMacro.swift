@@ -144,6 +144,65 @@ fileprivate struct InputMacroTimeZoneShortGeneric: InputMacro {
     }
 }
 
+fileprivate struct InputMacroThisYearGanZhi: InputMacro {
+    var name: String {
+        "MACRO@THIS_YEAR_GANZHI"
+    }
+
+    var replacement: String {
+        func ganshi(year: Int) -> String {
+            let gan = ["癸", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬"]
+            let zhi = ["亥", "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌"]
+
+            if year < 4 {
+                let year = year * -1
+                let base = 60 - (year + 2) % 60
+                let ganBase = base % 10
+                let zhiBase = base % 12
+                return gan[ganBase] + zhi[zhiBase] + "年"
+            }
+            let base = (year - 3) % 60
+            let ganBase = base % 10
+            let zhiBase = base % 12
+            return gan[ganBase] + zhi[zhiBase] + "年"
+        }
+        let date = Date()
+        let calendar = Calendar(identifier: .gregorian)
+        let year = calendar.component(.year, from: date)
+        return ganshi(year: year)
+    }
+}
+
+fileprivate struct InputMacroThisYearWoodRat: InputMacro {
+    var name: String {
+        "MACRO@THIS_YEAR_WOOD_RAT"
+    }
+
+    var replacement: String {
+        func woodRat(year: Int) -> String {
+            let gan = ["水", "木", "木", "火", "火", "土", "土", "金", "金", "水"]
+            let zhi = ["豬", "鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗"]
+
+            if year < 4 {
+                let year = year * -1
+                let base = 60 - (year + 2) % 60
+                let ganBase = base % 10
+                let zhiBase = base % 12
+                return gan[ganBase] + zhi[zhiBase] + "年"
+            }
+            let base = (year - 3) % 60
+            let ganBase = base % 10
+            let zhiBase = base % 12
+            return gan[ganBase] + zhi[zhiBase] + "年"
+        }
+
+        let date = Date()
+        let calendar = Calendar(identifier: .gregorian)
+        let year = calendar.component(.year, from: date)
+        return woodRat(year: year)
+    }
+}
+
 class InputMacroController: NSObject {
     @objc
     static let shared = InputMacroController()
@@ -158,6 +217,8 @@ class InputMacroController: NSObject {
             InputMacroTimeNowMedium(),
             InputMacroTimeZoneStandard(),
             InputMacroTimeZoneShortGeneric(),
+            InputMacroThisYearGanZhi(),
+            InputMacroThisYearWoodRat(),
         ]
 
     @objc
