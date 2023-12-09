@@ -28,72 +28,126 @@ protocol InputMacro {
     var replacement: String { get }
 }
 
+fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian)) -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateStyle = style
+    dateFormatter.timeStyle = .none
+    dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
+    dateFormatter.calendar = calendar
+    return dateFormatter.string(from: date)
+}
+
 fileprivate struct InputMacroDateTodayShort: InputMacro {
-    var name: String {
-        "MACRO@DATE_TODAY_SHORT"
-    }
+    var name: String { "MACRO@DATE_TODAY_SHORT" }
 
     var replacement: String {
         let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .none
-        dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
-        return dateFormatter.string(from: date)
+        return formatDate(date: date, style: .short)
+    }
+}
+
+fileprivate struct InputMacroDateYesterdayShort: InputMacro {
+    var name: String { "MACRO@DATE_YESTERDAY_SHORT" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * -24)
+        return formatDate(date: date, style: .short)
+    }
+}
+
+fileprivate struct InputMacroDateTomorrowShort: InputMacro {
+    var name: String { "MACRO@DATE_TOMORROW_SHORT" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * 24)
+        return formatDate(date: date, style: .short)
     }
 }
 
 fileprivate struct InputMacroDateTodayMedium: InputMacro {
-    var name: String {
-        "MACRO@DATE_TODAY_MEDIUEM"
-    }
+    var name: String { "MACRO@DATE_TODAY_MEDIUM" }
 
     var replacement: String {
         let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .none
-        dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
-        return dateFormatter.string(from: date)
+        return formatDate(date: date, style: .medium)
+    }
+}
+
+fileprivate struct InputMacroDateYesterdayMedium: InputMacro {
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * -24)
+        return formatDate(date: date, style: .medium)
+    }
+}
+
+fileprivate struct InputMacroDateTomorrowMedium: InputMacro {
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * 24)
+        return formatDate(date: date, style: .medium)
     }
 }
 
 fileprivate struct InputMacroDateTodayMediumROC: InputMacro {
-    var name: String {
-        "MACRO@DATE_TODAY_MEDIUEM_ROC"
-    }
+    var name: String { "MACRO@DATE_TODAY_MEDIUM_ROC" }
 
     var replacement: String {
         let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .none
-        dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
-        dateFormatter.calendar = Calendar(identifier: .republicOfChina)
-        return dateFormatter.string(from: date)
+        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .republicOfChina))
     }
 }
 
-fileprivate struct InputMacroDateTodayMediumChinese: InputMacro {
-    var name: String {
-        "MACRO@DATE_TODAY_MEDIUEM_CHINESE"
+fileprivate struct InputMacroDateYesterdayMediumROC: InputMacro {
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_ROC" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * -24)
+        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .republicOfChina))
     }
+}
+
+fileprivate struct InputMacroDateTomorrowMediumROC: InputMacro {
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_ROC" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * 24)
+        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .republicOfChina))
+    }
+}
+
+
+fileprivate struct InputMacroDateTodayMediumChinese: InputMacro {
+    var name: String { "MACRO@DATE_TODAY_MEDIUM_CHINESE" }
 
     var replacement: String {
         let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .none
-        dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
-        dateFormatter.calendar = Calendar(identifier: .chinese)
-        return dateFormatter.string(from: date)
+        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
+    }
+}
+
+fileprivate struct InputMacroDateYesterdayMediumChinese: InputMacro {
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_CHINESE" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * -24)
+        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
+    }
+}
+
+fileprivate struct InputMacroDateTomorrowMediumChinese: InputMacro {
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_CHINESE" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * 24)
+        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
     }
 }
 
 fileprivate struct InputMacroTimeNowShort: InputMacro {
-    var name: String {
-        "MACRO@TIME_NOW_SHORT"
-    }
+    var name: String { "MACRO@TIME_NOW_SHORT" }
 
     var replacement: String {
         let date = Date()
@@ -106,9 +160,7 @@ fileprivate struct InputMacroTimeNowShort: InputMacro {
 }
 
 fileprivate struct InputMacroTimeNowMedium: InputMacro {
-    var name: String {
-        "MACRO@TIME_NOW_MEDIUM"
-    }
+    var name: String { "MACRO@TIME_NOW_MEDIUM" }
 
     var replacement: String {
         let date = Date()
@@ -121,9 +173,7 @@ fileprivate struct InputMacroTimeNowMedium: InputMacro {
 }
 
 fileprivate struct InputMacroTimeZoneStandard: InputMacro {
-    var name: String {
-        "MACRO@TIMEZONE_STANDARD"
-    }
+    var name: String { "MACRO@TIMEZONE_STANDARD" }
 
     var replacement: String {
         let timezone = TimeZone.current
@@ -133,9 +183,7 @@ fileprivate struct InputMacroTimeZoneStandard: InputMacro {
 }
 
 fileprivate struct InputMacroTimeZoneShortGeneric: InputMacro {
-    var name: String {
-        "MACRO@TIMEZONE_GENERIC_SHORT"
-    }
+    var name: String { "MACRO@TIMEZONE_GENERIC_SHORT" }
 
     var replacement: String {
         let timezone = TimeZone.current
@@ -163,7 +211,7 @@ fileprivate func ganshi(year: Int) -> String {
     return gan[ganBase] + zhi[zhiBase] + "年"
 }
 
-func woodRat(year: Int) -> String {
+fileprivate func chineseZodiac(year: Int) -> String {
     let gan = ["水", "木", "木", "火", "火", "土", "土", "金", "金", "水"]
     let zhi = ["豬", "鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗"]
     let (ganBase, zhiBase) = getYearBase(year: year)
@@ -171,9 +219,7 @@ func woodRat(year: Int) -> String {
 }
 
 fileprivate struct InputMacroThisYearGanZhi: InputMacro {
-    var name: String {
-        "MACRO@THIS_YEAR_GANZHI"
-    }
+    var name: String { "MACRO@THIS_YEAR_GANZHI" }
 
     var replacement: String {
         let date = Date()
@@ -184,9 +230,7 @@ fileprivate struct InputMacroThisYearGanZhi: InputMacro {
 }
 
 fileprivate struct InputMacroLastYearGanZhi: InputMacro {
-    var name: String {
-        "MACRO@LAST_YEAR_GANZHI"
-    }
+    var name: String { "MACRO@LAST_YEAR_GANZHI" }
 
     var replacement: String {
         let date = Date()
@@ -197,9 +241,7 @@ fileprivate struct InputMacroLastYearGanZhi: InputMacro {
 }
 
 fileprivate struct InputMacroNextYearGanZhi: InputMacro {
-    var name: String {
-        "MACRO@NEXT_YEAR_GANZHI"
-    }
+    var name: String { "MACRO@NEXT_YEAR_GANZHI" }
 
     var replacement: String {
         let date = Date()
@@ -210,41 +252,35 @@ fileprivate struct InputMacroNextYearGanZhi: InputMacro {
 }
 
 fileprivate struct InputMacroThisYearWoodRat: InputMacro {
-    var name: String {
-        "MACRO@THIS_YEAR_WOOD_RAT"
-    }
+    var name: String { "MACRO@THIS_YEAR_WOOD_RAT" }
 
     var replacement: String {
         let date = Date()
         let calendar = Calendar(identifier: .gregorian)
         let year = calendar.component(.year, from: date)
-        return woodRat(year: year)
+        return chineseZodiac(year: year)
     }
 }
 
 fileprivate struct InputMacroLastYearWoodRat: InputMacro {
-    var name: String {
-        "MACRO@LAST_YEAR_WOOD_RAT"
-    }
+    var name: String { "MACRO@LAST_YEAR_WOOD_RAT" }
 
     var replacement: String {
         let date = Date()
         let calendar = Calendar(identifier: .gregorian)
         let year = calendar.component(.year, from: date)
-        return woodRat(year: year - 1)
+        return chineseZodiac(year: year - 1)
     }
 }
 
 fileprivate struct InputMacroNextYearWoodRat: InputMacro {
-    var name: String {
-        "MACRO@NEXT_YEAR_WOOD_RAT"
-    }
+    var name: String { "MACRO@NEXT_YEAR_WOOD_RAT" }
 
     var replacement: String {
         let date = Date()
         let calendar = Calendar(identifier: .gregorian)
         let year = calendar.component(.year, from: date)
-        return woodRat(year: year + 1)
+        return chineseZodiac(year: year + 1)
     }
 }
 
@@ -256,9 +292,17 @@ class InputMacroController: NSObject {
     private var macros: [InputMacro] =
         [
             InputMacroDateTodayShort(),
+            InputMacroDateYesterdayShort(),
+            InputMacroDateTomorrowShort(),
             InputMacroDateTodayMedium(),
+            InputMacroDateYesterdayMedium(),
+            InputMacroDateTomorrowMedium(),
             InputMacroDateTodayMediumROC(),
+            InputMacroDateYesterdayMediumROC(),
+            InputMacroDateTomorrowMediumROC(),
             InputMacroDateTodayMediumChinese(),
+            InputMacroDateYesterdayMediumChinese(),
+            InputMacroDateTomorrowMediumChinese(),
             InputMacroTimeNowShort(),
             InputMacroTimeNowMedium(),
             InputMacroTimeZoneStandard(),
