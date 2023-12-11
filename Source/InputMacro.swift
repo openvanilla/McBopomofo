@@ -28,6 +28,8 @@ protocol InputMacro {
     var replacement: String { get }
 }
 
+// MARK: - Date
+
 fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian)) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateStyle = style
@@ -146,6 +148,8 @@ fileprivate struct InputMacroDateTomorrowMediumChinese: InputMacro {
     }
 }
 
+// MARK: - Time
+
 fileprivate struct InputMacroTimeNowShort: InputMacro {
     var name: String { "MACRO@TIME_NOW_SHORT" }
 
@@ -172,6 +176,8 @@ fileprivate struct InputMacroTimeNowMedium: InputMacro {
     }
 }
 
+// MARK: - Time Zone
+
 fileprivate struct InputMacroTimeZoneStandard: InputMacro {
     var name: String { "MACRO@TIMEZONE_STANDARD" }
 
@@ -192,17 +198,19 @@ fileprivate struct InputMacroTimeZoneShortGeneric: InputMacro {
     }
 }
 
-fileprivate func getYearBase(year: Int) -> (Int, Int) {
-    let base: Int = {
-        if year < 4 {
-            let year = year * -1
-            return 60 - (year + 2) % 60
-        }
-        return (year - 3) % 60
-    }()
-    return (base % 10, base % 12)
+// MARK: - Ganzhi
+
+fileprivate func getCurrentYear() -> Int {
+    let date = Date()
+    let calendar = Calendar(identifier: .gregorian)
+    let year = calendar.component(.year, from: date)
+    return year
 }
 
+fileprivate func getYearBase(year: Int) -> (Int, Int) {
+    let base: Int = year < 4 ? 60 - ((year * -1) + 2) % 60 : (year - 3) % 60
+    return (base % 10, base % 12)
+}
 
 fileprivate func ganshi(year: Int) -> String {
     let gan = ["癸", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬"]
@@ -222,9 +230,7 @@ fileprivate struct InputMacroThisYearGanZhi: InputMacro {
     var name: String { "MACRO@THIS_YEAR_GANZHI" }
 
     var replacement: String {
-        let date = Date()
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: date)
+        let year = getCurrentYear()
         return ganshi(year: year)
     }
 }
@@ -233,9 +239,7 @@ fileprivate struct InputMacroLastYearGanZhi: InputMacro {
     var name: String { "MACRO@LAST_YEAR_GANZHI" }
 
     var replacement: String {
-        let date = Date()
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: date)
+        let year = getCurrentYear()
         return ganshi(year: year - 1)
     }
 }
@@ -244,46 +248,39 @@ fileprivate struct InputMacroNextYearGanZhi: InputMacro {
     var name: String { "MACRO@NEXT_YEAR_GANZHI" }
 
     var replacement: String {
-        let date = Date()
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: date)
+        let year = getCurrentYear()
         return ganshi(year: year + 1)
     }
 }
 
-fileprivate struct InputMacroThisYearWoodRat: InputMacro {
-    var name: String { "MACRO@THIS_YEAR_WOOD_RAT" }
+fileprivate struct InputMacroThisYearChineseZodiac: InputMacro {
+    var name: String { "MACRO@THIS_YEAR_CHINESE_ZODIAC" }
 
     var replacement: String {
-        let date = Date()
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: date)
+        let year = getCurrentYear()
         return chineseZodiac(year: year)
     }
 }
 
-fileprivate struct InputMacroLastYearWoodRat: InputMacro {
-    var name: String { "MACRO@LAST_YEAR_WOOD_RAT" }
+fileprivate struct InputMacroLastYearChineseZodiac: InputMacro {
+    var name: String { "MACRO@LAST_YEAR_CHINESE_ZODIAC" }
 
     var replacement: String {
-        let date = Date()
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: date)
+        let year = getCurrentYear()
         return chineseZodiac(year: year - 1)
     }
 }
 
-fileprivate struct InputMacroNextYearWoodRat: InputMacro {
-    var name: String { "MACRO@NEXT_YEAR_WOOD_RAT" }
+fileprivate struct InputMacroNextYearChineseZodiac: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR_CHINESE_ZODIAC" }
 
     var replacement: String {
-        let date = Date()
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: date)
+        let year = getCurrentYear()
         return chineseZodiac(year: year + 1)
     }
 }
 
+// MARK: - InputMacroController
 
 class InputMacroController: NSObject {
     @objc
@@ -310,9 +307,9 @@ class InputMacroController: NSObject {
             InputMacroThisYearGanZhi(),
             InputMacroLastYearGanZhi(),
             InputMacroNextYearGanZhi(),
-            InputMacroThisYearWoodRat(),
-            InputMacroLastYearWoodRat(),
-            InputMacroNextYearWoodRat(),
+            InputMacroThisYearChineseZodiac(),
+            InputMacroLastYearChineseZodiac(),
+            InputMacroNextYearChineseZodiac(),
         ]
 
     @objc

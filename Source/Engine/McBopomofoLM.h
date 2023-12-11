@@ -101,6 +101,8 @@ public:
     bool externalConverterEnabled() const;
     /// Sets a lambda to let the values of unigrams could be converted by it.
     void setExternalConverter(std::function<std::string(std::string)> externalConverter);
+    /// Sets a lambda to convert the macros.
+    void setMacroConverter(std::function<std::string(std::string)> macroConverter);
 
     const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
     bool hasAssociatedPhrasesForKey(const std::string& key);
@@ -128,6 +130,7 @@ protected:
     bool m_phraseReplacementEnabled;
     bool m_externalConverterEnabled;
     std::function<std::string(std::string)> m_externalConverter;
+    std::function<std::string(std::string)> m_macroConverter;
 };
 };
 
