@@ -32,8 +32,8 @@ MACRO@LAST_YEAR_GANZHI ㄑㄩˋ-ㄋㄧㄢˊ-ㄍㄢ-ㄓ -8
 明年干支 ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄍㄢ-ㄓ -8
 MACRO@NEXT_YEAR_GANZHI ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄍㄢ-ㄓ -8
 今年生肖 ㄐㄧㄣ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
-MACRO@THIS_YEAR_WOOD_RAT ㄐㄧㄣ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
+MACRO@THIS_YEAR_CHINESE_ZODIAC ㄐㄧㄣ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
 去年生肖 ㄑㄩˋ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
-MACRO@LAST_YEAR_WOOD_RAT ㄑㄩˋ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
+MACRO@LAST_YEAR_CHINESE_ZODIAC ㄑㄩˋ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
 明年生肖 ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
-MACRO@NEXT_YEAR_WOOD_RAT ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
+MACRO@NEXT_YEAR_CHINESE_ZODIAC ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄕㄥ-ㄒㄧㄠˋ -8
