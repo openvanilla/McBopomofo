@@ -212,7 +212,7 @@ fileprivate func getYearBase(year: Int) -> (Int, Int) {
     return (base % 10, base % 12)
 }
 
-fileprivate func ganshi(year: Int) -> String {
+fileprivate func ganzhi(year: Int) -> String {
     let gan = ["癸", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬"]
     let zhi = ["亥", "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌"]
     let (ganBase, zhiBase) = getYearBase(year: year)
@@ -231,7 +231,7 @@ fileprivate struct InputMacroThisYearGanZhi: InputMacro {
 
     var replacement: String {
         let year = getCurrentYear()
-        return ganshi(year: year)
+        return ganzhi(year: year)
     }
 }
 
@@ -240,7 +240,7 @@ fileprivate struct InputMacroLastYearGanZhi: InputMacro {
 
     var replacement: String {
         let year = getCurrentYear()
-        return ganshi(year: year - 1)
+        return ganzhi(year: year - 1)
     }
 }
 
@@ -249,7 +249,7 @@ fileprivate struct InputMacroNextYearGanZhi: InputMacro {
 
     var replacement: String {
         let year = getCurrentYear()
-        return ganshi(year: year + 1)
+        return ganzhi(year: year + 1)
     }
 }
 
@@ -286,8 +286,8 @@ class InputMacroController: NSObject {
     @objc
     static let shared = InputMacroController()
 
-    private var macros: [InputMacro] =
-        [
+    private var macros: [String:InputMacro] = {
+        let macros: [InputMacro] = [
             InputMacroDateTodayShort(),
             InputMacroDateYesterdayShort(),
             InputMacroDateTomorrowShort(),
@@ -311,13 +311,18 @@ class InputMacroController: NSObject {
             InputMacroLastYearChineseZodiac(),
             InputMacroNextYearChineseZodiac(),
         ]
+        var map:[String:InputMacro] = [:]
+        macros.forEach { macro in
+            map[macro.name] = macro
+        }
+        return map
+    } ()
+
 
     @objc
     func handle(_ input: String) -> String {
-        for inputMacro in macros {
-            if inputMacro.name == input {
-                return inputMacro.replacement
-            }
+        if let macro = macros[input] {
+            return macro.replacement
         }
         return input
     }
