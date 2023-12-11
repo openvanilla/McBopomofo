@@ -101,6 +101,12 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 
 + (void)setupDataModelValueConverter
 {
+    auto macroConverter = [](std::string input) {
+        NSString *inputText = [NSString stringWithUTF8String:input.c_str()];
+        NSString *handled = [[InputMacroController shared] handle:inputText];
+        return std::string(handled.UTF8String);
+    };
+
     auto converter = [](std::string input) {
         if (!Preferences.chineseConversionEnabled) {
             return input;
@@ -119,6 +125,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         return std::string(text.UTF8String);
     };
 
+    gLanguageModelMcBopomofo.setMacroConverter(macroConverter);
     gLanguageModelMcBopomofo.setExternalConverter(converter);
     gLanguageModelPlainBopomofo.setExternalConverter(converter);
 }
