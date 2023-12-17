@@ -28,6 +28,115 @@ protocol InputMacro {
     var replacement: String { get }
 }
 
+// MARK: - Year
+
+fileprivate func formatYear(from date: Date, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "GU年"
+    dateFormatter.locale = locale
+    dateFormatter.calendar = calendar
+    return dateFormatter.string(from: date)
+}
+
+fileprivate struct InputMacroThisYear: InputMacro {
+    var name: String { "MACRO@THIS_YEAR" }
+
+    var replacement: String {
+        let date = Date()
+        return formatYear(from: date)
+    }
+}
+
+fileprivate struct InputMacroThisYearROC: InputMacro {
+    var name: String { "MACRO@THIS_YEAR_ROC" }
+
+    var replacement: String {
+        let date = Date()
+        return formatYear(from: date, calendar: Calendar(identifier: .republicOfChina))
+    }
+}
+
+fileprivate struct InputMacroThisYearJapanese: InputMacro {
+    var name: String { "MACRO@THIS_YEAR_JAPANESE" }
+
+    var replacement: String {
+        let date = Date()
+        return formatYear(from: date, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
+fileprivate struct InputMacroLastYear: InputMacro {
+    var name: String { "MACRO@LAST_YEAR" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .gregorian)
+        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
+            return formatYear(from: date)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroLastYearROC: InputMacro {
+    var name: String { "MACRO@LAST_YEAR_ROC" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .republicOfChina)
+        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
+            return formatYear(from: date, calendar: calendar)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroLastYearJapanese: InputMacro {
+    var name: String { "MACRO@LAST_YEAR_JAPANESE" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .japanese)
+        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
+            return formatYear(from: date, calendar: calendar, locale: Locale(identifier: "ja_JP"))
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroNextYear: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .gregorian)
+        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
+            return formatYear(from: date)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroNextYearROC: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR_ROC" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .republicOfChina)
+        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
+            return formatYear(from: date, calendar: calendar)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroNextYearJapanese: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR_JAPANESE" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .japanese)
+        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
+            return formatYear(from: date, calendar: calendar, locale: Locale(identifier: "ja_JP"))
+        }
+        return ""
+    }
+}
+
 // MARK: - Date
 
 fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
@@ -315,6 +424,15 @@ class InputMacroController: NSObject {
 
     private var macros: [String:InputMacro] = {
         let macros: [InputMacro] = [
+            InputMacroThisYear(),
+            InputMacroThisYearROC(),
+            InputMacroThisYearJapanese(),
+            InputMacroLastYear(),
+            InputMacroLastYearROC(),
+            InputMacroLastYearJapanese(),
+            InputMacroNextYear(),
+            InputMacroNextYearROC(),
+            InputMacroNextYearJapanese(),
             InputMacroDateTodayShort(),
             InputMacroDateYesterdayShort(),
             InputMacroDateTomorrowShort(),

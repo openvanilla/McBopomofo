@@ -1,3 +1,15 @@
+今年年度 ㄐㄧㄣ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@THIS_YEAR ㄐㄧㄣ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@THIS_YEAR_ROC ㄐㄧㄣ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@THIS_YEAR_JAPANESE ㄐㄧㄣ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+去年年度 ㄑㄩˋ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@LAST_YEAR ㄑㄩˋ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@LAST_YEAR_ROC ㄑㄩˋ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@LAST_YEAR_JAPANESE ㄑㄩˋ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+明年年度 ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@NEXT_YEAR ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@NEXT_YEAR_ROC ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
+MACRO@NEXT_YEAR_JAPANESE ㄇㄧㄥˊ-ㄋㄧㄢˊ-ㄋㄧㄢˊ-ㄉㄨˋ -8
 今天日期 ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
 MACRO@DATE_TODAY_SHORT ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
 MACRO@DATE_TODAY_MEDIUM ㄐㄧㄣ-ㄊㄧㄢ-ㄖˋ-ㄑㄧˊ -8
