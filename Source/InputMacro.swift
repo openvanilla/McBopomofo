@@ -30,11 +30,11 @@ protocol InputMacro {
 
 // MARK: - Date
 
-fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian)) -> String {
+fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateStyle = style
     dateFormatter.timeStyle = .none
-    dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
+    dateFormatter.locale = locale
     dateFormatter.calendar = calendar
     return dateFormatter.string(from: date)
 }
@@ -145,6 +145,33 @@ fileprivate struct InputMacroDateTomorrowMediumChinese: InputMacro {
     var replacement: String {
         let date = Date().addingTimeInterval(60 * 60 * 24)
         return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
+    }
+}
+
+fileprivate struct InputMacroDateTodayFullJapanese: InputMacro {
+    var name: String { "MACRO@DATE_TODAY_FULL_JAPANESE" }
+
+    var replacement: String {
+        let date = Date()
+        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
+fileprivate struct InputMacroDateYesterdayFullJapanese: InputMacro {
+    var name: String { "MACRO@DATE_YESTERDAY_FULL_JAPANESE" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * -24)
+        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
+fileprivate struct InputMacroDateTomorrowFullJapanese: InputMacro {
+    var name: String { "MACRO@DATE_TOMORROW_FULL_JAPANESE" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * 24)
+        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
     }
 }
 
@@ -300,6 +327,9 @@ class InputMacroController: NSObject {
             InputMacroDateTodayMediumChinese(),
             InputMacroDateYesterdayMediumChinese(),
             InputMacroDateTomorrowMediumChinese(),
+            InputMacroDateTodayFullJapanese(),
+            InputMacroDateYesterdayFullJapanese(),
+            InputMacroDateTomorrowFullJapanese(),
             InputMacroTimeNowShort(),
             InputMacroTimeNowMedium(),
             InputMacroTimeZoneStandard(),
