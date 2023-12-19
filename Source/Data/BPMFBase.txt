@@ -710,6 +710,7 @@
 霦 ㄅㄧㄣ bin 1up big5
 矉 ㄅㄧㄣ bin 1up big5
 驞 ㄅㄧㄣ bin 1up big5
+玢 ㄅㄧㄣ bin2 1up big5
 殯 ㄅㄧㄣˋ bin4 1up4 big5
 鬢 ㄅㄧㄣˋ bin4 1up4 big5
 儐 ㄅㄧㄣˋ bin4 1up4 big5
@@ -740,6 +741,11 @@
 梪 ㄉㄡˋ dou4 2.4 big5
 浢 ㄉㄡˋ dou4 2.4 big5
 讀 ㄉㄡˋ dou4 2.4 big5
+闘 ㄉㄡˋ dou4 2.4 big5
+鬦 ㄉㄡˋ dou4 2.4 big5
+鬪 ㄉㄡˋ dou4 2.4 big5
+鬬 ㄉㄡˋ dou4 2.4 big5
+鬭 ㄉㄡˋ dou4 2.4 big5
 登 ㄉㄥ deng 2/ big5
 燈 ㄉㄥ deng 2/ big5
 鐙 ㄉㄥ deng 2/ big5
