@@ -491,21 +491,26 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     // MARK: Enter Big5 code mode
+
     if ([input isControlHold] && (charCode == '`')) {
-        [self clear];
-        if ([state isKindOfClass:[InputStateInputting class]]) {
-            InputStateInputting *current = (InputStateInputting *)state;
-            NSString *composingBuffer = current.composingBuffer;
-            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-            stateCallback(committing);
+        if (Preferences.big5InputEnabled) {
+            [self clear];
+            if ([state isKindOfClass:[InputStateInputting class]]) {
+                InputStateInputting *current = (InputStateInputting *)state;
+                NSString *composingBuffer = current.composingBuffer;
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+                stateCallback(committing);
+            }
+            InputStateBig5 *big5 = [[InputStateBig5 alloc] initWithCode:@""];
+            stateCallback(big5);
+            return YES;
         }
-        InputStateBig5 *big5 = [[InputStateBig5 alloc] initWithCode:@""];
-        stateCallback(big5);
-        return YES;
     }
 
     // MARK: Punctuation list
-    if ((char)charCode == '`') {
+    if ((char)charCode == '`' &&
+        !([input isControlHold] || [input isCommandHold] || [input isOptionHold])
+        ) {
         if (_languageModel->hasUnigrams("_punctuation_list")) {
             if (_bpmfReadingBuffer->isEmpty()) {
                 _grid->insertReading("_punctuation_list");
