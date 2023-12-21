@@ -24,6 +24,7 @@
 毦 ㄦˋ er4 -4 big5
 眲 ㄦˋ er4 -4 big5
 衈 ㄦˋ er4 -4 big5
+弍 ㄦˋ er4 -4 big5
 兒 ㄦˊ er2 -6 big5
 而 ㄦˊ er2 -6 big5
 洏 ㄦˊ er2 -6 big5
@@ -710,6 +711,7 @@
 霦 ㄅㄧㄣ bin 1up big5
 矉 ㄅㄧㄣ bin 1up big5
 驞 ㄅㄧㄣ bin 1up big5
+玢 ㄅㄧㄣ bin2 1up big5
 殯 ㄅㄧㄣˋ bin4 1up4 big5
 鬢 ㄅㄧㄣˋ bin4 1up4 big5
 儐 ㄅㄧㄣˋ bin4 1up4 big5
@@ -740,6 +742,11 @@
 梪 ㄉㄡˋ dou4 2.4 big5
 浢 ㄉㄡˋ dou4 2.4 big5
 讀 ㄉㄡˋ dou4 2.4 big5
+闘 ㄉㄡˋ dou4 2.4 big5
+鬦 ㄉㄡˋ dou4 2.4 big5
+鬪 ㄉㄡˋ dou4 2.4 big5
+鬬 ㄉㄡˋ dou4 2.4 big5
+鬭 ㄉㄡˋ dou4 2.4 big5
 登 ㄉㄥ deng 2/ big5
 燈 ㄉㄥ deng 2/ big5
 鐙 ㄉㄥ deng 2/ big5
@@ -7296,6 +7303,9 @@
 毿 ㄙㄢ san n0 big5
 攕 ㄙㄢ san n0 big5
 鬖 ㄙㄢ san n0 big5
+弎 ㄙㄢ san n0 big5
+叁 ㄙㄢ san n0 big5
+叄 ㄙㄢ san n0 big5
 散 ㄙㄢˇ san3 n03 big5
 傘 ㄙㄢˇ san3 n03 big5
 繖 ㄙㄢˇ san3 n03 big5
@@ -7331,6 +7341,7 @@
 貄 ㄙˋ si4 n4 big5
 蕼 ㄙˋ si4 n4 big5
 洍 ㄙˋ si4 n4 big5
+亖 ㄙˋ si4 n4 big5
 思 ㄙ˙ si5 n7 big5
 撒 ㄙㄚ sa n8 big5
 仨 ㄙㄚ sa n8 big5
@@ -10118,6 +10129,7 @@
 毉 ㄧ yi u big5
 黳 ㄧ yi u big5
 嶬 ㄧ yi u big5
+弌 ㄧ yi u big5
 耶 ㄧㄝ ye u, big5
 噎 ㄧㄝ ye u, big5
 蠮 ㄧㄝ ye u, big5
@@ -13836,6 +13848,7 @@
 糟 ㄗㄠ zao yl big5
 蹧 ㄗㄠ zao yl big5
 傮 ㄗㄠ zao yl big5
+醩 ㄗㄠ zao yl big5
 早 ㄗㄠˇ zao3 yl3 big5
 棗 ㄗㄠˇ zao3 yl3 big5
 澡 ㄗㄠˇ zao3 yl3 big5
@@ -13854,6 +13867,7 @@
 皁 ㄗㄠˋ zao4 yl4 big5
 趮 ㄗㄠˋ zao4 yl4 big5
 矂 ㄗㄠˋ zao4 yl4 big5
+竈 ㄗㄠˋ zao4 yl4 big5
 鑿 ㄗㄠˊ zao2 yl6 big5
 賊 ㄗㄟˊ zei2 yo6 big5
 怎 ㄗㄣˇ zen3 yp3 big5
