@@ -28,13 +28,122 @@ protocol InputMacro {
     var replacement: String { get }
 }
 
+// MARK: - Year
+
+fileprivate func formatYear(from date: Date, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "GU年"
+    dateFormatter.locale = locale
+    dateFormatter.calendar = calendar
+    return dateFormatter.string(from: date)
+}
+
+fileprivate struct InputMacroThisYear: InputMacro {
+    var name: String { "MACRO@THIS_YEAR" }
+
+    var replacement: String {
+        let date = Date()
+        return formatYear(from: date)
+    }
+}
+
+fileprivate struct InputMacroThisYearROC: InputMacro {
+    var name: String { "MACRO@THIS_YEAR_ROC" }
+
+    var replacement: String {
+        let date = Date()
+        return formatYear(from: date, calendar: Calendar(identifier: .republicOfChina))
+    }
+}
+
+fileprivate struct InputMacroThisYearJapanese: InputMacro {
+    var name: String { "MACRO@THIS_YEAR_JAPANESE" }
+
+    var replacement: String {
+        let date = Date()
+        return formatYear(from: date, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
+fileprivate struct InputMacroLastYear: InputMacro {
+    var name: String { "MACRO@LAST_YEAR" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .gregorian)
+        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
+            return formatYear(from: date)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroLastYearROC: InputMacro {
+    var name: String { "MACRO@LAST_YEAR_ROC" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .republicOfChina)
+        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
+            return formatYear(from: date, calendar: calendar)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroLastYearJapanese: InputMacro {
+    var name: String { "MACRO@LAST_YEAR_JAPANESE" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .japanese)
+        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
+            return formatYear(from: date, calendar: calendar, locale: Locale(identifier: "ja_JP"))
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroNextYear: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .gregorian)
+        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
+            return formatYear(from: date)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroNextYearROC: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR_ROC" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .republicOfChina)
+        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
+            return formatYear(from: date, calendar: calendar)
+        }
+        return ""
+    }
+}
+
+fileprivate struct InputMacroNextYearJapanese: InputMacro {
+    var name: String { "MACRO@NEXT_YEAR_JAPANESE" }
+
+    var replacement: String {
+        let calendar = Calendar(identifier: .japanese)
+        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
+            return formatYear(from: date, calendar: calendar, locale: Locale(identifier: "ja_JP"))
+        }
+        return ""
+    }
+}
+
 // MARK: - Date
 
-fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian)) -> String {
+fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateStyle = style
     dateFormatter.timeStyle = .none
-    dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
+    dateFormatter.locale = locale
     dateFormatter.calendar = calendar
     return dateFormatter.string(from: date)
 }
@@ -148,6 +257,33 @@ fileprivate struct InputMacroDateTomorrowMediumChinese: InputMacro {
     }
 }
 
+fileprivate struct InputMacroDateTodayFullJapanese: InputMacro {
+    var name: String { "MACRO@DATE_TODAY_FULL_JAPANESE" }
+
+    var replacement: String {
+        let date = Date()
+        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
+fileprivate struct InputMacroDateYesterdayFullJapanese: InputMacro {
+    var name: String { "MACRO@DATE_YESTERDAY_FULL_JAPANESE" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * -24)
+        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
+fileprivate struct InputMacroDateTomorrowFullJapanese: InputMacro {
+    var name: String { "MACRO@DATE_TOMORROW_FULL_JAPANESE" }
+
+    var replacement: String {
+        let date = Date().addingTimeInterval(60 * 60 * 24)
+        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
+    }
+}
+
 // MARK: - Time
 
 fileprivate struct InputMacroTimeNowShort: InputMacro {
@@ -212,7 +348,7 @@ fileprivate func getYearBase(year: Int) -> (Int, Int) {
     return (base % 10, base % 12)
 }
 
-fileprivate func ganshi(year: Int) -> String {
+fileprivate func ganzhi(year: Int) -> String {
     let gan = ["癸", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬"]
     let zhi = ["亥", "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌"]
     let (ganBase, zhiBase) = getYearBase(year: year)
@@ -231,7 +367,7 @@ fileprivate struct InputMacroThisYearGanZhi: InputMacro {
 
     var replacement: String {
         let year = getCurrentYear()
-        return ganshi(year: year)
+        return ganzhi(year: year)
     }
 }
 
@@ -240,7 +376,7 @@ fileprivate struct InputMacroLastYearGanZhi: InputMacro {
 
     var replacement: String {
         let year = getCurrentYear()
-        return ganshi(year: year - 1)
+        return ganzhi(year: year - 1)
     }
 }
 
@@ -249,7 +385,7 @@ fileprivate struct InputMacroNextYearGanZhi: InputMacro {
 
     var replacement: String {
         let year = getCurrentYear()
-        return ganshi(year: year + 1)
+        return ganzhi(year: year + 1)
     }
 }
 
@@ -286,8 +422,17 @@ class InputMacroController: NSObject {
     @objc
     static let shared = InputMacroController()
 
-    private var macros: [InputMacro] =
-        [
+    private var macros: [String:InputMacro] = {
+        let macros: [InputMacro] = [
+            InputMacroThisYear(),
+            InputMacroThisYearROC(),
+            InputMacroThisYearJapanese(),
+            InputMacroLastYear(),
+            InputMacroLastYearROC(),
+            InputMacroLastYearJapanese(),
+            InputMacroNextYear(),
+            InputMacroNextYearROC(),
+            InputMacroNextYearJapanese(),
             InputMacroDateTodayShort(),
             InputMacroDateYesterdayShort(),
             InputMacroDateTomorrowShort(),
@@ -300,6 +445,9 @@ class InputMacroController: NSObject {
             InputMacroDateTodayMediumChinese(),
             InputMacroDateYesterdayMediumChinese(),
             InputMacroDateTomorrowMediumChinese(),
+            InputMacroDateTodayFullJapanese(),
+            InputMacroDateYesterdayFullJapanese(),
+            InputMacroDateTomorrowFullJapanese(),
             InputMacroTimeNowShort(),
             InputMacroTimeNowMedium(),
             InputMacroTimeZoneStandard(),
@@ -311,13 +459,18 @@ class InputMacroController: NSObject {
             InputMacroLastYearChineseZodiac(),
             InputMacroNextYearChineseZodiac(),
         ]
+        var map:[String:InputMacro] = [:]
+        macros.forEach { macro in
+            map[macro.name] = macro
+        }
+        return map
+    } ()
+
 
     @objc
     func handle(_ input: String) -> String {
-        for inputMacro in macros {
-            if inputMacro.name == input {
-                return inputMacro.replacement
-            }
+        if let macro = macros[input] {
+            return macro.replacement
         }
         return input
     }

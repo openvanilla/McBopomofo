@@ -62,7 +62,7 @@ struct VersionUpdateApi {
     static func check(forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>) -> ()) -> URLSessionTask? {
         guard let infoDict = Bundle.main.infoDictionary,
               let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
-              let updateInfoURL = URL(string:(updateInfoURLString + (forced ? "?manual=yes" : ""))) else {
+              let updateInfoURL = URL(string: (updateInfoURLString + (forced ? "?manual=yes" : ""))) else {
             return nil
         }
 
@@ -80,8 +80,7 @@ struct VersionUpdateApi {
             do {
                 guard let plist = try PropertyListSerialization.propertyList(from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
                       let remoteVersion = plist[kCFBundleVersionKey] as? String,
-                      let infoDict = Bundle.main.infoDictionary
-                        else {
+                      let infoDict = Bundle.main.infoDictionary else {
                     DispatchQueue.main.async {
                         forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
@@ -102,8 +101,7 @@ struct VersionUpdateApi {
                 }
 
                 guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
-                      let siteInfoURL = URL(string: siteInfoURLString)
-                        else {
+                      let siteInfoURL = URL(string: siteInfoURLString) else {
                     DispatchQueue.main.async {
                         forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
@@ -235,7 +233,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                             report.versionDescription)
                     NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
                 case .noNeedToUpdate:
-                    NonModalAlertWindowController.shared.show(title:NSLocalizedString("Check for Update Completed", comment: ""), content:NSLocalizedString("McBopomofo is up to date.", comment: ""),  confirmButtonTitle:NSLocalizedString("OK", comment: ""), cancelButtonTitle:nil, cancelAsDefault: false, delegate: self)
+                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("Check for Update Completed", comment: ""), content: NSLocalizedString("McBopomofo is up to date.", comment: ""), confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: self)
                 case .ignored:
                     break
                 }

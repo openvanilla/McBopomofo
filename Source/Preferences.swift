@@ -63,6 +63,7 @@ private let kAddPhraseHookEnabledKey = "AddPhraseHookEnabled"
 private let kAddPhraseHookPath = "AddPhraseHookPath"
 
 private let kSelectCandidateWithNumericKeypad = "SelectCandidateWithNumericKeypad"
+private let kBig5InputEnabledKey = "Big5InputEnabled"
 
 // MARK: Property wrappers
 
@@ -187,7 +188,7 @@ struct CandidateListTextSize {
 // MARK: -
 
 class Preferences: NSObject {
-    static var allKeys:[String] {
+    static var allKeys: [String] {
         [kKeyboardLayoutPreferenceKey,
          kBasisKeyboardLayoutPreferenceKey,
          kFunctionKeyKeyboardLayoutPreferenceKey,
@@ -333,7 +334,6 @@ class Preferences: NSObject {
         }
 
     }
-
 }
 
 extension Preferences {
@@ -420,7 +420,7 @@ extension Preferences {
             }
             return customUserPhraseLocation
         }()
-        let notification = Notification(name: .userPhraseLocationDidChange, object: self, userInfo:  [
+        let notification = Notification(name: .userPhraseLocationDidChange, object: self, userInfo: [
             "location": location
         ])
         NotificationQueue.default.dequeueNotifications(matching: notification, coalesceMask: 0)
@@ -458,7 +458,12 @@ extension Preferences {
 }
 
 extension Preferences {
-    
     @UserDefault(key: kSelectCandidateWithNumericKeypad, defaultValue: false)
     @objc static var selectCandidateWithNumericKeypad: Bool
+}
+
+
+extension Preferences {
+    @UserDefault(key: kBig5InputEnabledKey, defaultValue: true)
+    @objc static var big5InputEnabled: Bool
 }
