@@ -281,6 +281,10 @@ public class VerticalCandidateController: CandidateController {
                 newIndex = 0
             }
 
+            if newIndex == UInt.max {
+                return
+            }
+
             var lastVisibleRow = newValue
 
             if selectedRow != -1 && itemCount > 0 && itemCount > labelCount {
