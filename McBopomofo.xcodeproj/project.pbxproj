@@ -67,6 +67,7 @@
 		D4A13D5A27A59F0B003BE359 /* InputMethodController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* InputMethodController.swift */; };
 		D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */; };
 		D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */ = {isa = PBXBuildFile; productRef = D4C9CAB027AAC9690058DFEA /* NSStringUtils */; };
+		D4CB1A5B2B389B78006EA984 /* DictionaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CB1A5A2B3891FB006EA984 /* DictionaryService.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
 		D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */; };
@@ -193,6 +194,7 @@
 		D4A13D5927A59D5C003BE359 /* InputMethodController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMethodController.swift; sourceTree = "<group>"; };
 		D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerPlainBopomofoTests.swift; sourceTree = "<group>"; };
 		D4C9CAAF27AAC8EC0058DFEA /* NSStringUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = NSStringUtils; path = Packages/NSStringUtils; sourceTree = "<group>"; };
+		D4CB1A5A2B3891FB006EA984 /* DictionaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryService.swift; sourceTree = "<group>"; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8B27A838D5006DB1CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8C27A838D8006DB1CF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -281,6 +283,7 @@
 				6AE215102A2849BB005A6A02 /* UTF8Helper.cpp */,
 				6AE2150F2A2849BB005A6A02 /* UTF8Helper.h */,
 				D43FC40A2B23788400ED5A1C /* InputMacro.swift */,
+				D4CB1A5A2B3891FB006EA984 /* DictionaryService.swift */,
 				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
 				D427F76B278CA1BA004A2160 /* AppDelegate.swift */,
@@ -673,6 +676,7 @@
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
+				D4CB1A5B2B389B78006EA984 /* DictionaryService.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */,
 				6AE215112A2849BB005A6A02 /* UTF8Helper.cpp in Sources */,

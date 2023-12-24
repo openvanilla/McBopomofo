@@ -289,6 +289,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.SelectingDictionaryService:
+            handle(state: newState, previous: previous, client: client)
         default:
             break
         }
@@ -444,6 +446,19 @@ extension McBopomofoInputMethodController {
         }
         client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
+
+    private func handle(state: InputState.SelectingDictionaryService, previous: InputState, client: Any?) {
+        hideTooltip()
+        guard let client = client as? IMKTextInput else {
+            gCurrentCandidateController?.visible = false
+            return
+        }
+        let candidateDate = state.previousState
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put this composing buffer
+        client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        show(candidateWindowWith: state, client: client)
+    }
 }
 
 // MARK: -
@@ -454,15 +469,24 @@ extension McBopomofoInputMethodController {
         let useVerticalMode: Bool = {
             var useVerticalMode = false
             var candidates: [InputState.Candidate] = []
-            if let state = state as? InputState.ChoosingCandidate {
+            switch state {
+            case let state as InputState.ChoosingCandidate:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
-            } else if let state = state as? InputState.AssociatedPhrases {
+            case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates.map {
                     InputState.Candidate(reading: "", value: $0, displayText: $0)
                 }
+            case let state as InputState.SelectingDictionaryService:
+                useVerticalMode = true
+                candidates = state.menu.map {
+                    InputState.Candidate(reading: "", value: $0, displayText: $0)
+                }
+            default:
+                break
             }
+
             if useVerticalMode == true {
                 return true
             }
@@ -477,14 +501,18 @@ extension McBopomofoInputMethodController {
             return false
         }()
 
+//        gCurrentCandidateController?.visible = false
         gCurrentCandidateController?.delegate = nil
 
         if useVerticalMode {
             gCurrentCandidateController = .vertical
+            CandidateController.horizontal.window?.orderOut(nil)
         } else if Preferences.useHorizontalCandidateList {
             gCurrentCandidateController = .horizontal
+            CandidateController.vertical.window?.orderOut(nil)
         } else {
             gCurrentCandidateController = .vertical
+            CandidateController.horizontal.window?.orderOut(nil)
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -562,6 +590,9 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
     }
 
     func keyHandler(_ keyHandler: KeyHandler, didSelectCandidateAt index: Int, candidateController controller: Any) {
+        if index < 0 {
+            return
+        }
         if let controller = controller as? CandidateController {
             self.candidateController(controller, didSelectCandidateAtIndex: UInt(index))
         }
@@ -623,27 +654,36 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
 
 extension McBopomofoInputMethodController: CandidateControllerDelegate {
     func candidateCountForController(_ controller: CandidateController) -> UInt {
-        if let state = state as? InputState.ChoosingCandidate {
-            return UInt(state.candidates.count)
-        } else if let state = state as? InputState.AssociatedPhrases {
-            return UInt(state.candidates.count)
+        return switch state {
+        case let state as InputState.ChoosingCandidate:
+            UInt(state.candidates.count)
+        case let state as InputState.AssociatedPhrases:
+            UInt(state.candidates.count)
+        case let state as InputState.SelectingDictionaryService:
+            UInt(state.menu.count)
+        default:
+            0
         }
-        return 0
     }
 
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
-        if let state = state as? InputState.ChoosingCandidate {
-            return state.candidates[Int(index)].displayText
-        } else if let state = state as? InputState.AssociatedPhrases {
-            return state.candidates[Int(index)]
+        return switch state {
+        case let state as InputState.ChoosingCandidate:
+            state.candidates[Int(index)].displayText
+        case let state as InputState.AssociatedPhrases:
+            state.candidates[Int(index)]
+        case let state as InputState.SelectingDictionaryService:
+            state.menu[Int(index)]
+        default:
+            ""
         }
-        return ""
     }
 
     func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
         let client = currentClient
 
-        if let state = state as? InputState.ChoosingCandidate {
+        switch state {
+        case let state as InputState.ChoosingCandidate:
             let selectedCandidate = state.candidates[Int(index)]
             keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, useMoveCursorAfterSelectionSetting: true)
 
@@ -664,7 +704,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             } else {
                 handle(state: inputting, client: client)
             }
-        } else if let state = state as? InputState.AssociatedPhrases {
+        case let state as InputState.AssociatedPhrases:
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentClient)
             if Preferences.associatedPhrasesEnabled,
@@ -673,6 +713,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             } else {
                 handle(state: .Empty(), client: client)
             }
+        case let state as InputState.SelectingDictionaryService:
+            state.lookup(usingServiceAtIndex: Int(index))
+        default:
+            break
         }
     }
 }

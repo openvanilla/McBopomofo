@@ -350,4 +350,28 @@ class InputState: NSObject {
             "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
     }
+
+    @objc (InputStateSelectingDictionaryService)
+    class SelectingDictionaryService: NotEmpty {
+        @objc private (set) var previousState: ChoosingCandidate
+        @objc private(set) var selectedPhrase: String = ""
+        @objc private(set) var selectedIndex: Int = 0
+        @objc var menu: [String]
+
+        @objc
+        init(previousState: ChoosingCandidate, selectedString: String, selectedIndex: Int) {
+            self.previousState = previousState
+            self.selectedPhrase = selectedString
+            self.selectedIndex = selectedIndex
+            self.menu = DictionaryServices.shared.services.map { service in
+                String(format: NSLocalizedString("Lookup \"%@\" in %@", comment: ""),
+                       selectedString, service.name)
+            }
+            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+        }
+
+        func lookup(usingServiceAtIndex index: Int) {
+            DictionaryServices.shared.lookup(phrase: selectedPhrase, serviceIndex: index)
+        }
+    }
 }

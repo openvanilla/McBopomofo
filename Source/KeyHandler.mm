@@ -293,6 +293,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(state);
     }
 
+    // MARK: Handle Selecting Dictionary Service
+    if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         InputStateMarking *marking = (InputStateMarking *)state;
@@ -1031,10 +1036,25 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
+    if ([input isTab]) {
+        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
+            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+            NSString *selectedPhrase = currentState.candidates[index].displayText;
+            InputStateSelectingDictionaryService *newState = [[InputStateSelectingDictionaryService alloc] initWithPreviousState:currentState selectedString:selectedPhrase selectedIndex:index];
+            stateCallback(newState);
+            return YES;
+        }
+    }
+
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
     if (cancelCandidateKey) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+        if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+            InputStateChoosingCandidate *newState = [(InputStateSelectingDictionaryService *)state previousState];
+            stateCallback(newState);
+            gCurrentCandidateController.selectedCandidateIndex = [(InputStateSelectingDictionaryService *)state selectedIndex];
+        } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1050,6 +1070,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (charCode == 13 || [input isEnter]) {
+        if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+            [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
+            InputStateChoosingCandidate *newState = [(InputStateSelectingDictionaryService *)state previousState];
+            stateCallback(newState);
+        }
         if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
