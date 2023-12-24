@@ -478,11 +478,8 @@ extension McBopomofoInputMethodController {
                 candidates = state.candidates.map {
                     InputState.Candidate(reading: "", value: $0, displayText: $0)
                 }
-            case let state as InputState.SelectingDictionaryService:
-                useVerticalMode = true
-                candidates = state.menu.map {
-                    InputState.Candidate(reading: "", value: $0, displayText: $0)
-                }
+            case _ as InputState.SelectingDictionaryService:
+                return true
             default:
                 break
             }
@@ -501,18 +498,15 @@ extension McBopomofoInputMethodController {
             return false
         }()
 
-//        gCurrentCandidateController?.visible = false
         gCurrentCandidateController?.delegate = nil
+        gCurrentCandidateController?.visible = false
 
         if useVerticalMode {
             gCurrentCandidateController = .vertical
-            CandidateController.horizontal.window?.orderOut(nil)
         } else if Preferences.useHorizontalCandidateList {
             gCurrentCandidateController = .horizontal
-            CandidateController.vertical.window?.orderOut(nil)
         } else {
             gCurrentCandidateController = .vertical
-            CandidateController.horizontal.window?.orderOut(nil)
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -691,7 +685,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 return
             }
 
-            if keyHandler.inputMode == .plainBopomofo {
+            switch keyHandler.inputMode {
+            case .plainBopomofo:
                 keyHandler.clear()
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
@@ -701,8 +696,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 } else {
                     handle(state: .Empty(), client: client)
                 }
-            } else {
+            case .bopomofo:
                 handle(state: inputting, client: client)
+            default:
+                break
             }
         case let state as InputState.AssociatedPhrases:
             let selectedValue = state.candidates[Int(index)]

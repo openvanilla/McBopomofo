@@ -1051,9 +1051,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     if (cancelCandidateKey) {
         if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
-            InputStateChoosingCandidate *newState = [(InputStateSelectingDictionaryService *)state previousState];
+            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
+            NSInteger selectedIndex = current.selectedIndex;
+            InputStateChoosingCandidate *newState = [current previousState];
             stateCallback(newState);
-            gCurrentCandidateController.selectedCandidateIndex = [(InputStateSelectingDictionaryService *)state selectedIndex];
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
         } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -1072,8 +1075,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     if (charCode == 13 || [input isEnter]) {
         if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
             [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
-            InputStateChoosingCandidate *newState = [(InputStateSelectingDictionaryService *)state previousState];
+            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
+            NSInteger selectedIndex = current.selectedIndex;
+            InputStateChoosingCandidate *newState = [current previousState];
             stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+            return YES;
         }
         if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
@@ -1193,6 +1201,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         candidates = [(InputStateChoosingCandidate *)state candidates];
     } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         candidates = [(InputStateAssociatedPhrases *)state candidates];
+    } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+        candidates = [(InputStateSelectingDictionaryService *)state menu];
     }
 
     if (!candidates) {
