@@ -1599,7 +1599,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        input = KeyHandlerInput(inputText: "?", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
         } errorCallback: {
@@ -1607,7 +1607,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
 
         XCTAssert(state is InputState.SelectingDictionaryService)
 
-        input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        input = KeyHandlerInput(inputText: "?", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
         } errorCallback: {
@@ -1634,7 +1634,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        input = KeyHandlerInput(inputText: "?", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
         } errorCallback: {
