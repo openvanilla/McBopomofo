@@ -1557,4 +1557,74 @@ class KeyHandlerBopomofoTests: XCTestCase {
         Preferences.escToCleanInputBuffer = enabled
     }
 
+    func testLookUpCandidateInDictionaryAndCancelWithTabKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("wu0 dj/ ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        var input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.down.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.SelectingDictionaryService)
+
+        input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.ChoosingCandidate)
+    }
+
+    func testLookUpCandidateInDictionaryAndCancelWithEscKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("wu0 dj/ ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(inputText: key, keyCode: 0, charCode: charCode(key), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        var input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.down.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        input = KeyHandlerInput(inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.SelectingDictionaryService)
+
+        input = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.ChoosingCandidate)
+    }
+
 }

@@ -3,14 +3,14 @@ import Cocoa
 
 protocol DictionaryService {
     var name: String { get }
-    func lookup(phrase: String)
+    func lookUp(phrase: String)
 }
 
 fileprivate struct MacOSBuiltInDictionary: DictionaryService {
     var name: String {
         return NSLocalizedString("Dictionary app", comment: "")
     }
-    func lookup(phrase: String) {
+    func lookUp(phrase: String) {
         guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return
         }
@@ -24,7 +24,7 @@ fileprivate struct MoeDictionary: DictionaryService {
     var name: String {
         return NSLocalizedString("MOE Dictionary", comment: "")
     }
-    func lookup(phrase: String) {
+    func lookUp(phrase: String) {
         guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return
         }
@@ -38,7 +38,7 @@ fileprivate struct GoogleSearch: DictionaryService {
     var name: String {
         return NSLocalizedString("Google", comment: "")
     }
-    func lookup(phrase: String) {
+    func lookUp(phrase: String) {
         guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return
         }
@@ -52,7 +52,7 @@ fileprivate struct MoeRevisedDictionary: DictionaryService {
     var name: String {
         return NSLocalizedString("教育部重編國語詞典修訂本", comment: "")
     }
-    func lookup(phrase: String) {
+    func lookUp(phrase: String) {
         guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return
         }
@@ -66,7 +66,7 @@ fileprivate struct MoeConcisedDictionary: DictionaryService {
     var name: String {
         return NSLocalizedString("教育部國語詞典簡邊本", comment: "")
     }
-    func lookup(phrase: String) {
+    func lookUp(phrase: String) {
         guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return
         }
@@ -76,11 +76,11 @@ fileprivate struct MoeConcisedDictionary: DictionaryService {
     }
 }
 
-fileprivate struct MoeIdionmDictionary: DictionaryService {
+fileprivate struct MoeIdiomsDictionary: DictionaryService {
     var name: String {
         return NSLocalizedString("教育部成語典", comment: "")
     }
-    func lookup(phrase: String) {
+    func lookUp(phrase: String) {
         guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return
         }
@@ -100,14 +100,14 @@ class DictionaryServices: NSObject {
         GoogleSearch(),
         MoeRevisedDictionary(),
         MoeConcisedDictionary(),
-        MoeIdionmDictionary(),
+        MoeIdiomsDictionary(),
     ]
 
-    func lookup(phrase: String, serviceIndex: Int) {
+    func lookUp(phrase: String, serviceIndex: Int) {
         if serviceIndex >= services.count {
             return
         }
         let service = services[serviceIndex]
-        service.lookup(phrase: phrase)
+        service.lookUp(phrase: phrase)
     }
 }

@@ -711,7 +711,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 handle(state: .Empty(), client: client)
             }
         case let state as InputState.SelectingDictionaryService:
-            state.lookup(usingServiceAtIndex: Int(index))
+            state.lookUp(usingServiceAtIndex: Int(index))
         default:
             break
         }

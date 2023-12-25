@@ -1037,7 +1037,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
     if ([input isTab]) {
-        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+        if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
+            NSInteger selectedIndex = current.selectedIndex;
+            InputStateChoosingCandidate *newState = [current previousState];
+            stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
             NSString *selectedPhrase = currentState.candidates[index].displayText;

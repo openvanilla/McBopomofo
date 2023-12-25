@@ -364,14 +364,14 @@ class InputState: NSObject {
             self.selectedPhrase = selectedString
             self.selectedIndex = selectedIndex
             self.menu = DictionaryServices.shared.services.map { service in
-                String(format: NSLocalizedString("Lookup \"%@\" in %@", comment: ""),
+                String(format: NSLocalizedString("Look up \"%1$@\" in %2$@", comment: ""),
                        selectedString, service.name)
             }
             super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
         }
 
-        func lookup(usingServiceAtIndex index: Int) {
-            DictionaryServices.shared.lookup(phrase: selectedPhrase, serviceIndex: index)
+        func lookUp(usingServiceAtIndex index: Int) {
+            DictionaryServices.shared.lookUp(phrase: selectedPhrase, serviceIndex: index)
         }
     }
 }

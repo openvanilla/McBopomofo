@@ -47,6 +47,8 @@
 		D427F7B6279086F6004A2160 /* InputSourceHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7B5279086F6004A2160 /* InputSourceHelper */; };
 		D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7C027908EFC004A2160 /* OpenCCBridge */; };
 		D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43FC40A2B23788400ED5A1C /* InputMacro.swift */; };
+		D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD5E2B393C00000C5812 /* InputMacroTests.swift */; };
+		D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD602B39506D000C5812 /* ServiceProviderTests.swift */; };
 		D44FB74527915565003C80A6 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
 		D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */ = {isa = PBXBuildFile; productRef = D44FB7492791B829003C80A6 /* VXHanConvert */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
@@ -170,6 +172,8 @@
 		D427F7B2279086B5004A2160 /* InputSourceHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InputSourceHelper; path = Packages/InputSourceHelper; sourceTree = "<group>"; };
 		D427F7BF27908EAC004A2160 /* OpenCCBridge */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenCCBridge; path = Packages/OpenCCBridge; sourceTree = "<group>"; };
 		D43FC40A2B23788400ED5A1C /* InputMacro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacro.swift; sourceTree = "<group>"; };
+		D449AD5E2B393C00000C5812 /* InputMacroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacroTests.swift; sourceTree = "<group>"; };
+		D449AD602B39506D000C5812 /* ServiceProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProviderTests.swift; sourceTree = "<group>"; };
 		D44FB74427915555003C80A6 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		D44FB7482791B346003C80A6 /* VXHanConvert */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = VXHanConvert; path = Packages/VXHanConvert; sourceTree = "<group>"; };
 		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
@@ -441,6 +445,8 @@
 				D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */,
 				D485D3B82796A8A000657FF3 /* PreferencesTests.swift */,
 				D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */,
+				D449AD5E2B393C00000C5812 /* InputMacroTests.swift */,
+				D449AD602B39506D000C5812 /* ServiceProviderTests.swift */,
 			);
 			path = McBopomofoTests;
 			sourceTree = "<group>";
@@ -701,8 +707,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */,
+				D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */,
 				D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */,
 				D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */,
+				D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */,
 				D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

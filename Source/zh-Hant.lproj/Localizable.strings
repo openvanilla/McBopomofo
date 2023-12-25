@@ -96,3 +96,5 @@
 "Check for Update Completed" = "版本檢查完成";
 
 "McBopomofo is up to date." = "您的小麥注音不需要更新。";
+
+"Look up \"%1$@\" in %2$@" = "在%2$@查詢 \"%1$@\"";
