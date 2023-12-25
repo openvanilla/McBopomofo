@@ -72,7 +72,7 @@ fileprivate struct MoeRevisedDictionary: DictionaryService {
 
 fileprivate struct MoeConcisedDictionary: DictionaryService {
     var name: String {
-        return NSLocalizedString("教育部國語詞典簡邊本", comment: "")
+        return NSLocalizedString("教育部國語詞典簡編本", comment: "")
     }
 
     func lookUp(phrase: String) -> Bool {
@@ -102,6 +102,54 @@ fileprivate struct MoeIdiomsDictionary: DictionaryService {
     }
 }
 
+fileprivate struct MoeVariantsDictionary: DictionaryService {
+    var name: String {
+        return NSLocalizedString("教育部異體字字典", comment: "")
+    }
+
+    func lookUp(phrase: String) -> Bool {
+        guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            return false
+        }
+        if let url = URL(string: "https://dict.variants.moe.edu.tw/variants/rbt/query_result.do?from=standard&search_text=\(encoded)") {
+            return NSWorkspace.shared.open(url)
+        }
+        return false
+    }
+}
+
+fileprivate struct KangXiictionary: DictionaryService {
+    var name: String {
+        return NSLocalizedString("康熙字典網上版", comment: "")
+    }
+
+    func lookUp(phrase: String) -> Bool {
+        guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            return false
+        }
+        if let url = URL(string: "https://www.kangxizidian.com/search/index.php?stype=Word&sword=\(encoded)&detail=n") {
+            return NSWorkspace.shared.open(url)
+        }
+        return false
+    }
+}
+
+fileprivate struct UnihanDatabase: DictionaryService {
+    var name: String {
+        return NSLocalizedString("Unihan Database", comment: "")
+    }
+
+    func lookUp(phrase: String) -> Bool {
+        guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            return false
+        }
+        if let url = URL(string: "https://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=\(encoded)") {
+            return NSWorkspace.shared.open(url)
+        }
+        return false
+    }
+}
+
 
 class DictionaryServices: NSObject {
     @objc static var shared = DictionaryServices()
@@ -112,6 +160,9 @@ class DictionaryServices: NSObject {
         MoeRevisedDictionary(),
         MoeConcisedDictionary(),
         MoeIdiomsDictionary(),
+        MoeVariantsDictionary(),
+        KangXiictionary(),
+        UnihanDatabase(),
     ]
 
     func lookUp(phrase: String, serviceIndex: Int) -> Bool {
