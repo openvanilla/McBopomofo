@@ -371,7 +371,7 @@ class InputState: NSObject {
         }
 
         func lookUp(usingServiceAtIndex index: Int) {
-            _ = DictionaryServices.shared.lookUp(phrase: selectedPhrase, serviceIndex: index)
+            _ = DictionaryServices.shared.lookUp(phrase: selectedPhrase, withServiceAtIndex: index)
         }
     }
 }
