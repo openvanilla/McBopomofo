@@ -41,6 +41,30 @@ class KeyHandlerBopomofoTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
+    func testSyncWithPreferences() {
+        let savedKeyboardLayout = Preferences.keyboardLayout
+        Preferences.keyboardLayout = 0
+        handler.syncWithPreferences()
+
+        Preferences.keyboardLayout = 1
+        handler.syncWithPreferences()
+
+        Preferences.keyboardLayout = 2
+        handler.syncWithPreferences()
+
+        Preferences.keyboardLayout = 3
+        handler.syncWithPreferences()
+
+        Preferences.keyboardLayout = 4
+        handler.syncWithPreferences()
+
+        Preferences.keyboardLayout = 5
+        handler.syncWithPreferences()
+
+        Preferences.keyboardLayout = savedKeyboardLayout
+        handler.syncWithPreferences()
+    }
+
     func testIgnoreEmpty() {
         let input = KeyHandlerInput(inputText: "", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
         var state: InputState = InputState.Empty()
