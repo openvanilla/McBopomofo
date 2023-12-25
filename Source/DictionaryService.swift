@@ -4,6 +4,44 @@ import Cocoa
 protocol DictionaryService {
     var name: String { get }
     func lookUp(phrase: String) -> Bool
+    func textForMenu(selectedString: String) -> String
+}
+
+extension DictionaryService {
+    func textForMenu(selectedString: String) -> String {
+        String(format: NSLocalizedString("Look up \"%1$@\" in %2$@", comment: ""),
+                selectedString, name)
+    }
+}
+
+fileprivate struct Speak: DictionaryService {
+    let speechSynthesizer: NSSpeechSynthesizer? = {
+        let voices = NSSpeechSynthesizer.availableVoices
+        let firstZhTWVoice = voices.first { voice in
+            voice.rawValue.contains("zh-TW")
+        }
+        guard let firstZhTWVoice else {
+            return nil
+        }
+        return NSSpeechSynthesizer.init(voice: firstZhTWVoice)
+    }()
+
+    var name: String {
+        return NSLocalizedString("Speak", comment: "")
+    }
+
+    func lookUp(phrase: String) -> Bool {
+        guard let speechSynthesizer else {
+            return false
+        }
+        speechSynthesizer.stopSpeaking()
+        speechSynthesizer.startSpeaking(phrase)
+        return true
+    }
+
+    func textForMenu(selectedString: String) -> String {
+        String(format: NSLocalizedString("Speak \"%@\"…", comment: ""), selectedString)
+    }
 }
 
 fileprivate struct MacOSBuiltInDictionary: DictionaryService {
@@ -24,7 +62,7 @@ fileprivate struct MacOSBuiltInDictionary: DictionaryService {
 
 fileprivate struct MoeDictionary: DictionaryService {
     var name: String {
-        return NSLocalizedString("MOE Dictionary", comment: "")
+        return NSLocalizedString("MOE Dict", comment: "")
     }
 
     func lookUp(phrase: String) -> Bool {
@@ -32,6 +70,38 @@ fileprivate struct MoeDictionary: DictionaryService {
             return false
         }
         if let url = URL(string: "https://www.moedict.tw/\(encoded)") {
+            return NSWorkspace.shared.open(url)
+        }
+        return false
+    }
+}
+
+fileprivate struct MoeDicHoloDictionary: DictionaryService {
+    var name: String {
+        return NSLocalizedString("MOE Dict (Holo)", comment: "")
+    }
+
+    func lookUp(phrase: String) -> Bool {
+        guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            return false
+        }
+        if let url = URL(string: "https://www.moedict.tw/'\(encoded)") {
+            return NSWorkspace.shared.open(url)
+        }
+        return false
+    }
+}
+
+fileprivate struct MoeDicHakkaDictionary: DictionaryService {
+    var name: String {
+        return NSLocalizedString("MOE Dict (Hakka)", comment: "")
+    }
+
+    func lookUp(phrase: String) -> Bool {
+        guard let encoded = phrase.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
+            return false
+        }
+        if let url = URL(string: "https://www.moedict.tw/:\(encoded)") {
             return NSWorkspace.shared.open(url)
         }
         return false
@@ -154,8 +224,11 @@ fileprivate struct UnihanDatabase: DictionaryService {
 class DictionaryServices: NSObject {
     @objc static var shared = DictionaryServices()
     var services: [DictionaryService] = [
+        Speak(),
         MacOSBuiltInDictionary(),
         MoeDictionary(),
+        MoeDicHoloDictionary(),
+        MoeDicHakkaDictionary(),
         GoogleSearch(),
         MoeRevisedDictionary(),
         MoeConcisedDictionary(),

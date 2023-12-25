@@ -1044,6 +1044,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+            return YES;
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
@@ -1251,6 +1252,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
         if (candidateIndex != NSUIntegerMax) {
             [self.delegate keyHandler:self didSelectCandidateAtIndex:candidateIndex candidateController:gCurrentCandidateController];
+
+            if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+                InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
+                NSInteger selectedIndex = current.selectedIndex;
+                InputStateChoosingCandidate *newState = [current previousState];
+                stateCallback(newState);
+                gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+                gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+            }
+
             return YES;
         }
     }
