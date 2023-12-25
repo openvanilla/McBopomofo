@@ -1036,7 +1036,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
-    if ([input isTab]) {
+    if ([[input inputText] isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
             InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
             NSInteger selectedIndex = current.selectedIndex;
