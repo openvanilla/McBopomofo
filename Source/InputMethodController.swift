@@ -712,6 +712,12 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             }
         case let state as InputState.SelectingDictionaryService:
             state.lookUp(usingServiceAtIndex: Int(index))
+            let previous = state.previousState
+            let candidateIndex = state.selectedIndex
+            handle(state: previous, client: client)
+            if candidateIndex > 0 {
+                gCurrentCandidateController?.selectedCandidateIndex = UInt(candidateIndex)
+            }
         default:
             break
         }

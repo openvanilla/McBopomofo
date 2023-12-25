@@ -1081,16 +1081,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (charCode == 13 || [input isEnter]) {
-        if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
-            [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
-            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
-            NSInteger selectedIndex = current.selectedIndex;
-            InputStateChoosingCandidate *newState = [current previousState];
-            stateCallback(newState);
-            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
-            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
-            return YES;
-        }
         if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -1252,16 +1242,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         NSUInteger candidateIndex = [gCurrentCandidateController candidateIndexAtKeyLabelIndex:index];
         if (candidateIndex != NSUIntegerMax) {
             [self.delegate keyHandler:self didSelectCandidateAtIndex:candidateIndex candidateController:gCurrentCandidateController];
-
-            if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
-                InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
-                NSInteger selectedIndex = current.selectedIndex;
-                InputStateChoosingCandidate *newState = [current previousState];
-                stateCallback(newState);
-                gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
-                gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
-            }
-
             return YES;
         }
     }
