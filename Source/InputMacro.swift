@@ -422,7 +422,7 @@ class InputMacroController: NSObject {
     @objc
     static let shared = InputMacroController()
 
-    private var macros: [String:InputMacro] = {
+    private var macros: [String: InputMacro] = {
         let macros: [InputMacro] = [
             InputMacroThisYear(),
             InputMacroThisYearROC(),
@@ -459,12 +459,12 @@ class InputMacroController: NSObject {
             InputMacroLastYearChineseZodiac(),
             InputMacroNextYearChineseZodiac(),
         ]
-        var map:[String:InputMacro] = [:]
+        var map: [String: InputMacro] = [:]
         macros.forEach { macro in
             map[macro.name] = macro
         }
         return map
-    } ()
+    }()
 
 
     @objc

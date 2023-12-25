@@ -467,7 +467,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Ctrl + ` for Big 5 Code" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="9wE-js-xtM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <binding destination="32" name="value" keyPath="values.Big5InputEnabled" id="0sV-29-JVt"/>

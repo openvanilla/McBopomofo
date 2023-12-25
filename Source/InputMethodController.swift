@@ -291,6 +291,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.SelectingDictionaryService:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.ShowingCharInfo:
+            handle(state: newState, previous: previous, client: client)
         default:
             break
         }
@@ -459,6 +461,20 @@ extension McBopomofoInputMethodController {
         client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
     }
+
+    private func handle(state: InputState.ShowingCharInfo, previous: InputState, client: Any?) {
+
+        hideTooltip()
+        guard let client = client as? IMKTextInput else {
+            gCurrentCandidateController?.visible = false
+            return
+        }
+        let candidateDate = state.previousState.previousState
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put this composing buffer
+        client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        show(candidateWindowWith: state, client: client)
+    }
 }
 
 // MARK: -
@@ -479,6 +495,8 @@ extension McBopomofoInputMethodController {
                     InputState.Candidate(reading: "", value: $0, displayText: $0)
                 }
             case _ as InputState.SelectingDictionaryService:
+                return true
+            case _ as InputState.ShowingCharInfo:
                 return true
             default:
                 break
@@ -655,6 +673,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             UInt(state.candidates.count)
         case let state as InputState.SelectingDictionaryService:
             UInt(state.menu.count)
+        case let state as InputState.ShowingCharInfo:
+            UInt(state.menu.count)
         default:
             0
         }
@@ -667,6 +687,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         case let state as InputState.AssociatedPhrases:
             state.candidates[Int(index)]
         case let state as InputState.SelectingDictionaryService:
+            state.menu[Int(index)]
+        case let state as InputState.ShowingCharInfo:
             state.menu[Int(index)]
         default:
             ""
@@ -711,9 +733,25 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 handle(state: .Empty(), client: client)
             }
         case let state as InputState.SelectingDictionaryService:
-            state.lookUp(usingServiceAtIndex: Int(index))
-            let previous = state.previousState
-            let candidateIndex = state.selectedIndex
+            let handled = state.lookUp(usingServiceAtIndex: Int(index), state: state) { state in
+                handle(state: state, client: client)
+            }
+            if handled {
+                let previous = state.previousState
+                let candidateIndex = state.selectedIndex
+                handle(state: previous, client: client)
+                if candidateIndex > 0 {
+                    gCurrentCandidateController?.selectedCandidateIndex = UInt(candidateIndex)
+                }
+            }
+        case let state as InputState.ShowingCharInfo:
+            let text = state.menuTitleValueMapping[Int(index)].1
+            NSPasteboard.general.declareTypes([.string], owner: nil)
+            NSPasteboard.general.setString(text, forType: .string)
+            NotifierController.notify(message:String(format:NSLocalizedString("%@ has been copied.", comment: ""), text))
+
+            let previous = state.previousState.previousState
+            let candidateIndex = state.previousState.selectedIndex
             handle(state: previous, client: client)
             if candidateIndex > 0 {
                 gCurrentCandidateController?.selectedCandidateIndex = UInt(candidateIndex)

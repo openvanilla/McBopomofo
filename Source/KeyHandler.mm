@@ -298,6 +298,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
+    // MARK: Handle Showing Character Information
+    if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         InputStateMarking *marking = (InputStateMarking *)state;
@@ -1036,15 +1042,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
+    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
+
     if ([[input inputText] isEqualToString:@"?"]) {
-        if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
-            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
-            NSInteger selectedIndex = current.selectedIndex;
-            InputStateChoosingCandidate *newState = [current previousState];
-            stateCallback(newState);
-            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
-            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
-            return YES;
+        if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
+            cancelCandidateKey = YES;
+        } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+            cancelCandidateKey = YES;
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
@@ -1055,13 +1059,18 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
-
     if (cancelCandidateKey) {
-        if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+        if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
+            InputStateShowingCharInfo *current = (InputStateShowingCharInfo *)state;
+            NSInteger selectedIndex = current.previousState.selectedIndex;
+            InputStateChoosingCandidate *newState = current.previousState.previousState;
+            stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
             InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
             NSInteger selectedIndex = current.selectedIndex;
-            InputStateChoosingCandidate *newState = [current previousState];
+            InputStateChoosingCandidate *newState = current.previousState;
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
@@ -1315,13 +1324,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     if ((charCode >= '0' && charCode <= '9') ||
         (charCode >= 'a' && charCode <= 'f')) {
-        NSString *appneded = [NSString stringWithFormat:@"%@%c", bigs.code, toupper(charCode)];
-        if (appneded.length == 4) {
-            long big5Code = (long)strtol(appneded.UTF8String, NULL, 16);
+        NSString *appended = [NSString stringWithFormat:@"%@%c", bigs.code, toupper(charCode)];
+        if (appended.length == 4) {
+            long big5Code = (long)strtol(appended.UTF8String, NULL, 16);
             char bytes[3] = {0};
             bytes[0] = (big5Code >> CHAR_BIT) & 0xff;
             bytes[1] = big5Code & 0xff;
-            CFStringRef string = CFStringCreateWithCString(NULL, bytes, kCFStringEncodingBig5);
+            CFStringRef string = CFStringCreateWithCString(NULL, bytes, kCFStringEncodingBig5_HKSCS_1999);
             if (string == NULL) {
                 errorCallback();
                 InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -1329,12 +1338,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return YES;
             }
 
-            InputStateCommitting *commiting = [[InputStateCommitting alloc] initWithPoppedText:(__bridge NSString *)string];
-            stateCallback(commiting);
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:(__bridge NSString *)string];
+            stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
         } else {
-            InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appneded];
+            InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appended];
             stateCallback(newState);
         }
         return YES;

@@ -434,7 +434,7 @@
                     <rect key="frame" x="182" y="19" width="234" height="18"/>
                     <buttonCell key="cell" type="check" title="使用 Ctrl + ` 輸入 Big5 內碼" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="29h-4W-Qux">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" size="13" name=".PingFangTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <binding destination="32" name="value" keyPath="values.Big5InputEnabled" id="aQr-XB-Bhd"/>

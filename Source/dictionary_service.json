@@ -45,10 +45,6 @@
       "url_template": "https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_su&tsha=(encoded)"
     },
     {
-      "name": "教育部臺灣客家語常用詞辭典",
-      "url_template": "https://hakkadict.moe.edu.tw/cgi-bin/gs32/gsweb.cgi/ccd=nsbgkx/search?qs0=(encoded)"
-    },
-    {
       "name": "Wiktionary",
       "url_template": "https://zh.wiktionary.org/wiki/Special:Search?search=(encoded)"
     },
