@@ -1044,7 +1044,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
-    if ([[input inputText] isEqualToString:@"?"]) {
+    if (_inputMode == InputModeBopomofo && [[input inputText] isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
             cancelCandidateKey = YES;
         } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
