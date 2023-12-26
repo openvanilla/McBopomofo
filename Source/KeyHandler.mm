@@ -988,6 +988,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    // Dictionary look up
+    if ([input.inputText isEqualToString:@"?"]) {
+        if (state.markedRange.length > 0) {
+            InputStateSelectingDictionaryService *newState = [[InputStateSelectingDictionaryService alloc] initWithPreviousState:state selectedString:state.selectedText selectedIndex:0];
+            stateCallback(newState);
+            return YES;
+        }
+    }
+
     // Shift + left
     if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
         && ([input isShiftHold])) {
@@ -1063,14 +1072,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
             InputStateShowingCharInfo *current = (InputStateShowingCharInfo *)state;
             NSInteger selectedIndex = current.previousState.selectedIndex;
-            InputStateChoosingCandidate *newState = current.previousState.previousState;
+            InputStateNotEmpty *newState = current.previousState.previousState;
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
         } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
             InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
             NSInteger selectedIndex = current.selectedIndex;
-            InputStateChoosingCandidate *newState = current.previousState;
+            InputStateNotEmpty *newState = current.previousState;
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;

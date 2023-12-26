@@ -356,13 +356,13 @@ class InputState: NSObject {
 
     @objc(InputStateSelectingDictionaryService)
     class SelectingDictionaryService: NotEmpty {
-        @objc private(set) var previousState: ChoosingCandidate
+        @objc private(set) var previousState: NotEmpty
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedIndex: Int = 0
         @objc private(set) var menu: [String]
 
         @objc
-        init(previousState: ChoosingCandidate, selectedString: String, selectedIndex: Int) {
+        init(previousState: NotEmpty, selectedString: String, selectedIndex: Int) {
             self.previousState = previousState
             self.selectedPhrase = selectedString
             self.selectedIndex = selectedIndex

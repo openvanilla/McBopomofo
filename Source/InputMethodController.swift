@@ -455,10 +455,16 @@ extension McBopomofoInputMethodController {
             gCurrentCandidateController?.visible = false
             return
         }
-        let candidateDate = state.previousState
+        let previousState = state.previousState
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+
+        if let candidateDate = previousState as? InputState.ChoosingCandidate {
+            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        } else if let candidateDate = previousState as? InputState.Marking {
+            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        }
+
         show(candidateWindowWith: state, client: client)
     }
 
@@ -469,10 +475,14 @@ extension McBopomofoInputMethodController {
             gCurrentCandidateController?.visible = false
             return
         }
-        let candidateDate = state.previousState.previousState
+        let previousState = state.previousState.previousState
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        if let candidateDate = previousState as? InputState.ChoosingCandidate {
+            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        } else if let candidateDate = previousState as? InputState.Marking {
+            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        }
         show(candidateWindowWith: state, client: client)
     }
 }
