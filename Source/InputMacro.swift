@@ -23,318 +23,52 @@
 
 import Foundation
 
-protocol InputMacro {
-    var name: String { get }
-    var replacement: String { get }
-}
+// MARK: Private Methods
 
-// MARK: - Year
-
-fileprivate func formatYear(from date: Date, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "GU年"
-    dateFormatter.locale = locale
-    dateFormatter.calendar = calendar
-    return dateFormatter.string(from: date)
-}
-
-fileprivate struct InputMacroThisYear: InputMacro {
-    var name: String { "MACRO@THIS_YEAR" }
-
-    var replacement: String {
-        let date = Date()
-        return formatYear(from: date)
-    }
-}
-
-fileprivate struct InputMacroThisYearROC: InputMacro {
-    var name: String { "MACRO@THIS_YEAR_ROC" }
-
-    var replacement: String {
-        let date = Date()
-        return formatYear(from: date, calendar: Calendar(identifier: .republicOfChina))
-    }
-}
-
-fileprivate struct InputMacroThisYearJapanese: InputMacro {
-    var name: String { "MACRO@THIS_YEAR_JAPANESE" }
-
-    var replacement: String {
-        let date = Date()
-        return formatYear(from: date, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
-    }
-}
-
-fileprivate struct InputMacroLastYear: InputMacro {
-    var name: String { "MACRO@LAST_YEAR" }
-
-    var replacement: String {
-        let calendar = Calendar(identifier: .gregorian)
-        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
-            return formatYear(from: date)
-        }
+fileprivate func formatDateWithStyle(calendarName:Calendar.Identifier, yearOffset: Int, dayOffset: Int, dateStyle: DateFormatter.Style, timeStyle: DateFormatter.Style) -> String {
+    let calendar = Calendar(identifier: calendarName)
+    let now = Date()
+    guard let dateAppendingYear = calendar.date(byAdding: .year, value: yearOffset, to: now),
+          let dateAppendingDay = calendar.date(byAdding: .day, value: dayOffset, to: dateAppendingYear)
+    else {
         return ""
     }
+    let formatter = DateFormatter()
+    formatter.calendar = calendar
+    formatter.dateStyle = dateStyle
+    formatter.timeStyle = timeStyle
+    formatter.locale = Locale(identifier: calendarName == .japanese ? "ja_JP" : "zh_Hant_TW")
+    return formatter.string(from: dateAppendingDay)
 }
 
-fileprivate struct InputMacroLastYearROC: InputMacro {
-    var name: String { "MACRO@LAST_YEAR_ROC" }
-
-    var replacement: String {
-        let calendar = Calendar(identifier: .republicOfChina)
-        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
-            return formatYear(from: date, calendar: calendar)
-        }
+fileprivate func formatWithPattern(calendarName:Calendar.Identifier, yearOffset: Int, dayOffset: Int, pattern: String) -> String {
+    let calendar = Calendar(identifier: calendarName)
+    let now = Date()
+    guard let dateAppendingYear = calendar.date(byAdding: .year, value: yearOffset, to: now),
+          let dateAppendingDay = calendar.date(byAdding: .day, value: dayOffset, to: dateAppendingYear)
+    else {
         return ""
     }
+    let formatter = DateFormatter()
+    formatter.calendar = calendar
+    formatter.dateFormat = pattern
+    formatter.locale = Locale(identifier: calendarName == .japanese ? "ja_JP" : "zh_Hant_TW")
+    return formatter.string(from: dateAppendingDay)
 }
 
-fileprivate struct InputMacroLastYearJapanese: InputMacro {
-    var name: String { "MACRO@LAST_YEAR_JAPANESE" }
-
-    var replacement: String {
-        let calendar = Calendar(identifier: .japanese)
-        if let date = calendar.date(byAdding: .year, value: -1, to: Date()) {
-            return formatYear(from: date, calendar: calendar, locale: Locale(identifier: "ja_JP"))
-        }
-        return ""
-    }
+fileprivate func formatDate(calendarName:Calendar.Identifier, dayOffset: Int, style: DateFormatter.Style) -> String {
+    return formatDateWithStyle(calendarName: calendarName, yearOffset: 0, dayOffset: dayOffset, dateStyle: style, timeStyle: .none)
 }
 
-fileprivate struct InputMacroNextYear: InputMacro {
-    var name: String { "MACRO@NEXT_YEAR" }
-
-    var replacement: String {
-        let calendar = Calendar(identifier: .gregorian)
-        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
-            return formatYear(from: date)
-        }
-        return ""
-    }
+fileprivate func formatTime(style: DateFormatter.Style) -> String {
+    return formatDateWithStyle(calendarName: .gregorian, yearOffset: 0, dayOffset: 0, dateStyle: .none, timeStyle: style)
 }
 
-fileprivate struct InputMacroNextYearROC: InputMacro {
-    var name: String { "MACRO@NEXT_YEAR_ROC" }
-
-    var replacement: String {
-        let calendar = Calendar(identifier: .republicOfChina)
-        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
-            return formatYear(from: date, calendar: calendar)
-        }
-        return ""
-    }
+fileprivate func formatTimeZone(style: TimeZone.NameStyle) -> String {
+    let timezone = TimeZone.current
+    let locale = Locale(identifier: "zh_Hant_TW")
+    return timezone.localizedName(for: style, locale: locale) ?? ""
 }
-
-fileprivate struct InputMacroNextYearJapanese: InputMacro {
-    var name: String { "MACRO@NEXT_YEAR_JAPANESE" }
-
-    var replacement: String {
-        let calendar = Calendar(identifier: .japanese)
-        if let date = calendar.date(byAdding: .year, value: 1, to: Date()) {
-            return formatYear(from: date, calendar: calendar, locale: Locale(identifier: "ja_JP"))
-        }
-        return ""
-    }
-}
-
-// MARK: - Date
-
-fileprivate func formatDate(date: Date, style: DateFormatter.Style, calendar: Calendar = Calendar(identifier: .gregorian), locale: Locale = Locale(identifier: "zh_Hant_TW")) -> String {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateStyle = style
-    dateFormatter.timeStyle = .none
-    dateFormatter.locale = locale
-    dateFormatter.calendar = calendar
-    return dateFormatter.string(from: date)
-}
-
-fileprivate struct InputMacroDateTodayShort: InputMacro {
-    var name: String { "MACRO@DATE_TODAY_SHORT" }
-
-    var replacement: String {
-        let date = Date()
-        return formatDate(date: date, style: .short)
-    }
-}
-
-fileprivate struct InputMacroDateYesterdayShort: InputMacro {
-    var name: String { "MACRO@DATE_YESTERDAY_SHORT" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * -24)
-        return formatDate(date: date, style: .short)
-    }
-}
-
-fileprivate struct InputMacroDateTomorrowShort: InputMacro {
-    var name: String { "MACRO@DATE_TOMORROW_SHORT" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * 24)
-        return formatDate(date: date, style: .short)
-    }
-}
-
-fileprivate struct InputMacroDateTodayMedium: InputMacro {
-    var name: String { "MACRO@DATE_TODAY_MEDIUM" }
-
-    var replacement: String {
-        let date = Date()
-        return formatDate(date: date, style: .medium)
-    }
-}
-
-fileprivate struct InputMacroDateYesterdayMedium: InputMacro {
-    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * -24)
-        return formatDate(date: date, style: .medium)
-    }
-}
-
-fileprivate struct InputMacroDateTomorrowMedium: InputMacro {
-    var name: String { "MACRO@DATE_TOMORROW_MEDIUM" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * 24)
-        return formatDate(date: date, style: .medium)
-    }
-}
-
-fileprivate struct InputMacroDateTodayMediumROC: InputMacro {
-    var name: String { "MACRO@DATE_TODAY_MEDIUM_ROC" }
-
-    var replacement: String {
-        let date = Date()
-        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .republicOfChina))
-    }
-}
-
-fileprivate struct InputMacroDateYesterdayMediumROC: InputMacro {
-    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_ROC" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * -24)
-        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .republicOfChina))
-    }
-}
-
-fileprivate struct InputMacroDateTomorrowMediumROC: InputMacro {
-    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_ROC" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * 24)
-        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .republicOfChina))
-    }
-}
-
-
-fileprivate struct InputMacroDateTodayMediumChinese: InputMacro {
-    var name: String { "MACRO@DATE_TODAY_MEDIUM_CHINESE" }
-
-    var replacement: String {
-        let date = Date()
-        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
-    }
-}
-
-fileprivate struct InputMacroDateYesterdayMediumChinese: InputMacro {
-    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_CHINESE" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * -24)
-        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
-    }
-}
-
-fileprivate struct InputMacroDateTomorrowMediumChinese: InputMacro {
-    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_CHINESE" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * 24)
-        return formatDate(date: date, style: .medium, calendar: Calendar(identifier: .chinese))
-    }
-}
-
-fileprivate struct InputMacroDateTodayFullJapanese: InputMacro {
-    var name: String { "MACRO@DATE_TODAY_FULL_JAPANESE" }
-
-    var replacement: String {
-        let date = Date()
-        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
-    }
-}
-
-fileprivate struct InputMacroDateYesterdayFullJapanese: InputMacro {
-    var name: String { "MACRO@DATE_YESTERDAY_FULL_JAPANESE" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * -24)
-        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
-    }
-}
-
-fileprivate struct InputMacroDateTomorrowFullJapanese: InputMacro {
-    var name: String { "MACRO@DATE_TOMORROW_FULL_JAPANESE" }
-
-    var replacement: String {
-        let date = Date().addingTimeInterval(60 * 60 * 24)
-        return formatDate(date: date, style: .full, calendar: Calendar(identifier: .japanese), locale: Locale(identifier: "ja_JP"))
-    }
-}
-
-// MARK: - Time
-
-fileprivate struct InputMacroTimeNowShort: InputMacro {
-    var name: String { "MACRO@TIME_NOW_SHORT" }
-
-    var replacement: String {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .none
-        dateFormatter.timeStyle = .short
-        dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
-        return dateFormatter.string(from: date)
-    }
-}
-
-fileprivate struct InputMacroTimeNowMedium: InputMacro {
-    var name: String { "MACRO@TIME_NOW_MEDIUM" }
-
-    var replacement: String {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .none
-        dateFormatter.timeStyle = .medium
-        dateFormatter.locale = Locale(identifier: "zh_Hant_TW")
-        return dateFormatter.string(from: date)
-    }
-}
-
-// MARK: - Time Zone
-
-fileprivate struct InputMacroTimeZoneStandard: InputMacro {
-    var name: String { "MACRO@TIMEZONE_STANDARD" }
-
-    var replacement: String {
-        let timezone = TimeZone.current
-        let locale = Locale(identifier: "zh_Hant_TW")
-        return timezone.localizedName(for: .standard, locale: locale) ?? ""
-    }
-}
-
-fileprivate struct InputMacroTimeZoneShortGeneric: InputMacro {
-    var name: String { "MACRO@TIMEZONE_GENERIC_SHORT" }
-
-    var replacement: String {
-        let timezone = TimeZone.current
-        let locale = Locale(identifier: "zh_Hant_TW")
-        return timezone.localizedName(for: .shortGeneric, locale: locale) ?? ""
-    }
-}
-
-// MARK: - Ganzhi
 
 fileprivate func getCurrentYear() -> Int {
     let date = Date()
@@ -362,59 +96,439 @@ fileprivate func chineseZodiac(year: Int) -> String {
     return gan[ganBase] + zhi[zhiBase] + "年"
 }
 
-fileprivate struct InputMacroThisYearGanZhi: InputMacro {
+
+// MARK: - Protocols
+
+protocol InputMacro {
+    var name: String { get }
+    var replacement: String { get }
+}
+
+fileprivate protocol InputMacroDate: InputMacro {
+    var calendarName: Calendar.Identifier { get }
+    var dayOffset: Int { get }
+    var style: DateFormatter.Style { get }
+}
+
+extension InputMacroDate {
+    var replacement: String {
+        formatDate(calendarName: calendarName, dayOffset: dayOffset, style: style)
+    }
+}
+
+fileprivate protocol InputMacroYear: InputMacro {
+    var calendarName: Calendar.Identifier { get }
+    var yearOffset: Int { get }
+    var pattern: String { get }
+}
+
+extension InputMacroYear {
+    var replacement: String {
+        formatWithPattern(calendarName: calendarName, yearOffset: yearOffset, dayOffset: 0, pattern: pattern) + "年"
+    }
+}
+
+fileprivate protocol InputMacroDayOfTheWeek: InputMacro {
+    var calendarName: Calendar.Identifier { get }
+    var dayOffset: Int { get }
+    var pattern: String { get }
+}
+
+extension InputMacroDayOfTheWeek {
+    var replacement: String {
+        formatWithPattern(calendarName: calendarName, yearOffset: 0, dayOffset: dayOffset, pattern: pattern)
+    }
+}
+
+fileprivate protocol InputMacroDateTime: InputMacro {
+    var style: DateFormatter.Style { get }
+}
+
+extension InputMacroDateTime {
+    var replacement: String { formatTime(style: style) }
+}
+
+fileprivate protocol InputMacroTimeZone: InputMacro {
+    var style: TimeZone.NameStyle { get }
+}
+
+extension InputMacroTimeZone {
+    var replacement: String { formatTimeZone(style: style) }
+}
+
+fileprivate protocol InputMacroTransform: InputMacro {
+    var yearOffset: Int { get }
+    var transform: (Int) -> (String) { get }
+}
+
+extension InputMacroTransform {
+    var replacement: String {
+        transform(getCurrentYear() + yearOffset)
+    }
+}
+
+fileprivate protocol InputMacroGanZhi: InputMacroTransform {}
+
+extension InputMacroGanZhi {
+    var transform: (Int) -> (String) { ganzhi(year:) }
+}
+
+fileprivate protocol InputMacroZodiac: InputMacroTransform {}
+
+extension InputMacroZodiac {
+    var transform: (Int) -> (String) { chineseZodiac(year:) }
+}
+
+
+
+// MARK: - Date
+
+struct InputMacroDateTodayShort: InputMacroDate {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 0 }
+    var style: DateFormatter.Style { .short }
+    var name: String { "MACRO@DATE_TODAY_SHORT" }
+}
+
+struct InputMacroDateTodayMedium: InputMacroDate {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 0 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TODAY_MEDIUM" }
+}
+
+struct InputMacroDateTodayMediumRoc: InputMacroDate {
+    var calendarName: Calendar.Identifier { .republicOfChina }
+    var dayOffset: Int { 0 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TODAY_MEDIUM_ROC" }
+}
+
+struct InputMacroDateTodayMediumChinese: InputMacroDate {
+    var calendarName: Calendar.Identifier { .chinese }
+    var dayOffset: Int { 0 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TODAY_MEDIUM_CHINESE" }
+}
+
+struct InputMacroDateTodayMediumJapanese: InputMacroDate {
+    var calendarName: Calendar.Identifier { .japanese }
+    var dayOffset: Int { 0 }
+    var style: DateFormatter.Style { .long }
+    var name: String { "MACRO@DATE_TODAY_MEDIUM_JAPANESE" }
+}
+
+struct InputMacroDateYesterdayShort: InputMacroDate {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { -1 }
+    var style: DateFormatter.Style { .short }
+    var name: String { "MACRO@DATE_YESTERDAY_SHORT" }
+}
+
+struct InputMacroDateYesterdayMedium: InputMacroDate {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { -1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM" }
+}
+
+struct InputMacroDateYesterdayMediumRoc: InputMacroDate {
+    var calendarName: Calendar.Identifier { .republicOfChina }
+    var dayOffset: Int { -1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_ROC" }
+}
+
+struct InputMacroDateYesterdayMediumChinese: InputMacroDate {
+    var calendarName: Calendar.Identifier { .chinese }
+    var dayOffset: Int { -1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_CHINESE" }
+}
+
+struct InputMacroDateYesterdayMediumJapanese: InputMacroDate {
+    var calendarName: Calendar.Identifier { .japanese }
+    var dayOffset: Int { -1 }
+    var style: DateFormatter.Style { .long }
+    var name: String { "MACRO@DATE_YESTERDAY_MEDIUM_JAPANESE" }
+}
+
+struct InputMacroDateTomorrowShort: InputMacroDate {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TOMORROW_SHORT" }
+}
+
+struct InputMacroDateTomorrowMedium: InputMacroDate {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM" }
+}
+
+struct InputMacroDateTomorrowMediumRoc: InputMacroDate {
+    var calendarName: Calendar.Identifier { .republicOfChina }
+    var dayOffset: Int { 1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_ROC" }
+}
+
+struct InputMacroDateTomorrowMediumChinese: InputMacroDate {
+    var calendarName: Calendar.Identifier { .chinese }
+    var dayOffset: Int { 1 }
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_CHINESE" }
+}
+
+struct InputMacroDateTomorrowMediumJapanese: InputMacroDate {
+    var calendarName: Calendar.Identifier { .japanese }
+    var dayOffset: Int { 1 }
+    var style: DateFormatter.Style { .long }
+    var name: String { "MACRO@DATE_TOMORROW_MEDIUM_JAPANESE" }
+}
+
+// MARK: - Year
+
+struct InputMacroThisYearPlain: InputMacroYear {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var yearOffset: Int { 0 }
+    var pattern: String { "y" }
+    var name: String { "MACRO@THIS_YEAR_PLAIN" }
+}
+
+struct InputMacroThisYearPlainWithEra: InputMacroYear {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var yearOffset: Int { 0 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@THIS_YEAR_PLAIN_WITH_ERA" }
+}
+
+struct InputMacroThisYearRoc: InputMacroYear {
+    var calendarName: Calendar.Identifier { .republicOfChina }
+    var yearOffset: Int { 0 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@THIS_YEAR_ROC" }
+}
+
+struct InputMacroThisYearJapanese: InputMacroYear {
+    var calendarName: Calendar.Identifier { .japanese }
+    var yearOffset: Int { 0 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@THIS_YEAR_JAPANESE" }
+}
+
+struct InputMacroLastYearPlain: InputMacroYear {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var yearOffset: Int { -1 }
+    var pattern: String { "y" }
+    var name: String { "MACRO@LAST_YEAR_PLAIN" }
+}
+
+struct InputMacroLastYearPlainWithEra: InputMacroYear {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var yearOffset: Int { -1 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@LAST_YEAR_PLAIN_WITH_ERA" }
+}
+
+struct InputMacroLastYearRoc: InputMacroYear {
+    var calendarName: Calendar.Identifier { .republicOfChina }
+    var yearOffset: Int { -1 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@LAST_YEAR_ROC" }
+}
+
+struct InputMacroLastYearJapanese: InputMacroYear {
+    var calendarName: Calendar.Identifier { .japanese }
+    var yearOffset: Int { -1 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@LAST_YEAR_JAPANESE" }
+}
+
+struct InputMacroNextYearPlain: InputMacroYear {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var yearOffset: Int { 1 }
+    var pattern: String { "y" }
+    var name: String { "MACRO@NEXT_YEAR_PLAIN" }
+}
+
+struct InputMacroNextYearPlainWithEra: InputMacroYear {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var yearOffset: Int { 1 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@NEXT_YEAR_PLAIN_WITH_ERA" }
+}
+
+struct InputMacroNextYearRoc: InputMacroYear {
+    var calendarName: Calendar.Identifier { .republicOfChina }
+    var yearOffset: Int { 1 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@NEXT_YEAR_PLAIN_WITH_ERA" }
+}
+
+struct InputMacroNextYearJapanese: InputMacroYear {
+    var calendarName: Calendar.Identifier { .japanese }
+    var yearOffset: Int { 1 }
+    var pattern: String { "Gy" }
+    var name: String { "MACRO@NEXT_YEAR_JAPANESE" }
+}
+
+// MARK: - Day of the Week
+
+struct InputMacroWeekdayTodayShort: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 0 }
+    var pattern: String { "E" }
+    var name: String { "MACRO@DATE_TODAY_WEEKDAY_SHORT" }
+}
+
+struct InputMacroWeekdayToday: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 0 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_TODAY_WEEKDAY" }
+}
+
+struct InputMacroWeekdayToday2: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 0 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_TODAY2_WEEKDAY" }
+
+    var replacement: String {
+        let original = formatWithPattern(calendarName: calendarName, yearOffset: 0, dayOffset: dayOffset, pattern: pattern)
+        return original.replacingOccurrences(of: "星期", with: "禮拜")
+    }
+}
+
+struct InputMacroWeekdayTodayJapanese: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .japanese }
+    var dayOffset: Int { 0 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_TODAY_WEEKDAY_JAPANESE" }
+}
+
+struct InputMacroWeekdayYesterdayShort: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { -1 }
+    var pattern: String { "E" }
+    var name: String { "MACRO@DATE_YESTERDAY_WEEKDAY_SHORT" }
+}
+
+struct InputMacroWeekdayYesterday: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { -1 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_YESTERDAY_WEEKDAY" }
+}
+
+struct InputMacroWeekdayYesterday2: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { -1 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_YESTERDAY2_WEEKDAY" }
+
+    var replacement: String {
+        let original = formatWithPattern(calendarName: calendarName, yearOffset: 0, dayOffset: dayOffset, pattern: pattern)
+        return original.replacingOccurrences(of: "星期", with: "禮拜")
+    }
+}
+
+struct InputMacroWeekdayYesterdayJapanese: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .japanese }
+    var dayOffset: Int { -1 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_YESTERDAY_WEEKDAY_JAPANESE" }
+}
+
+struct InputMacroWeekdayTomorrowShort: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 1 }
+    var pattern: String { "E" }
+    var name: String { "MACRO@DATE_TOMORROW_WEEKDAY_SHORT" }
+}
+
+struct InputMacroWeekdayTomorrow: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 1 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_TOMORROW_WEEKDAY" }
+}
+
+struct InputMacroWeekdayTomorrow2: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .gregorian }
+    var dayOffset: Int { 1 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_TOMORROW2_WEEKDAY" }
+}
+
+struct InputMacroWeekdayTomorrowJapanese: InputMacroDayOfTheWeek {
+    var calendarName: Calendar.Identifier { .japanese }
+    var dayOffset: Int { 1 }
+    var pattern: String { "EEEE" }
+    var name: String { "MACRO@DATE_TOMORROW_WEEKDAY_JAPANESE" }
+}
+
+// MARK: - Datetime
+
+struct InputMacroDateTimeNowShort: InputMacroDateTime {
+    var style: DateFormatter.Style { .short }
+    var name: String { "MACRO@TIME_NOW_SHORT" }
+}
+
+struct InputMacroDateTimeNowMedium: InputMacroDateTime {
+    var style: DateFormatter.Style { .medium }
+    var name: String { "MACRO@TIME_NOW_MEDIUM" }
+}
+
+// MARK: - Time Zone
+
+struct InputMacroTimeZoneStandard: InputMacroTimeZone {
+    var style: TimeZone.NameStyle { .standard }
+    var name: String { "MACRO@TIMEZONE_STANDARD" }
+}
+
+struct InputMacroTimeZoneShortGeneric: InputMacroTimeZone {
+    var style: TimeZone.NameStyle { .shortGeneric }
+    var name: String { "MACRO@TIMEZONE_GENERIC_SHORT" }
+}
+
+// MARK: - Ganzhi
+
+struct InputMacroThisYearGanZhi: InputMacroGanZhi {
+    var yearOffset: Int { 0 }
     var name: String { "MACRO@THIS_YEAR_GANZHI" }
-
-    var replacement: String {
-        let year = getCurrentYear()
-        return ganzhi(year: year)
-    }
 }
 
-fileprivate struct InputMacroLastYearGanZhi: InputMacro {
+struct InputMacroLastYearGanZhi: InputMacroGanZhi {
+    var yearOffset: Int { -1 }
     var name: String { "MACRO@LAST_YEAR_GANZHI" }
-
-    var replacement: String {
-        let year = getCurrentYear()
-        return ganzhi(year: year - 1)
-    }
 }
 
-fileprivate struct InputMacroNextYearGanZhi: InputMacro {
+struct InputMacroNextYearGanZhi: InputMacroGanZhi {
+    var yearOffset: Int { 1 }
     var name: String { "MACRO@NEXT_YEAR_GANZHI" }
-
-    var replacement: String {
-        let year = getCurrentYear()
-        return ganzhi(year: year + 1)
-    }
 }
 
-fileprivate struct InputMacroThisYearChineseZodiac: InputMacro {
+// MARK: - Chinese Zodiac
+
+struct InputMacroThisYearChineseZodiac: InputMacroZodiac {
+    var yearOffset: Int { 0 }
     var name: String { "MACRO@THIS_YEAR_CHINESE_ZODIAC" }
-
-    var replacement: String {
-        let year = getCurrentYear()
-        return chineseZodiac(year: year)
-    }
 }
 
-fileprivate struct InputMacroLastYearChineseZodiac: InputMacro {
+struct InputMacroLastYearChineseZodiac: InputMacroZodiac {
+    var yearOffset: Int { 0 }
     var name: String { "MACRO@LAST_YEAR_CHINESE_ZODIAC" }
-
-    var replacement: String {
-        let year = getCurrentYear()
-        return chineseZodiac(year: year - 1)
-    }
 }
 
-fileprivate struct InputMacroNextYearChineseZodiac: InputMacro {
+struct InputMacroNextYearChineseZodiac: InputMacroZodiac {
+    var yearOffset: Int { 0 }
     var name: String { "MACRO@NEXT_YEAR_CHINESE_ZODIAC" }
-
-    var replacement: String {
-        let year = getCurrentYear()
-        return chineseZodiac(year: year + 1)
-    }
 }
+
+
 
 // MARK: - InputMacroController
 
@@ -424,40 +538,55 @@ class InputMacroController: NSObject {
 
     private var macros: [String:InputMacro] = {
         let macros: [InputMacro] = [
-            InputMacroThisYear(),
-            InputMacroThisYearROC(),
-            InputMacroThisYearJapanese(),
-            InputMacroLastYear(),
-            InputMacroLastYearROC(),
-            InputMacroLastYearJapanese(),
-            InputMacroNextYear(),
-            InputMacroNextYearROC(),
-            InputMacroNextYearJapanese(),
-            InputMacroDateTodayShort(),
-            InputMacroDateYesterdayShort(),
-            InputMacroDateTomorrowShort(),
-            InputMacroDateTodayMedium(),
-            InputMacroDateYesterdayMedium(),
-            InputMacroDateTomorrowMedium(),
-            InputMacroDateTodayMediumROC(),
-            InputMacroDateYesterdayMediumROC(),
-            InputMacroDateTomorrowMediumROC(),
-            InputMacroDateTodayMediumChinese(),
-            InputMacroDateYesterdayMediumChinese(),
-            InputMacroDateTomorrowMediumChinese(),
-            InputMacroDateTodayFullJapanese(),
-            InputMacroDateYesterdayFullJapanese(),
-            InputMacroDateTomorrowFullJapanese(),
-            InputMacroTimeNowShort(),
-            InputMacroTimeNowMedium(),
-            InputMacroTimeZoneStandard(),
-            InputMacroTimeZoneShortGeneric(),
-            InputMacroThisYearGanZhi(),
-            InputMacroLastYearGanZhi(),
-            InputMacroNextYearGanZhi(),
-            InputMacroThisYearChineseZodiac(),
-            InputMacroLastYearChineseZodiac(),
-            InputMacroNextYearChineseZodiac(),
+           InputMacroDateTodayShort(),
+           InputMacroDateTodayMedium(),
+           InputMacroDateTodayMediumRoc(),
+           InputMacroDateTodayMediumChinese(),
+           InputMacroDateTodayMediumJapanese(),
+           InputMacroThisYearPlain(),
+           InputMacroThisYearPlainWithEra(),
+           InputMacroThisYearRoc(),
+           InputMacroThisYearJapanese(),
+           InputMacroLastYearPlain(),
+           InputMacroLastYearPlainWithEra(),
+           InputMacroLastYearRoc(),
+           InputMacroLastYearJapanese(),
+           InputMacroNextYearPlain(),
+           InputMacroNextYearPlainWithEra(),
+           InputMacroNextYearRoc(),
+           InputMacroNextYearJapanese(),
+           InputMacroWeekdayTodayShort(),
+           InputMacroWeekdayToday(),
+           InputMacroWeekdayToday2(),
+           InputMacroWeekdayTodayJapanese(),
+           InputMacroWeekdayYesterdayShort(),
+           InputMacroWeekdayYesterday(),
+           InputMacroWeekdayYesterday2(),
+           InputMacroWeekdayYesterdayJapanese(),
+           InputMacroWeekdayTomorrowShort(),
+           InputMacroWeekdayTomorrow(),
+           InputMacroWeekdayTomorrow2(),
+           InputMacroWeekdayTomorrowJapanese(),
+           InputMacroDateYesterdayShort(),
+           InputMacroDateYesterdayMedium(),
+           InputMacroDateYesterdayMediumRoc(),
+           InputMacroDateYesterdayMediumChinese(),
+           InputMacroDateYesterdayMediumJapanese(),
+           InputMacroDateTomorrowShort(),
+           InputMacroDateTomorrowMedium(),
+           InputMacroDateTomorrowMediumRoc(),
+           InputMacroDateTomorrowMediumChinese(),
+           InputMacroDateTomorrowMediumJapanese(),
+           InputMacroDateTimeNowShort(),
+           InputMacroDateTimeNowMedium(),
+           InputMacroTimeZoneStandard(),
+           InputMacroTimeZoneShortGeneric(),
+           InputMacroThisYearGanZhi(),
+           InputMacroLastYearGanZhi(),
+           InputMacroNextYearGanZhi(),
+           InputMacroThisYearChineseZodiac(),
+           InputMacroLastYearChineseZodiac(),
+           InputMacroNextYearChineseZodiac(),
         ]
         var map:[String:InputMacro] = [:]
         macros.forEach { macro in
