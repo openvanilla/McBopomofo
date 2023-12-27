@@ -5,15 +5,15 @@
       "url_template": "dict://(encoded)"
     },
     {
-      "name": "MOE Dict",
+      "name": "萌典",
       "url_template": "https://www.moedict.tw/(encoded)"
     },
     {
-      "name": "MOE Dict (Holo)",
+      "name": "萌典 (台語)",
       "url_template": "https://www.moedict.tw/'(encoded)"
     },
     {
-      "name": "MOE Dict (Hakka)",
+      "name": "萌典 (客語)",
       "url_template": "https://www.moedict.tw/:(encoded)"
     },
     {
