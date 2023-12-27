@@ -1,4 +1,5 @@
 // Copyright (c) 2022 and onwards The McBopomofo Authors.
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -256,7 +257,7 @@ struct InputMacroDateYesterdayMediumJapanese: InputMacroDate {
 struct InputMacroDateTomorrowShort: InputMacroDate {
     var calendarName: Calendar.Identifier { .gregorian }
     var dayOffset: Int { 1 }
-    var style: DateFormatter.Style { .medium }
+    var style: DateFormatter.Style { .short }
     var name: String { "MACRO@DATE_TOMORROW_SHORT" }
 }
 
@@ -364,7 +365,7 @@ struct InputMacroNextYearRoc: InputMacroYear {
     var calendarName: Calendar.Identifier { .republicOfChina }
     var yearOffset: Int { 1 }
     var pattern: String { "Gy" }
-    var name: String { "MACRO@NEXT_YEAR_PLAIN_WITH_ERA" }
+    var name: String { "MACRO@NEXT_YEAR_ROC" }
 }
 
 struct InputMacroNextYearJapanese: InputMacroYear {
@@ -602,6 +603,12 @@ class InputMacroController: NSObject {
             return macro.replacement
         }
         return input
+    }
+
+    @objc var availableMacros: [String] {
+        macros.map { k, v in
+            k
+        }
     }
 
 }

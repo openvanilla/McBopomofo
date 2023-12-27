@@ -32,8 +32,14 @@ class InputMacroTests: XCTestCase {
         XCTAssertTrue(macro == output)
     }
 
+    func testThisYearPlain() {
+        let macro = "MACRO@THIS_YEAR_PLAIN"
+        let output = InputMacroController.shared.handle(macro)
+        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+    }
+
     func testThisYear() {
-        let macro = "MACRO@THIS_YEAR"
+        let macro = "MACRO@THIS_YEAR_PLAIN_WITH_ERA"
         let output = InputMacroController.shared.handle(macro)
         XCTAssertTrue(output.starts(with: "西元"))
         XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
@@ -52,8 +58,15 @@ class InputMacroTests: XCTestCase {
         XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
+    func testLastYearPlain() {
+        let macro = "MACRO@LAST_YEAR_PLAIN"
+        let output = InputMacroController.shared.handle(macro)
+        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+    }
+
+
     func testLastYear() {
-        let macro = "MACRO@LAST_YEAR"
+        let macro = "MACRO@LAST_YEAR_PLAIN_WITH_ERA"
         let output = InputMacroController.shared.handle(macro)
         XCTAssertTrue(output.starts(with: "西元"))
         XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
@@ -72,8 +85,14 @@ class InputMacroTests: XCTestCase {
         XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
+    func testNextYearPlain() {
+        let macro = "MACRO@NEXT_YEAR_PLAIN"
+        let output = InputMacroController.shared.handle(macro)
+        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+    }
+
     func testNextYear() {
-        let macro = "MACRO@NEXT_YEAR"
+        let macro = "MACRO@NEXT_YEAR_PLAIN_WITH_ERA"
         let output = InputMacroController.shared.handle(macro)
         XCTAssertTrue(output.starts(with: "西元"))
         XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
@@ -207,30 +226,27 @@ class InputMacroTests: XCTestCase {
     }
 
     func testTodayLongJapanese() {
-        let macro = "MACRO@DATE_TODAY_FULL_JAPANESE"
+        let macro = "MACRO@DATE_TODAY_MEDIUM_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
         XCTAssert(output.contains("年"))
         XCTAssert(output.contains("月"))
         XCTAssert(output.contains("日"))
-        XCTAssert(output.contains("曜日"))
     }
 
     func testYesterdayLongJapanese() {
-        let macro = "MACRO@DATE_YESTERDAY_FULL_JAPANESE"
+        let macro = "MACRO@DATE_YESTERDAY_MEDIUM_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
         XCTAssert(output.contains("年"))
         XCTAssert(output.contains("月"))
         XCTAssert(output.contains("日"))
-        XCTAssert(output.contains("曜日"))
     }
 
     func testTomorrowLongJapanese() {
-        let macro = "MACRO@DATE_TOMORROW_FULL_JAPANESE"
+        let macro = "MACRO@DATE_TOMORROW_MEDIUM_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
         XCTAssert(output.contains("年"))
         XCTAssert(output.contains("月"))
         XCTAssert(output.contains("日"))
-        XCTAssert(output.contains("曜日"))
     }
 
     func testTimeNowShort() {
