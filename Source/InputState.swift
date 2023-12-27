@@ -58,7 +58,7 @@ import NSStringUtils
 class InputState: NSObject {
 
     /// Represents that the input controller is deactivated.
-    @objc (InputStateDeactivated)
+    @objc(InputStateDeactivated)
     class Deactivated: InputState {
         override var description: String {
             "<InputState.Deactivated>"
@@ -68,7 +68,7 @@ class InputState: NSObject {
     // MARK: -
 
     /// Represents that the composing buffer is empty.
-    @objc (InputStateEmpty)
+    @objc(InputStateEmpty)
     class Empty: InputState {
         @objc var composingBuffer: String {
             ""
@@ -82,7 +82,7 @@ class InputState: NSObject {
     // MARK: -
 
     /// Represents that the composing buffer is empty.
-    @objc (InputStateEmptyIgnoringPreviousState)
+    @objc(InputStateEmptyIgnoringPreviousState)
     class EmptyIgnoringPreviousState: InputState {
         @objc var composingBuffer: String {
             ""
@@ -95,7 +95,7 @@ class InputState: NSObject {
     // MARK: -
 
     /// Represents that the input controller is committing text into client app.
-    @objc (InputStateCommitting)
+    @objc(InputStateCommitting)
     class Committing: InputState {
         @objc private(set) var poppedText: String = ""
 
@@ -114,6 +114,7 @@ class InputState: NSObject {
     @objc(InputStateBig5)
     class Big5: InputState {
         @objc private(set) var code: String
+
         @objc init(code: String) {
             self.code = code
         }
@@ -130,7 +131,7 @@ class InputState: NSObject {
     // MARK: -
 
     /// Represents that the composing buffer is not empty.
-    @objc (InputStateNotEmpty)
+    @objc(InputStateNotEmpty)
     class NotEmpty: InputState {
         @objc private(set) var composingBuffer: String
         @objc private(set) var cursorIndex: UInt
@@ -148,7 +149,7 @@ class InputState: NSObject {
     // MARK: -
 
     /// Represents that the user is inputting text.
-    @objc (InputStateInputting)
+    @objc(InputStateInputting)
     class Inputting: NotEmpty {
         @objc var tooltip: String = ""
 
@@ -175,7 +176,7 @@ class InputState: NSObject {
     private let kMaxMarkRangeLength = 6
 
     /// Represents that the user is marking a range in the composing buffer.
-    @objc (InputStateMarking)
+    @objc(InputStateMarking)
     class Marking: NotEmpty {
 
         @objc private(set) var markerIndex: UInt
@@ -243,7 +244,7 @@ class InputState: NSObject {
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
                 .markedClauseSegment: 2
             ], range: NSRange(location: end,
-                              length: (composingBuffer as NSString).length - end))
+                    length: (composingBuffer as NSString).length - end))
             return attributedSting
         }
 
@@ -265,7 +266,7 @@ class InputState: NSObject {
             if composingBuffer.count != readings.count {
                 return false
             }
-            if  markedRange.length < kMinMarkRangeLength {
+            if markedRange.length < kMinMarkRangeLength {
                 return false
             }
             if markedRange.length > kMaxMarkRangeLength {
@@ -295,11 +296,12 @@ class InputState: NSObject {
 
     // MARK: -
 
-    @objc (InputStateCandidate)
+    @objc(InputStateCandidate)
     class Candidate: NSObject {
         @objc private(set) var reading: String
         @objc private(set) var value: String
         @objc private(set) var displayText: String
+
         @objc init(reading: String, value: String, displayText: String) {
             self.reading = reading
             self.value = value
@@ -308,7 +310,7 @@ class InputState: NSObject {
     }
 
     /// Represents that the user is choosing in a candidates list.
-    @objc (InputStateChoosingCandidate)
+    @objc(InputStateChoosingCandidate)
     class ChoosingCandidate: NotEmpty {
         @objc private(set) var candidates: [Candidate]
         @objc private(set) var useVerticalMode: Bool
@@ -336,10 +338,11 @@ class InputState: NSObject {
 
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
-    @objc (InputStateAssociatedPhrases)
+    @objc(InputStateAssociatedPhrases)
     class AssociatedPhrases: InputState {
         @objc private(set) var candidates: [String] = []
         @objc private(set) var useVerticalMode: Bool = false
+
         @objc init(candidates: [String], useVerticalMode: Bool) {
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
@@ -348,6 +351,100 @@ class InputState: NSObject {
 
         override var description: String {
             "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+        }
+    }
+
+    @objc(InputStateSelectingDictionaryService)
+    class SelectingDictionaryService: NotEmpty {
+        @objc private(set) var previousState: NotEmpty
+        @objc private(set) var selectedPhrase: String = ""
+        @objc private(set) var selectedIndex: Int = 0
+        @objc private(set) var menu: [String]
+
+        @objc
+        init(previousState: NotEmpty, selectedString: String, selectedIndex: Int) {
+            self.previousState = previousState
+            self.selectedPhrase = selectedString
+            self.selectedIndex = selectedIndex
+            self.menu = DictionaryServices.shared.services.map { service in
+                service.textForMenu(selectedString: selectedString)
+            }
+            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+        }
+
+        func lookUp(usingServiceAtIndex index: Int, state: InputState, stateCallback: (InputState) -> ()) -> Bool {
+            DictionaryServices.shared.lookUp(phrase: selectedPhrase, withServiceAtIndex: index, state: state, stateCallback: stateCallback)
+        }
+
+        override var description: String {
+            "<InputState.SelectingDictionaryService>"
+        }
+    }
+
+    @objc(InputStateShowingCharInfo)
+    class ShowingCharInfo: NotEmpty {
+
+        @objc private(set) var previousState: SelectingDictionaryService
+        @objc private(set) var selectedPhrase: String = ""
+        @objc private(set) var selectedIndex: Int = 0
+        @objc private(set) var menu: [String]
+        private(set) var menuTitleValueMapping: [(String, String)]
+
+        @objc
+        init(previousState: SelectingDictionaryService, selectedString: String, selectedIndex: Int) {
+            self.previousState = previousState
+            self.selectedPhrase = selectedString
+            self.selectedIndex = selectedIndex
+
+            func buildItem(prefix: String, selectedString: String, builder: (String) -> String) -> (String, String) {
+                let result = builder(selectedString)
+                return ("\(prefix): \(result)", result)
+            }
+
+            func getCharCode(string: String, encoding: UInt32) -> String {
+                return string.map { c in
+                    let swiftString = "\(c)"
+                    let cfString: CFString = swiftString as CFString
+                    var cStringBuffer = [CChar](repeating: 0, count: 4)
+                    CFStringGetCString(cfString, &cStringBuffer, 4, encoding)
+                    let data = Data(bytes: cStringBuffer, count: strlen(cStringBuffer))
+                    if data.count >= 2 {
+                        return "0x" + String(format: "%02x%02x", data[0], data[1]).uppercased()
+                    }
+                    return "N/A"
+                }.joined(separator: " ")
+            }
+
+            self.menuTitleValueMapping = [
+                buildItem(prefix: "UTF-8 HEX", selectedString: selectedPhrase, builder: { string in
+                    string.map { c in
+                        "0x" + c.utf8.map { String(format: "%02x", $0).uppercased() }.joined()
+                    }.joined(separator: " ")
+                }),
+                buildItem(prefix: "UTF-16 HEX", selectedString: selectedPhrase, builder: { string in
+                    string.map { c in
+                        "0x" + c.utf16.map { String(format: "%02x", $0).uppercased() }.joined()
+                    }.joined(separator: " ")
+                }),
+                buildItem(prefix: "URL Escape", selectedString: selectedPhrase, builder: { string in
+                    string.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                }),
+                buildItem(prefix: "Big5", selectedString: selectedPhrase, builder: { string in
+                    getCharCode(string: string, encoding: 0x0A06)
+                }),
+                buildItem(prefix: "GB2312", selectedString: selectedPhrase, builder: { string in
+                    getCharCode(string: string, encoding: 0x0631)
+                }),
+                buildItem(prefix: "Shift JIS", selectedString: selectedPhrase, builder: { string in
+                    getCharCode(string: string, encoding: 0x0A01)
+                }),
+            ]
+            self.menu = menuTitleValueMapping.map { $0.0 }
+            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+        }
+
+        override var description: String {
+            "<InputState.eShowingCharInfo>"
         }
     }
 }

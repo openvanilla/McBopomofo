@@ -293,6 +293,17 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(state);
     }
 
+    // MARK: Handle Selecting Dictionary Service
+    if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+    // MARK: Handle Showing Character Information
+    if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
         InputStateMarking *marking = (InputStateMarking *)state;
@@ -977,6 +988,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    // Dictionary look up
+    if ([input.inputText isEqualToString:@"?"]) {
+        if (state.markedRange.length > 0) {
+            InputStateSelectingDictionaryService *newState = [[InputStateSelectingDictionaryService alloc] initWithPreviousState:state selectedString:state.selectedText selectedIndex:0];
+            stateCallback(newState);
+            return YES;
+        }
+    }
+
     // Shift + left
     if (([input isCursorBackward] || input.emacsKey == McBopomofoEmacsKeyBackward)
         && ([input isShiftHold])) {
@@ -1033,8 +1053,37 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
+    if (_inputMode == InputModeBopomofo && [[input inputText] isEqualToString:@"?"]) {
+        if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
+            cancelCandidateKey = YES;
+        } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+            cancelCandidateKey = YES;
+        } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
+            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+            NSString *selectedPhrase = currentState.candidates[index].displayText;
+            InputStateSelectingDictionaryService *newState = [[InputStateSelectingDictionaryService alloc] initWithPreviousState:currentState selectedString:selectedPhrase selectedIndex:index];
+            stateCallback(newState);
+            return YES;
+        }
+    }
+
     if (cancelCandidateKey) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+        if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
+            InputStateShowingCharInfo *current = (InputStateShowingCharInfo *)state;
+            NSInteger selectedIndex = current.previousState.selectedIndex;
+            InputStateNotEmpty *newState = current.previousState.previousState;
+            stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
+            NSInteger selectedIndex = current.selectedIndex;
+            InputStateNotEmpty *newState = current.previousState;
+            stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1168,6 +1217,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         candidates = [(InputStateChoosingCandidate *)state candidates];
     } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         candidates = [(InputStateAssociatedPhrases *)state candidates];
+    } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+        candidates = [(InputStateSelectingDictionaryService *)state menu];
     }
 
     if (!candidates) {
@@ -1282,13 +1333,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     if ((charCode >= '0' && charCode <= '9') ||
         (charCode >= 'a' && charCode <= 'f')) {
-        NSString *appneded = [NSString stringWithFormat:@"%@%c", bigs.code, toupper(charCode)];
-        if (appneded.length == 4) {
-            long big5Code = (long)strtol(appneded.UTF8String, NULL, 16);
+        NSString *appended = [NSString stringWithFormat:@"%@%c", bigs.code, toupper(charCode)];
+        if (appended.length == 4) {
+            long big5Code = (long)strtol(appended.UTF8String, NULL, 16);
             char bytes[3] = {0};
             bytes[0] = (big5Code >> CHAR_BIT) & 0xff;
             bytes[1] = big5Code & 0xff;
-            CFStringRef string = CFStringCreateWithCString(NULL, bytes, kCFStringEncodingBig5);
+            CFStringRef string = CFStringCreateWithCString(NULL, bytes, kCFStringEncodingBig5_HKSCS_1999);
             if (string == NULL) {
                 errorCallback();
                 InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -1296,12 +1347,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return YES;
             }
 
-            InputStateCommitting *commiting = [[InputStateCommitting alloc] initWithPoppedText:(__bridge NSString *)string];
-            stateCallback(commiting);
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:(__bridge NSString *)string];
+            stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
         } else {
-            InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appneded];
+            InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appended];
             stateCallback(newState);
         }
         return YES;
