@@ -294,7 +294,7 @@ public class VerticalCandidateController: CandidateController {
                 // no need to handle the backward case: (newIndex < selectedRow && selectedRow - newIndex > 1)
             }
 
-            if itemCount > labelCount {
+            if itemCount > labelCount && lastVisibleRow < Int.max {
                 tableView.scrollRowToVisible(Int(lastVisibleRow))
             }
             tableView.selectRowIndexes(IndexSet(integer: Int(newIndex)), byExtendingSelection: false)
