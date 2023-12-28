@@ -8577,7 +8577,6 @@
 剄 ㄐㄧㄥˇ jing3 ru/3 big5
 璥 ㄐㄧㄥˇ jing3 ru/3 big5
 丼 ㄐㄧㄥˇ jing3 ru/3 big5
-烴 ㄐㄧㄥˇ jing3 ru/3 big5
 憼 ㄐㄧㄥˇ jing3 ru/3 big5
 暻 ㄐㄧㄥˇ jing3 ru/3 big5
 蟼 ㄐㄧㄥˇ jing3 ru/3 big5
@@ -12073,6 +12072,7 @@
 旲 ㄊㄞˊ tai2 w96 big5
 秮 ㄊㄞˊ tai2 w96 big5
 太 ㄊㄞ˙ tai5 w97 big5
+羰 ㄊㄤ tang w; big5
 湯 ㄊㄤ tang w; big5
 鏜 ㄊㄤ tang w; big5
 鼞 ㄊㄤ tang w; big5
@@ -12387,6 +12387,7 @@
 蛈 ㄊㄧㄝˋ tie4 wu,4 big5
 聽 ㄊㄧㄥ ting wu/ big5
 廳 ㄊㄧㄥ ting wu/ big5
+烴 ㄊㄧㄥ ting wu/ big5
 汀 ㄊㄧㄥ ting wu/ big5
 桯 ㄊㄧㄥ ting wu/ big5
 艼 ㄊㄧㄥ ting wu/ big5
