@@ -3788,6 +3788,7 @@
 坑 ㄎㄥ keng d/ big5
 硜 ㄎㄥ keng d/ big5
 鏗 ㄎㄥ keng d/ big5
+羥 ㄎㄥ keng d/ big5
 牼 ㄎㄥ keng d/ big5
 吭 ㄎㄥ keng d/ big5
 阬 ㄎㄥ keng d/ big5
@@ -5079,7 +5080,6 @@
 檶 ㄑㄧㄢ qian fu0 big5
 鐱 ㄑㄧㄢ qian fu0 big5
 婜 ㄑㄧㄢ qian fu0 big5
-羥 ㄑㄧㄢ qian fu0 big5
 攐 ㄑㄧㄢ qian fu0 big5
 攓 ㄑㄧㄢ qian fu0 big5
 譣 ㄑㄧㄢ qian fu0 big5
@@ -5287,6 +5287,7 @@
 強 ㄑㄧㄤˇ qiang3 fu;3 big5
 搶 ㄑㄧㄤˇ qiang3 fu;3 big5
 襁 ㄑㄧㄤˇ qiang3 fu;3 big5
+羥 ㄑㄧㄤˇ qiang3 fu;3 big5
 磢 ㄑㄧㄤˇ qiang3 fu;3 big5
 傸 ㄑㄧㄤˇ qiang3 fu;3 big5
 墏 ㄑㄧㄤˇ qiang3 fu;3 big5
@@ -7460,6 +7461,7 @@
 莎 ㄙㄨㄛ suo nji big5
 唆 ㄙㄨㄛ suo nji big5
 娑 ㄙㄨㄛ suo nji big5
+羧 ㄙㄨㄛ suo nji big5
 簑 ㄙㄨㄛ suo nji big5
 嗦 ㄙㄨㄛ suo nji big5
 傞 ㄙㄨㄛ suo nji big5
@@ -7569,6 +7571,7 @@
 嫂 ㄙㄠˇ sao3 nl3 big5
 埽 ㄙㄠˇ sao3 nl3 big5
 掃 ㄙㄠˋ sao4 nl4 big5
+燥 ㄙㄠˋ sao4 nl4 big5
 臊 ㄙㄠˋ sao4 nl4 big5
 氉 ㄙㄠˋ sao4 nl4 big5
 瘙 ㄙㄠˋ sao4 nl4 big5
