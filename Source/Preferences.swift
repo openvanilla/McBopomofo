@@ -140,19 +140,19 @@ struct CandidateListTextSize {
     case IBM = 5
 
     var name: String {
-        switch (self) {
+        return switch (self) {
         case .standard:
-            return "Standard"
+            "Standard"
         case .eten:
-            return "ETen"
+            "ETen"
         case .hsu:
-            return "Hsu"
+            "Hsu"
         case .eten26:
-            return "ETen26"
+            "ETen26"
         case .hanyuPinyin:
-            return "HanyuPinyin"
+            "HanyuPinyin"
         case .IBM:
-            return "IBM"
+            "IBM"
         }
     }
 }
@@ -162,11 +162,11 @@ struct CandidateListTextSize {
     case vxHanConvert
 
     var name: String {
-        switch (self) {
+        return switch (self) {
         case .openCC:
-            return "OpenCC"
+            "OpenCC"
         case .vxHanConvert:
-            return "VXHanConvert"
+            "VXHanConvert"
         }
     }
 }
@@ -176,11 +176,11 @@ struct CandidateListTextSize {
     case model
 
     var name: String {
-        switch (self) {
+        return switch (self) {
         case .output:
-            return "output"
+            "output"
         case .model:
-            return "model"
+            "model"
         }
     }
 }

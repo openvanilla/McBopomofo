@@ -1,0 +1,60 @@
+{
+  "services": [
+    {
+      "name": "Dictionary app",
+      "url_template": "dict://(encoded)"
+    },
+    {
+      "name": "萌典",
+      "url_template": "https://www.moedict.tw/(encoded)"
+    },
+    {
+      "name": "萌典 (台語)",
+      "url_template": "https://www.moedict.tw/'(encoded)"
+    },
+    {
+      "name": "萌典 (客語)",
+      "url_template": "https://www.moedict.tw/:(encoded)"
+    },
+    {
+      "name": "Google",
+      "url_template": "https://www.google.com/search?q=(encoded)"
+    },
+    {
+      "name": "教育部重編國語詞典修訂本",
+      "url_template": "https://dict.revised.moe.edu.tw/search.jsp?md=1&word=(encoded)"
+    },
+    {
+      "name": "教育部國語詞典簡編本",
+      "url_template": "https://dict.concised.moe.edu.tw/search.jsp?md=1&word=(encoded)"
+    },
+    {
+      "name": "教育部成語典",
+      "url_template": "https://dict.idioms.moe.edu.tw/idiomList.jsp?idiom=(encoded)&qMd=0&qTp=1&qTp=2"
+    },
+    {
+      "name": "教育部異體字字典",
+      "url_template": "https://dict.variants.moe.edu.tw/variants/rbt/query_result.do?from=standard&search_text=(encoded)"
+    },
+    {
+      "name": "教育部國字標準字體筆順學習網",
+      "url_template": "https://stroke-order.learningweb.moe.edu.tw/charactersQueryResult.do?words=(encoded)&lang=zh_TW&csrfPreventionSalt=null"
+    },
+    {
+      "name": "教育部臺灣閩南語常用詞辭典",
+      "url_template": "https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_su&tsha=(encoded)"
+    },
+    {
+      "name": "Wiktionary",
+      "url_template": "https://zh.wiktionary.org/wiki/Special:Search?search=(encoded)"
+    },
+    {
+      "name": "康熙字典網上版",
+      "url_template": "https://www.kangxizidian.com/search/index.php?stype=Word&sword=(encoded)&detail=n"
+    },
+    {
+      "name": "Unihan Database",
+      "url_template": "https://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=(encoded)"
+    }
+  ]
+}

@@ -23,22 +23,16 @@
 
 import AppKit
 
-class ServiceProvider: NSObject {
-    @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
-        guard let string = pasteboard.string(forType: .string),
-              let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
-        else {
-            return
-        }
-        
+class ServiceProvider: NSObject  {
+    func extractReading(from firstWord:String) -> String {
         var matches: [String] = []
-        
+
         // greedily find the longest possible matches
         var matchFrom = firstWord.startIndex
         while matchFrom < firstWord.endIndex {
             let substring = firstWord.suffix(from: matchFrom)
             let substringCount = substring.count
-            
+
             // if an exact match fails, try dropping successive characters from the end to see
             // if we can find shorter matches
             var drop = 0
@@ -52,15 +46,35 @@ class ServiceProvider: NSObject {
                 }
                 drop += 1
             }
-            
+
             if drop >= substringCount {
                 // didn't match anything?!
                 matches.append("？")
                 matchFrom = firstWord.index(matchFrom, offsetBy: 1)
             }
         }
-        
+
         let reading = matches.joined(separator: "-")
+        return reading
+    }
+
+    @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+        guard let string = pasteboard.string(forType: .string),
+              let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
+        else {
+            return
+        }
+
+        if firstWord.isEmpty {
+            return
+        }
+
+        let reading = extractReading(from: firstWord)
+
+        if reading.isEmpty {
+            return
+        }
+
         LanguageModelManager.writeUserPhrase("\(firstWord) \(reading)")
         (NSApp.delegate as? AppDelegate)?.openUserPhrases(self)
     }
