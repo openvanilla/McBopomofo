@@ -285,6 +285,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.ChoosingCandidate:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.AssociatedPhrases:
+            handle(state: newState, previous: previous, client: client)
         case let newState as InputState.AssociatedPhrasesPlain:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
@@ -425,6 +427,22 @@ extension McBopomofoInputMethodController {
         show(candidateWindowWith: state, client: client)
     }
 
+    private func handle(state: InputState.AssociatedPhrases, previous: InputState, client: Any?) {
+        hideTooltip()
+        guard let client = client as? IMKTextInput else {
+            gCurrentCandidateController?.visible = false
+            return
+        }
+
+        let previousState = state.previousState
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put this composing buffer
+        if let previousState = previousState as? InputState.ChoosingCandidate {
+            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        }
+        show(candidateWindowWith: state, client: client)
+    }
+
     private func handle(state: InputState.AssociatedPhrasesPlain, previous: InputState, client: Any?) {
         hideTooltip()
         guard let client = client as? IMKTextInput else {
@@ -500,6 +518,11 @@ extension McBopomofoInputMethodController {
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
             case let state as InputState.AssociatedPhrasesPlain:
+                useVerticalMode = state.useVerticalMode
+                candidates = state.candidates.map {
+                    InputState.Candidate(reading: "", value: $0, displayText: $0)
+                }
+            case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates.map {
                     InputState.Candidate(reading: "", value: $0, displayText: $0)
@@ -679,6 +702,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         return switch state {
         case let state as InputState.ChoosingCandidate:
             UInt(state.candidates.count)
+        case let state as InputState.AssociatedPhrases:
+            UInt(state.candidates.count)
         case let state as InputState.AssociatedPhrasesPlain:
             UInt(state.candidates.count)
         case let state as InputState.SelectingDictionary:
@@ -694,6 +719,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         return switch state {
         case let state as InputState.ChoosingCandidate:
             state.candidates[Int(index)].displayText
+        case let state as InputState.AssociatedPhrases:
+            state.candidates[Int(index)]
         case let state as InputState.AssociatedPhrasesPlain:
             state.candidates[Int(index)]
         case let state as InputState.SelectingDictionary:
@@ -723,7 +750,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
                 if Preferences.associatedPhrasesEnabled,
-                   let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
+                   let associatePhrases = keyHandler.buildAssociatePhrasePlainState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
                     self.handle(state: associatePhrases, client: client)
                 } else {
                     handle(state: .Empty(), client: client)
@@ -733,11 +760,23 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             default:
                 break
             }
+        case let state as InputState.AssociatedPhrases:
+            let selectedPhrase = state.candidates[Int(index)].map { String($0) }
+            if let previous = state.previousState as? InputState.ChoosingCandidate {
+                let selectedIndex = state.selectedIndex
+                let selectedCandidate = previous.candidates[selectedIndex]
+                keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: selectedPhrase)
+            }
+            guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
+                return
+            }
+            handle(state: inputting, client: client)
+            break
         case let state as InputState.AssociatedPhrasesPlain:
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentClient)
             if Preferences.associatedPhrasesEnabled,
-               let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
+               let associatePhrases = keyHandler.buildAssociatePhrasePlainState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
                 self.handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)

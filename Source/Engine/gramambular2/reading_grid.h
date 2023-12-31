@@ -235,7 +235,7 @@ class ReadingGrid {
     return readings_;
   }
 
- protected:
+// protected:
   size_t cursor_ = 0;
   std::string separator_ = kDefaultSeparator;
   std::vector<std::string> readings_;

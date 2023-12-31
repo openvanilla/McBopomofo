@@ -49,13 +49,17 @@ extern InputMode InputModePlainBopomofo;
 
 - (void)syncWithPreferences;
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:useMoveCursorAfterSelectionSetting:));
+- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <NSString *> *)associatedPhrase NS_SWIFT_NAME(fixNode(reading:value:associatedPhrase:));
+
 - (void)clear;
 
 - (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
     NS_SWIFT_NAME(handleForceCommit(stateCallback:));
 
 - (InputState *)buildInputtingState;
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatePhrasePlainStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index key:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
+
 
 @property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id<KeyHandlerDelegate> delegate;

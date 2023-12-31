@@ -338,6 +338,28 @@ class InputState: NSObject {
 
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
+    @objc(InputStateAssociatedPhrases)
+    class AssociatedPhrases: NotEmpty {
+        @objc private(set) var previousState: NotEmpty
+        @objc private(set) var candidates: [String] = []
+        @objc private(set) var useVerticalMode: Bool = false
+        @objc private(set) var selectedIndex: Int = 0
+
+        @objc init(previousState: NotEmpty, selectedIndex: Int, candidates: [String], useVerticalMode: Bool) {
+            self.previousState = previousState
+            self.selectedIndex = selectedIndex
+            self.candidates = candidates
+            self.useVerticalMode = useVerticalMode
+            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+        }
+
+        override var description: String {
+            "<InputState.AssociatedPhrases, previousState:\(previousState), candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+        }
+    }
+
+    /// Represents that the user is choosing in a candidates list
+    /// in the associated phrases mode.
     @objc(InputStateAssociatedPhrasesPlain)
     class AssociatedPhrasesPlain: InputState {
         @objc private(set) var candidates: [String] = []
@@ -350,9 +372,11 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.AssociatedPhrases, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+            "<InputState.AssociatedPhrasesPlain, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
     }
+
+    // MARK: -
 
     @objc(InputStateSelectingDictionary)
     class SelectingDictionary: NotEmpty {
