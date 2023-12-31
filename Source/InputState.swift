@@ -338,8 +338,8 @@ class InputState: NSObject {
 
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
-    @objc(InputStateAssociatedPhrases)
-    class AssociatedPhrases: InputState {
+    @objc(InputStateAssociatedPhrasesPlain)
+    class AssociatedPhrasesPlain: InputState {
         @objc private(set) var candidates: [String] = []
         @objc private(set) var useVerticalMode: Bool = false
 

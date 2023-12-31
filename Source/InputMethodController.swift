@@ -285,7 +285,7 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.ChoosingCandidate:
             handle(state: newState, previous: previous, client: client)
-        case let newState as InputState.AssociatedPhrases:
+        case let newState as InputState.AssociatedPhrasesPlain:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
@@ -425,7 +425,7 @@ extension McBopomofoInputMethodController {
         show(candidateWindowWith: state, client: client)
     }
 
-    private func handle(state: InputState.AssociatedPhrases, previous: InputState, client: Any?) {
+    private func handle(state: InputState.AssociatedPhrasesPlain, previous: InputState, client: Any?) {
         hideTooltip()
         guard let client = client as? IMKTextInput else {
             gCurrentCandidateController?.visible = false
@@ -499,7 +499,7 @@ extension McBopomofoInputMethodController {
             case let state as InputState.ChoosingCandidate:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
-            case let state as InputState.AssociatedPhrases:
+            case let state as InputState.AssociatedPhrasesPlain:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates.map {
                     InputState.Candidate(reading: "", value: $0, displayText: $0)
@@ -553,7 +553,7 @@ extension McBopomofoInputMethodController {
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
-        let keyLabelPrefix = state is InputState.AssociatedPhrases ? "⇧ " : ""
+        let keyLabelPrefix = state is InputState.AssociatedPhrasesPlain ? "⇧ " : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
             CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))
         }
@@ -679,7 +679,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         return switch state {
         case let state as InputState.ChoosingCandidate:
             UInt(state.candidates.count)
-        case let state as InputState.AssociatedPhrases:
+        case let state as InputState.AssociatedPhrasesPlain:
             UInt(state.candidates.count)
         case let state as InputState.SelectingDictionary:
             UInt(state.menu.count)
@@ -694,7 +694,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         return switch state {
         case let state as InputState.ChoosingCandidate:
             state.candidates[Int(index)].displayText
-        case let state as InputState.AssociatedPhrases:
+        case let state as InputState.AssociatedPhrasesPlain:
             state.candidates[Int(index)]
         case let state as InputState.SelectingDictionary:
             state.menu[Int(index)]
@@ -723,7 +723,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
                 if Preferences.associatedPhrasesEnabled,
-                   let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
+                   let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
                     self.handle(state: associatePhrases, client: client)
                 } else {
                     handle(state: .Empty(), client: client)
@@ -733,11 +733,11 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             default:
                 break
             }
-        case let state as InputState.AssociatedPhrases:
+        case let state as InputState.AssociatedPhrasesPlain:
             let selectedValue = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedValue), client: currentClient)
             if Preferences.associatedPhrasesEnabled,
-               let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrases {
+               let associatePhrases = keyHandler.buildAssociatePhraseState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
                 self.handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)

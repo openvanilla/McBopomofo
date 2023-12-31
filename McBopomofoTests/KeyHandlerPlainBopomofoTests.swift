@@ -281,8 +281,8 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
             }
         }
 
-        XCTAssertTrue(state is InputState.AssociatedPhrases, "\(state)")
-        if let state = state as? InputState.AssociatedPhrases {
+        XCTAssertTrue(state is InputState.AssociatedPhrasesPlain, "\(state)")
+        if let state = state as? InputState.AssociatedPhrasesPlain {
             XCTAssertTrue(state.candidates.contains("嗚"))
         }
         Preferences.associatedPhrasesEnabled = enabled
