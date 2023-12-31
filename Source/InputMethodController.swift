@@ -289,7 +289,7 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
-        case let newState as InputState.SelectingDictionaryService:
+        case let newState as InputState.SelectingDictionary:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.ShowingCharInfo:
             handle(state: newState, previous: previous, client: client)
@@ -449,7 +449,7 @@ extension McBopomofoInputMethodController {
         client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
-    private func handle(state: InputState.SelectingDictionaryService, previous: InputState, client: Any?) {
+    private func handle(state: InputState.SelectingDictionary, previous: InputState, client: Any?) {
         hideTooltip()
         guard let client = client as? IMKTextInput else {
             gCurrentCandidateController?.visible = false
@@ -504,7 +504,7 @@ extension McBopomofoInputMethodController {
                 candidates = state.candidates.map {
                     InputState.Candidate(reading: "", value: $0, displayText: $0)
                 }
-            case _ as InputState.SelectingDictionaryService:
+            case _ as InputState.SelectingDictionary:
                 return true
             case _ as InputState.ShowingCharInfo:
                 return true
@@ -681,7 +681,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             UInt(state.candidates.count)
         case let state as InputState.AssociatedPhrases:
             UInt(state.candidates.count)
-        case let state as InputState.SelectingDictionaryService:
+        case let state as InputState.SelectingDictionary:
             UInt(state.menu.count)
         case let state as InputState.ShowingCharInfo:
             UInt(state.menu.count)
@@ -696,7 +696,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             state.candidates[Int(index)].displayText
         case let state as InputState.AssociatedPhrases:
             state.candidates[Int(index)]
-        case let state as InputState.SelectingDictionaryService:
+        case let state as InputState.SelectingDictionary:
             state.menu[Int(index)]
         case let state as InputState.ShowingCharInfo:
             state.menu[Int(index)]
@@ -742,7 +742,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             } else {
                 handle(state: .Empty(), client: client)
             }
-        case let state as InputState.SelectingDictionaryService:
+        case let state as InputState.SelectingDictionary:
             let handled = state.lookUp(usingServiceAtIndex: Int(index), state: state) { state in
                 handle(state: state, client: client)
             }

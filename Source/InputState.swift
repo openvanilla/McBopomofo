@@ -354,8 +354,8 @@ class InputState: NSObject {
         }
     }
 
-    @objc(InputStateSelectingDictionaryService)
-    class SelectingDictionaryService: NotEmpty {
+    @objc(InputStateSelectingDictionary)
+    class SelectingDictionary: NotEmpty {
         @objc private(set) var previousState: NotEmpty
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedIndex: Int = 0
@@ -384,14 +384,14 @@ class InputState: NSObject {
     @objc(InputStateShowingCharInfo)
     class ShowingCharInfo: NotEmpty {
 
-        @objc private(set) var previousState: SelectingDictionaryService
+        @objc private(set) var previousState: SelectingDictionary
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedIndex: Int = 0
         @objc private(set) var menu: [String]
         private(set) var menuTitleValueMapping: [(String, String)]
 
         @objc
-        init(previousState: SelectingDictionaryService, selectedString: String, selectedIndex: Int) {
+        init(previousState: SelectingDictionary, selectedString: String, selectedIndex: Int) {
             self.previousState = previousState
             self.selectedPhrase = selectedString
             self.selectedIndex = selectedIndex
