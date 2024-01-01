@@ -104,3 +104,5 @@
 "Speak \"%@\"…" = "朗讀「%@」…";
 
 "%@ has been copied." = "已成功複製 %@";
+
+"Look up %@" = "Look up %@";

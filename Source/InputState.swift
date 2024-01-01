@@ -338,6 +338,8 @@ class InputState: NSObject {
 
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
+    ///
+    /// This is for Bopomofo input mode.
     @objc(InputStateAssociatedPhrases)
     class AssociatedPhrases: NotEmpty {
         @objc private(set) var previousState: NotEmpty
@@ -365,6 +367,8 @@ class InputState: NSObject {
 
     /// Represents that the user is choosing in a candidates list
     /// in the associated phrases mode.
+    ///
+    /// This is for Plain Bopomofo input mode.
     @objc(InputStateAssociatedPhrasesPlain)
     class AssociatedPhrasesPlain: InputState {
         @objc private(set) var candidates: [String] = []
@@ -383,6 +387,7 @@ class InputState: NSObject {
 
     // MARK: -
 
+    /// Represents that the user is choosing a dictionary service.
     @objc(InputStateSelectingDictionary)
     class SelectingDictionary: NotEmpty {
         @objc private(set) var previousState: NotEmpty
@@ -410,9 +415,10 @@ class InputState: NSObject {
         }
     }
 
+    /// Represents that the user is choosing information about selected
+    /// characters.
     @objc(InputStateShowingCharInfo)
     class ShowingCharInfo: NotEmpty {
-
         @objc private(set) var previousState: SelectingDictionary
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedIndex: Int = 0

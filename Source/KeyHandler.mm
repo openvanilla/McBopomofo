@@ -190,8 +190,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 }
 
-//- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <NSString *> *)associatedPhrase
-
 - (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <NSString *> *)associatedPhrase
 {
     size_t actualCursor = index;
@@ -555,17 +553,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         if ([input isControlHold] && Preferences.controlEnterOutput != 0) {
             return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
         }
-        // TODO: use associated phrase flag
         if (_inputMode == InputModeBopomofo &&
             [input isShiftHold] &&
-            [state isKindOfClass:[InputStateInputting class]]) {
+            [state isKindOfClass:[InputStateInputting class]] &&
+            Preferences.associatedPhrasesEnabled) {
             return [self _handleAssociatedPhraseWithState:(InputStateInputting *)state stateCallback:stateCallback errorCallback:errorCallback];
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Enter Big5 code mode
-
     if ([input isControlHold] && (charCode == '`')) {
         if (Preferences.big5InputEnabled) {
             [self clear];
@@ -1169,8 +1166,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     if (charCode == 13 || [input isEnter]) {
         // Start associated phrases
-        // TODO: check if associated phrase flag is on
-        if (_inputMode == InputModeBopomofo && [input isShiftHold]) {
+        if (_inputMode == InputModeBopomofo &&
+            [input isShiftHold] &&
+            Preferences.associatedPhrasesEnabled) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
                 InputStateChoosingCandidate *current = (InputStateChoosingCandidate *)state;
                 NSInteger index = gCurrentCandidateController.selectedCandidateIndex;

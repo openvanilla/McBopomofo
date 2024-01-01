@@ -73,15 +73,11 @@ class McBopomofoInputMethodController: IMKInputController {
         let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Use Half-Width Punctuations", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "h")
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
         halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
+        let associatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "")
+        associatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
 
         let inputMode = keyHandler.inputMode
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
-
-        if inputMode == .plainBopomofo {
-            let associatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "")
-            associatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
-        }
-
         if inputMode == .bopomofo && optionKeyPressed {
             let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
@@ -604,7 +600,7 @@ extension McBopomofoInputMethodController {
         var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
         var cursor: Int = 0
 
-        if let state = state as? InputState.ChoosingCandidate {
+        if let state = state as? InputState.NotEmpty {
             cursor = Int(state.cursorIndex)
             if cursor == state.composingBuffer.count && cursor != 0 {
                 cursor -= 1
@@ -782,7 +778,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 let selectedCandidate = previous.candidates[selectedIndex]
                 keyHandler.fixNode(index:keyHandler.actualCandidateCursorIndex, reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: selectedPhrase)
             case _ as InputState.Inputting:
-                keyHandler.fixNode(index:keyHandler.cursorIndex, reading: state.selectedReading, value: state.selectedPhrase, associatedPhrase: selectedPhrase)
+                keyHandler.fixNode(index:keyHandler.cursorIndex - 1, reading: state.selectedReading, value: state.selectedPhrase, associatedPhrase: selectedPhrase)
             default:
                 break
             }
