@@ -437,8 +437,13 @@ extension McBopomofoInputMethodController {
         let previousState = state.previousState
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        if let previousState = previousState as? InputState.ChoosingCandidate {
+        switch previousState {
+        case let previousState as InputState.ChoosingCandidate:
             client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        case let previousState as InputState.Inputting:
+            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        default:
+            break
         }
         show(candidateWindowWith: state, client: client)
     }
@@ -558,6 +563,15 @@ extension McBopomofoInputMethodController {
             gCurrentCandidateController = .horizontal
         } else {
             gCurrentCandidateController = .vertical
+        }
+
+        gCurrentCandidateController?.tooltip = switch state {
+        case let state as InputState.SelectingDictionary:
+            String(format:NSLocalizedString("Look up %@", comment: ""), state.selectedPhrase)
+        case let state as InputState.AssociatedPhrases:
+            String(format:NSLocalizedString("%@…", comment: ""), state.selectedPhrase)
+        default:
+            ""
         }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
@@ -762,10 +776,15 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             }
         case let state as InputState.AssociatedPhrases:
             let selectedPhrase = state.candidates[Int(index)].map { String($0) }
-            if let previous = state.previousState as? InputState.ChoosingCandidate {
+            switch state.previousState {
+            case let previous as InputState.ChoosingCandidate:
                 let selectedIndex = state.selectedIndex
                 let selectedCandidate = previous.candidates[selectedIndex]
-                keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: selectedPhrase)
+                keyHandler.fixNode(index:keyHandler.actualCandidateCursorIndex, reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: selectedPhrase)
+            case _ as InputState.Inputting:
+                keyHandler.fixNode(index:keyHandler.cursorIndex, reading: state.selectedReading, value: state.selectedPhrase, associatedPhrase: selectedPhrase)
+            default:
+                break
             }
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return

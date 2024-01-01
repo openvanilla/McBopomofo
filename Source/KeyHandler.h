@@ -49,7 +49,7 @@ extern InputMode InputModePlainBopomofo;
 
 - (void)syncWithPreferences;
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:useMoveCursorAfterSelectionSetting:));
-- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <NSString *> *)associatedPhrase NS_SWIFT_NAME(fixNode(reading:value:associatedPhrase:));
+- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <NSString *> *)associatedPhrase NS_SWIFT_NAME(fixNode(index:reading:value:associatedPhrase:));
 
 - (void)clear;
 
@@ -58,11 +58,12 @@ extern InputMode InputModePlainBopomofo;
 
 - (InputState *)buildInputtingState;
 - (nullable InputState *)buildAssociatePhrasePlainStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
-- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index key:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
-
+- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index selectedPhrase:(NSString *)key selectedReading:(NSString *)selectedReading useVerticalMode:(BOOL)useVerticalMode;
 
 @property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id<KeyHandlerDelegate> delegate;
+@property (assign, nonatomic, readonly) NSInteger actualCandidateCursorIndex;
+@property (assign, nonatomic, readonly) NSInteger cursorIndex;
 @end
 
 NS_ASSUME_NONNULL_END

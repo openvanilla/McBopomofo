@@ -341,12 +341,17 @@ class InputState: NSObject {
     @objc(InputStateAssociatedPhrases)
     class AssociatedPhrases: NotEmpty {
         @objc private(set) var previousState: NotEmpty
+        @objc private(set) var selectedPhrase: String = ""
+        @objc private(set) var selectedReading: String = ""
+        @objc private(set) var selectedIndex: Int = 0
         @objc private(set) var candidates: [String] = []
         @objc private(set) var useVerticalMode: Bool = false
-        @objc private(set) var selectedIndex: Int = 0
 
-        @objc init(previousState: NotEmpty, selectedIndex: Int, candidates: [String], useVerticalMode: Bool) {
+
+        @objc init(previousState: NotEmpty, selectedPhrase: String, selectedReading: String, selectedIndex: Int, candidates: [String], useVerticalMode: Bool) {
             self.previousState = previousState
+            self.selectedPhrase = selectedPhrase
+            self.selectedReading = selectedReading
             self.selectedIndex = selectedIndex
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode

@@ -38,6 +38,9 @@ size_t CodePointCount(const std::string& s);
 // will be the string clamped up to before that invalid sequence.
 std::string SubstringToCodePoints(const std::string& s, size_t cp);
 
+// Gets the code point at the given index.
+std::string GetCodePoint(const std::string& s, size_t cp);
+
 }  // namespace McBopomofo
 
 #endif  // SRC_UTF8HELPER_H_
