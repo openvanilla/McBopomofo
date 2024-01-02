@@ -148,11 +148,8 @@ fileprivate class HorizontalCandidateView: NSView {
         }
 
         if let toolTip = toolTip {
-            lightGray.setFill()
-            NSBezierPath.fill(NSMakeRect(0, 0, bounds.width, tooltipSize.height))
             let tooltipFrame = NSRect(x: 0, y: 0, width: tooltipSize.width, height: tooltipSize.height)
             (toolTip as NSString).draw(in: tooltipFrame, withAttributes: keyLabelAttrDict)
-            NSBezierPath.strokeLine(from: NSPoint(x: 0, y: tooltipSize.height - 2), to: NSPoint(x: bounds.width, y: tooltipSize.height - 2))
         }
 
         NSBezierPath.strokeLine(from: NSPoint(x: bounds.width, y: 0), to: NSPoint(x: bounds.width, y: bounds.height))
