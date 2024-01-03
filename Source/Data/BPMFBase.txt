@@ -8577,7 +8577,6 @@
 剄 ㄐㄧㄥˇ jing3 ru/3 big5
 璥 ㄐㄧㄥˇ jing3 ru/3 big5
 丼 ㄐㄧㄥˇ jing3 ru/3 big5
-烴 ㄐㄧㄥˇ jing3 ru/3 big5
 憼 ㄐㄧㄥˇ jing3 ru/3 big5
 暻 ㄐㄧㄥˇ jing3 ru/3 big5
 蟼 ㄐㄧㄥˇ jing3 ru/3 big5
@@ -12391,6 +12390,7 @@
 桯 ㄊㄧㄥ ting wu/ big5
 艼 ㄊㄧㄥ ting wu/ big5
 耵 ㄊㄧㄥ ting wu/ big5
+烴 ㄊㄧㄥ ting wu/ big5
 挺 ㄊㄧㄥˇ ting3 wu/3 big5
 艇 ㄊㄧㄥˇ ting3 wu/3 big5
 町 ㄊㄧㄥˇ ting3 wu/3 big5
