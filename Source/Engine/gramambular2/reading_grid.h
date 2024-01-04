@@ -28,6 +28,7 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -153,6 +154,12 @@ class ReadingGrid {
 
   using NodePtr = std::shared_ptr<Node>;
 
+  // Find, in a span at the cursor, the first node satisfying the predicate.
+  // Returns std::nullopt if not found.
+  std::optional<NodePtr> findInSpan(
+      size_t cursor,
+      const std::function<bool(const NodePtr&)>& predicate) const;
+
   struct WalkResult {
     std::vector<NodePtr> nodes;
     size_t totalReadings;
@@ -265,7 +272,7 @@ class ReadingGrid {
 
   // Find all nodes that overlap with the location. The return value is a list
   // of nodes along with their starting location in the grid.
-  std::vector<NodeInSpan> overlappingNodesAt(size_t loc);
+  std::vector<NodeInSpan> overlappingNodesAt(size_t loc) const;
 };
 
 }  // namespace Formosa::Gramambular2

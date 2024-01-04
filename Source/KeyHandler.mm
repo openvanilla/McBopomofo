@@ -30,15 +30,60 @@
 #import "UserOverrideModel.h"
 #import "reading_grid.h"
 
+#import <algorithm>
+#import <optional>
 #import <string>
 #import <unordered_map>
 #import <utility>
+#import <vector>
 
 @import CandidateUI;
 @import NSStringUtils;
+@import OpenCCBridge;
+@import VXHanConvert;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
+
+@implementation AssociatedPhraseArrayItem
+
+- (instancetype)initWithValue:(NSString *)inCharacter reading:(NSString *)inReading;
+{
+    self = [super init];
+    if (self) {
+        self.value = inCharacter;
+        self.reading = inReading;
+    }
+    return self;
+}
+
++ (nonnull NSArray<AssociatedPhraseArrayItem *> *)createItemWithModelSearchableText:(nonnull NSString *)modelText readingSearchableText:(nonnull NSString *)readingText
+{
+    NSMutableArray *results = [NSMutableArray array];
+    if (modelText.length != readingText.length) {
+        return results;
+    }
+
+    for (NSInteger i = 0; i < modelText.length; i++) {
+        unichar text = [modelText characterAtIndex:i];
+        unichar key = [readingText characterAtIndex:i];
+        NSString *itemReading = [LanguageModelManager readingFor:[NSString stringWithFormat:@"%C", key]];
+        if (itemReading) {
+            AssociatedPhraseArrayItem *item = [[AssociatedPhraseArrayItem alloc] initWithValue:[NSString stringWithFormat:@"%C", text] reading:itemReading];
+            [results addObject:item];
+        }
+    }
+    return results;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ %@ %@", [super description], self.value, self.reading];
+}
+
+@synthesize value;
+@synthesize reading;
+@end
 
 @implementation KeyHandler {
     std::shared_ptr<Formosa::Gramambular2::LanguageModel> _emptySharedPtr;
@@ -58,7 +103,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     NSString *_inputMode;
 }
 
-//@synthesize inputMode = _inputMode;
 @synthesize delegate = _delegate;
 
 - (NSString *)inputMode
@@ -136,34 +180,34 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 {
     NSInteger layout = Preferences.keyboardLayout;
     switch (layout) {
-    case KeyboardLayoutStandard:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
-        break;
-    case KeyboardLayoutEten:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::ETenLayout());
-        break;
-    case KeyboardLayoutHsu:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::HsuLayout());
-        break;
-    case KeyboardLayoutEten26:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::ETen26Layout());
-        break;
-    case KeyboardLayoutHanyuPinyin:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
-        break;
-    case KeyboardLayoutIBM:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::IBMLayout());
-        break;
-    default:
-        _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
-        Preferences.keyboardLayout = KeyboardLayoutStandard;
+        case KeyboardLayoutStandard:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+            break;
+        case KeyboardLayoutEten:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::ETenLayout());
+            break;
+        case KeyboardLayoutHsu:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::HsuLayout());
+            break;
+        case KeyboardLayoutEten26:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::ETen26Layout());
+            break;
+        case KeyboardLayoutHanyuPinyin:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::HanyuPinyinLayout());
+            break;
+        case KeyboardLayoutIBM:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::IBMLayout());
+            break;
+        default:
+            _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
+            Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
 }
 
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag
 {
-    size_t actualCursor = [self _actualCandidateCursorIndex];
+    size_t actualCursor = [self actualCandidateCursorIndex];
     Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
     if (!_grid->overrideCandidate(actualCursor, candidate)) {
         return;
@@ -174,18 +218,52 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // Update the user override model if warranted.
     size_t accumulatedCursor = 0;
-    auto nodeIter = _latestWalk.findNodeAt([self _actualCandidateCursorIndex], &accumulatedCursor);
+    auto nodeIter = _latestWalk.findNodeAt(actualCursor, &accumulatedCursor);
     if (nodeIter == _latestWalk.nodes.cend()) {
         return;
     }
     Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
     if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
-        _userOverrideModel->observe(prevWalk, _latestWalk, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
+        _userOverrideModel->observe(prevWalk, _latestWalk, [self actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
     }
 
     if (currentNode != nullptr && flag && Preferences.moveCursorAfterSelectingCandidate) {
         _grid->setCursor(accumulatedCursor);
     }
+}
+
+- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase
+{
+    size_t actualCursor = index;
+    Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
+    BOOL overrideResult = _grid->overrideCandidate(actualCursor, candidate);
+    if (!overrideResult) {
+        NSLog(@"sometimes it may fail after Chinese conversion. Bypass the error anyway");
+    }
+
+    Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk;
+    [self _walk];
+
+    // Update the user override model if warranted.
+    size_t accumulatedCursor = 0;
+    auto nodeIter = _latestWalk.findNodeAt(actualCursor, &accumulatedCursor);
+    if (nodeIter == _latestWalk.nodes.cend()) {
+        return;
+    }
+    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
+    if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
+        _userOverrideModel->observe(prevWalk, _latestWalk, [self actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
+    }
+    _grid->setCursor(accumulatedCursor);
+
+    for (NSInteger i = 0; i < associatedPhrase.count; i++) {
+        NSString *itemReading = associatedPhrase[i].reading;
+        _grid->insertReading(itemReading.UTF8String);
+        NSString *phrase = associatedPhrase[i].value;
+        NSInteger candidateIIndex = accumulatedCursor + i;
+        _grid->overrideCandidate(candidateIIndex, phrase.UTF8String);
+    }
+    [self _walk];
 }
 
 - (void)clear
@@ -236,7 +314,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey = ([input isCommandHold] || [input isOptionHold] || [input isNumericPad]) || [input isControlHotKey];
-    if (![state isKindOfClass:[InputStateNotEmpty class]] && ![state isKindOfClass:[InputStateAssociatedPhrases class]] && isFunctionKey) {
+    if (![state isKindOfClass:[InputStateNotEmpty class]] &&
+        ![state isKindOfClass:[InputStateAssociatedPhrasesPlain class]] &&
+        isFunctionKey) {
         return NO;
     }
 
@@ -278,13 +358,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    // MARK: Handle Candidates
-    if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
-
     // MARK: Handle Associated Phrases
-    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+    if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
         BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
         if (result) {
             return YES;
@@ -293,8 +368,17 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(state);
     }
 
+    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+    // MARK: Handle Candidates
+    if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
     // MARK: Handle Selecting Dictionary Service
-    if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+    if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -365,10 +449,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         // get user override model suggestion
         if (_inputMode != InputModePlainBopomofo) {
-            McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, [self _actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
+            McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, [self actualCandidateCursorIndex], [[NSDate date] timeIntervalSince1970]);
             if (!suggestion.empty()) {
                 Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = suggestion.forceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
-                _grid->overrideCandidate([self _actualCandidateCursorIndex], suggestion.candidate, type);
+                _grid->overrideCandidate([self actualCandidateCursorIndex], suggestion.candidate, type);
                 [self _walk];
             }
         }
@@ -391,7 +475,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
                 } else {
-                    InputStateAssociatedPhrases *associatedPhrases = (InputStateAssociatedPhrases *)[self buildAssociatePhraseStateWithKey:text useVerticalMode:input.useVerticalMode];
+                    InputStateAssociatedPhrasesPlain *associatedPhrases = (InputStateAssociatedPhrasesPlain *)[self buildAssociatePhrasePlainStateWithKey:text useVerticalMode:input.useVerticalMode];
                     if (associatedPhrases) {
                         stateCallback(associatedPhrases);
                     } else {
@@ -498,11 +582,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         if ([input isControlHold] && Preferences.controlEnterOutput != 0) {
             return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
         }
+        if (_inputMode == InputModeBopomofo &&
+            [input isShiftHold] &&
+            [state isKindOfClass:[InputStateInputting class]] &&
+            Preferences.associatedPhrasesEnabled) {
+            return [self _handleAssociatedPhraseWithState:(InputStateInputting *)state stateCallback:stateCallback errorCallback:errorCallback];
+        }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Enter Big5 code mode
-
     if ([input isControlHold] && (charCode == '`')) {
         if (Preferences.big5InputEnabled) {
             [self clear];
@@ -610,7 +699,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    auto nodeIter = _latestWalk.findNodeAt([self _actualCandidateCursorIndex]);
+    auto nodeIter = _latestWalk.findNodeAt([self actualCandidateCursorIndex]);
     if (nodeIter == _latestWalk.nodes.cend()) {
         // Shouldn't happen.
         errorCallback();
@@ -991,7 +1080,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // Dictionary look up
     if ([input.inputText isEqualToString:@"?"]) {
         if (state.markedRange.length > 0) {
-            InputStateSelectingDictionaryService *newState = [[InputStateSelectingDictionaryService alloc] initWithPreviousState:state selectedString:state.selectedText selectedIndex:0];
+            InputStateSelectingDictionary *newState = [[InputStateSelectingDictionary alloc] initWithPreviousState:state selectedString:state.selectedText selectedIndex:0];
             stateCallback(newState);
             return YES;
         }
@@ -1054,15 +1143,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || [input isDelete];
 
     if (_inputMode == InputModeBopomofo && [[input inputText] isEqualToString:@"?"]) {
-        if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
-            cancelCandidateKey = YES;
-        } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
+        if ([state isKindOfClass:[InputStateShowingCharInfo class]] ||
+            [state isKindOfClass:[InputStateSelectingDictionary class]]) {
             cancelCandidateKey = YES;
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
             NSString *selectedPhrase = currentState.candidates[index].displayText;
-            InputStateSelectingDictionaryService *newState = [[InputStateSelectingDictionaryService alloc] initWithPreviousState:currentState selectedString:selectedPhrase selectedIndex:index];
+            InputStateSelectingDictionary *newState = [[InputStateSelectingDictionary alloc] initWithPreviousState:currentState selectedString:selectedPhrase selectedIndex:index];
             stateCallback(newState);
             return YES;
         }
@@ -1076,14 +1164,21 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
-        } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
-            InputStateSelectingDictionaryService *current = (InputStateSelectingDictionaryService *)state;
+        } else if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
+            InputStateSelectingDictionary *current = (InputStateSelectingDictionary *)state;
             NSInteger selectedIndex = current.selectedIndex;
             InputStateNotEmpty *newState = current.previousState;
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
         } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+            InputStateAssociatedPhrases *current = (InputStateAssociatedPhrases *)state;
+            NSInteger selectedIndex = current.selectedIndex;
+            InputStateNotEmpty *newState = current.previousState;
+            stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1099,12 +1194,33 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (charCode == 13 || [input isEnter]) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+        // Start associated phrases
+        if (_inputMode == InputModeBopomofo &&
+            [input isShiftHold] &&
+            Preferences.associatedPhrasesEnabled) {
+            if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+                InputStateChoosingCandidate *current = (InputStateChoosingCandidate *)state;
+                NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+                InputStateCandidate *candidate = current.candidates[index];
+                NSString *key = candidate.value;
+                NSString *reading = candidate.reading;
+                InputState* newState = [self buildAssociatePhraseStateWithPreviousState:current selectedIndex:index selectedPhrase:key selectedReading:reading useVerticalMode:NO];
+                if (newState) {
+                    stateCallback(newState);
+                } else {
+                    errorCallback();
+                }
+                return YES;
+            }
+        }
+
+        if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
             return YES;
         }
+
         [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
         return YES;
     }
@@ -1217,8 +1333,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         candidates = [(InputStateChoosingCandidate *)state candidates];
     } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         candidates = [(InputStateAssociatedPhrases *)state candidates];
-    } else if ([state isKindOfClass:[InputStateSelectingDictionaryService class]]) {
-        candidates = [(InputStateSelectingDictionaryService *)state menu];
+    } else if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
+        candidates = [(InputStateAssociatedPhrasesPlain *)state candidates];
+    } else if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
+        candidates = [(InputStateSelectingDictionary *)state menu];
     }
 
     if (!candidates) {
@@ -1234,7 +1352,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+    if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
         if (![input isShiftHold]) {
             return NO;
         }
@@ -1242,7 +1360,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     NSInteger index = NSNotFound;
     NSString *match;
-    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+    if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
         match = input.inputTextIgnoringModifiers;
     } else {
         match = inputText;
@@ -1264,7 +1382,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+    if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
         return NO;
     }
 
@@ -1308,9 +1426,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 }
 
 - (BOOL)_handleBig5State:(InputState *)state
-                        input:(KeyHandlerInput *)input
-                stateCallback:(void (^)(InputState *))stateCallback
-                errorCallback:(void (^)(void))errorCallback;
+                   input:(KeyHandlerInput *)input
+           stateCallback:(void (^)(InputState *))stateCallback
+           errorCallback:(void (^)(void))errorCallback;
 {
     InputStateBig5 *bigs = (InputStateBig5 *)state;
     UniChar charCode = input.charCode;
@@ -1359,6 +1477,49 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     errorCallback();
+    return YES;
+}
+
+- (BOOL)_handleAssociatedPhraseWithState:(InputStateInputting *)state
+                stateCallback:(void (^)(InputState *))stateCallback
+                errorCallback:(void (^)(void))errorCallback;
+{
+    size_t cursor = _grid->cursor();
+    if (cursor < 1) {
+        errorCallback();
+        return YES;
+    }
+    std::string composingBuffer = std::string(state.composingBuffer.UTF8String);
+    std::string characterBeforeCursor = McBopomofo::GetCodePoint(composingBuffer, cursor - 1);
+    auto candidates = _grid->candidatesAt(cursor - 1);
+    auto candidateIt = std::find_if(candidates.begin(),
+                 candidates.end(),
+                 [characterBeforeCursor](auto candidate){
+        return candidate.value == characterBeforeCursor;
+    });
+
+    if (candidateIt == candidates.end()) {
+        // The character before the cursor is not composed by a single reading.
+        errorCallback();
+        return YES;
+    }
+
+    std::optional<Formosa::Gramambular2::ReadingGrid::NodePtr> oneUnitLongSpan = _grid->findInSpan(cursor - 1, [](const Formosa::Gramambular2::ReadingGrid::NodePtr& node) {
+        return node->spanningLength() == 1;
+    });
+
+    if (!oneUnitLongSpan.has_value()) {
+        errorCallback();
+        return YES;
+    }
+    std::string reading = (*oneUnitLongSpan)->reading();
+
+    InputState *newState = [self buildAssociatePhraseStateWithPreviousState:state selectedIndex:0 selectedPhrase:[NSString stringWithUTF8String:characterBeforeCursor.c_str()] selectedReading:[NSString stringWithUTF8String:reading.c_str()] useVerticalMode:NO];
+    if (newState) {
+        stateCallback(newState);
+    } else {
+        errorCallback();
+    }
     return YES;
 }
 
@@ -1450,7 +1611,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (InputStateChoosingCandidate *)_buildCandidateState:(InputStateNotEmpty *)currentState useVerticalMode:(BOOL)useVerticalMode
 {
-    auto candidates = _grid->candidatesAt([self _actualCandidateCursorIndex]);
+    auto candidates = _grid->candidatesAt([self actualCandidateCursorIndex]);
 
     std::unordered_map<std::string, size_t> valueCountMap;
     for (const auto& c : candidates) {
@@ -1479,7 +1640,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return state;
 }
 
-- (size_t)_actualCandidateCursorIndex
+- (NSInteger)actualCandidateCursorIndex
 {
     size_t cursor = _grid->cursor();
 
@@ -1502,6 +1663,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return cursor;
 }
 
+- (NSInteger)cursorIndex
+{
+    size_t cursor = _grid->cursor();
+    return cursor;
+}
+
 - (NSArray *)_currentReadings
 {
     NSMutableArray *readingsArray = [[NSMutableArray alloc] init];
@@ -1512,7 +1679,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return readingsArray;
 }
 
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
+- (nullable InputState *)buildAssociatePhrasePlainStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
 {
     std::string cppKey(key.UTF8String);
     if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
@@ -1522,10 +1689,50 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
             [array addObject:item];
         }
-        InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
+        InputStateAssociatedPhrasesPlain *associatedPhrases = [[InputStateAssociatedPhrasesPlain alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
         return associatedPhrases;
     }
     return nil;
 }
+
+- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index selectedPhrase:(NSString *)key selectedReading:(NSString *)selectedReading useVerticalMode:(BOOL)useVerticalMode
+{
+    if (![state isKindOfClass:[InputStateNotEmpty class]]) {
+        return nil;
+    }
+
+    BOOL scToTc = Preferences.chineseConversionEnabled &&
+            Preferences.chineseConversionStyle == 1;
+    if (scToTc) {
+        if (Preferences.chineseConversionEngine == 1) {
+            key = [VXHanConvert convertToTraditionalFrom:key];
+        } else {
+            key = [[OpenCCBridge sharedInstance] convertTraditional:key];
+        }
+    }
+    std::string cppKey(key.UTF8String);
+
+    if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
+        std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
+        NSMutableArray<InputStateCandidate *> *array = [NSMutableArray array];
+        for (auto phrase : phrases) {
+            NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
+            NSString *diaplayText = [[NSString alloc] initWithString:item];
+            if (scToTc) {
+                if (Preferences.chineseConversionEngine == 1) {
+                    diaplayText = [VXHanConvert convertToSimplifiedFrom:diaplayText];
+                } else {
+                    diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
+                }
+            }
+            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:@"" value:item displayText:diaplayText];
+            [array addObject:candidate];
+        }
+        InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state selectedPhrase:key selectedReading:selectedReading selectedIndex:index candidates:array useVerticalMode:useVerticalMode];
+        return associatedPhrases;
+    }
+    return nil;
+}
+
 
 @end

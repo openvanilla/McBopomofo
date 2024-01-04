@@ -62,6 +62,10 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
     }
+    if (!gLanguageModelMcBopomofo.isAssociatedPhrasesLoaded()) {
+        LTLoadAssociatedPhrases(gLanguageModelMcBopomofo);
+    }
+
     if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
     }
@@ -75,6 +79,9 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     if ([mode isEqualToString:InputModeBopomofo]) {
         if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
+        }
+        if (!gLanguageModelMcBopomofo.isAssociatedPhrasesLoaded()) {
+            LTLoadAssociatedPhrases(gLanguageModelMcBopomofo);
         }
     }
 
