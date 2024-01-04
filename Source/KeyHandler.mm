@@ -259,6 +259,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     for (NSInteger i = 0; i < associatedPhrase.count; i++) {
         NSString *itemReading = associatedPhrase[i].reading;
         _grid->insertReading(itemReading.UTF8String);
+        NSString *phrase = associatedPhrase[i].value;
+        NSInteger candidateIIndex = accumulatedCursor + i;
+        _grid->overrideCandidate(candidateIIndex, phrase.UTF8String);
     }
     [self _walk];
 }
@@ -1698,7 +1701,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return nil;
     }
 
-    // zonble
     BOOL scToTc = Preferences.chineseConversionEnabled &&
             Preferences.chineseConversionStyle == 1;
     if (scToTc) {
