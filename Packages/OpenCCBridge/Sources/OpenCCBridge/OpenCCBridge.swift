@@ -32,10 +32,12 @@ public class OpenCCBridge: NSObject {
 
     @objc(sharedInstance) public static let shared = OpenCCBridge()
 
-    private var converter: ChineseConverter?
+    private var t2s: ChineseConverter?
+    private var s2t: ChineseConverter?
 
     private override init() {
-        try? converter = ChineseConverter(options: .simplify)
+        try? t2s = ChineseConverter(options: .simplify)
+        try? s2t = ChineseConverter(options: .traditionalize)
         super.init()
     }
 
@@ -44,6 +46,14 @@ public class OpenCCBridge: NSObject {
     /// - Parameter string: Text in Traditional Chinese.
     /// - Returns: Text in Simplified Chinese.
     @objc public func convertToSimplified(_ string: String) -> String? {
-        converter?.convert(string)
+        t2s?.convert(string)
+    }
+
+    /// Converts to Traditional Chinese.
+    ///
+    /// - Parameter string: Text in Traditional Chinese.
+    /// - Returns: Text in Simplified Chinese.
+    @objc public func convertTraditional(_ string: String) -> String? {
+        s2t?.convert(string)
     }
 }

@@ -38,9 +38,51 @@
 
 @import CandidateUI;
 @import NSStringUtils;
+@import OpenCCBridge;
+@import VXHanConvert;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
+
+@implementation AssociatedPhraseArrayItem
+
+- (instancetype)initWithValue:(NSString *)inCharacter reading:(NSString *)inReading;
+{
+    self = [super init];
+    if (self) {
+        self.value = inCharacter;
+        self.reading = inReading;
+    }
+    return self;
+}
+
++ (nonnull NSArray<AssociatedPhraseArrayItem *> *)createItemWithModelSearchableText:(nonnull NSString *)modelText readingSearchableText:(nonnull NSString *)readingText
+{
+    NSMutableArray *results = [NSMutableArray array];
+    if (modelText.length != readingText.length) {
+        return results;
+    }
+
+    for (NSInteger i = 0; i < modelText.length; i++) {
+        unichar text = [modelText characterAtIndex:i];
+        unichar key = [readingText characterAtIndex:i];
+        NSString *itemReading = [LanguageModelManager readingFor:[NSString stringWithFormat:@"%C", key]];
+        if (itemReading) {
+            AssociatedPhraseArrayItem *item = [[AssociatedPhraseArrayItem alloc] initWithValue:[NSString stringWithFormat:@"%C", text] reading:itemReading];
+            [results addObject:item];
+        }
+    }
+    return results;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ %@ %@", [super description], self.value, self.reading];
+}
+
+@synthesize value;
+@synthesize reading;
+@end
 
 @implementation KeyHandler {
     std::shared_ptr<Formosa::Gramambular2::LanguageModel> _emptySharedPtr;
@@ -60,7 +102,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     NSString *_inputMode;
 }
 
-//@synthesize inputMode = _inputMode;
 @synthesize delegate = _delegate;
 
 - (NSString *)inputMode
@@ -190,13 +231,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 }
 
-- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <NSString *> *)associatedPhrase
+- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase
 {
+    NSLog(@"fixNodeAtIndex");
     size_t actualCursor = index;
-    //    [self actualCandidateCursorIndex];
     Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
-    if (!_grid->overrideCandidate(actualCursor, candidate)) {
-        return;
+    BOOL overrideResult = _grid->overrideCandidate(actualCursor, candidate);
+    if (!overrideResult) {
+        NSLog(@"sometimes it may fail after Chinese conversion. Bypass the error anyway");
     }
 
     Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk;
@@ -214,25 +256,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
     _grid->setCursor(accumulatedCursor);
 
-    NSMutableArray *itemReadings = [[NSMutableArray alloc] init];
-
-    for (NSString *item in associatedPhrase) {
-        NSString *itemReading = [LanguageModelManager readingFor:item];
-        if (itemReading) {
-            [itemReadings addObject:itemReading];
-        }
-    }
-
-    if (itemReadings.count != associatedPhrase.count) {
-        return;
-    }
-
-    for (NSInteger i = 0; i < itemReadings.count; i++) {
-        NSString *itemReading = itemReadings[i];
+    for (NSInteger i = 0; i < associatedPhrase.count; i++) {
+        NSString *itemReading = associatedPhrase[i].reading;
         _grid->insertReading(itemReading.UTF8String);
-        NSString *phrase = associatedPhrase[i];
-        NSInteger candidateIIndex = accumulatedCursor + i;
-        _grid->overrideCandidate(candidateIIndex, phrase.UTF8String);
+        NSString *phrase = associatedPhrase[i].value;
+        NSInteger candidateIndex = accumulatedCursor + i;
+        BOOL hasNode = _grid->hasNodeAt(candidateIndex, 1, phrase.UTF8String);
+        BOOL result = _grid->overrideCandidate(candidateIndex, phrase.UTF8String);
+        NSLog(@"override %d %d %@ %@", hasNode, result, phrase, itemReading);
     }
     [self _walk];
 }
@@ -1668,17 +1699,37 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index selectedPhrase:(NSString *)key selectedReading:(NSString *)selectedReading useVerticalMode:(BOOL)useVerticalMode
 {
-    std::string cppKey(key.UTF8String);
     if (![state isKindOfClass:[InputStateNotEmpty class]]) {
         return nil;
     }
 
+    // zonble
+    BOOL scToTc = Preferences.chineseConversionEnabled &&
+            Preferences.chineseConversionStyle == 1;
+    if (scToTc) {
+        if (Preferences.chineseConversionEngine == 1) {
+            key = [VXHanConvert convertToTraditionalFrom:key];
+        } else {
+            key = [[OpenCCBridge sharedInstance] convertTraditional:key];
+        }
+    }
+    std::string cppKey(key.UTF8String);
+
     if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
         std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
-        NSMutableArray<NSString *> *array = [NSMutableArray array];
+        NSMutableArray<InputStateCandidate *> *array = [NSMutableArray array];
         for (auto phrase : phrases) {
             NSString *item = [[NSString alloc] initWithUTF8String:phrase.c_str()];
-            [array addObject:item];
+            NSString *diaplayText = [[NSString alloc] initWithString:item];
+            if (scToTc) {
+                if (Preferences.chineseConversionEngine == 1) {
+                    diaplayText = [VXHanConvert convertToSimplifiedFrom:diaplayText];
+                } else {
+                    diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
+                }
+            }
+            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:@"" value:item displayText:diaplayText];
+            [array addObject:candidate];
         }
         InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state selectedPhrase:key selectedReading:selectedReading selectedIndex:index candidates:array useVerticalMode:useVerticalMode];
         return associatedPhrases;

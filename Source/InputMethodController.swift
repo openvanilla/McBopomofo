@@ -525,9 +525,7 @@ extension McBopomofoInputMethodController {
                 }
             case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
-                candidates = state.candidates.map {
-                    InputState.Candidate(reading: "", value: $0, displayText: $0)
-                }
+                candidates = state.candidates
             case _ as InputState.SelectingDictionary:
                 return true
             case _ as InputState.ShowingCharInfo:
@@ -730,7 +728,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         case let state as InputState.ChoosingCandidate:
             state.candidates[Int(index)].displayText
         case let state as InputState.AssociatedPhrases:
-            state.candidates[Int(index)]
+            state.candidates[Int(index)].displayText
         case let state as InputState.AssociatedPhrasesPlain:
             state.candidates[Int(index)]
         case let state as InputState.SelectingDictionary:
@@ -771,14 +769,25 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 break
             }
         case let state as InputState.AssociatedPhrases:
-            let selectedPhrase = state.candidates[Int(index)].map { String($0) }
+            let scToTc = Preferences.chineseConversionEnabled && Preferences.chineseConversionStyle == 1
+            let selectedPhrase: String = {
+                let selectedPhrase = state.selectedPhrase
+                return if scToTc {
+                    Preferences.chineseConversionEngine == 1 ?
+                    VXHanConvert.convertToTraditional(from: selectedPhrase) :
+                    OpenCCBridge.shared.convertTraditional(selectedPhrase) ?? ""
+                } else { selectedPhrase }
+            }()
+            let candidate = state.candidates[Int(index)]
+            let associatedPhrase = AssociatedPhraseArrayItem.createItem(withModelSearchableText: candidate.displayText, readingSearchableText: candidate.value)
+
             switch state.previousState {
             case let previous as InputState.ChoosingCandidate:
                 let selectedIndex = state.selectedIndex
                 let selectedCandidate = previous.candidates[selectedIndex]
-                keyHandler.fixNode(index:keyHandler.actualCandidateCursorIndex, reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: selectedPhrase)
+                keyHandler.fixNode(index:keyHandler.actualCandidateCursorIndex, reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: associatedPhrase)
             case _ as InputState.Inputting:
-                keyHandler.fixNode(index:keyHandler.cursorIndex - 1, reading: state.selectedReading, value: state.selectedPhrase, associatedPhrase: selectedPhrase)
+                keyHandler.fixNode(index:keyHandler.cursorIndex - 1, reading: state.selectedReading, value: selectedPhrase, associatedPhrase: associatedPhrase)
             default:
                 break
             }
