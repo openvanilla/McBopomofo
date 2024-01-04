@@ -31,6 +31,7 @@ namespace Mandarin {
 
 class PinyinParseHelper {
  public:
+  // Returns true after `target` got stripped the specified `prefix`.
   static bool ConsumePrefix(std::string& target, const std::string& prefix) {
     if (target.length() < prefix.length()) {
       return false;

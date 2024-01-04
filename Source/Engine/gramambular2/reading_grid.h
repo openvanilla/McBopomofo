@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef READING_GRID_H_
-#define READING_GRID_H_
+#ifndef SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_
+#define SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_
 
 #include <array>
 #include <cassert>
@@ -270,4 +270,4 @@ class ReadingGrid {
 
 }  // namespace Formosa::Gramambular2
 
-#endif
+#endif  // SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_

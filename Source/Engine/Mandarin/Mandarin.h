@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef MANDARIN_H_
-#define MANDARIN_H_
+#ifndef SRC_ENGINE_MANDARIN_MANDARIN_H_
+#define SRC_ENGINE_MANDARIN_MANDARIN_H_
 
 #include <cstdint>
 #include <iostream>
@@ -483,4 +483,4 @@ class BopomofoReadingBuffer {
 }  // namespace Mandarin
 }  // namespace Formosa
 
-#endif  // MANDARIN_H_
+#endif  // SRC_ENGINE_MANDARIN_MANDARIN_H_

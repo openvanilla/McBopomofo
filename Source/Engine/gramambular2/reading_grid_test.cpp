@@ -23,13 +23,12 @@
 
 #include "reading_grid.h"
 
-#include <gtest/gtest.h>
-
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "gtest/gtest.h"
 #include "language_model.h"
 
 namespace Formosa::Gramambular2 {
@@ -668,8 +667,8 @@ TEST(ReadingGridTest, DisambiguateCandidates) {
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高熱", "🔥", "焰", "危險"}));
 
-  ASSERT_TRUE(
-      grid.overrideCandidate(loc, ReadingGrid::Candidate("ㄏㄨㄛˇㄧㄢˋ", "🔥")));
+  ASSERT_TRUE(grid.overrideCandidate(
+      loc, ReadingGrid::Candidate("ㄏㄨㄛˇㄧㄢˋ", "🔥")));
   result = grid.walk();
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高熱", "🔥", "危險"}));
