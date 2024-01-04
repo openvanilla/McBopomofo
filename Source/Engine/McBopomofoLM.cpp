@@ -23,9 +23,10 @@
 
 #include "McBopomofoLM.h"
 #include <algorithm>
-#include <float.h>
 #include <iterator>
 #include <limits>
+#include <string>
+#include <vector>
 
 namespace McBopomofo {
 
@@ -176,7 +177,8 @@ void McBopomofoLM::setExternalConverter(std::function<std::string(std::string)> 
     m_externalConverter = externalConverter;
 }
 
-void McBopomofoLM::setMacroConverter(std::function<std::string(std::string)> macroConverter) {
+void McBopomofoLM::setMacroConverter(std::function<std::string(std::string)> macroConverter)
+{
     m_macroConverter = macroConverter;
 }
 
@@ -193,7 +195,6 @@ std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::filterA
         }
 
         std::string value = originalValue;
-
         if (m_phraseReplacementEnabled) {
             std::string replacement = m_phraseReplacement.valueForKey(value);
             if (!replacement.empty()) {
@@ -208,7 +209,7 @@ std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::filterA
             std::string replacement = m_externalConverter(value);
             value = replacement;
         }
-        if (!value.empty() && insertedValues.find(value) == insertedValues.end()) {
+        if (insertedValues.find(value) == insertedValues.end()) {
             results.emplace_back(value, unigram.score());
             insertedValues.insert(value);
         }

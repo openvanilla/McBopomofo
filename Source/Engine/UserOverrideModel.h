@@ -21,12 +21,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef USEROVERRIDEMODEL_H
-#define USEROVERRIDEMODEL_H
+#ifndef SRC_ENGINE_USEROVERRIDEMODEL_H_
+#define SRC_ENGINE_USEROVERRIDEMODEL_H_
 
 #include <list>
 #include <map>
 #include <string>
+#include <utility>
 
 #include "gramambular2/reading_grid.h"
 
@@ -95,4 +96,4 @@ private:
 
 } // namespace McBopomofo
 
-#endif
+#endif // SRC_ENGINE_USEROVERRIDEMODEL_H_

@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef SOURCE_ENGINE_PARSELESSLM_H_
-#define SOURCE_ENGINE_PARSELESSLM_H_
+#ifndef SRC_ENGINE_PARSELESSLM_H_
+#define SRC_ENGINE_PARSELESSLM_H_
 
 #include <memory>
 #include <string>
@@ -59,6 +59,6 @@ private:
     std::unique_ptr<ParselessPhraseDB> db_;
 };
 
-}; // namespace McBopomofo
+} // namespace McBopomofo
 
-#endif // SOURCE_ENGINE_PARSELESSLM_H_
+#endif // SRC_ENGINE_PARSELESSLM_H_

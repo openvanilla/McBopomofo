@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef SOURCE_ENGINE_PARSELESSPHRASEDB_H_
-#define SOURCE_ENGINE_PARSELESSPHRASEDB_H_
+#ifndef SRC_ENGINE_PARSELESSPHRASEDB_H_
+#define SRC_ENGINE_PARSELESSPHRASEDB_H_
 
 #include <cstddef>
 #include <string>
@@ -63,6 +63,6 @@ private:
     const char* end_;
 };
 
-}; // namespace McBopomofo
+} // namespace McBopomofo
 
-#endif // SOURCE_ENGINE_PARSELESSPHRASEDB_H_
+#endif // SRC_ENGINE_PARSELESSPHRASEDB_H_

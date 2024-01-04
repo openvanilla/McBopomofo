@@ -23,13 +23,12 @@
 
 #include "reading_grid.h"
 
-#include <gtest/gtest.h>
-
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "gtest/gtest.h"
 #include "language_model.h"
 
 namespace Formosa::Gramambular2 {

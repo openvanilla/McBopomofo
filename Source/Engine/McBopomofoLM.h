@@ -21,17 +21,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef MCBOPOMOFOLM_H
-#define MCBOPOMOFOLM_H
+#ifndef SRC_ENGINE_MCBOPOMOFOLM_H_
+#define SRC_ENGINE_MCBOPOMOFOLM_H_
 
 #include "AssociatedPhrases.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
 #include "UserPhrasesLM.h"
 #include "gramambular2/language_model.h"
+#include <cstdio>
 #include <functional>
-#include <stdio.h>
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 namespace McBopomofo {
 
@@ -101,7 +103,8 @@ public:
     bool externalConverterEnabled() const;
     /// Sets a lambda to let the values of unigrams could be converted by it.
     void setExternalConverter(std::function<std::string(std::string)> externalConverter);
-    /// Sets a lambda to convert the macros.
+
+    /// Sets a lambda to convert the macro to a string.
     void setMacroConverter(std::function<std::string(std::string)> macroConverter);
 
     const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
@@ -127,11 +130,11 @@ protected:
     UserPhrasesLM m_excludedPhrases;
     PhraseReplacementMap m_phraseReplacement;
     AssociatedPhrases m_associatedPhrases;
+    std::function<std::string(std::string)> m_macroConverter;
     bool m_phraseReplacementEnabled;
     bool m_externalConverterEnabled;
     std::function<std::string(std::string)> m_externalConverter;
-    std::function<std::string(std::string)> m_macroConverter;
 };
-};
+} // namespace McBopomofo
 
-#endif
+#endif // SRC_ENGINE_MCBOPOMOFOLM_H_

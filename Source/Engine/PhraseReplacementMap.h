@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef PHRASEREPLACEMENTMAP_H
-#define PHRASEREPLACEMENTMAP_H
+#ifndef SRC_ENGINE_PHRASEREPLACEMENTMAP_H_
+#define SRC_ENGINE_PHRASEREPLACEMENTMAP_H_
 
 #include <iostream>
 #include <map>
@@ -46,6 +46,6 @@ protected:
     size_t length;
 };
 
-}
+} // namespace McBopomofo
 
-#endif
+#endif // SRC_ENGINE_PHRASEREPLACEMENTMAP_H_
