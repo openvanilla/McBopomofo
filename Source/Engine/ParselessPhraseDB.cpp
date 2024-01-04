@@ -196,4 +196,4 @@ std::vector<std::string> ParselessPhraseDB::reverseFindRows(
     return rows;
 }
 
-}; // namespace McBopomofo
+} // namespace McBopomofo

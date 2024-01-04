@@ -221,4 +221,4 @@ TEST(ParselessPhraseDBTest, LookUpByValue)
     ASSERT_TRUE(rows.empty());
 }
 
-}; // namespace McBopomofo
+} // namespace McBopomofo

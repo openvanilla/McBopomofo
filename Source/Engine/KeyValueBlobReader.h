@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef SOURCE_ENGINE_KEYVALUEBLOBREADER_H_
-#define SOURCE_ENGINE_KEYVALUEBLOBREADER_H_
+#ifndef SRC_ENGINE_KEYVALUEBLOBREADER_H_
+#define SRC_ENGINE_KEYVALUEBLOBREADER_H_
 
 #include <cstddef>
 #include <functional>
@@ -103,4 +103,4 @@ std::ostream& operator<<(std::ostream&, const KeyValueBlobReader::KeyValue&);
 
 } // namespace McBopomofo
 
-#endif // SOURCE_ENGINE_KEYVALUEBLOBREADER_H_
+#endif // SRC_ENGINE_KEYVALUEBLOBREADER_H_

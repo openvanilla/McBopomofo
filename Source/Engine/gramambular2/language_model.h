@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef LANGUAGE_MODEL_H_
-#define LANGUAGE_MODEL_H_
+#ifndef SRC_ENGINE_GRAMAMBULAR2_LANGUAGE_MODEL_H_
+#define SRC_ENGINE_GRAMAMBULAR2_LANGUAGE_MODEL_H_
 
 #include <string>
 #include <utility>
@@ -59,4 +59,4 @@ class LanguageModel {
 
 }  // namespace Formosa::Gramambular2
 
-#endif
+#endif  // SRC_ENGINE_GRAMAMBULAR2_LANGUAGE_MODEL_H_
