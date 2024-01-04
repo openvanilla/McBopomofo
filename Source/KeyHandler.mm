@@ -30,10 +30,11 @@
 #import "UserOverrideModel.h"
 #import "reading_grid.h"
 
+#import <algorithm>
+#import <optional>
 #import <string>
 #import <unordered_map>
 #import <utility>
-#import <algorithm>
 #import <vector>
 
 @import CandidateUI;
@@ -233,7 +234,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase
 {
-    NSLog(@"fixNodeAtIndex");
     size_t actualCursor = index;
     Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
     BOOL overrideResult = _grid->overrideCandidate(actualCursor, candidate);
@@ -259,11 +259,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     for (NSInteger i = 0; i < associatedPhrase.count; i++) {
         NSString *itemReading = associatedPhrase[i].reading;
         _grid->insertReading(itemReading.UTF8String);
-        NSString *phrase = associatedPhrase[i].value;
-        NSInteger candidateIndex = accumulatedCursor + i;
-        BOOL hasNode = _grid->hasNodeAt(candidateIndex, 1, phrase.UTF8String);
-        BOOL result = _grid->overrideCandidate(candidateIndex, phrase.UTF8String);
-        NSLog(@"override %d %d %@ %@", hasNode, result, phrase, itemReading);
     }
     [self _walk];
 }
@@ -1506,15 +1501,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    std::vector<Formosa::Gramambular2::ReadingGrid::NodeInSpan> nodes = _grid->overlappingNodesAt(cursor - 1);
-    auto nodesIt = std::find_if(nodes.begin(),nodes.end(), [](auto nodeInSpan){
-        return nodeInSpan.node->spanningLength() == 1;
+    std::optional<Formosa::Gramambular2::ReadingGrid::NodePtr> oneUnitLongSpan = _grid->findInSpan(cursor - 1, [](const Formosa::Gramambular2::ReadingGrid::NodePtr& node) {
+        return node->spanningLength() == 1;
     });
-    if (nodesIt == nodes.end()) {
+
+    if (!oneUnitLongSpan.has_value()) {
         errorCallback();
         return YES;
     }
-    std::string reading = nodesIt->node->reading();
+    std::string reading = (*oneUnitLongSpan)->reading();
 
     InputState *newState = [self buildAssociatePhraseStateWithPreviousState:state selectedIndex:0 selectedPhrase:[NSString stringWithUTF8String:characterBeforeCursor.c_str()] selectedReading:[NSString stringWithUTF8String:reading.c_str()] useVerticalMode:NO];
     if (newState) {
