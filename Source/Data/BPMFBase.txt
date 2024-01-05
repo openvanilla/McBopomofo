@@ -696,7 +696,6 @@
 濱 ㄅㄧㄣ bin 1up big5
 彬 ㄅㄧㄣ bin 1up big5
 檳 ㄅㄧㄣ bin 1up big5
-殯 ㄅㄧㄣ bin 1up big5
 儐 ㄅㄧㄣ bin 1up big5
 斌 ㄅㄧㄣ bin 1up big5
 繽 ㄅㄧㄣ bin 1up big5
