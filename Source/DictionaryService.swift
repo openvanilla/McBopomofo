@@ -43,7 +43,7 @@ fileprivate struct CharacterInfo: DictionaryService {
     }
 
     func lookUp(phrase: String, state: InputState, serviceIndex: Int, stateCallback: (InputState) -> ()) -> Bool {
-        guard let state = state as? InputState.SelectingDictionaryService else {
+        guard let state = state as? InputState.SelectingDictionary else {
             return false
         }
         let newState = InputState.ShowingCharInfo(previousState: state, selectedString: state.selectedPhrase, selectedIndex: serviceIndex)

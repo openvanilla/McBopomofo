@@ -93,6 +93,21 @@ bool ReadingGrid::deleteReadingAfterCursor() {
   return true;
 }
 
+std::optional<ReadingGrid::NodePtr> ReadingGrid::findInSpan(
+    size_t cursor, const std::function<bool(const NodePtr&)>& predicate) const {
+  assert(cursor <= readings_.size());
+  std::vector<ReadingGrid::NodeInSpan> nodes =
+      overlappingNodesAt(cursor == readings_.size() ? cursor - 1 : cursor);
+
+  auto nodesIt = std::find_if(
+      nodes.cbegin(), nodes.cend(),
+      [&](const NodeInSpan& nodeInSpan) { return predicate(nodeInSpan.node); });
+
+  return nodesIt == nodes.end()
+             ? std::nullopt
+             : std::optional<ReadingGrid::NodePtr>(nodesIt->node);
+}
+
 namespace {
 
 // Defines a vertex of a DAG. This is a mutable data structure used for both
@@ -471,7 +486,7 @@ bool ReadingGrid::overrideCandidate(
 }
 
 std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
-    size_t loc) {
+    size_t loc) const {
   std::vector<ReadingGrid::NodeInSpan> results;
 
   if (spans_.empty() || loc >= spans_.size()) {

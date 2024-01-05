@@ -24,12 +24,13 @@
 #include "ParselessLM.h"
 
 #include <fcntl.h>
-#include <string_view>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include <memory>
+#include <string_view>
+#include <utility>
 
 McBopomofo::ParselessLM::~ParselessLM() { close(); }
 

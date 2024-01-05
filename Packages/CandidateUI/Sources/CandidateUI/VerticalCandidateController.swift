@@ -150,6 +150,7 @@ public class VerticalCandidateController: CandidateController {
         tooltipView.isSelectable = false
         tooltipView.isBezeled = false
         tooltipView.drawsBackground = true
+        tooltipView.backgroundColor = NSColor.clear
         tooltipView.lineBreakMode = .byTruncatingTail
 
         contentRect.origin = NSPoint.zero

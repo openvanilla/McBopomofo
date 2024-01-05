@@ -40,6 +40,15 @@ extern InputMode InputModePlainBopomofo;
 - (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputState *)state;
 @end
 
+@interface AssociatedPhraseArrayItem : NSObject
+
++ (NSArray <AssociatedPhraseArrayItem *>*)createItemWithModelSearchableText:(NSString *)modelText readingSearchableText:(NSString *)readingText;
+
+- (instancetype)initWithValue:(NSString *)character reading:(NSString *)reading;
+@property (strong, nonatomic) NSString *value;
+@property (strong, nonatomic) NSString *reading;
+@end
+
 @interface KeyHandler : NSObject
 
 - (BOOL)handleInput:(KeyHandlerInput *)input
@@ -49,16 +58,21 @@ extern InputMode InputModePlainBopomofo;
 
 - (void)syncWithPreferences;
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:useMoveCursorAfterSelectionSetting:));
+- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase NS_SWIFT_NAME(fixNode(index:reading:value:associatedPhrase:));
+
 - (void)clear;
 
 - (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
     NS_SWIFT_NAME(handleForceCommit(stateCallback:));
 
 - (InputState *)buildInputtingState;
-- (nullable InputState *)buildAssociatePhraseStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatePhrasePlainStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index selectedPhrase:(NSString *)key selectedReading:(NSString *)selectedReading useVerticalMode:(BOOL)useVerticalMode;
 
 @property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id<KeyHandlerDelegate> delegate;
+@property (assign, nonatomic, readonly) NSInteger actualCandidateCursorIndex;
+@property (assign, nonatomic, readonly) NSInteger cursorIndex;
 @end
 
 NS_ASSUME_NONNULL_END

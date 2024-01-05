@@ -23,13 +23,12 @@
 
 #include "reading_grid.h"
 
-#include <gtest/gtest.h>
-
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "gtest/gtest.h"
 #include "language_model.h"
 
 namespace Formosa::Gramambular2 {
@@ -457,6 +456,81 @@ TEST(ReadingGridTest, LongGridDeletion) {
   ASSERT_EQ(grid.spans()[8].nodeOf(5)->reading(), "jklmn");
 }
 
+TEST(ReadingGridTest, FindNodeInSpans) {
+  ReadingGrid grid(std::make_shared<MockLM>());
+  grid.setReadingSeparator(";");
+  grid.insertReading("a");
+  grid.insertReading("b");
+  grid.insertReading("c");
+
+  ASSERT_FALSE(
+      grid.findInSpan(0, [](const auto& n) { return n->spanningLength() == 4; })
+          .has_value());
+  ASSERT_FALSE(
+      grid.findInSpan(1, [](const auto& n) { return n->spanningLength() == 0; })
+          .has_value());
+  ASSERT_EQ(
+      grid.findInSpan(0, [](const auto& n) { return n->spanningLength() == 1; })
+          ->get()
+          ->reading(),
+      "a");
+  ASSERT_EQ(
+      grid.findInSpan(1, [](const auto& n) { return n->spanningLength() == 1; })
+          ->get()
+          ->reading(),
+      "b");
+  ASSERT_EQ(
+      grid.findInSpan(2, [](const auto& n) { return n->spanningLength() == 1; })
+          ->get()
+          ->reading(),
+      "c");
+  ASSERT_EQ(
+      grid.findInSpan(3, [](const auto& n) { return n->spanningLength() == 1; })
+          ->get()
+          ->reading(),
+      "c");
+  ASSERT_EQ(
+      grid.findInSpan(0, [](const auto& n) { return n->spanningLength() == 2; })
+          ->get()
+          ->reading(),
+      "a;b");
+  ASSERT_EQ(
+      grid.findInSpan(1, [](const auto& n) { return n->spanningLength() == 2; })
+          ->get()
+          ->reading(),
+      "b;c");
+  ASSERT_EQ(
+      grid.findInSpan(2, [](const auto& n) { return n->spanningLength() == 2; })
+          ->get()
+          ->reading(),
+      "b;c");
+  ASSERT_EQ(
+      grid.findInSpan(3, [](const auto& n) { return n->spanningLength() == 2; })
+          ->get()
+          ->reading(),
+      "b;c");
+  ASSERT_EQ(
+      grid.findInSpan(0, [](const auto& n) { return n->spanningLength() == 3; })
+          ->get()
+          ->reading(),
+      "a;b;c");
+  ASSERT_EQ(
+      grid.findInSpan(1, [](const auto& n) { return n->spanningLength() == 3; })
+          ->get()
+          ->reading(),
+      "a;b;c");
+  ASSERT_EQ(
+      grid.findInSpan(2, [](const auto& n) { return n->spanningLength() == 3; })
+          ->get()
+          ->reading(),
+      "a;b;c");
+  ASSERT_EQ(
+      grid.findInSpan(3, [](const auto& n) { return n->spanningLength() == 3; })
+          ->get()
+          ->reading(),
+      "a;b;c");
+}
+
 TEST(ReadingGridTest, StressTest) {
   constexpr char kStressData[] = R"(
 ㄧ 一 -2.08170692
@@ -668,8 +742,8 @@ TEST(ReadingGridTest, DisambiguateCandidates) {
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高熱", "🔥", "焰", "危險"}));
 
-  ASSERT_TRUE(
-      grid.overrideCandidate(loc, ReadingGrid::Candidate("ㄏㄨㄛˇㄧㄢˋ", "🔥")));
+  ASSERT_TRUE(grid.overrideCandidate(
+      loc, ReadingGrid::Candidate("ㄏㄨㄛˇㄧㄢˋ", "🔥")));
   result = grid.walk();
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高熱", "🔥", "危險"}));

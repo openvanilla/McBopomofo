@@ -1605,7 +1605,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        XCTAssert(state is InputState.SelectingDictionaryService)
+        XCTAssert(state is InputState.SelectingDictionary)
 
         input = KeyHandlerInput(inputText: "?", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
@@ -1640,7 +1640,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        XCTAssert(state is InputState.SelectingDictionaryService)
+        XCTAssert(state is InputState.SelectingDictionary)
 
         input = KeyHandlerInput(inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
