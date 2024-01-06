@@ -285,6 +285,10 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.AssociatedPhrasesPlain:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.SelectingFeature:
+            handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.ChineseNumber:
+            handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.SelectingDictionary:
@@ -454,6 +458,35 @@ extension McBopomofoInputMethodController {
         show(candidateWindowWith: state, client: client)
     }
 
+    private func handle(state: InputState.SelectingFeature, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        show(candidateWindowWith: state, client: client)
+    }
+
+    private func handle(state: InputState.ChineseNumber, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+    }
+
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
@@ -526,6 +559,8 @@ extension McBopomofoInputMethodController {
             case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
+            case _ as InputState.SelectingFeature:
+                return true
             case _ as InputState.SelectingDictionary:
                 return true
             case _ as InputState.ShowingCharInfo:
@@ -714,6 +749,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             UInt(state.candidates.count)
         case let state as InputState.AssociatedPhrasesPlain:
             UInt(state.candidates.count)
+        case let state as InputState.SelectingFeature:
+            UInt(state.menu.count)
         case let state as InputState.SelectingDictionary:
             UInt(state.menu.count)
         case let state as InputState.ShowingCharInfo:
@@ -731,6 +768,8 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             state.candidates[Int(index)].displayText
         case let state as InputState.AssociatedPhrasesPlain:
             state.candidates[Int(index)]
+        case let state as InputState.SelectingFeature:
+            state.menu[Int(index)]
         case let state as InputState.SelectingDictionary:
             state.menu[Int(index)]
         case let state as InputState.ShowingCharInfo:
@@ -804,6 +843,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 self.handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)
+            }
+        case let state as InputState.SelectingFeature:
+            if let nextState = state.nextState(by: Int(index)) {
+                handle(state: nextState, client: client)
             }
         case let state as InputState.SelectingDictionary:
             let handled = state.lookUp(usingServiceAtIndex: Int(index), state: state) { state in

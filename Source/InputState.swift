@@ -111,6 +111,66 @@ class InputState: NSObject {
 
     // MARK: -
 
+    @objc(InputStateSelectingFeature)
+    class SelectingFeature: InputState {
+        var featureList: [(String, ()->InputState)] = [
+            (NSLocalizedString("Big5 Code Input", comment: ""), {  .Big5(code:"") }),
+            (NSLocalizedString("Lower Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
+            (NSLocalizedString("Upper Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
+            (NSLocalizedString("Suzhou Numbers", comment: ""), {  .ChineseNumber(style:.suzhou, number: "") }),
+        ]
+
+        override var description: String {
+            "<InputState.SelectingFeature>"
+        }
+
+        @objc var menu: [String] {
+            featureList.map { $0.0 }
+        }
+
+        func nextState(by index: Int) -> InputState? {
+            featureList[index].1()
+        }
+    }
+
+    @objc(InputStateChineseNumber)
+    class ChineseNumber: InputState {
+
+        @objc(InputStateChineseNumberStyle)
+        enum Style: Int {
+            case lower = 0
+            case upper = 1
+            case suzhou = 2
+
+            var label: String {
+                switch self {
+                case .lower:
+                    "一般數字"
+                case .upper:
+                    "大寫數字"
+                case .suzhou:
+                    "蘇州碼"
+                }
+            }
+        }
+
+        @objc private(set) var number: String
+        @objc private(set) var style: Style
+
+        @objc init(style: Style, number: String) {
+            self.style = style
+            self.number = number
+        }
+
+        override var description: String {
+            "<InputState.ChineseNumber, style:\(style), number:\(number)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[\(style.label)] \(number)"
+        }
+    }
+
     @objc(InputStateBig5)
     class Big5: InputState {
         @objc private(set) var code: String
@@ -127,6 +187,7 @@ class InputState: NSObject {
             return "[內碼] \(code)"
         }
     }
+
 
     // MARK: -
 

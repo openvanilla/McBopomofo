@@ -47,6 +47,7 @@
 		D427F7B6279086F6004A2160 /* InputSourceHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7B5279086F6004A2160 /* InputSourceHelper */; };
 		D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7C027908EFC004A2160 /* OpenCCBridge */; };
 		D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43FC40A2B23788400ED5A1C /* InputMacro.swift */; };
+		D44488DA2B486BD000B4F842 /* ChineseNumber in Frameworks */ = {isa = PBXBuildFile; productRef = D44488D92B486BD000B4F842 /* ChineseNumber */; };
 		D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD5E2B393C00000C5812 /* InputMacroTests.swift */; };
 		D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD602B39506D000C5812 /* ServiceProviderTests.swift */; };
 		D44FB74527915565003C80A6 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
@@ -176,6 +177,7 @@
 		D427F7B2279086B5004A2160 /* InputSourceHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InputSourceHelper; path = Packages/InputSourceHelper; sourceTree = "<group>"; };
 		D427F7BF27908EAC004A2160 /* OpenCCBridge */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenCCBridge; path = Packages/OpenCCBridge; sourceTree = "<group>"; };
 		D43FC40A2B23788400ED5A1C /* InputMacro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacro.swift; sourceTree = "<group>"; };
+		D44488D62B48561800B4F842 /* ChineseNumber */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ChineseNumber; path = Packages/ChineseNumber; sourceTree = "<group>"; };
 		D449AD5E2B393C00000C5812 /* InputMacroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacroTests.swift; sourceTree = "<group>"; };
 		D449AD602B39506D000C5812 /* ServiceProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProviderTests.swift; sourceTree = "<group>"; };
 		D44FB74427915555003C80A6 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 			files = (
 				D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */,
 				D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */,
+				D44488DA2B486BD000B4F842 /* ChineseNumber in Frameworks */,
 				D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */,
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */,
@@ -428,6 +431,7 @@
 		D427F766278C9CBD004A2160 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				D44488D62B48561800B4F842 /* ChineseNumber */,
 				D427F768278C9D0D004A2160 /* CandidateUI */,
 				D427F7A727905E43004A2160 /* TooltipUI */,
 				D427F7AC27907B7E004A2160 /* NotifierUI */,
@@ -506,6 +510,7 @@
 				D44FB7492791B829003C80A6 /* VXHanConvert */,
 				D47D73C227A7200500255A50 /* FSEventStreamHelper */,
 				D4C9CAB027AAC9690058DFEA /* NSStringUtils */,
+				D44488D92B486BD000B4F842 /* ChineseNumber */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1405,6 +1410,10 @@
 		D427F7C027908EFC004A2160 /* OpenCCBridge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OpenCCBridge;
+		};
+		D44488D92B486BD000B4F842 /* ChineseNumber */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ChineseNumber;
 		};
 		D44FB7492791B829003C80A6 /* VXHanConvert */ = {
 			isa = XCSwiftPackageProductDependency;

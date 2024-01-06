@@ -41,6 +41,7 @@
 @import NSStringUtils;
 @import OpenCCBridge;
 @import VXHanConvert;
+@import ChineseNumber;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
@@ -302,9 +303,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     UniChar charCode = input.charCode;
     McBopomofoEmacsKey emacsKey = input.emacsKey;
 
+    // MARK: Handle Selecting Feature
+    if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
+        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
     // MARK: Handle Big5 Input
     if ([state isKindOfClass:[InputStateBig5 class]]) {
         return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+    // MARK: Handle Chinese Number Input
+    if ([state isKindOfClass:[InputStateChineseNumber class]]) {
+        return [self _handleNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // if the inputText is empty, it's a function key combination, we ignore it
@@ -606,6 +617,22 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
     }
+
+    NSLog(@"char code %d", charCode);
+
+    if ([input isControlHold] && (charCode == 28)) {
+        [self clear];
+        if ([state isKindOfClass:[InputStateInputting class]]) {
+            InputStateInputting *current = (InputStateInputting *)state;
+            NSString *composingBuffer = current.composingBuffer;
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+            stateCallback(committing);
+        }
+        InputStateSelectingFeature *selecting = [[InputStateSelectingFeature alloc] init];
+        stateCallback(selecting);
+        return YES;
+    }
+
 
     // MARK: Punctuation list
     if ((char)charCode == '`' &&
@@ -1171,6 +1198,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
         } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             InputStateAssociatedPhrases *current = (InputStateAssociatedPhrases *)state;
             NSInteger selectedIndex = current.selectedIndex;
@@ -1335,6 +1366,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         candidates = [(InputStateAssociatedPhrases *)state candidates];
     } else if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
         candidates = [(InputStateAssociatedPhrasesPlain *)state candidates];
+    } else if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
+        candidates = [(InputStateSelectingFeature *)state menu];
     } else if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
         candidates = [(InputStateSelectingDictionary *)state menu];
     }
@@ -1422,6 +1455,104 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     errorCallback();
+    return YES;
+}
+
+- (BOOL)_handleNumberState:(InputState *)state
+                   input:(KeyHandlerInput *)input
+           stateCallback:(void (^)(InputState *))stateCallback
+           errorCallback:(void (^)(void))errorCallback;
+{
+    InputStateChineseNumber *numberState = (InputStateChineseNumber *)state;
+    UniChar charCode = input.charCode;
+    BOOL cancelKey = (charCode == 27);
+    if (cancelKey) {
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+    if ((charCode == 8) || [input isDelete]) {
+        NSString *number = numberState.number;
+        if (number.length > 0) {
+            number = [number substringToIndex:number.length - 1];
+        }
+        InputStateChineseNumber *newState = [[InputStateChineseNumber alloc] initWithStyle:numberState.style number:number];
+        stateCallback(newState);
+        return YES;
+    }
+
+    if (charCode == 13) {
+        if (![numberState.number count]) {
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
+            return YES;
+        }
+        NSString *intPart = @"";
+        NSString *decPart = @"";
+        NSArray *components = [numberState.number componentsSeparatedByString:@"."];
+        if (components.count == 2) {
+            intPart = components[0];
+            decPart = components[1];
+        } else {
+            intPart = numberState.number;
+        }
+
+        switch (numberState.style) {
+            case InputStateChineseNumberStyleLower:
+            {
+                NSString *string = [ChineseNumber lowerNumberWithIntPart:intPart decPart:decPart];
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+                stateCallback(committing);
+            }
+                break;
+            case InputStateChineseNumberStyleUpper:
+            {
+                NSString *string = [ChineseNumber upperNumberWithIntPart:intPart decPart:decPart];
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+                stateCallback(committing);
+            }
+                break;
+
+            case InputStateChineseNumberStyleSuzhou:
+            {
+                NSString *string = [ChineseNumber suzhouNumberWithIntPart:intPart decPart:decPart];
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+                stateCallback(committing);
+            }
+                break;
+            default:
+                break;
+        }
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+
+    if (charCode >= '0' && charCode <= '9') {
+        if (numberState.number.length > 20) {
+            errorCallback();
+            return YES;
+        }
+
+        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
+        InputStateChineseNumber *newState = [[InputStateChineseNumber alloc] initWithStyle:numberState.style number:appended];
+        stateCallback(newState);
+    } else if (charCode == '.') {
+        if ([numberState.number containsString:@"."]) {
+            errorCallback();
+            return YES;
+        }
+        if (numberState.number.length > 20) {
+            errorCallback();
+            return YES;
+        }
+
+        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
+        InputStateChineseNumber *newState = [[InputStateChineseNumber alloc] initWithStyle:numberState.style number:appended];
+        stateCallback(newState);
+    } else {
+        errorCallback();
+    }
     return YES;
 }
 
