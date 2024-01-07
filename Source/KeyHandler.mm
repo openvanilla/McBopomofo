@@ -1542,7 +1542,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             errorCallback();
             return YES;
         }
-        if (numberState.number.length > 20) {
+        if (numberState.number.length == 0 ||
+            numberState.number.length > 20) {
             errorCallback();
             return YES;
         }

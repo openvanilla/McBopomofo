@@ -1,13 +1,13 @@
 #import "ChineseNumber.h"
 
-const char *chinese_number(const char *int_part, const char *dec_part, bool use_formal, const char *unit);
+const char *chinese_number(const char *int_part, const char *dec_part, bool use_formal);
 extern const char *suzhou_number(const char *int_part, const char *dec_part, bool vertical_digit_at_start, const char *unit);
 
 @implementation ChineseNumber
 
 + (NSString *)lowerNumberWithIntPart:(NSString *)intPart decPart:(NSString *)decPart
 {
-    const char *result = chinese_number (intPart.UTF8String, decPart.UTF8String, false, (const char *) "");
+    const char *result = chinese_number (intPart.UTF8String, decPart.UTF8String, false);
     NSString *string = [[NSString alloc] initWithUTF8String:result];
     free ((void *) result);
     return string;
@@ -15,7 +15,7 @@ extern const char *suzhou_number(const char *int_part, const char *dec_part, boo
 
 + (NSString *)upperNumberWithIntPart:(NSString *)intPart decPart:(NSString *)decPart
 {
-    const char *result = chinese_number (intPart.UTF8String, decPart.UTF8String, true, (const char *) "");
+    const char *result = chinese_number (intPart.UTF8String, decPart.UTF8String, true);
     NSString *string = [[NSString alloc] initWithUTF8String:result];
     free ((void *) result);
     return string;

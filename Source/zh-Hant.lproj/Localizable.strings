@@ -105,4 +105,13 @@
 
 "%@ has been copied." = "已成功複製 %@";
 
-"Look up %@" = "Look up %@";
+"Look up %@" = "查找 %@";
+
+"Big5 Code Input" = "Big5 內碼輸入";
+
+"Lower Case Chinese Numbers" = "小寫中文數字";
+
+"Upper Case Chinese Numbers" = "大小中文數字";
+
+"Suzhou Numbers" = "蘇州碼";
+

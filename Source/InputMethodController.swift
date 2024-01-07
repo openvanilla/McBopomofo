@@ -334,6 +334,13 @@ extension McBopomofoInputMethodController {
             commit(text: previous.composingBuffer, client: client)
         }
 
+        if let _ = previous as? InputState.Big5 {
+            client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
+        }
+        if let _ = previous as? InputState.ChineseNumber {
+            client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
+        }
+
         // Unlike the Empty state handler, we don't call client.setMarkedText() here:
         // there's no point calling setMarkedText() with an empty string as the session
         // is being deactivated anyway, and we have found issues with how certains app

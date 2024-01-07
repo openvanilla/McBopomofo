@@ -22,8 +22,8 @@ const char *trim_zero(const char *input, bool from_start) {
     } else {
         char reversed[BUFFER_SIZE] = "";
         size_t n = 0;
-        for (size_t i = strlen (input) - 1; i >= 0; i--) {
-            char c = input[i];
+        for (size_t i = strlen (input); i > 0; i--) {
+            char c = input[i - 1];
             if (non_zero_found) {
                 reversed[n++] = c;
             } else if (c != '0') {
@@ -32,8 +32,8 @@ const char *trim_zero(const char *input, bool from_start) {
             }
         }
         n = 0;
-        for (size_t i = strlen (reversed) - 1; i >= 0; i--) {
-            rtn[n] = reversed[i];
+        for (size_t i = strlen (reversed); i > 0; i--) {
+            rtn[n] = reversed[i - 1];
             n++;
         }
     }
@@ -42,9 +42,10 @@ const char *trim_zero(const char *input, bool from_start) {
 
 const char *left_padding_with_zero(const char *input, size_t target) {
     char *buffer = (char *) calloc (BUFFER_SIZE, 1);
+    memset(buffer, 0,  BUFFER_SIZE);
     size_t len = strlen (input);
     if (len >= target) {
-        memcpy(buffer, (char *) input, sizeof (input));
+        memcpy(buffer, (char *) input, strlen (input));
         return buffer;
     }
     memset(buffer, '0', target - len);

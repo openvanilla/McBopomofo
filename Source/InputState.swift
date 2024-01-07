@@ -115,8 +115,8 @@ class InputState: NSObject {
     class SelectingFeature: InputState {
         var featureList: [(String, ()->InputState)] = [
             (NSLocalizedString("Big5 Code Input", comment: ""), {  .Big5(code:"") }),
-            (NSLocalizedString("Lower Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
-            (NSLocalizedString("Upper Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
+            (NSLocalizedString("Lower Case Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
+            (NSLocalizedString("Upper Case Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
             (NSLocalizedString("Suzhou Numbers", comment: ""), {  .ChineseNumber(style:.suzhou, number: "") }),
         ]
 
@@ -145,7 +145,7 @@ class InputState: NSObject {
             var label: String {
                 switch self {
                 case .lower:
-                    "一般數字"
+                    "中文數字"
                 case .upper:
                     "大寫數字"
                 case .suzhou:
