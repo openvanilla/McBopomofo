@@ -101,7 +101,7 @@ const char *suzhou_number(const char *int_part, const char *dec_part, bool verti
         strcat(str, unit);
     } else {
         strcat(str, "\n");
-        int place = (int) strlen (data.int_part) - 1 + data.int_shift;
+        size_t place = strlen (data.int_part) - 1 + data.int_shift;
         strcat(str, place_name[place]);
         strcat(str, unit);
     }

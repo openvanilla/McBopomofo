@@ -304,7 +304,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     McBopomofoEmacsKey emacsKey = input.emacsKey;
 
     // MARK: Handle Selecting Feature
-    if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
+    if ([state isKindOfClass:[InputStateSelectingFeature class]] ||
+        [state isKindOfClass:[InputStateSelectingDateMacro class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -379,25 +380,17 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(state);
     }
 
-    if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
-
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
-    // MARK: Handle Selecting Dictionary Service
-    if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
+    // MARK: Handle Other States with Menu
+    if ([state isKindOfClass:[InputStateAssociatedPhrases class]] ||
+        [state isKindOfClass:[InputStateSelectingDictionary class]] ||
+        [state isKindOfClass:[InputStateShowingCharInfo class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
-
-    // MARK: Handle Showing Character Information
-    if ([state isKindOfClass:[InputStateShowingCharInfo class]]) {
-        return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
-
 
     // MARK: Handle Marking
     if ([state isKindOfClass:[InputStateMarking class]]) {
@@ -1358,29 +1351,20 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    NSArray *candidates;
-
-    if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-        candidates = [(InputStateChoosingCandidate *)state candidates];
-    } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-        candidates = [(InputStateAssociatedPhrases *)state candidates];
-    } else if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
-        candidates = [(InputStateAssociatedPhrasesPlain *)state candidates];
-    } else if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
-        candidates = [(InputStateSelectingFeature *)state menu];
-    } else if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
-        candidates = [(InputStateSelectingDictionary *)state menu];
+    NSInteger candidateCount = 0;
+    if ([state conformsToProtocol:@protocol(CandidateProvider)]) {
+        candidateCount = [(id<CandidateProvider>)state candidateCount];
     }
 
-    if (!candidates) {
+    if (!candidateCount) {
         return NO;
     }
 
-    if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && candidates.count > 0) {
-        if (gCurrentCandidateController.selectedCandidateIndex == candidates.count - 1) {
+    if (([input isEnd] || input.emacsKey == McBopomofoEmacsKeyEnd) && candidateCount > 0) {
+        if (gCurrentCandidateController.selectedCandidateIndex == candidateCount - 1) {
             errorCallback();
         } else {
-            gCurrentCandidateController.selectedCandidateIndex = candidates.count - 1;
+            gCurrentCandidateController.selectedCandidateIndex = candidateCount - 1;
         }
         return YES;
     }
@@ -1475,6 +1459,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         NSString *number = numberState.number;
         if (number.length > 0) {
             number = [number substringToIndex:number.length - 1];
+        } else {
+            errorCallback();
+            return YES;
         }
         InputStateChineseNumber *newState = [[InputStateChineseNumber alloc] initWithStyle:numberState.style number:number];
         stateCallback(newState);
