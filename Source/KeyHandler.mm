@@ -1495,6 +1495,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             case InputStateChineseNumberStyleUpper:
             {
                 NSString *string = [ChineseNumber upperNumberWithIntPart:intPart decPart:decPart];
+                if (Preferences.chineseConversionEnabled) {
+                    if (Preferences.chineseConversionEngine == 0) {
+                        string = [OpenCCBridge.sharedInstance convertToSimplified:string];
+                    } else if (Preferences.chineseConversionEngine == 0) {
+                        string = [VXHanConvert convertToSimplifiedFrom:string];
+                    }
+                }
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
                 stateCallback(committing);
             }
