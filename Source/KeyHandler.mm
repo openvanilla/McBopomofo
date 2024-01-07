@@ -1585,6 +1585,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             }
 
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:(__bridge NSString *)string];
+            CFRelease(string);
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
