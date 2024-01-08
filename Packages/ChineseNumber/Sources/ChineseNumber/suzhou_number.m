@@ -7,30 +7,30 @@
 struct suzhou_number_struct
 {
     const char *int_part;
-    size_t int_shift;
+    size_t int_trimmed_zero_count;
     const char *dec_part;
 };
 
 static struct suzhou_number_struct build_struct(const char *int_part, const char *dec_part) {
-    const char *int_initial = trim_zero (int_part, true);
-    const char *dec_initial = trim_zero (dec_part, false);
-    const char *int_trimmed = trim_zero (int_initial, false);
-    size_t shift = 0;
-    if (!strlen (dec_initial)) {
-        shift = strlen (int_initial) - strlen (int_trimmed);
+    const char *initial_int_part = trim_zero (int_part, true);
+    const char *initial_dec_part = trim_zero (dec_part, false);
+    const char *trimmed_int_part = trim_zero (initial_int_part, false);
+    size_t int_trimmed_zero_count = 0;
+    if (!strlen (initial_dec_part)) {
+        int_trimmed_zero_count = strlen (initial_int_part) - strlen (trimmed_int_part);
     } else {
-        free ((void *) int_trimmed);
-        int_trimmed = int_initial;
+        free ((void *) trimmed_int_part);
+        trimmed_int_part = initial_int_part;
     }
 
-    if (!strlen (int_trimmed)) {
-        memcpy((void *) int_trimmed, (void *) "0", 2);
+    if (!strlen (trimmed_int_part)) {
+        memcpy((void *) trimmed_int_part, (void *) "0", 2);
     }
 
     struct suzhou_number_struct rtn = {
-            .int_part = int_trimmed,
-            .int_shift = shift,
-            .dec_part = dec_initial
+            .int_part = trimmed_int_part,
+            .int_trimmed_zero_count = int_trimmed_zero_count,
+            .dec_part = initial_dec_part
     };
     return rtn;
 }
@@ -54,8 +54,8 @@ const char *suzhou_number(const char *int_part, const char *dec_part, bool verti
             "穰", "十穰", "百穰", "千穰",
     };
     struct suzhou_number_struct data = build_struct (int_part, dec_part);
-    char *str = calloc (1024, 1);
-    memset((void *) str, 0, BUFFER_SIZE);
+    char *output = calloc (1024, 1);
+    memset((void *) output, 0, BUFFER_SIZE);
     char joined[BUFFER_SIZE] = "";
     strcat(joined, data.int_part);
     strcat(joined, data.dec_part);
@@ -67,45 +67,45 @@ const char *suzhou_number(const char *int_part, const char *dec_part, bool verti
         if (c >= 1 && c <= 3) {
             if (use_vertical) {
                 use_vertical = false;
-                strcat(str, vertical_digits[c]);
+                strcat(output, vertical_digits[c]);
                 code_point_count++;
             } else {
                 use_vertical = true;
-                strcat(str, horizontal_digits[c]);
+                strcat(output, horizontal_digits[c]);
                 code_point_count++;
             }
         } else {
             use_vertical = vertical_digit_at_start;
-            strcat(str, vertical_digits[c]);
+            strcat(output, vertical_digits[c]);
             code_point_count++;
         }
     }
 
-    if (code_point_count < 2 && data.int_shift == 0) {
-        strcat(str, unit);
-    } else if (code_point_count < 2 && data.int_shift == 1 && data.int_part[0] <= '3') {
-        memset((void *) str, 0, sizeof (str));
+    if (code_point_count < 2 && data.int_trimmed_zero_count == 0) {
+        strcat(output, unit);
+    } else if (code_point_count < 2 && data.int_trimmed_zero_count == 1 && data.int_part[0] <= '3') {
+        memset((void *) output, 0, sizeof (output));
         switch (data.int_part[0]) {
             case '1':
-                strcat(str, "〸");
+                strcat(output, "〸");
                 break;
             case '2':
-                strcat(str, "〹");
+                strcat(output, "〹");
                 break;
             case '3':
-                strcat(str, "〺");
+                strcat(output, "〺");
                 break;
             default:
                 break;
         }
-        strcat(str, unit);
+        strcat(output, unit);
     } else {
-        strcat(str, "\n");
-        size_t place = strlen (data.int_part) - 1 + data.int_shift;
-        strcat(str, place_name[place]);
-        strcat(str, unit);
+        strcat(output, "\n");
+        size_t place = strlen (data.int_part) - 1 + data.int_trimmed_zero_count;
+        strcat(output, place_name[place]);
+        strcat(output, unit);
     }
     free ((void *) data.int_part);
     free ((void *) data.dec_part);
-    return str;
+    return output;
 }
