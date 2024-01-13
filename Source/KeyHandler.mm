@@ -611,9 +611,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    NSLog(@"char code %d", charCode);
-
-    if (input.isControlHold && (charCode == 28)) {
+    if (input.isControlHold && (input.keyCode == 42)) {
         [self clear];
         if ([state isKindOfClass:[InputStateInputting class]]) {
             InputStateInputting *current = (InputStateInputting *)state;
