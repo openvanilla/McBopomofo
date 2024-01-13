@@ -41,7 +41,7 @@
 @import NSStringUtils;
 @import OpenCCBridge;
 @import VXHanConvert;
-@import ChineseNumber;
+@import ChineseNumbers;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
@@ -1487,14 +1487,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         switch (numberState.style) {
             case InputStateChineseNumberStyleLower:
             {
-                NSString *string = [ChineseNumber lowerNumberWithIntPart:intPart decPart:decPart];
+                NSString *string = [ChineseNumbers generateWithIntPart:intPart decPart:decPart digitCase:ChineseNumbersCaseLowercase];
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
                 stateCallback(committing);
             }
                 break;
             case InputStateChineseNumberStyleUpper:
             {
-                NSString *string = [ChineseNumber upperNumberWithIntPart:intPart decPart:decPart];
+                NSString *string = [ChineseNumbers generateWithIntPart:intPart decPart:decPart digitCase:ChineseNumbersCaseUppercase];
                 if (Preferences.chineseConversionEnabled) {
                     if (Preferences.chineseConversionEngine == 0) {
                         string = [OpenCCBridge.sharedInstance convertToSimplified:string];
@@ -1509,7 +1509,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
             case InputStateChineseNumberStyleSuzhou:
             {
-                NSString *string = [ChineseNumber suzhouNumberWithIntPart:intPart decPart:decPart];
+                NSString *string = [SuzhouNumbers generateWithIntPart:intPart decPart:decPart unit:@"[單位]" preferInitialVertical:YES];
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
                 stateCallback(committing);
             }

@@ -121,8 +121,8 @@ class InputState: NSObject {
         var featureList: [(String, ()->InputState)] = [
             (NSLocalizedString("Big5 Code", comment: ""), { .Big5(code:"") }),
             (NSLocalizedString("Date and Time", comment: ""), { .SelectingDateMacro() }),
-            (NSLocalizedString("Lower Case Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
-            (NSLocalizedString("Upper Case Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
+            (NSLocalizedString("Lowercase Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
+            (NSLocalizedString("Uppercase Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
             (NSLocalizedString("Suzhou Numbers", comment: ""), {  .ChineseNumber(style:.suzhou, number: "") }),
         ]
 
