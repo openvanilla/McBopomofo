@@ -66,6 +66,8 @@ public class SuzhouNumbers: NSObject {
             }
         }
         let place = intTrimmed.count + trimmedZeroCounts - 1
-        return output + "\n" + placeNames[place] + unit
+        return output +
+            (output.count > 1 ? "\n" : "") +
+            placeNames[place] + unit
     }
 }
