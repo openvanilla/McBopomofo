@@ -1,7 +1,11 @@
 import Foundation
 
+/// Helps to convert Arabic numbers to Chinese numbers
 @objc public class ChineseNumbers: NSObject {
 
+    /// Represents uppercase or lowercase Chinese numbers
+    /// - lowercase: like 一、二、三
+    /// - uppercase: like 壹、貳、參
     @objc (ChineseNumbersCase)
     public enum Case: Int {
         case lowercase
@@ -28,6 +32,12 @@ import Foundation
 
     fileprivate static let higherPlaces = ["", "萬", "億", "兆", "京", "垓", "秭", "穰"]
 
+    /// Converts an Arabic number to a Chinese number
+    /// - Parameters:
+    ///   - intPart: The integer part of the number
+    ///   - decPart: The decimal part of the number
+    ///   - digitCase: Whether in uppercase or lowercase
+    /// - Returns: The output
     @objc static public func generate(intPart: String, decPart: String, digitCase: Case) -> String {
 
         func convert4Digits(_ subString: Substring, zeroEverHappened:Bool = false) -> String {

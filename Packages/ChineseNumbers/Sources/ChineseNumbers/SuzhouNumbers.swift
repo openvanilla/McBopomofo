@@ -1,5 +1,7 @@
 import Foundation
 
+/// Helps to convert Arabic numbers to Sushou numbers (蘇州碼, A kind of
+/// ancient Chinese number)
 public class SuzhouNumbers: NSObject {
 
     static private let verticalDigits: [Character: String] = [
@@ -20,6 +22,14 @@ public class SuzhouNumbers: NSObject {
         "穰", "十穰", "百穰", "千穰",
     ]
 
+    /// Converts an Arabic number to a Suzhou number
+    /// - Parameters:
+    ///   - intPart: The integer part of the number
+    ///   - decPart: The decimal part of the number
+    ///   - unit: An additional string representing the unit like 元, 两, etc.
+    ///   - preferInitialVertical: If vertical digits like 〡,〢, and 〣 are
+    ///         preferred than 一, 二 and 三.
+    /// - Returns: The output
     @objc static public func generate(intPart: String, decPart: String,
                                unit: String = "",
                                preferInitialVertical: Bool = true ) -> String {
@@ -41,7 +51,7 @@ public class SuzhouNumbers: NSObject {
         var isVertical = preferInitialVertical
         for c in joined {
             switch c {
-            case "0", "1", "2":
+            case "1", "2", "3":
                 output += isVertical ? verticalDigits[c]! : horizontalDigits[c]!
                 isVertical = !isVertical
             default:
