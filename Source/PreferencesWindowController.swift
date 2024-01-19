@@ -86,7 +86,7 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
                 }
             }
 
-            // If not selecetd, Preferences.candidateListTextSize is not set to
+            // If not selected, Preferences.candidateListTextSize is not set to
             // one of the options provided in the pop up button. Let's list the
             // option for the user.
             if !selected {

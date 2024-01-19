@@ -20,7 +20,7 @@ fileprivate struct Speak: DictionaryService {
     }()
 
     var name: String {
-        return NSLocalizedString("Speak", comment: "")
+        NSLocalizedString("Speak", comment: "")
     }
 
     func lookUp(phrase: String, state: InputState, serviceIndex: Int, stateCallback: (InputState) -> ()) -> Bool {
