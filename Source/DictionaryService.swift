@@ -5,6 +5,11 @@ protocol DictionaryService {
     var name: String { get }
     func lookUp(phrase: String, state: InputState, serviceIndex: Int, stateCallback: (InputState) -> ()) -> Bool
     func textForMenu(selectedString: String) -> String
+    var shouldSkipTest: Bool { get }
+}
+
+extension DictionaryService {
+    var shouldSkipTest: Bool { false }
 }
 
 fileprivate struct Speak: DictionaryService {
@@ -34,6 +39,12 @@ fileprivate struct Speak: DictionaryService {
 
     func textForMenu(selectedString: String) -> String {
         String(format: NSLocalizedString("Speak \"%@\"…", comment: ""), selectedString)
+    }
+
+    var shouldSkipTest: Bool {
+        // Note: the test machine may be without Chinese TTS installed and
+        // it causes tests to fail.
+        true
     }
 }
 
@@ -115,7 +126,6 @@ class DictionaryServices: NSObject {
         self.services = services
     }
 
-
     func lookUp(phrase: String, withServiceAtIndex index: Int, state: InputState, stateCallback: (InputState) -> ()) -> Bool {
         if index >= services.count {
             return false
@@ -123,4 +133,13 @@ class DictionaryServices: NSObject {
         let service = services[index]
         return service.lookUp(phrase: phrase, state: state, serviceIndex: index, stateCallback: stateCallback)
     }
+
+    func shouldSkipTest(withServiceAtIndex index: Int ) -> Bool {
+        if index >= services.count {
+            return false
+        }
+        let service = services[index]
+        return service.shouldSkipTest
+    }
+
 }
