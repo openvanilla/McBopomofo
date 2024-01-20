@@ -47,14 +47,14 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:filenameWithoutExtension ofType:@"txt"];
-    lm.loadLanguageModel([dataPath UTF8String]);
+    lm.loadLanguageModel(dataPath.UTF8String);
 }
 
 static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
     NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"txt"];
-    lm.loadAssociatedPhrases([dataPath UTF8String]);
+    lm.loadAssociatedPhrases(dataPath.UTF8String);
 }
 
 + (void)loadDataModels
@@ -97,19 +97,19 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 
 + (void)loadUserPhrases
 {
-    gLanguageModelMcBopomofo.loadUserPhrases([[self userPhrasesDataPathMcBopomofo] UTF8String], [[self excludedPhrasesDataPathMcBopomofo] UTF8String]);
-    gLanguageModelPlainBopomofo.loadUserPhrases(NULL, [[self excludedPhrasesDataPathPlainBopomofo] UTF8String]);
+    gLanguageModelMcBopomofo.loadUserPhrases([self userPhrasesDataPathMcBopomofo].UTF8String, [self excludedPhrasesDataPathMcBopomofo].UTF8String);
+    gLanguageModelPlainBopomofo.loadUserPhrases(NULL, [self excludedPhrasesDataPathPlainBopomofo].UTF8String);
 }
 
 + (void)loadUserPhraseReplacement
 {
-    gLanguageModelMcBopomofo.loadPhraseReplacementMap([[self phraseReplacementDataPathMcBopomofo] UTF8String]);
+    gLanguageModelMcBopomofo.loadPhraseReplacementMap([self phraseReplacementDataPathMcBopomofo].UTF8String);
 }
 
 + (void)setupDataModelValueConverter
 {
     auto macroConverter = [](std::string input) {
-        NSString *inputText = [NSString stringWithUTF8String:input.c_str()];
+        NSString *inputText = @(input.c_str());
         NSString *handled = [[InputMacroController shared] handle:inputText];
         return std::string(handled.UTF8String);
     };
@@ -123,7 +123,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
             return input;
         }
 
-        NSString *text = [NSString stringWithUTF8String:input.c_str()];
+        NSString *text = @(input.c_str());
         if (Preferences.chineseConversionEngine == 1) {
             text = [VXHanConvert convertToSimplifiedFrom:text];
         } else {
@@ -234,7 +234,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
             if (readFile) {
                 [readFile seekToFileOffset:fileSize - 1];
                 NSData *data = [readFile readDataToEndOfFile];
-                const void *bytes = [data bytes];
+                const void *bytes = data.bytes;
                 if (*(char *)bytes != '\n') {
                     addLineBreakAtFront = YES;
                 }
@@ -325,7 +325,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     }
     
     std::string reading = gLanguageModelMcBopomofo.getReading(phrase.UTF8String);
-    return !reading.empty() ? [NSString stringWithUTF8String:reading.c_str()] : nil;
+    return !reading.empty() ? @(reading.c_str()) : nil;
 }
 
 @end

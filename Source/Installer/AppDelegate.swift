@@ -207,7 +207,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
         if inputSource == nil {
             NSLog("Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString).");
-            let status = InputSourceHelper.registerTnputSource(at: imeBundleURL)
+            let status = InputSourceHelper.registerInputSource(at: imeBundleURL)
             if !status {
                 let message = String(format: NSLocalizedString("Cannot find input source %@ after registration.", comment: ""), imeIdentifier)
                 runAlertPanel(title: NSLocalizedString("Fatal Error", comment: ""), message: message, buttonTitle: NSLocalizedString("Abort", comment: ""))

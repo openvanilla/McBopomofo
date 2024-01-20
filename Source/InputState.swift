@@ -24,6 +24,11 @@
 import Cocoa
 import NSStringUtils
 
+@objc protocol CandidateProvider: NSObjectProtocol {
+    @objc var candidateCount: Int { get }
+    @objc func candidate(at index: Int) -> String
+}
+
 /// Represents the states for the input method controller.
 ///
 /// An input method is actually a finite state machine. It receives the inputs
@@ -111,6 +116,118 @@ class InputState: NSObject {
 
     // MARK: -
 
+    @objc(InputStateSelectingFeature)
+    class SelectingFeature: InputState, CandidateProvider {
+        var featureList: [(String, ()->InputState)] = [
+            (NSLocalizedString("Big5 Code", comment: ""), { .Big5(code:"") }),
+            (NSLocalizedString("Date and Time", comment: ""), { .SelectingDateMacro() }),
+            (NSLocalizedString("Lowercase Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
+            (NSLocalizedString("Uppercase Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
+            (NSLocalizedString("Suzhou Numbers", comment: ""), {  .ChineseNumber(style:.suzhou, number: "") }),
+        ]
+
+        override var description: String {
+            "<InputState.SelectingFeature>"
+        }
+
+        @objc var menu: [String] {
+            featureList.map { $0.0 }
+        }
+
+        func nextState(by index: Int) -> InputState? {
+            featureList[index].1()
+        }
+
+        var candidateCount: Int {
+            featureList.count
+        }
+
+        func candidate(at index: Int) -> String {
+            featureList[index].0
+        }
+    }
+
+    @objc(InputStateSelectingDateMacro)
+    class SelectingDateMacro: InputState, CandidateProvider {
+        private var macros: [String] = [
+            "MACRO@DATE_TODAY_SHORT",
+            "MACRO@DATE_TODAY_MEDIUM",
+            "MACRO@DATE_TODAY_MEDIUM_ROC",
+            "MACRO@DATE_TODAY_MEDIUM_CHINESE",
+            "MACRO@DATE_TODAY_MEDIUM_JAPANESE",
+            "MACRO@THIS_YEAR_PLAIN",
+            "MACRO@THIS_YEAR_PLAIN_WITH_ERA",
+            "MACRO@THIS_YEAR_ROC",
+            "MACRO@THIS_YEAR_JAPANESE",
+            "MACRO@DATE_TODAY_WEEKDAY_SHORT",
+            "MACRO@DATE_TODAY_WEEKDAY",
+            "MACRO@DATE_TODAY2_WEEKDAY",
+            "MACRO@DATE_TODAY_WEEKDAY_JAPANESE",
+            "MACRO@TIME_NOW_SHORT",
+            "MACRO@TIME_NOW_MEDIUM",
+            "MACRO@THIS_YEAR_GANZHI",
+            "MACRO@THIS_YEAR_CHINESE_ZODIAC"
+        ]
+
+        private (set) var menu: [String]
+
+        override init() {
+            self.menu = self.macros.map { macro in
+                InputMacroController.shared.handle(macro)
+            }
+        }
+
+        override var description: String {
+            "<InputState.SelectingDateMacro>"
+        }
+
+        var candidateCount: Int {
+            menu.count
+        }
+
+        func candidate(at index: Int) -> String {
+            menu[index]
+        }
+    }
+
+    @objc(InputStateChineseNumber)
+    class ChineseNumber: InputState {
+
+        @objc(InputStateChineseNumberStyle)
+        enum Style: Int {
+            case lower = 0
+            case upper = 1
+            case suzhou = 2
+
+            var label: String {
+                switch self {
+                case .lower:
+                    "中文數字"
+                case .upper:
+                    "大寫數字"
+                case .suzhou:
+                    "蘇州碼"
+                }
+            }
+        }
+
+        @objc private(set) var number: String
+        @objc private(set) var style: Style
+
+        @objc init(style: Style, number: String) {
+            self.style = style
+            self.number = number
+        }
+
+        override var description: String {
+            "<InputState.ChineseNumber, style:\(style), number:\(number)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[\(style.label)] \(number)"
+        }
+    }
+
     @objc(InputStateBig5)
     class Big5: InputState {
         @objc private(set) var code: String
@@ -127,6 +244,7 @@ class InputState: NSObject {
             return "[內碼] \(code)"
         }
     }
+
 
     // MARK: -
 
@@ -311,7 +429,7 @@ class InputState: NSObject {
 
     /// Represents that the user is choosing in a candidates list.
     @objc(InputStateChoosingCandidate)
-    class ChoosingCandidate: NotEmpty {
+    class ChoosingCandidate: NotEmpty, CandidateProvider {
         @objc private(set) var candidates: [Candidate]
         @objc private(set) var useVerticalMode: Bool
 
@@ -332,6 +450,14 @@ class InputState: NSObject {
         override var description: String {
             "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
+
+        @objc var candidateCount: Int {
+            candidates.count
+        }
+
+        @objc func candidate(at index: Int) -> String {
+            candidates[index].displayText
+        }
     }
 
     // MARK: -
@@ -341,14 +467,13 @@ class InputState: NSObject {
     ///
     /// This is for Bopomofo input mode.
     @objc(InputStateAssociatedPhrases)
-    class AssociatedPhrases: NotEmpty {
+    class AssociatedPhrases: NotEmpty, CandidateProvider {
         @objc private(set) var previousState: NotEmpty
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedReading: String = ""
         @objc private(set) var selectedIndex: Int = 0
         @objc private(set) var candidates: [Candidate] = []
         @objc private(set) var useVerticalMode: Bool = false
-
 
         @objc init(previousState: NotEmpty, selectedPhrase: String, selectedReading: String, selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool) {
             self.previousState = previousState
@@ -363,6 +488,14 @@ class InputState: NSObject {
         override var description: String {
             "<InputState.AssociatedPhrases, previousState:\(previousState), candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
+
+        var candidateCount: Int {
+            candidates.count
+        }
+
+        func candidate(at index: Int) -> String {
+            candidates[index].displayText
+        }
     }
 
     /// Represents that the user is choosing in a candidates list
@@ -370,7 +503,7 @@ class InputState: NSObject {
     ///
     /// This is for Plain Bopomofo input mode.
     @objc(InputStateAssociatedPhrasesPlain)
-    class AssociatedPhrasesPlain: InputState {
+    class AssociatedPhrasesPlain: InputState, CandidateProvider {
         @objc private(set) var candidates: [String] = []
         @objc private(set) var useVerticalMode: Bool = false
 
@@ -383,13 +516,21 @@ class InputState: NSObject {
         override var description: String {
             "<InputState.AssociatedPhrasesPlain, candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
+
+        @objc var candidateCount: Int {
+            candidates.count
+        }
+
+        func candidate(at index: Int) -> String {
+            candidates[index]
+        }
     }
 
     // MARK: -
 
     /// Represents that the user is choosing a dictionary service.
     @objc(InputStateSelectingDictionary)
-    class SelectingDictionary: NotEmpty {
+    class SelectingDictionary: NotEmpty, CandidateProvider {
         @objc private(set) var previousState: NotEmpty
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedIndex: Int = 0
@@ -413,12 +554,21 @@ class InputState: NSObject {
         override var description: String {
             "<InputState.SelectingDictionaryService>"
         }
+
+        @objc var candidateCount: Int {
+            menu.count
+        }
+
+        @objc func candidate(at index: Int) -> String {
+            menu[index]
+        }
+
     }
 
     /// Represents that the user is choosing information about selected
     /// characters.
     @objc(InputStateShowingCharInfo)
-    class ShowingCharInfo: NotEmpty {
+    class ShowingCharInfo: NotEmpty, CandidateProvider {
         @objc private(set) var previousState: SelectingDictionary
         @objc private(set) var selectedPhrase: String = ""
         @objc private(set) var selectedIndex: Int = 0
@@ -481,5 +631,14 @@ class InputState: NSObject {
         override var description: String {
             "<InputState.eShowingCharInfo>"
         }
+
+        var candidateCount: Int {
+            menu.count
+        }
+
+        func candidate(at index: Int) -> String {
+            menu[index]
+        }
+
     }
 }

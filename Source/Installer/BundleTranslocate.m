@@ -3,7 +3,7 @@
 
 BOOL appBundleTranslocatedToARandomizedPath(NSString *bundle)
 {
-    const char *bundleAbsPath = [[bundle stringByExpandingTildeInPath] UTF8String];
+    const char *bundleAbsPath = bundle.stringByExpandingTildeInPath.UTF8String;
     int entryCount = getfsstat(NULL, 0, 0);
     int entrySize = sizeof(struct statfs);
     struct statfs *bufs = (struct statfs *)calloc(entryCount, entrySize);

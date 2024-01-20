@@ -55,6 +55,10 @@
     {
       "name": "Unihan Database",
       "url_template": "https://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=(encoded)"
+    },
+    {
+      "name": "國際電腦漢字及異體字知識庫",
+      "url_template": "https://chardb.iis.sinica.edu.tw/search.jsp?q=(encoded)&stype=1"
     }
   ]
 }

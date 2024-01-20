@@ -285,6 +285,12 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.AssociatedPhrasesPlain:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.SelectingFeature:
+            handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.SelectingDateMacro:
+            handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.ChineseNumber:
+            handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.SelectingDictionary:
@@ -328,6 +334,13 @@ extension McBopomofoInputMethodController {
 
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
+        }
+
+        if let _ = previous as? InputState.Big5 {
+            client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
+        }
+        if let _ = previous as? InputState.ChineseNumber {
+            client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
         }
 
         // Unlike the Empty state handler, we don't call client.setMarkedText() here:
@@ -454,6 +467,50 @@ extension McBopomofoInputMethodController {
         show(candidateWindowWith: state, client: client)
     }
 
+    private func handle(state: InputState.SelectingFeature, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        show(candidateWindowWith: state, client: client)
+    }
+
+    private func handle(state: InputState.SelectingDateMacro, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        show(candidateWindowWith: state, client: client)
+    }
+
+    private func handle(state: InputState.ChineseNumber, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+    }
+
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
@@ -526,6 +583,10 @@ extension McBopomofoInputMethodController {
             case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
+            case _ as InputState.SelectingFeature:
+                return true
+            case _ as InputState.SelectingDateMacro:
+                return true
             case _ as InputState.SelectingDictionary:
                 return true
             case _ as InputState.ShowingCharInfo:
@@ -707,35 +768,17 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
 
 extension McBopomofoInputMethodController: CandidateControllerDelegate {
     func candidateCountForController(_ controller: CandidateController) -> UInt {
-        return switch state {
-        case let state as InputState.ChoosingCandidate:
-            UInt(state.candidates.count)
-        case let state as InputState.AssociatedPhrases:
-            UInt(state.candidates.count)
-        case let state as InputState.AssociatedPhrasesPlain:
-            UInt(state.candidates.count)
-        case let state as InputState.SelectingDictionary:
-            UInt(state.menu.count)
-        case let state as InputState.ShowingCharInfo:
-            UInt(state.menu.count)
-        default:
+        return if let state = state as? CandidateProvider {
+            UInt(state.candidateCount)
+        } else {
             0
         }
     }
 
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
-        return switch state {
-        case let state as InputState.ChoosingCandidate:
-            state.candidates[Int(index)].displayText
-        case let state as InputState.AssociatedPhrases:
-            state.candidates[Int(index)].displayText
-        case let state as InputState.AssociatedPhrasesPlain:
-            state.candidates[Int(index)]
-        case let state as InputState.SelectingDictionary:
-            state.menu[Int(index)]
-        case let state as InputState.ShowingCharInfo:
-            state.menu[Int(index)]
-        default:
+        return if let state = state as? CandidateProvider {
+            state.candidate(at: Int(index))
+        } else {
             ""
         }
     }
@@ -804,6 +847,16 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 self.handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)
+            }
+        case let state as InputState.SelectingFeature:
+            if let nextState = state.nextState(by: Int(index)) {
+                handle(state: nextState, client: client)
+            }
+        case let state as InputState.SelectingDateMacro:
+            let candidate = state.candidate(at: Int(index))
+            if !candidate.isEmpty {
+                let committing = InputState.Committing(poppedText: candidate)
+                handle(state: committing, client: client)
             }
         case let state as InputState.SelectingDictionary:
             let handled = state.lookUp(usingServiceAtIndex: Int(index), state: state) { state in
