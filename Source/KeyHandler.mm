@@ -1160,6 +1160,39 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || input.isDelete;
 
+    if ([state isKindOfClass:[InputStateChoosingCandidate class]] &&
+        Preferences.allowMovingCursorWhenChoosingCandidates
+        ) {
+        if ([input.inputText isEqualToString:@"j"] || (input.isLeft && input.isShiftHold)
+            ) {
+            size_t cursor = _grid->cursor();
+            if (cursor > 0) {
+                cursor--;
+                _grid->setCursor(cursor);
+            } else {
+                errorCallback();
+                return YES;
+            }
+            InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
+            stateCallback(newState);
+            return YES;
+        }
+
+        if ([input.inputText isEqualToString:@"k"]  || (input.isRight && input.isShiftHold)) {
+            size_t cursor = _grid->cursor();
+            if (cursor < _grid->length()) {
+                cursor++;
+                _grid->setCursor(cursor);
+            } else {
+                errorCallback();
+                return YES;
+            }
+            InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
+            stateCallback(newState);
+            return YES;
+        }
+    }
+
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateShowingCharInfo class]] ||
             [state isKindOfClass:[InputStateSelectingDictionary class]]) {
@@ -1435,6 +1468,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
     }
+
+
 
     errorCallback();
     return YES;
@@ -1761,7 +1796,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         [candidatesArray addObject:candidate];
     }
 
-    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
+    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:_grid->cursor() candidates:candidatesArray useVerticalMode:useVerticalMode];
     return state;
 }
 
