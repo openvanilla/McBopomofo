@@ -462,7 +462,6 @@ extension Preferences {
     @objc static var selectCandidateWithNumericKeypad: Bool
 }
 
-
 extension Preferences {
     @UserDefault(key: kBig5InputEnabledKey, defaultValue: true)
     @objc static var big5InputEnabled: Bool
