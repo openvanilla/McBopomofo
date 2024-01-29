@@ -1862,7 +1862,6 @@
 貯 ㄓㄨˇ zhu3 5j3 big5
 渚 ㄓㄨˇ zhu3 5j3 big5
 矚 ㄓㄨˇ zhu3 5j3 big5
-著 ㄓㄨˇ zhu3 5j3 big5
 麈 ㄓㄨˇ zhu3 5j3 big5
 拄 ㄓㄨˇ zhu3 5j3 big5
 瘃 ㄓㄨˇ zhu3 5j3 big5
@@ -14145,6 +14144,7 @@
 孚 ㄈㄨˊ fu2 zj6 big5
 袱 ㄈㄨˊ fu2 zj6 big5
 芙 ㄈㄨˊ fu2 zj6 big5
+佛 ㄈㄨˊ fu2 zj6 big5
 輻 ㄈㄨˊ fu2 zj6 big5
 蝠 ㄈㄨˊ fu2 zj6 big5
 匐 ㄈㄨˊ fu2 zj6 big5
