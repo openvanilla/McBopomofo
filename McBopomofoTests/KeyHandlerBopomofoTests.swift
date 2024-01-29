@@ -33,6 +33,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
     var handler = KeyHandler()
 
     override func setUpWithError() throws {
+        Preferences.chineseConversionEnabled = false
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
         handler.inputMode = .bopomofo
