@@ -644,7 +644,7 @@ extension McBopomofoInputMethodController {
         gCurrentCandidateController?.candidateFont = font(name: Preferences.candidateTextFontName, size: textSize)
 
         let candidateKeys = Preferences.candidateKeys
-        let keyLabels = candidateKeys.count > 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
+        let keyLabels = candidateKeys.count >= 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
         let keyLabelPrefix = state is InputState.AssociatedPhrasesPlain ? "⇧ " : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
             CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))
