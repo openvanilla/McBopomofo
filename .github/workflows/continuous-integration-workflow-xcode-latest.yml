@@ -44,6 +44,9 @@ jobs:
       - name: Test NSStringUtils
         run: swift test
         working-directory: Packages/NSStringUtils
+      - name: Test ChineseNumbers
+        run: swift test
+        working-directory: Packages/ChineseNumbers
       - name: Clean McBopomofo for testing
         run: xcodebuild -scheme McBopomofo -configuration Debug clean
       - name: Test McBopomofo

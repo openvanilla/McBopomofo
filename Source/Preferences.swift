@@ -43,6 +43,8 @@ private let kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
 private let kCandidateTextFontName = "CandidateTextFontName"
 private let kCandidateKeyLabelFontName = "CandidateKeyLabelFontName"
 private let kCandidateKeys = "CandidateKeys"
+private let kAllowMovingCursorWhenChoosingCandidates = "AllowMovingCursorWhenChoosingCandidates"
+
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
@@ -332,8 +334,12 @@ class Preferences: NSObject {
                 return NSLocalizedString("Candidate keys cannot be longer than 15 characters.", comment: "")
             }
         }
-
     }
+
+    /// Whether allows moving the cursor by J/K keys, when the candidate
+    /// window is presented.
+    @UserDefault(key: kAllowMovingCursorWhenChoosingCandidates, defaultValue: false)
+    @objc static var allowMovingCursorWhenChoosingCandidates: Bool
 }
 
 extension Preferences {
@@ -461,7 +467,6 @@ extension Preferences {
     @UserDefault(key: kSelectCandidateWithNumericKeypad, defaultValue: false)
     @objc static var selectCandidateWithNumericKeypad: Bool
 }
-
 
 extension Preferences {
     @UserDefault(key: kBig5InputEnabledKey, defaultValue: true)

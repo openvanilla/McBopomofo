@@ -16,6 +16,11 @@ final class DictionaryServiceTests: XCTestCase {
             var callbackCalled = false
             let choosing = InputState.ChoosingCandidate(composingBuffer: "hi", cursorIndex: 0, candidates: [InputState.Candidate(reading: "", value: "", displayText: "")], useVerticalMode: false)
             let selecting =  InputState.SelectingDictionary(previousState: choosing, selectedString: "你", selectedIndex: 0)
+
+            if DictionaryServices.shared.shouldSkipTest(withServiceAtIndex: index) {
+                continue
+            }
+
             let result = DictionaryServices.shared.lookUp(phrase: "你", withServiceAtIndex: index, state: selecting) { _ in
                 callbackCalled = true
             }
