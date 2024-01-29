@@ -30,7 +30,7 @@ import Foundation
         }
     }
 
-    fileprivate static let higherPlaces = ["", "萬", "億", "兆", "京", "垓", "秭", "穰"]
+    fileprivate static let higherPlaces = ["", "萬", "億", "兆", "京", "垓", "秭", "穰", "溝", "澗", "正", "載"]
 
     /// Converts an Arabic number to a Chinese number
     /// - Parameters:
