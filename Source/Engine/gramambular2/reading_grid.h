@@ -27,6 +27,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
