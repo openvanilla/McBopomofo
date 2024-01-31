@@ -531,6 +531,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return YES;
             }
         }
+        if(_grid->cursor() == _grid->length() && Preferences.selectPhraseAfterCursorAsCandidate){
+            _grid->setCursor(_grid->cursor() - 1);
+        }
         InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:(InputStateNotEmpty *)state useVerticalMode:input.useVerticalMode];
         stateCallback(choosingCandidates);
         return YES;
