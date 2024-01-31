@@ -172,12 +172,12 @@ bool McBopomofoLM::externalConverterEnabled() const
     return m_externalConverterEnabled;
 }
 
-void McBopomofoLM::setExternalConverter(std::function<std::string(const std::string&)> externalConverter)
+void McBopomofoLM::setExternalConverter(std::function<std::string(std::string)> externalConverter)
 {
     m_externalConverter = externalConverter;
 }
 
-void McBopomofoLM::setMacroConverter(std::function<std::string(const std::string&)> macroConverter)
+void McBopomofoLM::setMacroConverter(std::function<std::string(std::string)> macroConverter)
 {
     m_macroConverter = macroConverter;
 }
