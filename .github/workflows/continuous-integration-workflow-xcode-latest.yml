@@ -13,19 +13,19 @@ jobs:
         with:
           xcode-version: "^15.1.0"
       - name: Build McBopomofoLMLibTest
-        run: cmake -S . -B build
+        run: cmake -DENABLE_TEST=1 -S . -B build
         working-directory: Source/Engine
       - name: Run McBopomofoLMLibTest
         run: make runMcBopomofoLMLibTest
         working-directory: Source/Engine/build
       - name: Build MandarinTest
-        run: cmake -S . -B build
+        run: cmake -DENABLE_TEST=1 -S . -B build
         working-directory: Source/Engine/Mandarin
       - name: Run MandarinTest
         run: make runMandarinTest
         working-directory: Source/Engine/Mandarin/build
       - name: Build Gramambular2Test
-        run: cmake -S . -B build
+        run: cmake -DENABLE_TEST=1 -S . -B build
         working-directory: Source/Engine/gramambular2
       - name: Run Gramambular2Test
         run: make runGramambular2Test
