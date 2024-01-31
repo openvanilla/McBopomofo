@@ -1245,6 +1245,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         } else {
+            if(Preferences.selectPhraseAfterCursorAsCandidate && _grid->cursor() == _grid->length() - 1){
+                _grid->setCursor(_grid->cursor() + 1);
+            }
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         }
