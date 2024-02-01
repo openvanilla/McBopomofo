@@ -789,7 +789,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         switch state {
         case let state as InputState.ChoosingCandidate:
             let selectedCandidate = state.candidates[Int(index)]
-            keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, useMoveCursorAfterSelectionSetting: true)
+            keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, originalCursorIndex: Int(state.originalCursorIndex), useMoveCursorAfterSelectionSetting: true)
 
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return

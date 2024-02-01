@@ -57,7 +57,7 @@ extern InputMode InputModePlainBopomofo;
       errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 
 - (void)syncWithPreferences;
-- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:useMoveCursorAfterSelectionSetting:));
+- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex  useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:originalCursorIndex:useMoveCursorAfterSelectionSetting:));
 - (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase NS_SWIFT_NAME(fixNode(index:reading:value:associatedPhrase:));
 
 - (void)clear;
