@@ -63,32 +63,49 @@ unsigned short VXUCS2SimpToTradChinese(unsigned short c)
     return VXHCFind(c, vxSC2TCTable, vxSC2TCTableSize);
 }
 
+static NSString *GetConvertedString(NSString *input, uint16_t (*filterFunction)(uint16_t))
+{
+    NSUInteger length = [input length];
+    if (!length) {
+        return input;
+    }
+
+    unichar *chars = (unichar *) calloc(length, sizeof(unichar));
+    if (!chars) {
+        return input;
+    }
+
+    for (NSUInteger i = 0; i < length; i++) {
+        // -getCharacters:range: calls characterAtIndex: "correctly, though inefficiently"
+        // according to the API doc; since we only care about the raw data (see below),
+        // we just use characterAtIndex:.
+        unichar ch = [input characterAtIndex:i];
+
+        // Since the convert tables only deal with code points < U+FFFF,
+        // even if this straddles a surrogate pair, this is still ok.
+        unichar converted = filterFunction(ch);
+        if (converted) {
+            chars[i] = converted;
+        } else {
+            chars[i] = ch;
+        }
+    }
+
+    NSString *output = [[NSString alloc] initWithCharacters:chars length:length];
+    free(chars);
+    return output;
+}
+
 @implementation VXHanConvert
 
 + (NSString *)convertToSimplifiedFrom:(NSString *)string NS_SWIFT_NAME(convertToSimplified(from:))
 {
-    NSData *utf16Data = [string dataUsingEncoding:NSUTF16StringEncoding];
-    unsigned short *bytes = (unsigned short *)utf16Data.bytes;
-    for (NSInteger i = 0; i < utf16Data.length; i++) {
-        unsigned short c = bytes[i];
-        unsigned short value = VXUCS2TradToSimpChinese(c);
-        bytes[i] = value ? value : c;
-    }
-
-    return [[NSString alloc] initWithData:utf16Data encoding:NSUTF16StringEncoding];
+    return GetConvertedString(string, VXUCS2TradToSimpChinese);
 }
 
 + (NSString *)convertToTraditionalFrom:(NSString *)string NS_SWIFT_NAME(convertToTraditional(from:))
 {
-    NSData *utf16Data = [string dataUsingEncoding:NSUTF16StringEncoding];
-    unsigned short *bytes = (unsigned short *)utf16Data.bytes;
-    for (NSInteger i = 0; i < utf16Data.length; i++) {
-        unsigned short c = bytes[i];
-        unsigned short value = VXUCS2SimpToTradChinese(c);
-        bytes[i] = value ? value : c;
-    }
-
-    return [[NSString alloc] initWithData:utf16Data encoding:NSUTF16StringEncoding];
+    return GetConvertedString(string, VXUCS2SimpToTradChinese);
 }
 
 @end

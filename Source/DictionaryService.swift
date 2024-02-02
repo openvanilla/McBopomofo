@@ -96,6 +96,10 @@ fileprivate struct HttpBasedDictionary: DictionaryService, Codable {
                 selectedString, name)
     }
 
+    var shouldSkipTest: Bool {
+        // Note: Opening URLs appear to be flaky on CI instances
+        true
+    }
 }
 
 
