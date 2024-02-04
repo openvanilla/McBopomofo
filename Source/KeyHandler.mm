@@ -535,7 +535,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
 
         size_t originalCursorIndex = _grid->cursor();
-        if (originalCursorIndex == _grid->length() && Preferences.selectPhraseAfterCursorAsCandidate) {
+
+        // Note: When the cursor is at the end of the composing buffer and the
+        // preference that make McBopomofo be like MS Bopomofo are on, the
+        // cursor should be moved to the begin of the last character.
+        if (originalCursorIndex == _grid->length() &&
+            Preferences.selectPhraseAfterCursorAsCandidate &&
+            Preferences.moveCursorAfterSelectingCandidate) {
             _grid->setCursor(originalCursorIndex - 1);
         }
         InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:(InputStateNotEmpty *)state useVerticalMode:input.useVerticalMode];
