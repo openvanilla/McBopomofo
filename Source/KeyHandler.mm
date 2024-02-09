@@ -651,7 +651,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 stateCallback(inputting);
                 size_t originalCursorIndex = _grid->cursor();
                 if (Preferences.selectPhraseAfterCursorAsCandidate) {
-                 _grid->setCursor(originalCursorIndex - 1);
+                    _grid->setCursor(originalCursorIndex - 1);
                 }
                 InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
                 choosingCandidate.originalCursorIndex = originalCursorIndex;
