@@ -432,10 +432,12 @@ class InputState: NSObject {
     class ChoosingCandidate: NotEmpty, CandidateProvider {
         @objc private(set) var candidates: [Candidate]
         @objc private(set) var useVerticalMode: Bool
+        @objc var originalCursorIndex: UInt
 
         @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [Candidate], useVerticalMode: Bool) {
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
+            self.originalCursorIndex = cursorIndex
             super.init(composingBuffer: composingBuffer, cursorIndex: cursorIndex)
         }
 
