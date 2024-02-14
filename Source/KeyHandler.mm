@@ -1180,9 +1180,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || input.isDelete;
 
-    if ([state isKindOfClass:[InputStateChoosingCandidate class]] &&
-        Preferences.allowMovingCursorWhenChoosingCandidates
-        ) {
+    BOOL isCursorMovingKey =
+        (Preferences.allowMovingCursorWhenChoosingCandidates && ([input.inputText isEqualToString:@"j"] || [input.inputText isEqualToString:@"k"])) ||
+        (input.isShiftHold && (input.isLeft || input.isRight ));
+
+    if ([state isKindOfClass:[InputStateChoosingCandidate class]] && isCursorMovingKey) {
         if ([input.inputText isEqualToString:@"j"] || (input.isLeft && input.isShiftHold)
             ) {
             size_t cursor = _grid->cursor();
@@ -1193,12 +1195,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 errorCallback();
                 return YES;
             }
-            InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
-            stateCallback(newState);
-            return YES;
-        }
-
-        if ([input.inputText isEqualToString:@"k"]  || (input.isRight && input.isShiftHold)) {
+        } else if ([input.inputText isEqualToString:@"k"]  || (input.isRight && input.isShiftHold)) {
             size_t cursor = _grid->cursor();
             if (cursor < _grid->length()) {
                 cursor++;
@@ -1207,10 +1204,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 errorCallback();
                 return YES;
             }
-            InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
-            stateCallback(newState);
-            return YES;
         }
+        InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
+        stateCallback(newState);
+        return YES;
     }
 
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
