@@ -12699,6 +12699,7 @@
 崀 ㄌㄤˊ lang2 x;6 big5
 欴 ㄌㄤˊ lang2 x;6 big5
 嚕 ㄌㄨ lu xj big5
+擼 ㄌㄨ lu xj big5
 隴 ㄌㄨㄥˇ long3 xj/3 big5
 攏 ㄌㄨㄥˇ long3 xj/3 big5
 壟 ㄌㄨㄥˇ long3 xj/3 big5
