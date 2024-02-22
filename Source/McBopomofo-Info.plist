@@ -138,13 +138,35 @@
 				<key>default</key>
 				<string>Add to McBopomofo User Phrases</string>
 			</dict>
-			<key>NSSendTypes</key>
-			<array>
-				<string>NSStringPboardType</string>
-			</array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
 			<key>NSRequiredContext</key>
 			<dict/>
 		</dict>
-	</array>
+        <dict>
+            <key>NSMessage</key>
+            <string>addReading</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Add Bopomofo Readings to Selected Text</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+    </array>
 </dict>
 </plist>

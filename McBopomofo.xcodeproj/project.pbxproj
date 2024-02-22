@@ -39,6 +39,7 @@
 		D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* LanguageModelManager.mm */; };
 		D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
+		D41B626C2B86EAE900583148 /* BopomofoBraille in Frameworks */ = {isa = PBXBuildFile; productRef = D41B626B2B86EAE900583148 /* BopomofoBraille */; };
 		D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F769278C9E29004A2160 /* CandidateUI */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D427F7A927905E90004A2160 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7A827905E90004A2160 /* TooltipUI */; };
@@ -169,6 +170,7 @@
 		D41355DA278E6D17005E5CBD /* McBopomofoLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = McBopomofoLM.h; sourceTree = "<group>"; };
 		D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UserPhrasesLM.cpp; sourceTree = "<group>"; };
 		D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPhrasesLM.h; sourceTree = "<group>"; };
+		D41B626A2B86EAD400583148 /* BopomofoBraille */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BopomofoBraille; path = Packages/BopomofoBraille; sourceTree = "<group>"; };
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427F768278C9D0D004A2160 /* CandidateUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateUI; path = Packages/CandidateUI; sourceTree = "<group>"; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
 				D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */,
 				D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */,
+				D41B626C2B86EAE900583148 /* BopomofoBraille in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +434,7 @@
 		D427F766278C9CBD004A2160 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				D41B626A2B86EAD400583148 /* BopomofoBraille */,
 				D4E791782B52CDCF00676A68 /* ChineseNumbers */,
 				D427F768278C9D0D004A2160 /* CandidateUI */,
 				D427F7A727905E43004A2160 /* TooltipUI */,
@@ -511,6 +515,7 @@
 				D47D73C227A7200500255A50 /* FSEventStreamHelper */,
 				D4C9CAB027AAC9690058DFEA /* NSStringUtils */,
 				D4E791792B52CDE500676A68 /* ChineseNumbers */,
+				D41B626B2B86EAE900583148 /* BopomofoBraille */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1387,6 +1392,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D41B626B2B86EAE900583148 /* BopomofoBraille */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BopomofoBraille;
+		};
 		D427F769278C9E29004A2160 /* CandidateUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CandidateUI;

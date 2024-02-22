@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import AppKit
+import OpenCCBridge
 
 class ServiceProvider: NSObject  {
     func extractReading(from firstWord:String) -> String {
@@ -38,7 +39,8 @@ class ServiceProvider: NSObject  {
             var drop = 0
             while drop < substringCount {
                 let candidate = String(substring.dropLast(drop))
-                if let match = LanguageModelManager.reading(for: candidate) {
+                if let converted = OpenCCBridge.shared.convertTraditional(candidate),
+                    let match = LanguageModelManager.reading(for: converted) {
                     // append the match and skip over the matched portion
                     matches.append(match)
                     matchFrom = firstWord.index(matchFrom, offsetBy: substringCount - drop)
@@ -78,4 +80,25 @@ class ServiceProvider: NSObject  {
         LanguageModelManager.writeUserPhrase("\(firstWord) \(reading)")
         (NSApp.delegate as? AppDelegate)?.openUserPhrases(self)
     }
+
+    @objc func addReading(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = ""
+        for c in string {
+            output += String(c)
+            if let converted = OpenCCBridge.shared.convertTraditional(String(c)),
+               let reading = LanguageModelManager.reading(for:converted) {
+                if reading.isEmpty == false && reading.starts(with: "_") == false {
+                    output += "(\(reading))"
+                }
+            }
+        }
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
 }
