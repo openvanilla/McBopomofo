@@ -25,7 +25,16 @@ import AppKit
 import OpenCCBridge
 import BopomofoBraille
 
-class ServiceProvider: NSObject  {
+@objc protocol ServiceProviderDelegate: NSObjectProtocol {
+    @objc(serviceProvider:didRequestInsertReading:)
+    func serviceProvider(_ provider:ServiceProvider, didRequestInsertReading: String)
+    @objc(serviceProviderDidRequestCommitting:)
+    func serviceProvider(didRequestCommitting provider:ServiceProvider) -> String
+}
+
+class ServiceProvider: NSObject {
+    weak var delegate: ServiceProviderDelegate?
+
     func extractReading(from firstWord:String) -> String {
         var matches: [String] = []
 
@@ -150,5 +159,34 @@ class ServiceProvider: NSObject  {
         pasteboard.writeObjects([output as NSString])
     }
 
+    @objc func convertBrailleToChineseText(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = ""
+        let tokens = BopomofoBrailleConverter.convert(brailleToTokens: string)
+
+        for token in tokens {
+            switch token {
+            case let token as BopomofoSyllable:
+                delegate?.serviceProvider(self, didRequestInsertReading: token.rawValue)
+            case let token as String:
+                if let string = delegate?.serviceProvider(didRequestCommitting: self) {
+                    output += string
+                }
+                output += token
+            default:
+                continue
+            }
+        }
+        if let string = delegate?.serviceProvider(didRequestCommitting: self) {
+            output += string
+        }
+
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
 
 }

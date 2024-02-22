@@ -377,19 +377,8 @@ public struct BopomofoSyllable {
     private static let ㄨBraille = Set(ㄨ_Combination.allCases.map { $0.braille })
     private static let ㄩBraille = Set(ㄩ_Combination.allCases.map { $0.braille })
 
-    public static let allowedValues = consonantValues
-        .union(middleVowelValues)
-        .union(vowelValues)
-        .union(toneValues)
-    public static let allowedBraille = consonantBraille
-        .union(middleVowelBraille)
-        .union(vowelBraille)
-        .union(toneBraille)
-        .union(ㄧBraille)
-        .union(ㄨBraille)
-        .union(ㄩBraille)
-    var rawValue: String
-    var braille: String
+    public var rawValue: String
+    public var braille: String
 
     public init(rawValue: String) throws {
         var consonant: Consonant?

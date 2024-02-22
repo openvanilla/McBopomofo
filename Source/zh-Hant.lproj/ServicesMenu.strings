@@ -1,2 +1,5 @@
 "Add to McBopomofo User Phrases" = "加入小麥注音使用者詞彙";
-"Add Bopomofo Readings to Selected Text" = "將選定的文字加上注音";
+"Add Bopomofo Readings to Text" = "將選定的文字加上注音";
+"Convert Text to Bopomofo Readings" = "將中文轉換成注音";
+"Convert Text to Taiwanese Braille" = "將中文轉換成台灣點字";
+"Convert Taiwanese Braille to Text" = "將台灣點字轉換成中文";

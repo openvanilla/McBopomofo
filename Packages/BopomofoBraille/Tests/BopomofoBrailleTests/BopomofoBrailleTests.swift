@@ -80,6 +80,15 @@ final class BopomofoBrailleTests: XCTestCase {
         XCTAssert(r2 == input, r2)
     }
 
+    func testBrailleToTokens() {
+        let input = "「ㄊㄞˊㄨㄢㄖㄣˊㄒㄩㄧㄠˋㄏㄣˇㄉㄨㄛㄉㄜ˙ㄒㄧㄠㄆㄛㄎㄨㄞˋ」"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(brailleToTokens: r1)
+        print(r2)
+
+    }
+
+
     func test第() {
         do {
             let b = try BopomofoSyllable(rawValue: "ㄉㄧˋ")
