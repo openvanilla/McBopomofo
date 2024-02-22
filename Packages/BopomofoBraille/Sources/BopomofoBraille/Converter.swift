@@ -1,7 +1,7 @@
 import Foundation
 
 /// Convert Bopomofo to Braille and vice versa.
-@objc public class Converter: NSObject {
+@objc public class BopomofoBrailleConverter: NSObject {
     /// Convert from Bopomofo to Braille.
     @objc(convertFromBopomofo:)
     public static func convert(bopomofo: String) -> String {
@@ -26,6 +26,20 @@ import Foundation
                     // pass
                 }
             }
+            if !found {
+                for i in (0..<target).reversed() {
+                    let start = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
+                    let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead + i)
+                    let substring = bopomofo[start...end]
+                    if let punc = Punctuation(rawValue: String(substring)) {
+                        output += punc.braille
+                        readHead += i + 1
+                        found = true
+                        break
+                    }
+                }
+            }
+
             if !found {
                 let start = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
                 output += bopomofo[start...start]
@@ -62,6 +76,22 @@ import Foundation
                     // pass
                 }
             }
+
+            if !found {
+                for i in (0..<target).reversed() {
+                    let start = braille.index(braille.startIndex, offsetBy: readHead)
+                    let end = braille.index(braille.startIndex, offsetBy: readHead + i)
+                    let substring = braille[start...end]
+                    if let punc = Punctuation(braille: String(substring)) {
+                        output += punc.rawValue
+                        readHead += i + 1
+                        found = true
+                        break
+                    }
+                }
+            }
+
+
             if !found {
                 let start = braille.index(braille.startIndex, offsetBy: readHead)
                 output += braille[start...start]

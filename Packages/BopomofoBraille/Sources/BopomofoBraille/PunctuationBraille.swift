@@ -1,6 +1,17 @@
 import Foundation
 
-public enum Punctuation: String {
+public enum Punctuation: String, CaseIterable {
+    init?(braille: String) {
+        let aCase = Punctuation.allCases.first { aCase in
+            aCase.braille == braille
+        }
+        if let aCase {
+            self = aCase
+        } else {
+            return nil
+        }
+    }
+
     var bopomofo: String {
         return rawValue
     }

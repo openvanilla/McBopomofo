@@ -23,6 +23,7 @@
 
 import AppKit
 import OpenCCBridge
+import BopomofoBraille
 
 class ServiceProvider: NSObject  {
     func extractReading(from firstWord:String) -> String {
@@ -100,5 +101,54 @@ class ServiceProvider: NSObject  {
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
     }
+
+    @objc func convertToReadings(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = ""
+        for c in string {
+
+            if let converted = OpenCCBridge.shared.convertTraditional(String(c)),
+               let reading = LanguageModelManager.reading(for:converted) {
+                if reading.isEmpty == false && reading.starts(with: "_") == false {
+                    output += reading
+                } else {
+                    output += String(c)
+                }
+            } else {
+                output += String(c)
+            }
+        }
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
+    @objc func convertToBraille(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = ""
+        for c in string {
+
+            if let converted = OpenCCBridge.shared.convertTraditional(String(c)),
+               let reading = LanguageModelManager.reading(for:converted) {
+                if reading.isEmpty == false && reading.starts(with: "_") == false {
+                    output += BopomofoBrailleConverter.convert(bopomofo: reading)
+                } else {
+                    output += BopomofoBrailleConverter.convert(bopomofo: String(c))
+                }
+            } else {
+                output += BopomofoBrailleConverter.convert(bopomofo: String(c))
+            }
+        }
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
 
 }

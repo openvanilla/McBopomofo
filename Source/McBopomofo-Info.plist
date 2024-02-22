@@ -167,6 +167,49 @@
             <key>NSRequiredContext</key>
             <dict/>
         </dict>
+        <dict>
+            <key>NSMessage</key>
+            <string>convertToReadings</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Convert Selected Text to Bopomofo Readings</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>NSMessage</key>
+            <string>convertToBraille</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Convert Selected Text to Bopomofo Braillie</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+
     </array>
 </dict>
 </plist>
