@@ -42,6 +42,7 @@
 @import OpenCCBridge;
 @import VXHanConvert;
 @import ChineseNumbers;
+@import BopomofoBraille;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
@@ -597,8 +598,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // MARK: Enter
     if (charCode == 13) {
-        if (input.isControlHold && Preferences.controlEnterOutput != 0) {
-            return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        if (_inputMode == InputModeBopomofo && input.isControlHold) {
+            if (Preferences.controlEnterOutput == ControlEnterOutputBpmfReading) {
+                return [self _handleCtrlEnterBpmfReadingWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            }
+            if (Preferences.controlEnterOutput == ControlEnterOutputBraille) {
+                return [self _handleCtrlEnterBrailleWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            }
+            errorCallback();
+            return YES;
         }
         if (_inputMode == InputModeBopomofo &&
             input.isShiftHold &&
@@ -1022,7 +1030,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
-- (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleCtrlEnterBpmfReadingWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
@@ -1039,6 +1047,46 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     stateCallback(empty);
     return YES;
 }
+
+- (BOOL)_handleCtrlEnterBrailleWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+{
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+    NSMutableString *composingBuffer = [[NSMutableString alloc] init];
+    for (const auto& node : _latestWalk.nodes) {
+        std::string value = node->currentUnigram().value();
+        std::string reading = node->reading();
+        if (reading[0] == '_') {
+            NSString *punctuation = [[NSString alloc] initWithUTF8String:value.c_str()];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:punctuation];
+            [composingBuffer appendString:converted];
+        } else {
+            std::string delimiter = "-";
+            size_t pos = 0;
+            std::string token;
+            while ((pos = reading.find(delimiter)) != std::string::npos) {
+                token = reading.substr(0, pos);
+                NSString *tokenString = [[NSString alloc] initWithUTF8String:token.c_str()];
+                NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString];
+                [composingBuffer appendString:converted];
+                reading.erase(0, pos + delimiter.length());
+            }
+            NSString *tokenString = [[NSString alloc] initWithUTF8String:reading.c_str()];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString];
+            [composingBuffer appendString:converted];
+        }
+    }
+
+    [self clear];
+
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    stateCallback(committing);
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    stateCallback(empty);
+    return YES;
+}
+
 
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
