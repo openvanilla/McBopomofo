@@ -152,7 +152,7 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Add Bopomofo Readings to Selected Text</string>
+                <string>Add Bopomofo Readings to Text</string>
             </dict>
             <key>NSReturnTypes</key>
             <array>
@@ -173,7 +173,7 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Convert Selected Text to Bopomofo Readings</string>
+                <string>Convert Text to Bopomofo Readings</string>
             </dict>
             <key>NSReturnTypes</key>
             <array>
@@ -194,7 +194,7 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Convert Chinese Text to Taiwanese Braille</string>
+                <string>Convert Text to Taiwanese Braille</string>
             </dict>
             <key>NSReturnTypes</key>
             <array>
@@ -215,7 +215,7 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Convert Taiwanese Braille to Chinese Text</string>
+                <string>Convert Taiwanese Braille to Text</string>
             </dict>
             <key>NSReturnTypes</key>
             <array>
