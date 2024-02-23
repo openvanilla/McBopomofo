@@ -22,11 +22,14 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #include "McBopomofoLM.h"
+
 #include <algorithm>
-#include <iterator>
 #include <limits>
 #include <string>
+#include <utility>
 #include <vector>
+
+#include "gramambular2/reading_grid.h"
 
 namespace McBopomofo {
 
@@ -121,7 +124,45 @@ std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::getUnig
         allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams, excludedValues, insertedValues);
     }
 
-    allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+    // This relies on the fact that we always use the default separator.
+    bool isKeyMultiSyllable = key.find(Formosa::Gramambular2::ReadingGrid::kDefaultSeparator) != std::string::npos;
+
+    // If key is multi-syllabic (for example, ㄉㄨㄥˋ-ㄈㄢˋ), we just
+    // insert all collected userUnigrams on top of the unigrams fetched from
+    // the database. If key is mono-syllabic (for example, ㄉㄨㄥˋ), then
+    // we'll have to rewrite the collected userUnigrams.
+    //
+    // This is because, by default, user unigrams have a score of 0, which
+    // guarantees that grid walks will choose them. This is problematic,
+    // however, when a single-syllabic user phrase is competing with other
+    // multisyllabic phrases that start with the same syllable. For example,
+    // if a user has 丼 for ㄉㄨㄥˋ, and because that unigram has a score
+    // of 0, no other phrases in the database that start with ㄉㄨㄥˋ would
+    // be able to compete with it. Without the rewrite, ㄉㄨㄥˋ-ㄗㄨㄛˋ
+    // would always result in "丼" + "作" instead of "動作" because the
+    // node for "丼" would dominate the walk.
+    if (isKeyMultiSyllable || allUnigrams.empty()) {
+        allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
+    } else if (!userUnigrams.empty()) {
+        // Find the highest score from the existing allUnigrams.
+        double topScore = std::numeric_limits<double>::lowest();
+        for (const auto& unigram : allUnigrams) {
+            if (unigram.score() > topScore) {
+                topScore = unigram.score();
+            }
+        }
+
+        // Boost by a very small number. This is the score for user phrases.
+        constexpr double epsilon = 0.000000001;
+        double boostedScore = topScore + epsilon;
+
+        std::vector<Formosa::Gramambular2::LanguageModel::Unigram> rewrittenUserUnigrams;
+        for (const auto& unigram : userUnigrams) {
+            rewrittenUserUnigrams.emplace_back(Formosa::Gramambular2::LanguageModel::Unigram(unigram.value(), boostedScore));
+        }
+        allUnigrams.insert(allUnigrams.begin(), rewrittenUserUnigrams.begin(), rewrittenUserUnigrams.end());
+    }
+
     return allUnigrams;
 }
 
@@ -174,12 +215,20 @@ bool McBopomofoLM::externalConverterEnabled() const
 
 void McBopomofoLM::setExternalConverter(std::function<std::string(const std::string&)> externalConverter)
 {
-    m_externalConverter = externalConverter;
+    m_externalConverter = std::move(externalConverter);
 }
 
 void McBopomofoLM::setMacroConverter(std::function<std::string(const std::string&)> macroConverter)
 {
-    m_macroConverter = macroConverter;
+    m_macroConverter = std::move(macroConverter);
+}
+
+std::string McBopomofoLM::convertMacro(const std::string& input)
+{
+    if (m_macroConverter != nullptr) {
+        return m_macroConverter(input);
+    }
+    return input;
 }
 
 std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::filterAndTransformUnigrams(const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams, const std::unordered_set<std::string>& excludedValues, std::unordered_set<std::string>& insertedValues)
@@ -189,7 +238,7 @@ std::vector<Formosa::Gramambular2::LanguageModel::Unigram> McBopomofoLM::filterA
     for (auto&& unigram : unigrams) {
         // excludedValues filters out the unigrams with the original value.
         // insertedValues filters out the ones with the converted value
-        std::string originalValue = unigram.value();
+        const std::string& originalValue = unigram.value();
         if (excludedValues.find(originalValue) != excludedValues.end()) {
             continue;
         }
