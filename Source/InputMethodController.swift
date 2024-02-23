@@ -26,7 +26,6 @@ import InputMethodKit
 import CandidateUI
 import NotifierUI
 import TooltipUI
-import VXHanConvert
 import OpenCCBridge
 
 private extension Bool {
@@ -311,7 +310,7 @@ extension McBopomofoInputMethodController {
             if Preferences.chineseConversionStyle == 1 {
                 return text
             }
-            return Preferences.chineseConversionEngine == 1 ? VXHanConvert.convertToSimplified(from: text) : OpenCCBridge.shared.convertToSimplified(text) ?? ""
+            return OpenCCBridge.shared.convertToSimplified(text) ?? ""
         }
 
         let buffer = convertToSimplifiedChineseIfRequired(text)
@@ -816,9 +815,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             let selectedPhrase: String = {
                 let selectedPhrase = state.selectedPhrase
                 return if scToTc {
-                    Preferences.chineseConversionEngine == 1 ?
-                    VXHanConvert.convertToTraditional(from: selectedPhrase) :
-                    OpenCCBridge.shared.convertTraditional(selectedPhrase) ?? ""
+                    OpenCCBridge.shared.convertToTraditional(selectedPhrase) ?? ""
                 } else { selectedPhrase }
             }()
             let candidate = state.candidates[Int(index)]

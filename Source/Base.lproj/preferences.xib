@@ -385,39 +385,6 @@ when selecting candidats</string>
             <rect key="frame" x="0.0" y="0.0" width="477" height="156"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gu5-mN-Rn7">
-                    <rect key="frame" x="64" y="74" width="173" height="16"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Chinese Conversion Engine:" id="mgC-11-2qn">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gsg-Ew-VBh">
-                    <rect key="frame" x="242" y="53" width="213" height="38"/>
-                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <size key="cellSize" width="213" height="18"/>
-                    <size key="intercellSpacing" width="4" height="2"/>
-                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="l3R-gI-bcZ">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <cells>
-                        <column>
-                            <buttonCell type="radio" title="OpenCC" imagePosition="left" alignment="left" state="on" inset="2" id="aSu-wX-cCe">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <buttonCell type="radio" title="Legacy VXHanConvert" imagePosition="left" alignment="left" tag="1" inset="2" id="kZd-F2-QVT">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                        </column>
-                    </cells>
-                    <connections>
-                        <binding destination="32" name="selectedTag" keyPath="values.ChineseConversionEngine" id="Xd8-aZ-29H"/>
-                    </connections>
-                </matrix>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wds-Zh-QHP">
                     <rect key="frame" x="74" y="120" width="163" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Chinese Conversion Style:" id="cMO-Ss-Jar">
@@ -426,7 +393,7 @@ when selecting candidats</string>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xwt-fe-fQG">
+                <matrix verticalHuggingPriority="750" ambiguous="YES" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xwt-fe-fQG">
                     <rect key="frame" x="243" y="99" width="213" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="213" height="18"/>
@@ -467,18 +434,12 @@ when selecting candidats</string>
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="NGh-Dn-Qpf" secondAttribute="trailing" constant="75" id="5Ht-Dt-dKR"/>
-                <constraint firstItem="gu5-mN-Rn7" firstAttribute="top" secondItem="wds-Zh-QHP" secondAttribute="bottom" constant="30" id="Av7-g6-UYH"/>
-                <constraint firstItem="Gsg-Ew-VBh" firstAttribute="leading" secondItem="gu5-mN-Rn7" secondAttribute="trailing" constant="7" id="B3d-15-KyX"/>
                 <constraint firstItem="6u2-Su-7mb" firstAttribute="leading" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="20" symbolic="YES" id="F85-tW-oQT"/>
                 <constraint firstItem="wds-Zh-QHP" firstAttribute="leading" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="76" id="GYV-Ei-TBy"/>
-                <constraint firstItem="6u2-Su-7mb" firstAttribute="top" secondItem="Gsg-Ew-VBh" secondAttribute="bottom" constant="8" symbolic="YES" id="KCl-CR-GKe"/>
                 <constraint firstItem="NGh-Dn-Qpf" firstAttribute="leading" secondItem="Xwt-fe-fQG" secondAttribute="leading" id="NXr-qF-ZHZ"/>
                 <constraint firstItem="wds-Zh-QHP" firstAttribute="top" secondItem="S2Y-nP-nn8" secondAttribute="top" constant="20" symbolic="YES" id="P39-Rs-be4"/>
-                <constraint firstItem="Gsg-Ew-VBh" firstAttribute="leading" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="242" id="QgL-oP-ZQ8"/>
                 <constraint firstAttribute="bottom" secondItem="NGh-Dn-Qpf" secondAttribute="bottom" constant="20" symbolic="YES" id="XcQ-vP-lvY"/>
                 <constraint firstItem="NGh-Dn-Qpf" firstAttribute="top" secondItem="6u2-Su-7mb" secondAttribute="bottom" constant="8" symbolic="YES" id="Y4H-g2-LHN"/>
-                <constraint firstItem="Gsg-Ew-VBh" firstAttribute="top" secondItem="Xwt-fe-fQG" secondAttribute="bottom" constant="8" symbolic="YES" id="ZG9-US-bLi"/>
-                <constraint firstItem="gu5-mN-Rn7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="20" symbolic="YES" id="ZIO-Aw-kds"/>
                 <constraint firstAttribute="trailing" secondItem="6u2-Su-7mb" secondAttribute="trailing" constant="20" symbolic="YES" id="Zij-FW-FLR"/>
                 <constraint firstItem="Xwt-fe-fQG" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wds-Zh-QHP" secondAttribute="trailing" symbolic="YES" id="rRe-qT-xAw"/>
             </constraints>

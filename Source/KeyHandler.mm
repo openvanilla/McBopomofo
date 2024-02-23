@@ -40,7 +40,6 @@
 @import CandidateUI;
 @import NSStringUtils;
 @import OpenCCBridge;
-@import VXHanConvert;
 @import ChineseNumbers;
 @import BopomofoBraille;
 
@@ -1599,11 +1598,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             {
                 NSString *string = [ChineseNumbers generateWithIntPart:intPart decPart:decPart digitCase:ChineseNumbersCaseUppercase];
                 if (Preferences.chineseConversionEnabled) {
-                    if (Preferences.chineseConversionEngine == 0) {
-                        string = [OpenCCBridge.sharedInstance convertToSimplified:string];
-                    } else if (Preferences.chineseConversionEngine == 0) {
-                        string = [VXHanConvert convertToSimplifiedFrom:string];
-                    }
+                    string = [[OpenCCBridge sharedInstance] convertToSimplified:string];
                 }
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
                 stateCallback(committing);
@@ -1934,11 +1929,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     BOOL scToTc = Preferences.chineseConversionEnabled &&
             Preferences.chineseConversionStyle == 1;
     if (scToTc) {
-        if (Preferences.chineseConversionEngine == 1) {
-            key = [VXHanConvert convertToTraditionalFrom:key];
-        } else {
-            key = [[OpenCCBridge sharedInstance] convertTraditional:key];
-        }
+        key = [[OpenCCBridge sharedInstance] convertToTraditional:key];
     }
     std::string cppKey(key.UTF8String);
 
@@ -1949,11 +1940,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSString *item = @(phrase.c_str());
             NSString *diaplayText = [[NSString alloc] initWithString:item];
             if (scToTc) {
-                if (Preferences.chineseConversionEngine == 1) {
-                    diaplayText = [VXHanConvert convertToSimplifiedFrom:diaplayText];
-                } else {
-                    diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
-                }
+                diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
             }
             InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:@"" value:item displayText:diaplayText];
             [array addObject:candidate];

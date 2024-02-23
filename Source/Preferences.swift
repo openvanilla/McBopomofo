@@ -46,7 +46,6 @@ private let kCandidateKeys = "CandidateKeys"
 private let kAllowMovingCursorWhenChoosingCandidates = "AllowMovingCursorWhenChoosingCandidates"
 
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
-private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
@@ -226,7 +225,6 @@ class Preferences: NSObject {
          kCandidateKeyLabelFontName,
          kCandidateKeys,
          kPhraseReplacementEnabledKey,
-         kChineseConversionEngineKey,
          kChineseConversionStyleKey,
          kAssociatedPhrasesEnabledKey,
          kControlEnterOutputKey,
@@ -362,17 +360,6 @@ class Preferences: NSObject {
 }
 
 extension Preferences {
-    /// The conversion engine.
-    ///
-    /// - 0: OpenCC
-    /// - 1: VXHanConvert
-    @UserDefault(key: kChineseConversionEngineKey, defaultValue: 0)
-    @objc static var chineseConversionEngine: Int
-
-    @objc static var chineseConversionEngineName: String? {
-        ChineseConversionEngine(rawValue: chineseConversionEngine)?.name
-    }
-
     /// The conversion style.
     ///
     /// - 0: convert the output

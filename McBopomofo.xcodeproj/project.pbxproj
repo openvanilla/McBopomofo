@@ -52,7 +52,6 @@
 		D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD5E2B393C00000C5812 /* InputMacroTests.swift */; };
 		D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD602B39506D000C5812 /* ServiceProviderTests.swift */; };
 		D44FB74527915565003C80A6 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
-		D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */ = {isa = PBXBuildFile; productRef = D44FB7492791B829003C80A6 /* VXHanConvert */; };
 		D44FB74D2792189A003C80A6 /* PhraseReplacementMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */; };
 		D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */; };
 		D461B792279DAC010070E734 /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D461B791279DAC010070E734 /* InputState.swift */; };
@@ -185,7 +184,6 @@
 		D449AD5E2B393C00000C5812 /* InputMacroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacroTests.swift; sourceTree = "<group>"; };
 		D449AD602B39506D000C5812 /* ServiceProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProviderTests.swift; sourceTree = "<group>"; };
 		D44FB74427915555003C80A6 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
-		D44FB7482791B346003C80A6 /* VXHanConvert */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = VXHanConvert; path = Packages/VXHanConvert; sourceTree = "<group>"; };
 		D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PhraseReplacementMap.cpp; sourceTree = "<group>"; };
 		D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhraseReplacementMap.h; sourceTree = "<group>"; };
 		D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerInput.swift; sourceTree = "<group>"; };
@@ -238,7 +236,6 @@
 			files = (
 				D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */,
 				D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */,
-				D44FB74A2791B829003C80A6 /* VXHanConvert in Frameworks */,
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */,
 				D4E7917A2B52CDE500676A68 /* ChineseNumbers in Frameworks */,
@@ -446,7 +443,6 @@
 				D427F7AC27907B7E004A2160 /* NotifierUI */,
 				D427F7B2279086B5004A2160 /* InputSourceHelper */,
 				D427F7BF27908EAC004A2160 /* OpenCCBridge */,
-				D44FB7482791B346003C80A6 /* VXHanConvert */,
 				D47D73C027A71FFA00255A50 /* FSEventStreamHelper */,
 				D4C9CAAF27AAC8EC0058DFEA /* NSStringUtils */,
 			);
@@ -516,7 +512,6 @@
 				D427F7AD27907B8A004A2160 /* NotifierUI */,
 				D427F7B3279086DC004A2160 /* InputSourceHelper */,
 				D427F7C027908EFC004A2160 /* OpenCCBridge */,
-				D44FB7492791B829003C80A6 /* VXHanConvert */,
 				D47D73C227A7200500255A50 /* FSEventStreamHelper */,
 				D4C9CAB027AAC9690058DFEA /* NSStringUtils */,
 				D4E791792B52CDE500676A68 /* ChineseNumbers */,
@@ -1425,10 +1420,6 @@
 		D427F7C027908EFC004A2160 /* OpenCCBridge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OpenCCBridge;
-		};
-		D44FB7492791B829003C80A6 /* VXHanConvert */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = VXHanConvert;
 		};
 		D47D73C227A7200500255A50 /* FSEventStreamHelper */ = {
 			isa = XCSwiftPackageProductDependency;

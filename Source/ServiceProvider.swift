@@ -46,7 +46,7 @@ class ServiceProvider: NSObject {
             var drop = 0
             while drop < substringCount {
                 let candidate = String(substring.dropLast(drop))
-                if let converted = OpenCCBridge.shared.convertTraditional(candidate),
+                if let converted = OpenCCBridge.shared.convertToTraditional(candidate),
                     let match = LanguageModelManager.reading(for: converted)
                 {
                     // append the match and skip over the matched portion
@@ -186,7 +186,7 @@ extension ServiceProvider {
 
     @objc func addReading(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string), string.count < kMaxLength,
-            let converted = OpenCCBridge.shared.convertTraditional(String(string))
+            let converted = OpenCCBridge.shared.convertToTraditional(String(string))
         else {
             return
         }
