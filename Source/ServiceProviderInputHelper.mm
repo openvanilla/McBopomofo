@@ -7,7 +7,6 @@
 {
     std::shared_ptr<Formosa::Gramambular2::LanguageModel> _emptySharedPtr;
     Formosa::Gramambular2::ReadingGrid *_grid;
-    Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk;
 }
 @end
 
@@ -27,7 +26,6 @@
     if (self) {
         std::shared_ptr<Formosa::Gramambular2::LanguageModel> lm(_emptySharedPtr, [LanguageModelManager languageModelMcBopomofo]);
         _grid = new Formosa::Gramambular2::ReadingGrid(lm);
-        _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult {};
     }
     return self;
 }
@@ -36,22 +34,32 @@
 
 @implementation ServiceProviderInputHelper(ServiceProviderDelegate)
 
+- (void)reset
+{
+    _grid->clear();
+}
+
 
 - (void)serviceProvider:(ServiceProvider * _Nonnull)provider didRequestInsertReading:(NSString * _Nonnull)didRequestInsertReading 
 {
     _grid->insertReading(didRequestInsertReading.UTF8String);
-    _latestWalk = _grid->walk();
 }
 
 - (NSString * _Nonnull)serviceProviderDidRequestCommitting:(ServiceProvider * _Nonnull)provider 
 {
+    Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk = _grid->walk();
     std::string output;
     for (const auto& node : _latestWalk.nodes) {
         output += node->value();
     }
-    _grid->clear();
-    _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult {};
+    [self reset];
     return [NSString stringWithUTF8String:output.c_str()];
 }
+
+- (void)serviceProviderDidRequestReset:(ServiceProvider * _Nonnull)provider
+{
+    [self reset];
+}
+
 
 @end

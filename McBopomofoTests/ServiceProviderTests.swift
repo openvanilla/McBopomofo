@@ -60,4 +60,15 @@ final class ServiceProviderTests: XCTestCase {
         let output = provider.extractReading(from: "！")
         XCTAssert(output == "_ctrl_punctuation_!", output)
     }
+
+    func testConvertBrailleToChinese1() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "⠰⠤⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐⠤⠆"
+        let expected = "「台灣人最需要的就是消波塊」"
+        let output = provider.convertBrailleToChineseText(string: input)
+        XCTAssert(output == expected, output)
+    }
 }

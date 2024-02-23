@@ -1,18 +1,21 @@
 import Foundation
 
-fileprivate protocol Syllable {
+let kMinimalBopomofoLength = 1
+let kMinimalBrailleLength = 2
+
+private protocol Syllable {
     var bopomofo: String { get }
     var braille: String { get }
 }
 
-fileprivate protocol Combination {
+private protocol Combination {
     var bopomofo: String { get }
     var braille: String { get }
 }
 
 // MARK: - Syllables
 
-fileprivate enum Consonant: String, CaseIterable, Syllable {
+private enum Consonant: String, CaseIterable, Syllable {
     fileprivate var bopomofo: String {
         return self.rawValue
     }
@@ -66,7 +69,7 @@ fileprivate enum Consonant: String, CaseIterable, Syllable {
 
     fileprivate var isSingle: Bool {
         switch self {
-        case.ㄓ, .ㄔ, .ㄕ, .ㄖ, .ㄗ, .ㄘ, .ㄙ:
+        case .ㄓ, .ㄔ, .ㄕ, .ㄖ, .ㄗ, .ㄘ, .ㄙ:
             true
         default:
             false
@@ -96,8 +99,7 @@ fileprivate enum Consonant: String, CaseIterable, Syllable {
     case ㄙ = "ㄙ"
 }
 
-
-fileprivate enum MiddleVowel: String, CaseIterable, Syllable {
+private enum MiddleVowel: String, CaseIterable, Syllable {
     fileprivate var bopomofo: String {
         return self.rawValue
     }
@@ -114,14 +116,17 @@ fileprivate enum MiddleVowel: String, CaseIterable, Syllable {
     }
 
     fileprivate func buildCombination(rawValue: String) throws -> Combination {
-        guard let result: Combination = switch self {
-        case .ㄧ:
-            ㄧ_Combination(rawValue: rawValue)
-        case .ㄨ:
-            ㄨ_Combination(rawValue: rawValue)
-        case .ㄩ:
-            ㄩ_Combination(rawValue: rawValue)
-        } else {
+        guard
+            let result: Combination =
+                switch self {
+                case .ㄧ:
+                    ㄧ_Combination(rawValue: rawValue)
+                case .ㄨ:
+                    ㄨ_Combination(rawValue: rawValue)
+                case .ㄩ:
+                    ㄩ_Combination(rawValue: rawValue)
+                }
+        else {
             throw BopomofoSyllableError.invalidCharacter
         }
         return result
@@ -132,12 +137,11 @@ fileprivate enum MiddleVowel: String, CaseIterable, Syllable {
     case ㄩ = "ㄩ"
 }
 
-
-fileprivate enum Vowel: String, CaseIterable, Syllable {
+private enum Vowel: String, CaseIterable, Syllable {
     fileprivate var bopomofo: String {
         return self.rawValue
     }
-    
+
     fileprivate var braille: String {
         switch self {
         case .ㄚ:
@@ -186,7 +190,7 @@ fileprivate enum Vowel: String, CaseIterable, Syllable {
 
 // MARK: - Combination
 
-fileprivate enum ㄧ_Combination: String, CaseIterable, Combination {
+private enum ㄧ_Combination: String, CaseIterable, Combination {
     fileprivate var bopomofo: String {
         "ㄧ" + self.rawValue
     }
@@ -228,7 +232,7 @@ fileprivate enum ㄧ_Combination: String, CaseIterable, Combination {
     case ㄧㄥ = "ㄥ"
 }
 
-fileprivate enum ㄨ_Combination: String, CaseIterable, Combination {
+private enum ㄨ_Combination: String, CaseIterable, Combination {
     fileprivate var bopomofo: String {
         "ㄨ" + self.rawValue
     }
@@ -264,7 +268,7 @@ fileprivate enum ㄨ_Combination: String, CaseIterable, Combination {
     case ㄨㄥ = "ㄥ"
 }
 
-fileprivate enum ㄩ_Combination: String, CaseIterable, Combination {
+private enum ㄩ_Combination: String, CaseIterable, Combination {
     fileprivate var bopomofo: String {
         "ㄩ" + self.rawValue
     }
@@ -291,7 +295,7 @@ fileprivate enum ㄩ_Combination: String, CaseIterable, Combination {
 
 // MARK: - Tone
 
-fileprivate enum Tone: String, CaseIterable {
+private enum Tone: String, CaseIterable {
     fileprivate var bopomofo: String {
         return self.rawValue
     }
@@ -322,6 +326,7 @@ fileprivate enum Tone: String, CaseIterable {
 
 /// Errors for `BopomofoSyllable`.
 public enum BopomofoSyllableError: Error, LocalizedError {
+    case invalidLength
     case invalidCharacter
     case duplicatedConsonant
     case consonantShouldBeAtFront
@@ -336,6 +341,8 @@ public enum BopomofoSyllableError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
+        case .invalidLength:
+            "Invalid length"
         case .invalidCharacter:
             "Invalid character"
         case .duplicatedConsonant:
@@ -365,12 +372,12 @@ public enum BopomofoSyllableError: Error, LocalizedError {
 /// Represents the Bopomofo syllables.
 public struct BopomofoSyllable {
     private static let consonantValues = Set(Consonant.allCases.map { $0.rawValue })
-    private static let middleVowelValues = Set(MiddleVowel.allCases.map{ $0.rawValue })
+    private static let middleVowelValues = Set(MiddleVowel.allCases.map { $0.rawValue })
     private static let vowelValues = Set(Vowel.allCases.map { $0.rawValue })
     private static let toneValues = Set(Tone.allCases.map { $0.rawValue })
 
     private static let consonantBraille = Set(Consonant.allCases.map { $0.braille })
-    private static let middleVowelBraille = Set(MiddleVowel.allCases.map{ $0.braille })
+    private static let middleVowelBraille = Set(MiddleVowel.allCases.map { $0.braille })
     private static let vowelBraille = Set(Vowel.allCases.map { $0.braille })
     private static let toneBraille = Set(Tone.allCases.map { $0.braille })
     private static let ㄧBraille = Set(ㄧ_Combination.allCases.map { $0.braille })
@@ -381,6 +388,10 @@ public struct BopomofoSyllable {
     public var braille: String
 
     public init(rawValue: String) throws {
+        if rawValue.count < kMinimalBopomofoLength {
+            throw BopomofoSyllableError.invalidLength
+        }
+
         var consonant: Consonant?
         var middleVowel: MiddleVowel?
         var vowel: Vowel?
@@ -410,7 +421,7 @@ public struct BopomofoSyllable {
                     throw BopomofoSyllableError.vowelAlreadySet
                 }
                 if let middleVowel {
-                    _ = try middleVowel.buildCombination(rawValue:s)
+                    _ = try middleVowel.buildCombination(rawValue: s)
                 }
 
                 vowel = Vowel(rawValue: s)
@@ -432,11 +443,15 @@ public struct BopomofoSyllable {
     }
 
     public init(braille: String) throws {
+
+        if braille.count < kMinimalBrailleLength {
+            throw BopomofoSyllableError.invalidLength
+        }
+
         func shouldConnectWithYiOrYv(_ next: String) -> Bool {
-            return next == MiddleVowel.ㄧ.braille ||
-                next ==  MiddleVowel.ㄩ.braille ||
-                BopomofoSyllable.ㄧBraille.contains(next) ||
-                BopomofoSyllable.ㄩBraille.contains(next)
+            return next == MiddleVowel.ㄧ.braille || next == MiddleVowel.ㄩ.braille
+                || BopomofoSyllable.ㄧBraille.contains(next)
+                || BopomofoSyllable.ㄩBraille.contains(next)
         }
 
         var consonant: Consonant?
@@ -455,7 +470,7 @@ public struct BopomofoSyllable {
                 if let consonant, consonant.isSingle == false {
                     throw BopomofoSyllableError.other
                 }
-            case "⠁": // ㄓ or tone5
+            case "⠁":  // ㄓ or tone5
                 if index == 0 {
                     consonant = Consonant.ㄓ
                 } else {
@@ -467,7 +482,7 @@ public struct BopomofoSyllable {
                     }
                     tone = .tone5
                 }
-            case "⠑": // ㄙ and ㄒ
+            case "⠑":  // ㄙ and ㄒ
                 if consonant != nil {
                     throw BopomofoSyllableError.duplicatedConsonant
                 }
@@ -482,7 +497,7 @@ public struct BopomofoSyllable {
                 } else {
                     consonant = .ㄙ
                 }
-            case "⠚": // ㄑ and ㄘ
+            case "⠚":  // ㄑ and ㄘ
                 if consonant != nil {
                     throw BopomofoSyllableError.duplicatedConsonant
                 }
@@ -497,7 +512,7 @@ public struct BopomofoSyllable {
                 } else {
                     consonant = .ㄘ
                 }
-            case "⠅": // ㄍ and ㄐ
+            case "⠅":  // ㄍ and ㄐ
                 if consonant != nil {
                     throw BopomofoSyllableError.duplicatedConsonant
                 }
@@ -598,7 +613,7 @@ public struct BopomofoSyllable {
                 throw BopomofoSyllableError.invalidCharacter
             }
         }
-        
+
         guard let tone = tone else {
             throw BopomofoSyllableError.noTone
         }
@@ -613,10 +628,8 @@ public struct BopomofoSyllable {
         _ vowel: Vowel?,
         _ tone: Tone
     ) -> String {
-        return (consonant?.rawValue ?? "") +
-        (middleVowel?.rawValue ?? "") +
-        (vowel?.rawValue ?? "") +
-        tone.rawValue
+        return (consonant?.rawValue ?? "") + (middleVowel?.rawValue ?? "") + (vowel?.rawValue ?? "")
+            + tone.rawValue
     }
 
     static private func makeBraille(

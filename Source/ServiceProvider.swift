@@ -22,20 +22,22 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import AppKit
-import OpenCCBridge
 import BopomofoBraille
+import OpenCCBridge
 
 @objc protocol ServiceProviderDelegate: NSObjectProtocol {
     @objc(serviceProvider:didRequestInsertReading:)
-    func serviceProvider(_ provider:ServiceProvider, didRequestInsertReading: String)
+    func serviceProvider(_ provider: ServiceProvider, didRequestInsertReading: String)
     @objc(serviceProviderDidRequestCommitting:)
-    func serviceProvider(didRequestCommitting provider:ServiceProvider) -> String
+    func serviceProvider(didRequestCommitting provider: ServiceProvider) -> String
+    @objc(serviceProviderDidRequestReset:)
+    func serviceProvider(didRequestReset provider: ServiceProvider)
 }
 
 class ServiceProvider: NSObject {
     weak var delegate: ServiceProviderDelegate?
 
-    func extractReading(from firstWord:String) -> String {
+    func extractReading(from firstWord: String) -> String {
         var matches: [String] = []
 
         // greedily find the longest possible matches
@@ -50,7 +52,8 @@ class ServiceProvider: NSObject {
             while drop < substringCount {
                 let candidate = String(substring.dropLast(drop))
                 if let converted = OpenCCBridge.shared.convertTraditional(candidate),
-                    let match = LanguageModelManager.reading(for: converted) {
+                    let match = LanguageModelManager.reading(for: converted)
+                {
                     // append the match and skip over the matched portion
                     matches.append(match)
                     matchFrom = firstWord.index(matchFrom, offsetBy: substringCount - drop)
@@ -72,7 +75,7 @@ class ServiceProvider: NSObject {
 
     @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string),
-              let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
+            let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
         else {
             return
         }
@@ -91,6 +94,8 @@ class ServiceProvider: NSObject {
         (NSApp.delegate as? AppDelegate)?.openUserPhrases(self)
     }
 
+    // MARK: -
+
     @objc func addReading(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string)
         else {
@@ -100,7 +105,8 @@ class ServiceProvider: NSObject {
         for c in string {
             output += String(c)
             if let converted = OpenCCBridge.shared.convertTraditional(String(c)),
-               let reading = LanguageModelManager.reading(for:converted) {
+                let reading = LanguageModelManager.reading(for: converted)
+            {
                 if reading.isEmpty == false && reading.starts(with: "_") == false {
                     output += "(\(reading))"
                 }
@@ -110,17 +116,15 @@ class ServiceProvider: NSObject {
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
     }
+}
 
-    @objc func convertToReadings(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
-        guard let string = pasteboard.string(forType: .string)
-        else {
-            return
-        }
+extension ServiceProvider {
+    func convertToReadings(string: String) -> String {
         var output = ""
         for c in string {
-
             if let converted = OpenCCBridge.shared.convertTraditional(String(c)),
-               let reading = LanguageModelManager.reading(for:converted) {
+               let reading = LanguageModelManager.reading(for: converted)
+            {
                 if reading.isEmpty == false && reading.starts(with: "_") == false {
                     output += reading
                 } else {
@@ -130,21 +134,28 @@ class ServiceProvider: NSObject {
                 output += String(c)
             }
         }
+        return output
+    }
+
+    @objc func convertToReadings(
+        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+    ) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = convertToReadings(string: string)
         pasteboard.clearContents()
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
     }
 
-    @objc func convertToBraille(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
-        guard let string = pasteboard.string(forType: .string)
-        else {
-            return
-        }
+    func convertToBraille(string: String) -> String {
         var output = ""
         for c in string {
-
             if let converted = OpenCCBridge.shared.convertTraditional(String(c)),
-               let reading = LanguageModelManager.reading(for:converted) {
+               let reading = LanguageModelManager.reading(for: converted)
+            {
                 if reading.isEmpty == false && reading.starts(with: "_") == false {
                     output += BopomofoBrailleConverter.convert(bopomofo: reading)
                 } else {
@@ -154,17 +165,25 @@ class ServiceProvider: NSObject {
                 output += BopomofoBrailleConverter.convert(bopomofo: String(c))
             }
         }
+        return output
+    }
+
+    @objc func convertToBraille(
+        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+    ) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = convertToBraille(string: string)
         pasteboard.clearContents()
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
     }
 
-    @objc func convertBrailleToChineseText(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
-        guard let string = pasteboard.string(forType: .string)
-        else {
-            return
-        }
+    func convertBrailleToChineseText(string: String) -> String {
         var output = ""
+        let test = BopomofoBrailleConverter.convert(braille: string)
         let tokens = BopomofoBrailleConverter.convert(brailleToTokens: string)
 
         for token in tokens {
@@ -183,7 +202,17 @@ class ServiceProvider: NSObject {
         if let string = delegate?.serviceProvider(didRequestCommitting: self) {
             output += string
         }
+        return output
+    }
 
+    @objc func convertBrailleToChineseText(
+        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+    ) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        var output = convertBrailleToChineseText(string: string)
         pasteboard.clearContents()
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])

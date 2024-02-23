@@ -10,9 +10,9 @@ import Foundation
         let length = bopomofo.count
 
         while readHead < length {
-            let target = min(4, length - readHead)
+            let target = min(3, length - readHead - 1)
             var found = false
-            for i in (0..<target).reversed() {
+            for i in (0...target).reversed() {
                 let start = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
                 let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead + i)
                 let substring = bopomofo[start...end]
@@ -27,16 +27,13 @@ import Foundation
                 }
             }
             if !found {
-                for i in (0..<target).reversed() {
-                    let start = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
-                    let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead + i)
-                    let substring = bopomofo[start...end]
-                    if let punc = Punctuation(rawValue: String(substring)) {
-                        output += punc.braille
-                        readHead += i + 1
-                        found = true
-                        break
-                    }
+                let start = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
+                let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
+                let substring = bopomofo[start...end]
+                if let punctuation = Punctuation(rawValue: String(substring)) {
+                    output += punctuation.braille
+                    readHead += 1
+                    found = true
                 }
             }
 
@@ -58,25 +55,28 @@ import Foundation
         let length = braille.count
 
         while readHead < length {
-            let target = min(3, length - readHead)
+            var target = min(2, length - readHead - 1)
             var found = false
-            for i in (0..<target).reversed() {
-                let start = braille.index(braille.startIndex, offsetBy: readHead)
-                let end = braille.index(braille.startIndex, offsetBy: readHead + i)
-                let substring = braille[start...end]
-                do {
-                    let b = try  BopomofoSyllable(braille: String(substring))
-                    output += b.rawValue
-                    readHead += i + 1
-                    found = true
-                    break
-                } catch {
-                    // pass
+            if target > 0 {
+                for i in (1...target).reversed() {
+                    let start = braille.index(braille.startIndex, offsetBy: readHead)
+                    let end = braille.index(braille.startIndex, offsetBy: readHead + i)
+                    let substring = braille[start...end]
+                    do {
+                        let b = try BopomofoSyllable(braille: String(substring))
+                        output += b.rawValue
+                        readHead += i + 1
+                        found = true
+                        break
+                    } catch {
+                        // pass
+                    }
                 }
             }
 
             if !found {
-                for i in (0..<target).reversed() {
+                target = min(3, length - readHead - 1)
+                for i in (0...target).reversed() {
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
@@ -89,7 +89,6 @@ import Foundation
                 }
             }
 
-
             if !found {
                 let start = braille.index(braille.startIndex, offsetBy: readHead)
                 output += braille[start...start]
@@ -100,7 +99,6 @@ import Foundation
         return output
     }
 
-
     @objc(convertBrailleToTokens:)
     public static func convert(brailleToTokens braille: String) -> [Any] {
         var output: [Any] = []
@@ -109,41 +107,43 @@ import Foundation
         let length = braille.count
 
         while readHead < length {
-            let target = min(3, length - readHead)
+            var target = min(2, length - readHead - 1)
             var found = false
-            for i in (0..<target).reversed() {
-                let start = braille.index(braille.startIndex, offsetBy: readHead)
-                let end = braille.index(braille.startIndex, offsetBy: readHead + i)
-                let substring = braille[start...end]
-                do {
-                    let b = try BopomofoSyllable(braille: String(substring))
-                    output.append(b)
-                    readHead += i + 1
-                    if !text.isEmpty {
-                        output.append(text)
-                        text = ""
+            if target > 0 {
+                for i in (1...target).reversed() {
+                    let start = braille.index(braille.startIndex, offsetBy: readHead)
+                    let end = braille.index(braille.startIndex, offsetBy: readHead + i)
+                    let substring = braille[start...end]
+                    do {
+                        let b = try BopomofoSyllable(braille: String(substring))
+                        readHead += i + 1
+                        if !text.isEmpty {
+                            output.append(text)
+                            text = ""
+                        }
+                        output.append(b)
+                        found = true
+                        break
+                    } catch {
+                        // pass
                     }
-                    found = true
-                    break
-                } catch {
-                    // pass
                 }
             }
 
             if !found {
-                for i in (0..<target).reversed() {
+                target = min(3, length - readHead - 1)
+                for i in (0...target).reversed() {
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
-                    if let punc = Punctuation(braille: String(substring)) {
-                        text += punc.rawValue
+                    if let punctuation = Punctuation(braille: String(substring)) {
+                        text += punctuation.rawValue
                         readHead += i + 1
                         found = true
                         break
                     }
                 }
             }
-
 
             if !found {
                 let start = braille.index(braille.startIndex, offsetBy: readHead)

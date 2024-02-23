@@ -80,14 +80,46 @@ final class BopomofoBrailleTests: XCTestCase {
         XCTAssert(r2 == input, r2)
     }
 
-    func testBrailleToTokens() {
+    func testC11() {
+        let input = "『『ㄊㄞˊㄨㄢㄖㄣˊㄒㄩㄧㄠˋㄏㄣˇㄉㄨㄛㄉㄜ˙ㄒㄧㄠㄆㄛㄎㄨㄞˋ』』"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        print(r1)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+
+    func testC12() {
+        let input = "ㄧㄡˇㄉㄧㄢˇㄑㄧˊㄍㄨㄞˋ，ㄓㄜˋㄧㄤˋㄎㄜˇㄧˇㄇㄚ？"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        print(r1)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testBrailleToTokens1() {
         let input = "「ㄊㄞˊㄨㄢㄖㄣˊㄒㄩㄧㄠˋㄏㄣˇㄉㄨㄛㄉㄜ˙ㄒㄧㄠㄆㄛㄎㄨㄞˋ」"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
         let r2 = BopomofoBrailleConverter.convert(brailleToTokens: r1)
-        print(r2)
-
+        let substring = r2[0] as! String
+        XCTAssert(substring == "「", substring)
     }
 
+    func testBrailleToTokens2() {
+        let input = "「「"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(brailleToTokens: r1)
+        let substring = r2[0] as! String
+        XCTAssert(substring == "『", substring)
+    }
+
+    func testBrailleToTokens3() {
+        let input = "「"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(brailleToTokens: r1)
+        let substring = r2[0] as! String
+        XCTAssert(substring == "「", substring)
+    }
 
     func test第() {
         do {
