@@ -177,20 +177,6 @@ struct CandidateListTextSize {
     }
 }
 
-@objc enum ChineseConversionEngine: Int {
-    case openCC
-    case vxHanConvert
-
-    var name: String {
-        return switch (self) {
-        case .openCC:
-            "OpenCC"
-        case .vxHanConvert:
-            "VXHanConvert"
-        }
-    }
-}
-
 @objc enum ChineseConversionStyle: Int {
     case output
     case model
