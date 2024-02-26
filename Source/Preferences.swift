@@ -115,7 +115,7 @@ struct EnumUserDefault<T: RawRepresentable> {
             return defaultValue
         }
         set {
-            container.set(newValue, forKey: key)
+            container.set(newValue.rawValue, forKey: key)
         }
     }
 }

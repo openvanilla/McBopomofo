@@ -179,7 +179,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (void)syncWithPreferences
 {
-    NSInteger layout = Preferences.keyboardLayout;
+    KeyboardLayout layout = Preferences.keyboardLayout;
     switch (layout) {
         case KeyboardLayoutStandard:
             _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
