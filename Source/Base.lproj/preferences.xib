@@ -334,7 +334,7 @@ when selecting candidats</string>
                 <constraint firstItem="3oc-Wl-pem" firstAttribute="top" secondItem="AvT-mU-HNg" secondAttribute="top" id="J26-55-kji"/>
                 <constraint firstItem="s4T-Mw-U2e" firstAttribute="top" secondItem="Frc-9z-VZe" secondAttribute="bottom" constant="10" id="L59-Rf-SnT"/>
                 <constraint firstItem="bhe-DC-FkH" firstAttribute="top" secondItem="YEO-Nr-Xri" secondAttribute="top" constant="26" id="L7s-Xm-LXg"/>
-                <constraint firstItem="Nma-j4-skB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="YEO-Nr-Xri" secondAttribute="leading" symbolic="YES" id="LCh-b8-xXg"/>
+                <constraint firstItem="Nma-j4-skB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="YEO-Nr-Xri" secondAttribute="leading" constant="20" symbolic="YES" id="LCh-b8-xXg"/>
                 <constraint firstItem="Pdz-c8-G89" firstAttribute="top" secondItem="UiH-9a-GF7" secondAttribute="bottom" constant="8" id="O2s-wX-T0t"/>
                 <constraint firstItem="Frc-9z-VZe" firstAttribute="leading" secondItem="YEO-Nr-Xri" secondAttribute="leading" constant="20" symbolic="YES" id="Obg-X1-fuW"/>
                 <constraint firstItem="iZs-U3-CJx" firstAttribute="top" secondItem="s4T-Mw-U2e" secondAttribute="bottom" constant="9" id="QWR-rt-HEb"/>
@@ -344,7 +344,7 @@ when selecting candidats</string>
                 <constraint firstItem="Pdz-c8-G89" firstAttribute="leading" secondItem="YEO-Nr-Xri" secondAttribute="leading" constant="232" id="Up9-ed-0dG"/>
                 <constraint firstItem="AvT-mU-HNg" firstAttribute="top" secondItem="Pdz-c8-G89" secondAttribute="bottom" constant="10" id="VgD-h8-weo"/>
                 <constraint firstItem="3oc-Wl-pem" firstAttribute="trailing" secondItem="Sp0-2u-7hi" secondAttribute="trailing" id="W0h-NP-ex7"/>
-                <constraint firstItem="bhe-DC-FkH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="YEO-Nr-Xri" secondAttribute="leading" symbolic="YES" id="YEV-YT-uQf"/>
+                <constraint firstItem="bhe-DC-FkH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="YEO-Nr-Xri" secondAttribute="leading" constant="20" symbolic="YES" id="YEV-YT-uQf"/>
                 <constraint firstItem="Pdz-c8-G89" firstAttribute="leading" secondItem="eBz-xC-fkE" secondAttribute="trailing" constant="14" id="Zb9-zd-PG9"/>
                 <constraint firstItem="s4T-Mw-U2e" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Sp0-2u-7hi" secondAttribute="trailing" constant="8" symbolic="YES" id="ayv-gh-1Fj"/>
                 <constraint firstItem="1UT-Vk-jJp" firstAttribute="trailing" secondItem="JFW-qA-UTv" secondAttribute="trailing" id="bir-NM-ZOw"/>
@@ -393,10 +393,10 @@ when selecting candidats</string>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <matrix verticalHuggingPriority="750" ambiguous="YES" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xwt-fe-fQG">
-                    <rect key="frame" x="243" y="99" width="213" height="38"/>
+                <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xwt-fe-fQG">
+                    <rect key="frame" x="243" y="98" width="214" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <size key="cellSize" width="213" height="18"/>
+                    <size key="cellSize" width="214" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="ojf-1B-dTG">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -418,12 +418,9 @@ when selecting candidats</string>
                         <binding destination="32" name="selectedTag" keyPath="values.ChineseConversionStyle" id="cnK-mJ-pCg"/>
                     </connections>
                 </matrix>
-                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="6u2-Su-7mb">
-                    <rect key="frame" x="20" y="42" width="437" height="5"/>
-                </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NGh-Dn-Qpf">
-                    <rect key="frame" x="241" y="19" width="161" height="18"/>
-                    <buttonCell key="cell" type="check" title="Ctrl + ` for Big 5 Code" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="9wE-js-xtM">
+                    <rect key="frame" x="241" y="41" width="128" height="18"/>
+                    <buttonCell key="cell" type="check" title="Input Big 5 Code" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="9wE-js-xtM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -431,17 +428,58 @@ when selecting candidats</string>
                         <binding destination="32" name="value" keyPath="values.Big5InputEnabled" id="0sV-29-JVt"/>
                     </connections>
                 </button>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tT1-Uf-Efn">
+                    <rect key="frame" x="134" y="70" width="103" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + Enter Key:" id="lrz-7F-6e5">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxC-Bs-SbF">
+                    <rect key="frame" x="156" y="42" width="81" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + `  Key:" id="F6Q-1k-YTn">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sHq-Tf-8nD">
+                    <rect key="frame" x="240" y="64" width="221" height="25"/>
+                    <popUpButtonCell key="cell" type="push" title="Off" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="bAf-tJ-tnK" id="dl4-pi-p7L">
+                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="menu"/>
+                        <menu key="menu" id="Nps-ru-fnW">
+                            <items>
+                                <menuItem title="Off" state="on" id="bAf-tJ-tnK"/>
+                                <menuItem title="Bopomofo Readings" tag="1" id="X6F-Wk-ZkH"/>
+                                <menuItem title="Taiwanese Braille" tag="2" id="JEj-fm-gxW"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <connections>
+                        <binding destination="32" name="selectedTag" keyPath="values.ControlEnterOutput" id="X6k-Nm-Z0a"/>
+                    </connections>
+                </popUpButton>
             </subviews>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="NGh-Dn-Qpf" secondAttribute="trailing" constant="75" id="5Ht-Dt-dKR"/>
-                <constraint firstItem="6u2-Su-7mb" firstAttribute="leading" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="20" symbolic="YES" id="F85-tW-oQT"/>
-                <constraint firstItem="wds-Zh-QHP" firstAttribute="leading" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="76" id="GYV-Ei-TBy"/>
-                <constraint firstItem="NGh-Dn-Qpf" firstAttribute="leading" secondItem="Xwt-fe-fQG" secondAttribute="leading" id="NXr-qF-ZHZ"/>
-                <constraint firstItem="wds-Zh-QHP" firstAttribute="top" secondItem="S2Y-nP-nn8" secondAttribute="top" constant="20" symbolic="YES" id="P39-Rs-be4"/>
-                <constraint firstAttribute="bottom" secondItem="NGh-Dn-Qpf" secondAttribute="bottom" constant="20" symbolic="YES" id="XcQ-vP-lvY"/>
-                <constraint firstItem="NGh-Dn-Qpf" firstAttribute="top" secondItem="6u2-Su-7mb" secondAttribute="bottom" constant="8" symbolic="YES" id="Y4H-g2-LHN"/>
-                <constraint firstAttribute="trailing" secondItem="6u2-Su-7mb" secondAttribute="trailing" constant="20" symbolic="YES" id="Zij-FW-FLR"/>
-                <constraint firstItem="Xwt-fe-fQG" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wds-Zh-QHP" secondAttribute="trailing" symbolic="YES" id="rRe-qT-xAw"/>
+                <constraint firstAttribute="trailing" secondItem="NGh-Dn-Qpf" secondAttribute="trailing" constant="108" id="0bO-dF-405"/>
+                <constraint firstItem="wds-Zh-QHP" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="20" symbolic="YES" id="2n0-mf-Dgi"/>
+                <constraint firstItem="wds-Zh-QHP" firstAttribute="top" secondItem="S2Y-nP-nn8" secondAttribute="top" constant="20" symbolic="YES" id="6Bt-aJ-kfb"/>
+                <constraint firstItem="Xwt-fe-fQG" firstAttribute="leading" secondItem="wds-Zh-QHP" secondAttribute="trailing" constant="8" symbolic="YES" id="B7g-vL-ZUl"/>
+                <constraint firstItem="wds-Zh-QHP" firstAttribute="top" secondItem="Xwt-fe-fQG" secondAttribute="top" id="CQf-GR-EhY"/>
+                <constraint firstItem="OxC-Bs-SbF" firstAttribute="trailing" secondItem="wds-Zh-QHP" secondAttribute="trailing" id="H0p-LE-u7d"/>
+                <constraint firstItem="sHq-Tf-8nD" firstAttribute="centerX" secondItem="Xwt-fe-fQG" secondAttribute="centerX" id="T0q-m6-K4g"/>
+                <constraint firstItem="OxC-Bs-SbF" firstAttribute="top" secondItem="tT1-Uf-Efn" secondAttribute="bottom" constant="12" id="T9I-Ao-XJc"/>
+                <constraint firstItem="sHq-Tf-8nD" firstAttribute="top" secondItem="tT1-Uf-Efn" secondAttribute="top" constant="-2" id="UZc-gi-Mzk"/>
+                <constraint firstItem="OxC-Bs-SbF" firstAttribute="leading" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="158" id="VKa-Dw-QPJ"/>
+                <constraint firstItem="OxC-Bs-SbF" firstAttribute="trailing" secondItem="tT1-Uf-Efn" secondAttribute="trailing" id="a0r-gb-nGL"/>
+                <constraint firstItem="NGh-Dn-Qpf" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="OxC-Bs-SbF" secondAttribute="trailing" constant="8" symbolic="YES" id="j9j-GL-5FK"/>
+                <constraint firstItem="sHq-Tf-8nD" firstAttribute="leading" secondItem="NGh-Dn-Qpf" secondAttribute="leading" id="sqB-9s-KL0"/>
+                <constraint firstItem="tT1-Uf-Efn" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="S2Y-nP-nn8" secondAttribute="leading" constant="20" symbolic="YES" id="tUQ-lk-I7D"/>
+                <constraint firstAttribute="trailing" secondItem="sHq-Tf-8nD" secondAttribute="trailing" constant="20" symbolic="YES" id="xd4-JD-UTu"/>
+                <constraint firstItem="OxC-Bs-SbF" firstAttribute="baseline" secondItem="NGh-Dn-Qpf" secondAttribute="baseline" id="y5w-3S-Tzr"/>
+                <constraint firstAttribute="bottom" secondItem="OxC-Bs-SbF" secondAttribute="bottom" constant="42" id="yVu-vP-IwN"/>
             </constraints>
             <point key="canvasLocation" x="129.5" y="-159"/>
         </view>
