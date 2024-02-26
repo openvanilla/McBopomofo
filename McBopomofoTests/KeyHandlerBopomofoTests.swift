@@ -44,22 +44,22 @@ class KeyHandlerBopomofoTests: XCTestCase {
 
     func testSyncWithPreferences() {
         let savedKeyboardLayout = Preferences.keyboardLayout
-        Preferences.keyboardLayout = 0
+        Preferences.keyboardLayout = .standard
         handler.syncWithPreferences()
 
-        Preferences.keyboardLayout = 1
+        Preferences.keyboardLayout = .eten
         handler.syncWithPreferences()
 
-        Preferences.keyboardLayout = 2
+        Preferences.keyboardLayout = .hsu
         handler.syncWithPreferences()
 
-        Preferences.keyboardLayout = 3
+        Preferences.keyboardLayout = .eten26
         handler.syncWithPreferences()
 
-        Preferences.keyboardLayout = 4
+        Preferences.keyboardLayout = .hanyuPinyin
         handler.syncWithPreferences()
 
-        Preferences.keyboardLayout = 5
+        Preferences.keyboardLayout = .IBM
         handler.syncWithPreferences()
 
         Preferences.keyboardLayout = savedKeyboardLayout
