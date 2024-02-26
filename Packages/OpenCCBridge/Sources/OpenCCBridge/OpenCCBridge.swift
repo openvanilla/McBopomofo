@@ -51,9 +51,9 @@ public class OpenCCBridge: NSObject {
 
     /// Converts to Traditional Chinese.
     ///
-    /// - Parameter string: Text in Traditional Chinese.
-    /// - Returns: Text in Simplified Chinese.
-    @objc public func convertTraditional(_ string: String) -> String? {
+    /// - Parameter string: Text in Simplified Chinese.
+    /// - Returns: Text in Traditional Chinese.
+    @objc public func convertToTraditional(_ string: String) -> String? {
         s2t?.convert(string)
     }
 }
