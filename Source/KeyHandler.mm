@@ -1229,7 +1229,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL isCursorMovingKey =
         (Preferences.allowMovingCursorWhenChoosingCandidates && ([input.inputText isEqualToString:@"j"] || [input.inputText isEqualToString:@"k"])) ||
-        (input.isShiftHold && (input.isLeft || input.isRight ));
+        (input.isShiftHold && (input.isLeft || input.isRight));
 
     if ([state isKindOfClass:[InputStateChoosingCandidate class]] && isCursorMovingKey) {
         if ([input.inputText isEqualToString:@"j"] || (input.isLeft && input.isShiftHold)
@@ -1860,8 +1860,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt];
         [candidatesArray addObject:candidate];
     }
+    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
 
-    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:_grid->cursor() candidates:candidatesArray useVerticalMode:useVerticalMode];
+    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:inputting.composingBuffer cursorIndex:inputting.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
     return state;
 }
 
