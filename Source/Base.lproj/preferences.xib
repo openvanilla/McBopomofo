@@ -453,7 +453,8 @@ when selecting candidats</string>
                             <items>
                                 <menuItem title="Off" state="on" id="bAf-tJ-tnK"/>
                                 <menuItem title="Bopomofo Readings" tag="1" id="X6F-Wk-ZkH"/>
-                                <menuItem title="Taiwanese Braille" tag="2" id="JEj-fm-gxW"/>
+                                <menuItem title="HTML Ruby" tag="2" id="ZwE-fD-480"/>
+                                <menuItem title="Taiwanese Braille" tag="3" id="JEj-fm-gxW"/>
                             </items>
                         </menu>
                     </popUpButtonCell>

@@ -436,7 +436,8 @@
                             <items>
                                 <menuItem title="關閉" state="on" id="4VD-Kh-SxN"/>
                                 <menuItem title="注音符號" tag="1" id="eyd-n5-aYf"/>
-                                <menuItem title="台灣點字" tag="2" id="xYc-er-OPo"/>
+                                <menuItem title="HTML旁注標記" tag="2" id="fS8-3m-elO"/>
+                                <menuItem title="台灣點字" tag="3" id="xYc-er-OPo"/>
                             </items>
                         </menu>
                     </popUpButtonCell>

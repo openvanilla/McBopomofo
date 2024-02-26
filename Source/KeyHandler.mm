@@ -598,13 +598,30 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // MARK: Enter
     if (charCode == 13) {
         if (_inputMode == InputModeBopomofo && input.isControlHold) {
-            if (Preferences.controlEnterOutput == ControlEnterOutputBpmfReading) {
-                return [self _handleCtrlEnterBpmfReadingWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            NSString *string = @"";
+            if (Preferences.controlEnterOutput == ControlEnterOutputOff) {
+                errorCallback();
+                return YES;
             }
-            if (Preferences.controlEnterOutput == ControlEnterOutputBraille) {
-                return [self _handleCtrlEnterBrailleWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            switch (Preferences.controlEnterOutput) {
+                case ControlEnterOutputBpmfReading:
+                    string = [self _currentBpmfReading];
+                    break;
+                case ControlEnterOutputHtmlRuby:
+                    string = [self _currentHtmlRuby];
+                    break;
+                case ControlEnterOutputBraille:
+                    string = [self _currentBraille];
+                    break;
+                default:
+                    break;
             }
-            errorCallback();
+            [self clear];
+
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+            stateCallback(committing);
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
             return YES;
         }
         if (_inputMode == InputModeBopomofo &&
@@ -1027,29 +1044,38 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
-- (BOOL)_handleCtrlEnterBpmfReadingWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (NSString *)_currentBpmfReading
 {
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
-    }
-
     NSArray *readings = [self _currentReadings];
     NSString *composingBuffer = [readings componentsJoinedByString:@"-"];
-
-    [self clear];
-
-    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-    stateCallback(committing);
-    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-    stateCallback(empty);
-    return YES;
+    return composingBuffer;
 }
 
-- (BOOL)_handleCtrlEnterBrailleWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (NSString *)_currentHtmlRuby
 {
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
+    std::string composed;
+    for (const auto& node : _latestWalk.nodes) {
+        std::string key = node->reading();
+        std::replace(key.begin(), key.end(), '-', ' ');
+        std::string value = node->value();
+
+        // If a key starts with underscore, it is usually for a punctuation or a
+        // symbol but not a Bopomofo reading, so we just ignore such case.
+        if (key.rfind(std::string("_"), 0) == 0) {
+            composed += value;
+        } else {
+            composed += "<ruby>";
+            composed += value;
+            composed += "<rp>(</rp><rt>" + key + "</rt><rp>)</rp>";
+            composed += "</ruby>";
+        }
     }
+    return [NSString stringWithUTF8String:composed.c_str()];
+}
+
+
+- (NSString *)_currentBraille
+{
     NSMutableString *composingBuffer = [[NSMutableString alloc] init];
     for (const auto& node : _latestWalk.nodes) {
         std::string value = node->currentUnigram().value();
@@ -1074,14 +1100,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [composingBuffer appendString:converted];
         }
     }
-
-    [self clear];
-
-    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-    stateCallback(committing);
-    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-    stateCallback(empty);
-    return YES;
+    return composingBuffer;
 }
 
 

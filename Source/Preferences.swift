@@ -386,7 +386,8 @@ extension Preferences {
 @objc enum ControlEnterOutput: Int {
     case off = 0
     case bpmfReading = 1
-    case braille = 2
+    case htmlRuby = 2
+    case braille = 3
 }
 
 extension Preferences {
