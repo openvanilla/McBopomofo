@@ -183,6 +183,8 @@ class InputState: NSObject {
         override init() {
             self.menu = self.macros.map { macro in
                 InputMacroController.shared.handle(macro)
+            }.filter { string in
+                !string.isEmpty
             }
         }
 
