@@ -307,7 +307,7 @@ extension McBopomofoInputMethodController {
             if !Preferences.chineseConversionEnabled {
                 return text
             }
-            if Preferences.chineseConversionStyle == 1 {
+            if Preferences.chineseConversionStyle == .model {
                 return text
             }
             return OpenCCBridge.shared.convertToSimplified(text) ?? ""
@@ -811,7 +811,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 break
             }
         case let state as InputState.AssociatedPhrases:
-            let scToTc = Preferences.chineseConversionEnabled && Preferences.chineseConversionStyle == 1
+            let scToTc = Preferences.chineseConversionEnabled && Preferences.chineseConversionStyle == .model
             let selectedPhrase: String = {
                 let selectedPhrase = state.selectedPhrase
                 return if scToTc {

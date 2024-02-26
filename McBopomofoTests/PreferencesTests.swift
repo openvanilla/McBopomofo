@@ -60,14 +60,14 @@ class PreferencesTests: XCTestCase {
     }
 
     func testKeyboardLayout() {
-        XCTAssert(Preferences.keyboardLayout == 0)
-        Preferences.keyboardLayout = 1
-        XCTAssert(Preferences.keyboardLayout == 1)
+        XCTAssert(Preferences.keyboardLayout == .standard)
+        Preferences.keyboardLayout = .eten
+        XCTAssert(Preferences.keyboardLayout == .eten)
     }
 
     func testKeyboardLayoutName() {
         XCTAssert(Preferences.keyboardLayoutName == "Standard")
-        Preferences.keyboardLayout = 1
+        Preferences.keyboardLayout = .eten
         XCTAssert(Preferences.keyboardLayoutName == "ETen")
     }
 
@@ -176,9 +176,9 @@ class PreferencesTests: XCTestCase {
     }
 
     func testChineseConversionStyle() {
-        XCTAssert(Preferences.chineseConversionStyle == 0)
-        Preferences.chineseConversionStyle = 1
-        XCTAssert(Preferences.chineseConversionStyle == 1)
+        XCTAssert(Preferences.chineseConversionStyle == .output)
+        Preferences.chineseConversionStyle = .model
+        XCTAssert(Preferences.chineseConversionStyle == .model)
     }
 
 }

@@ -29,7 +29,8 @@ private let kBasisKeyboardLayoutPreferenceKey = "BasisKeyboardLayout"
 /// alphanumeric ("ASCII") input basic keyboard layout.
 private let kFunctionKeyKeyboardLayoutPreferenceKey = "FunctionKeyKeyboardLayout"
 /// whether include shift.
-private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey = "FunctionKeyKeyboardLayoutOverrideIncludeShift"
+private let kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey =
+    "FunctionKeyKeyboardLayoutOverrideIncludeShift"
 private let kCandidateListTextSizeKey = "CandidateListTextSize"
 private let kSelectPhraseAfterCursorAsCandidateKey = "SelectPhraseAfterCursorAsCandidate"
 private let kMoveCursorAfterSelectingCandidateKey = "MoveCursorAfterSelectingCandidate"
@@ -160,7 +161,7 @@ struct CandidateListTextSize {
     case IBM = 5
 
     var name: String {
-        return switch (self) {
+        return switch self {
         case .standard:
             "Standard"
         case .eten:
@@ -182,7 +183,7 @@ struct CandidateListTextSize {
     case model
 
     var name: String {
-        return switch (self) {
+        return switch self {
         case .output:
             "output"
         case .model:
@@ -195,41 +196,43 @@ struct CandidateListTextSize {
 
 class Preferences: NSObject {
     static var allKeys: [String] {
-        [kKeyboardLayoutPreferenceKey,
-         kBasisKeyboardLayoutPreferenceKey,
-         kFunctionKeyKeyboardLayoutPreferenceKey,
-         kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey,
-         kCandidateListTextSizeKey,
-         kSelectPhraseAfterCursorAsCandidateKey,
-         kUseHorizontalCandidateListPreferenceKey,
-         kChooseCandidateUsingSpaceKey,
-         kChineseConversionEnabledKey,
-         kHalfWidthPunctuationEnabledKey,
-         kEscToCleanInputBufferKey,
-         kKeepReadingUponCompositionError,
-         kCandidateTextFontName,
-         kCandidateKeyLabelFontName,
-         kCandidateKeys,
-         kPhraseReplacementEnabledKey,
-         kChineseConversionStyleKey,
-         kAssociatedPhrasesEnabledKey,
-         kControlEnterOutputKey,
-         kUseCustomUserPhraseLocation,
-         kCustomUserPhraseLocation]
+        [
+            kKeyboardLayoutPreferenceKey,
+            kBasisKeyboardLayoutPreferenceKey,
+            kFunctionKeyKeyboardLayoutPreferenceKey,
+            kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey,
+            kCandidateListTextSizeKey,
+            kSelectPhraseAfterCursorAsCandidateKey,
+            kUseHorizontalCandidateListPreferenceKey,
+            kChooseCandidateUsingSpaceKey,
+            kChineseConversionEnabledKey,
+            kHalfWidthPunctuationEnabledKey,
+            kEscToCleanInputBufferKey,
+            kKeepReadingUponCompositionError,
+            kCandidateTextFontName,
+            kCandidateKeyLabelFontName,
+            kCandidateKeys,
+            kPhraseReplacementEnabledKey,
+            kChineseConversionStyleKey,
+            kAssociatedPhrasesEnabledKey,
+            kControlEnterOutputKey,
+            kUseCustomUserPhraseLocation,
+            kCustomUserPhraseLocation,
+        ]
     }
 
-
-    @UserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: 0)
-    @objc static var keyboardLayout: Int
+    @EnumUserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: KeyboardLayout.standard)
+    @objc static var keyboardLayout: KeyboardLayout
 
     @objc static var keyboardLayoutName: String {
-        (KeyboardLayout(rawValue: keyboardLayout) ?? KeyboardLayout.standard).name
+        keyboardLayout.name
     }
 
     @UserDefault(key: kBasisKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
     @objc static var basisKeyboardLayout: String
 
-    @UserDefault(key: kFunctionKeyKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
+    @UserDefault(
+        key: kFunctionKeyKeyboardLayoutPreferenceKey, defaultValue: "com.apple.keylayout.US")
     @objc static var functionKeyboardLayout: String
 
     @UserDefault(key: kFunctionKeyKeyboardLayoutOverrideIncludeShiftKey, defaultValue: false)
@@ -326,15 +329,18 @@ class Preferences: NSObject {
             case .empty:
                 return NSLocalizedString("Candidates keys cannot be empty.", comment: "")
             case .invalidCharacters:
-                return NSLocalizedString("Candidate keys can only contain Latin characters and numbers.", comment: "")
+                return NSLocalizedString(
+                    "Candidate keys can only contain Latin characters and numbers.", comment: "")
             case .containSpace:
                 return NSLocalizedString("Candidate keys cannot contain space.", comment: "")
             case .duplicatedCharacters:
                 return NSLocalizedString("There should not be duplicated keys.", comment: "")
             case .tooShort:
-                return NSLocalizedString("Candidate keys cannot be shorter than 4 characters.", comment: "")
+                return NSLocalizedString(
+                    "Candidate keys cannot be shorter than 4 characters.", comment: "")
             case .tooLong:
-                return NSLocalizedString("Candidate keys cannot be longer than 15 characters.", comment: "")
+                return NSLocalizedString(
+                    "Candidate keys cannot be longer than 15 characters.", comment: "")
             }
         }
     }
@@ -350,11 +356,11 @@ extension Preferences {
     ///
     /// - 0: convert the output
     /// - 1: convert the phrase models.
-    @UserDefault(key: kChineseConversionStyleKey, defaultValue: 0)
-    @objc static var chineseConversionStyle: Int
+    @EnumUserDefault(key: kChineseConversionStyleKey, defaultValue: ChineseConversionStyle.output)
+    @objc static var chineseConversionStyle: ChineseConversionStyle
 
-    @objc static var chineseConversionStyleName: String? {
-        ChineseConversionStyle(rawValue: chineseConversionStyle)?.name
+    @objc static var chineseConversionStyleName: String {
+        chineseConversionStyle.name
     }
 }
 
@@ -376,7 +382,6 @@ extension Preferences {
         return associatedPhrasesEnabled
     }
 }
-
 
 @objc enum ControlEnterOutput: Int {
     case off = 0
@@ -402,14 +407,16 @@ extension Preferences {
 
 @objc class UserPhraseLocationHelper: NSObject {
     @objc static var defaultUserPhraseLocation: String {
-        let paths = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
+        let paths = NSSearchPathForDirectoriesInDomains(
+            .applicationSupportDirectory, .userDomainMask, true)
         let appSupportPath = paths.first!
         return (appSupportPath as NSString).appendingPathComponent("McBopomofo")
     }
 }
 
 extension NSNotification.Name {
-    static var userPhraseLocationDidChange = NSNotification.Name(rawValue: "UserPhraseLocationDidChangeNotification")
+    static var userPhraseLocationDidChange = NSNotification.Name(
+        rawValue: "UserPhraseLocationDidChangeNotification")
 }
 
 extension Preferences {
@@ -424,9 +431,11 @@ extension Preferences {
             }
             return customUserPhraseLocation
         }()
-        let notification = Notification(name: .userPhraseLocationDidChange, object: self, userInfo: [
-            "location": location
-        ])
+        let notification = Notification(
+            name: .userPhraseLocationDidChange, object: self,
+            userInfo: [
+                "location": location
+            ])
         NotificationQueue.default.dequeueNotifications(matching: notification, coalesceMask: 0)
         NotificationQueue.default.enqueue(notification, postingStyle: .now)
     }
@@ -446,7 +455,6 @@ extension Preferences {
     }
 }
 
-
 extension Preferences {
     static func defaultAddPhraseHookPath() -> String {
         let bundle = Bundle.main
@@ -457,7 +465,8 @@ extension Preferences {
     @UserDefault(key: kAddPhraseHookEnabledKey, defaultValue: false)
     @objc static var addPhraseHookEnabled: Bool
 
-    @UserDefaultWithFunction(key: kAddPhraseHookPath, defaultValueFunction: defaultAddPhraseHookPath)
+    @UserDefaultWithFunction(
+        key: kAddPhraseHookPath, defaultValueFunction: defaultAddPhraseHookPath)
     @objc static var addPhraseHookPath: String
 }
 

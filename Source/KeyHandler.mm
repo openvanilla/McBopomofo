@@ -125,7 +125,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
         newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
-    newLanguageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
+    newLanguageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == ChineseConversionStyleModel);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
@@ -203,7 +203,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
             Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
-    _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
+    _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == ChineseConversionStyleModel);
 }
 
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex useMoveCursorAfterSelectionSetting:(BOOL)flag
@@ -1801,7 +1801,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         // Create a tooltip to warn the user that their cursor is between two
         // readings (syllables) even if the cursor is not in the middle of a
         // composed string due to its being shorter than the number of readings.
-        if (valueCodePointCount < readingLength) {
+        if (valueCodePointCount != readingLength) {
             // builderCursor is guaranteed to be > 0. If it was 0, we wouldn't even
             // reach here due to runningCursor having already "caught up" with
             // builderCursor. It is also guaranteed to be less than the size of the
@@ -1928,7 +1928,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     BOOL scToTc = Preferences.chineseConversionEnabled &&
-            Preferences.chineseConversionStyle == 1;
+            Preferences.chineseConversionStyle == ChineseConversionStyleModel;
     if (scToTc) {
         key = [[OpenCCBridge sharedInstance] convertToTraditional:key];
     }

@@ -324,7 +324,9 @@ class InputState: NSObject {
                 return false
 
             }
-            if Preferences.chineseConversionStyle == 1 && Preferences.chineseConversionEnabled {
+            if Preferences.chineseConversionStyle == ChineseConversionStyle.model
+                && Preferences.chineseConversionEnabled
+            {
                 tooltip = NSLocalizedString(
                     "Model-based Chinese conversion is on. Not recommended to add user phrases.",
                     comment: "")
