@@ -118,12 +118,21 @@ class InputState: NSObject {
 
     @objc(InputStateSelectingFeature)
     class SelectingFeature: InputState, CandidateProvider {
-        var featureList: [(String, ()->InputState)] = [
-            (NSLocalizedString("Big5 Code", comment: ""), { .Big5(code:"") }),
+        var featureList: [(String, () -> InputState)] = [
+            (NSLocalizedString("Big5 Code", comment: ""), { .Big5(code: "") }),
             (NSLocalizedString("Date and Time", comment: ""), { .SelectingDateMacro() }),
-            (NSLocalizedString("Lowercase Chinese Numbers", comment: ""), {  .ChineseNumber(style:.lower, number: "") }),
-            (NSLocalizedString("Uppercase Chinese Numbers", comment: ""), {  .ChineseNumber(style:.upper, number: "") }),
-            (NSLocalizedString("Suzhou Numbers", comment: ""), {  .ChineseNumber(style:.suzhou, number: "") }),
+            (
+                NSLocalizedString("Lowercase Chinese Numbers", comment: ""),
+                { .ChineseNumber(style: .lower, number: "") }
+            ),
+            (
+                NSLocalizedString("Uppercase Chinese Numbers", comment: ""),
+                { .ChineseNumber(style: .upper, number: "") }
+            ),
+            (
+                NSLocalizedString("Suzhou Numbers", comment: ""),
+                { .ChineseNumber(style: .suzhou, number: "") }
+            ),
         ]
 
         override var description: String {
@@ -166,10 +175,10 @@ class InputState: NSObject {
             "MACRO@TIME_NOW_SHORT",
             "MACRO@TIME_NOW_MEDIUM",
             "MACRO@THIS_YEAR_GANZHI",
-            "MACRO@THIS_YEAR_CHINESE_ZODIAC"
+            "MACRO@THIS_YEAR_CHINESE_ZODIAC",
         ]
 
-        private (set) var menu: [String]
+        private(set) var menu: [String]
 
         override init() {
             self.menu = self.macros.map { macro in
@@ -245,7 +254,6 @@ class InputState: NSObject {
         }
     }
 
-
     // MARK: -
 
     /// Represents that the composing buffer is not empty.
@@ -276,10 +284,12 @@ class InputState: NSObject {
         }
 
         @objc var attributedString: NSAttributedString {
-            let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .markedClauseSegment: 0
-            ])
+            let attributedSting = NSAttributedString(
+                string: composingBuffer,
+                attributes: [
+                    .underlineStyle: NSUnderlineStyle.single.rawValue,
+                    .markedClauseSegment: 0,
+                ])
             return attributedSting
         }
 
@@ -296,48 +306,86 @@ class InputState: NSObject {
     /// Represents that the user is marking a range in the composing buffer.
     @objc(InputStateMarking)
     class Marking: NotEmpty {
-
-        @objc private(set) var markerIndex: UInt
-        @objc private(set) var markedRange: NSRange
-        @objc var tooltip: String {
-
+        private func validate(tooltip: inout String) -> Bool {
+            /// McBopomofo allows users to input a string whose length differs
+            /// from the amount of Bopomofo readings. In this case, the range
+            /// in the composing buffer and the readings could not match, so
+            /// we disable the function to write user phrases in this case.
             if composingBuffer.count != readings.count {
-                return NSLocalizedString("Certain Unicode symbols or characters not supported as user phrases.", comment: "")
+                tooltip = NSLocalizedString(
+                    "Certain Unicode symbols or characters not supported as user phrases.",
+                    comment: "")
+                return false
             }
-
             if Preferences.phraseReplacementEnabled {
-                return NSLocalizedString("Phrase replacement mode is on. Not recommended to add user phrases.", comment: "")
+                tooltip = NSLocalizedString(
+                    "Phrase replacement mode is on. Not recommended to add user phrases.",
+                    comment: "")
+                return false
+
             }
             if Preferences.chineseConversionStyle == 1 && Preferences.chineseConversionEnabled {
-                return NSLocalizedString("Model-based Chinese conversion is on. Not recommended to add user phrases.", comment: "")
+                tooltip = NSLocalizedString(
+                    "Model-based Chinese conversion is on. Not recommended to add user phrases.",
+                    comment: "")
+                return false
             }
+
             if markedRange.length == 0 {
-                return ""
+                tooltip = ""
+                return false
             }
 
             let text = (composingBuffer as NSString).substring(with: markedRange)
             if markedRange.length < kMinMarkRangeLength {
-                return String(format: NSLocalizedString("Marking \"%@\": add a custom phrase by selecting two or more characters.", comment: ""), text)
-            } else if (markedRange.length > kMaxMarkRangeLength) {
-                return String(format: NSLocalizedString("The phrase being marked \"%@\" is longer than the allowed %d characters.", comment: ""), text, kMaxMarkRangeLength)
+                tooltip = String(
+                    format: NSLocalizedString(
+                        "Marking \"%@\": add a custom phrase by selecting two or more characters.",
+                        comment: ""), text)
+                return false
+            } else if markedRange.length > kMaxMarkRangeLength {
+                tooltip = String(
+                    format: NSLocalizedString(
+                        "The phrase being marked \"%@\" is longer than the allowed %d characters.",
+                        comment: ""), text, kMaxMarkRangeLength)
+                return false
             }
 
-            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
-            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
+                from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
+                from: markedRange.location + markedRange.length)
             let selectedReadings = readings[exactBegin..<exactEnd]
+
             let joined = selectedReadings.joined(separator: "-")
             let exist = LanguageModelManager.checkIfExist(userPhrase: text, key: joined)
             if exist {
-                return String(format: NSLocalizedString("The phrase being marked \"%@\" already exists.", comment: ""), text)
+                tooltip = String(
+                    format: NSLocalizedString(
+                        "The phrase being marked \"%@\" already exists.", comment: ""), text)
+                return false
             }
 
-            return String(format: NSLocalizedString("Marking \"%@\". Press Enter to add it as a new phrase.", comment: ""), text)
+            tooltip = String(
+                format: NSLocalizedString(
+                    "Marking \"%@\". Press Enter to add it as a new phrase.", comment: ""), text)
+            return true
+        }
+
+        @objc private(set) var markerIndex: UInt
+        @objc private(set) var markedRange: NSRange
+        @objc var tooltip: String {
+            var tooltip = ""
+            _ = validate(tooltip: &tooltip)
+            return tooltip
         }
 
         @objc var tooltipForInputting: String = ""
         @objc private(set) var readings: [String]
 
-        @objc init(composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]) {
+        @objc init(
+            composingBuffer: String, cursorIndex: UInt, markerIndex: UInt, readings: [String]
+        ) {
             self.markerIndex = markerIndex
             let begin = min(cursorIndex, markerIndex)
             let end = max(cursorIndex, markerIndex)
@@ -350,18 +398,23 @@ class InputState: NSObject {
             let attributedSting = NSMutableAttributedString(string: composingBuffer)
             let end = markedRange.location + markedRange.length
 
-            attributedSting.setAttributes([
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .markedClauseSegment: 0
-            ], range: NSRange(location: 0, length: markedRange.location))
-            attributedSting.setAttributes([
-                .underlineStyle: NSUnderlineStyle.thick.rawValue,
-                .markedClauseSegment: 1
-            ], range: markedRange)
-            attributedSting.setAttributes([
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .markedClauseSegment: 2
-            ], range: NSRange(location: end,
+            attributedSting.setAttributes(
+                [
+                    .underlineStyle: NSUnderlineStyle.single.rawValue,
+                    .markedClauseSegment: 0,
+                ], range: NSRange(location: 0, length: markedRange.location))
+            attributedSting.setAttributes(
+                [
+                    .underlineStyle: NSUnderlineStyle.thick.rawValue,
+                    .markedClauseSegment: 1,
+                ], range: markedRange)
+            attributedSting.setAttributes(
+                [
+                    .underlineStyle: NSUnderlineStyle.single.rawValue,
+                    .markedClauseSegment: 2,
+                ],
+                range: NSRange(
+                    location: end,
                     length: (composingBuffer as NSString).length - end))
             return attributedSting
         }
@@ -377,25 +430,8 @@ class InputState: NSObject {
         }
 
         @objc var validToWrite: Bool {
-            /// McBopomofo allows users to input a string whose length differs
-            /// from the amount of Bopomofo readings. In this case, the range
-            /// in the composing buffer and the readings could not match, so
-            /// we disable the function to write user phrases in this case.
-            if composingBuffer.count != readings.count {
-                return false
-            }
-            if markedRange.length < kMinMarkRangeLength {
-                return false
-            }
-            if markedRange.length > kMaxMarkRangeLength {
-                return false
-            }
-            let text = (composingBuffer as NSString).substring(with: markedRange)
-            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
-            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
-            let selectedReadings = readings[exactBegin..<exactEnd]
-            let joined = selectedReadings.joined(separator: "-")
-            return LanguageModelManager.checkIfExist(userPhrase: text, key: joined) == false
+            var tooltip = ""
+            return validate(tooltip: &tooltip)
         }
 
         @objc var selectedText: String {
@@ -404,8 +440,10 @@ class InputState: NSObject {
 
         @objc var userPhrase: String {
             let text = (composingBuffer as NSString).substring(with: markedRange)
-            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location)
-            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(from: markedRange.location + markedRange.length)
+            let (exactBegin, _) = (composingBuffer as NSString).characterIndex(
+                from: markedRange.location)
+            let (exactEnd, _) = (composingBuffer as NSString).characterIndex(
+                from: markedRange.location + markedRange.length)
             let selectedReadings = readings[exactBegin..<exactEnd]
             let joined = selectedReadings.joined(separator: "-")
             return "\(text) \(joined)"
@@ -434,7 +472,10 @@ class InputState: NSObject {
         @objc private(set) var useVerticalMode: Bool
         @objc var originalCursorIndex: UInt
 
-        @objc init(composingBuffer: String, cursorIndex: UInt, candidates: [Candidate], useVerticalMode: Bool) {
+        @objc init(
+            composingBuffer: String, cursorIndex: UInt, candidates: [Candidate],
+            useVerticalMode: Bool
+        ) {
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
             self.originalCursorIndex = cursorIndex
@@ -442,10 +483,12 @@ class InputState: NSObject {
         }
 
         @objc var attributedString: NSAttributedString {
-            let attributedSting = NSAttributedString(string: composingBuffer, attributes: [
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .markedClauseSegment: 0
-            ])
+            let attributedSting = NSAttributedString(
+                string: composingBuffer,
+                attributes: [
+                    .underlineStyle: NSUnderlineStyle.single.rawValue,
+                    .markedClauseSegment: 0,
+                ])
             return attributedSting
         }
 
@@ -477,14 +520,19 @@ class InputState: NSObject {
         @objc private(set) var candidates: [Candidate] = []
         @objc private(set) var useVerticalMode: Bool = false
 
-        @objc init(previousState: NotEmpty, selectedPhrase: String, selectedReading: String, selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool) {
+        @objc init(
+            previousState: NotEmpty, selectedPhrase: String, selectedReading: String,
+            selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool
+        ) {
             self.previousState = previousState
             self.selectedPhrase = selectedPhrase
             self.selectedReading = selectedReading
             self.selectedIndex = selectedIndex
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
-            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+            super.init(
+                composingBuffer: previousState.composingBuffer,
+                cursorIndex: previousState.cursorIndex)
         }
 
         override var description: String {
@@ -546,11 +594,17 @@ class InputState: NSObject {
             self.menu = DictionaryServices.shared.services.map { service in
                 service.textForMenu(selectedString: selectedString)
             }
-            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+            super.init(
+                composingBuffer: previousState.composingBuffer,
+                cursorIndex: previousState.cursorIndex)
         }
 
-        func lookUp(usingServiceAtIndex index: Int, state: InputState, stateCallback: (InputState) -> ()) -> Bool {
-            DictionaryServices.shared.lookUp(phrase: selectedPhrase, withServiceAtIndex: index, state: state, stateCallback: stateCallback)
+        func lookUp(
+            usingServiceAtIndex index: Int, state: InputState, stateCallback: (InputState) -> Void
+        ) -> Bool {
+            DictionaryServices.shared.lookUp(
+                phrase: selectedPhrase, withServiceAtIndex: index, state: state,
+                stateCallback: stateCallback)
         }
 
         override var description: String {
@@ -583,7 +637,9 @@ class InputState: NSObject {
             self.selectedPhrase = selectedString
             self.selectedIndex = selectedIndex
 
-            func buildItem(prefix: String, selectedString: String, builder: (String) -> String) -> (String, String) {
+            func buildItem(prefix: String, selectedString: String, builder: (String) -> String) -> (
+                String, String
+            ) {
                 let result = builder(selectedString)
                 return ("\(prefix): \(result)", result)
             }
@@ -603,31 +659,45 @@ class InputState: NSObject {
             }
 
             self.menuTitleValueMapping = [
-                buildItem(prefix: "UTF-8 HEX", selectedString: selectedPhrase, builder: { string in
-                    string.map { c in
-                        "0x" + c.utf8.map { String(format: "%02x", $0).uppercased() }.joined()
-                    }.joined(separator: " ")
-                }),
-                buildItem(prefix: "UTF-16 HEX", selectedString: selectedPhrase, builder: { string in
-                    string.map { c in
-                        "0x" + c.utf16.map { String(format: "%02x", $0).uppercased() }.joined()
-                    }.joined(separator: " ")
-                }),
-                buildItem(prefix: "URL Escape", selectedString: selectedPhrase, builder: { string in
-                    string.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                }),
-                buildItem(prefix: "Big5", selectedString: selectedPhrase, builder: { string in
-                    getCharCode(string: string, encoding: 0x0A06)
-                }),
-                buildItem(prefix: "GB2312", selectedString: selectedPhrase, builder: { string in
-                    getCharCode(string: string, encoding: 0x0631)
-                }),
-                buildItem(prefix: "Shift JIS", selectedString: selectedPhrase, builder: { string in
-                    getCharCode(string: string, encoding: 0x0A01)
-                }),
+                buildItem(
+                    prefix: "UTF-8 HEX", selectedString: selectedPhrase,
+                    builder: { string in
+                        string.map { c in
+                            "0x" + c.utf8.map { String(format: "%02x", $0).uppercased() }.joined()
+                        }.joined(separator: " ")
+                    }),
+                buildItem(
+                    prefix: "UTF-16 HEX", selectedString: selectedPhrase,
+                    builder: { string in
+                        string.map { c in
+                            "0x" + c.utf16.map { String(format: "%02x", $0).uppercased() }.joined()
+                        }.joined(separator: " ")
+                    }),
+                buildItem(
+                    prefix: "URL Escape", selectedString: selectedPhrase,
+                    builder: { string in
+                        string.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                    }),
+                buildItem(
+                    prefix: "Big5", selectedString: selectedPhrase,
+                    builder: { string in
+                        getCharCode(string: string, encoding: 0x0A06)
+                    }),
+                buildItem(
+                    prefix: "GB2312", selectedString: selectedPhrase,
+                    builder: { string in
+                        getCharCode(string: string, encoding: 0x0631)
+                    }),
+                buildItem(
+                    prefix: "Shift JIS", selectedString: selectedPhrase,
+                    builder: { string in
+                        getCharCode(string: string, encoding: 0x0A01)
+                    }),
             ]
             self.menu = menuTitleValueMapping.map { $0.0 }
-            super.init(composingBuffer: previousState.composingBuffer, cursorIndex: previousState.cursorIndex)
+            super.init(
+                composingBuffer: previousState.composingBuffer,
+                cursorIndex: previousState.cursorIndex)
         }
 
         override var description: String {
