@@ -470,7 +470,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(inputting);
 
         if (_inputMode == InputModePlainBopomofo) {
-            InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateWithUseVerticalMode:input.useVerticalMode];
+            InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateFromInputtingState:inputting UseVerticalMode:input.useVerticalMode];
+
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
                 NSString *text = choosingCandidates.candidates.firstObject.value;
@@ -544,7 +545,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             Preferences.moveCursorAfterSelectingCandidate) {
             _grid->setCursor(originalCursorIndex - 1);
         }
-        InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateWithUseVerticalMode:input.useVerticalMode];
+        InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] UseVerticalMode:input.useVerticalMode];
         choosingCandidates.originalCursorIndex = originalCursorIndex;
         stateCallback(choosingCandidates);
         return YES;
@@ -675,7 +676,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 if (Preferences.selectPhraseAfterCursorAsCandidate) {
                     _grid->setCursor(originalCursorIndex - 1);
                 }
-                InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateStateWithUseVerticalMode:input.useVerticalMode];
+                InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] UseVerticalMode:input.useVerticalMode];
                 choosingCandidate.originalCursorIndex = originalCursorIndex;
                 stateCallback(choosingCandidate);
             } else { // If there is still unfinished bpmf reading, ignore the punctuation
@@ -752,7 +753,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    InputStateChoosingCandidate *candidateState = [self _buildCandidateStateWithUseVerticalMode:NO];
+    InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] UseVerticalMode:NO];
     NSArray *candidates = candidateState.candidates;
     if (candidates.count == 0) {
         errorCallback();
@@ -1140,7 +1141,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     stateCallback(inputting);
 
     if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
-        InputStateChoosingCandidate *candidateState = [self _buildCandidateStateWithUseVerticalMode:useVerticalMode];
+
+        InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] UseVerticalMode:useVerticalMode];
 
         if (candidateState.candidates.count == 1) {
             [self clear];
@@ -1269,7 +1271,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return YES;
             }
         }
-        InputState *newState = [self _buildCandidateStateWithUseVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
+        InputState *newState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] UseVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
         stateCallback(newState);
         return YES;
     }
@@ -1851,7 +1853,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     _latestWalk = _grid->walk();
 }
 
-- (InputStateChoosingCandidate *)_buildCandidateStateWithUseVerticalMode:(BOOL)useVerticalMode
+- (InputStateChoosingCandidate *)_buildCandidateStateFromInputtingState:(InputStateInputting *)inputting   UseVerticalMode:(BOOL)useVerticalMode
 {
     auto candidates = _grid->candidatesAt(self.actualCandidateCursorIndex);
 
@@ -1878,7 +1880,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         [candidatesArray addObject:candidate];
     }
 
-    InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:inputting.composingBuffer cursorIndex:inputting.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
     return state;
 }
