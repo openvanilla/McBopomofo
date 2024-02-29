@@ -413,6 +413,7 @@
 綼 ㄅㄟ bei 1o big5
 鵯 ㄅㄟ bei 1o big5
 藣 ㄅㄟ bei 1o big5
+埤 ㄅㄟ bei 1o big5
 北 ㄅㄟˇ bei3 1o3 big5
 被 ㄅㄟˋ bei4 1o4 big5
 備 ㄅㄟˋ bei4 1o4 big5
@@ -7963,6 +7964,7 @@
 鷿 ㄆㄧˋ pi4 qu4 big5
 髲 ㄆㄧˋ pi4 qu4 big5
 礔 ㄆㄧˋ pi4 qu4 big5
+埤 ㄆㄧˋ pi4 qu4 big5
 皮 ㄆㄧˊ pi2 qu6 big5
 疲 ㄆㄧˊ pi2 qu6 big5
 脾 ㄆㄧˊ pi2 qu6 big5
@@ -12702,6 +12704,7 @@
 崀 ㄌㄤˊ lang2 x;6 big5
 欴 ㄌㄤˊ lang2 x;6 big5
 嚕 ㄌㄨ lu xj big5
+擼 ㄌㄨ lu xj big5
 隴 ㄌㄨㄥˇ long3 xj/3 big5
 攏 ㄌㄨㄥˇ long3 xj/3 big5
 壟 ㄌㄨㄥˇ long3 xj/3 big5

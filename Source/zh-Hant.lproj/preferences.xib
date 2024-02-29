@@ -378,39 +378,6 @@
             <rect key="frame" x="0.0" y="0.0" width="436" height="163"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jAZ-sE-wLZ">
-                    <rect key="frame" x="57" y="81" width="121" height="16"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="中文簡繁轉換引擎：" id="8mX-v8-X1y">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="weE-qL-B2N">
-                    <rect key="frame" x="184" y="59" width="206" height="38"/>
-                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <size key="cellSize" width="206" height="18"/>
-                    <size key="intercellSpacing" width="4" height="2"/>
-                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="n0W-08-ZaS">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <cells>
-                        <column>
-                            <buttonCell type="radio" title="OpenCC" imagePosition="left" alignment="left" state="on" inset="2" id="oO6-Hv-B3l">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <buttonCell type="radio" title="古早香草簡繁轉換引擎" imagePosition="left" alignment="left" tag="1" inset="2" id="6B2-Ew-jR1">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                        </column>
-                    </cells>
-                    <connections>
-                        <binding destination="32" name="selectedTag" keyPath="values.ChineseConversionEngine" id="UmH-Rw-leg"/>
-                    </connections>
-                </matrix>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cks-CZ-m7g">
                     <rect key="frame" x="57" y="127" width="121" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="中文簡繁轉換模式：" id="bX9-g7-U8G">
@@ -449,7 +416,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bAc-Eh-8y4">
-                    <rect key="frame" x="182" y="19" width="234" height="18"/>
+                    <rect key="frame" x="182" y="19" width="191" height="18"/>
                     <buttonCell key="cell" type="check" title="使用 Ctrl + ` 輸入 Big5 內碼" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="29h-4W-Qux">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -460,19 +427,14 @@
                 </button>
             </subviews>
             <constraints>
-                <constraint firstItem="jAZ-sE-wLZ" firstAttribute="top" secondItem="weE-qL-B2N" secondAttribute="top" id="3y8-9T-Nr6"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="top" secondItem="PuO-lM-5fF" secondAttribute="top" id="9f0-yl-Lcg"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="BcQ-48-gwy"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="BiS-LY-BQX"/>
+                <constraint firstItem="bAc-Eh-8y4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="BwA-2r-Qx0"/>
                 <constraint firstAttribute="bottom" secondItem="bAc-Eh-8y4" secondAttribute="bottom" constant="20" symbolic="YES" id="Dj3-ff-uQI"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="NoS-nF-SDm"/>
-                <constraint firstItem="weE-qL-B2N" firstAttribute="top" secondItem="PuO-lM-5fF" secondAttribute="bottom" constant="8" symbolic="YES" id="QIb-oU-fsb"/>
                 <constraint firstAttribute="trailing" secondItem="cks-CZ-m7g" secondAttribute="trailing" constant="260" id="QRN-hI-wWF"/>
-                <constraint firstItem="jAZ-sE-wLZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="T5t-oz-400"/>
-                <constraint firstItem="bAc-Eh-8y4" firstAttribute="leading" secondItem="weE-qL-B2N" secondAttribute="leading" id="jAS-hU-8br"/>
-                <constraint firstItem="weE-qL-B2N" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="lRo-g5-LoD"/>
-                <constraint firstAttribute="trailing" secondItem="bAc-Eh-8y4" secondAttribute="trailing" constant="20" symbolic="YES" id="rUj-xd-ehx"/>
-                <constraint firstAttribute="trailing" secondItem="jAZ-sE-wLZ" secondAttribute="trailing" constant="260" id="zlq-Sd-uCb"/>
+                <constraint firstAttribute="trailing" secondItem="bAc-Eh-8y4" secondAttribute="trailing" constant="63" id="rUj-xd-ehx"/>
             </constraints>
             <point key="canvasLocation" x="651" y="-145.5"/>
         </view>

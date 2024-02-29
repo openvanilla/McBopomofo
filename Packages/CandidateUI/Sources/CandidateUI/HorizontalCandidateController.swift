@@ -140,19 +140,10 @@ fileprivate class HorizontalCandidateView: NSView {
             backgroundColor.setFill()
             NSBezierPath.fill(bounds)
         }
-
-        if #available(macOS 10.14, *) {
-            NSColor.separatorColor.setStroke()
-        } else {
-            NSColor.darkGray.setStroke()
-        }
-
         if let toolTip = toolTip {
             let tooltipFrame = NSRect(x: 0, y: 0, width: tooltipSize.width, height: tooltipSize.height)
             (toolTip as NSString).draw(in: tooltipFrame, withAttributes: keyLabelAttrDict)
         }
-
-        NSBezierPath.strokeLine(from: NSPoint(x: bounds.width, y: 0), to: NSPoint(x: bounds.width, y: bounds.height))
 
         var accuWidth: CGFloat = 0
         for index in 0..<elementWidths.count {

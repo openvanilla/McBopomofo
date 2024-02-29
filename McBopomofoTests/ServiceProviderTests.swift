@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import XCTest
+
 @testable import McBopomofo
 
 final class ServiceProviderTests: XCTestCase {
@@ -60,4 +61,60 @@ final class ServiceProviderTests: XCTestCase {
         let output = provider.extractReading(from: "！")
         XCTAssert(output == "_ctrl_punctuation_!", output)
     }
+
+    func testAddReading() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let input = "美好的朝陽"
+        let expected = "美(ㄇㄟˇ)好(ㄏㄠˇ)的(ㄉㄜ˙)朝(ㄓㄠ)陽(ㄧㄤˊ)"
+        let output = provider.addReading(string: input)
+        XCTAssert(output == expected, output)
+    }
+
+    func testTokenize1() {
+        let provider = ServiceProvider()
+        let output = provider.tokenize(string: "『『』『』『")
+        let expected = ["『", "『", "』", "『", "』", "『"]
+        XCTAssert(output == expected, "\(output)")
+    }
+
+    func testTokenize2() {
+        let provider = ServiceProvider()
+        let output = provider.tokenize(string: "『這樣可以嗎？』")
+        let expected = ["『", "這樣", "可以", "嗎", "？", "』"]
+        XCTAssert(output == expected, "\(output)")
+    }
+
+    func testAddReading2() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let input = "『這樣可以嗎？』我相當好奇的問了他，但是還是不知道他的意思"
+        let expected =
+            "『這(ㄓㄜˋ)樣(ㄧㄤˋ)可(ㄎㄜˇ)以(ㄧˇ)嗎(ㄇㄚ)？』我(ㄨㄛˇ)相(ㄒㄧㄤ)當(ㄉㄤ)好(ㄏㄠˋ)奇(ㄑㄧˊ)的(ㄉㄜ˙)問(ㄨㄣˋ)了(ㄌㄜ˙)他(ㄊㄚ)，但(ㄉㄢˋ)是(ㄕˋ)還(ㄏㄞˊ)是(ㄕˋ)不(ㄅㄨˊ)知(ㄓ)道(ㄉㄠˋ)他(ㄊㄚ)的(ㄉㄜ˙)意(ㄧˋ)思(ㄙ)"
+        let output = provider.addReading(string: input)
+        XCTAssert(output == expected, output)
+    }
+
+    func testConvertBrailleToChinese1() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "⠰⠤⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐⠤⠆"
+        let expected = "「台灣人最需要的就是消波塊」"
+        let output = provider.convertBrailleToChineseText(string: input)
+        XCTAssert(output == expected, output)
+    }
+
+    func testConvertBrailleToChinese2() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "⠰⠤⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐⠤⠆"
+        let expected = "「台灣人最需要的就是消波塊」"
+        let output = provider.convertBrailleToChineseText(string: input)
+        XCTAssert(output == expected, output)
+    }
+
 }

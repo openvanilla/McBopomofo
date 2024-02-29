@@ -138,13 +138,98 @@
 				<key>default</key>
 				<string>Add to McBopomofo User Phrases</string>
 			</dict>
-			<key>NSSendTypes</key>
-			<array>
-				<string>NSStringPboardType</string>
-			</array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
 			<key>NSRequiredContext</key>
 			<dict/>
 		</dict>
-	</array>
+        <dict>
+            <key>NSMessage</key>
+            <string>addReading</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Add Bopomofo Readings to Text</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>NSMessage</key>
+            <string>convertToReadings</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Convert Text to Bopomofo Readings</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>NSMessage</key>
+            <string>convertToBraille</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Convert Text to Taiwanese Braille</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>NSMessage</key>
+            <string>convertBrailleToChineseText</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Convert Taiwanese Braille to Text</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+    </array>
 </dict>
 </plist>
