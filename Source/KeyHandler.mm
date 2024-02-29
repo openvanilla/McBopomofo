@@ -40,8 +40,8 @@
 @import CandidateUI;
 @import NSStringUtils;
 @import OpenCCBridge;
-@import VXHanConvert;
 @import ChineseNumbers;
+@import BopomofoBraille;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
@@ -597,8 +597,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // MARK: Enter
     if (charCode == 13) {
-        if (input.isControlHold && Preferences.controlEnterOutput != 0) {
-            return [self _handleCtrlEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+        if (_inputMode == InputModeBopomofo && input.isControlHold) {
+            if (Preferences.controlEnterOutput == ControlEnterOutputBpmfReading) {
+                return [self _handleCtrlEnterBpmfReadingWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            }
+            if (Preferences.controlEnterOutput == ControlEnterOutputBraille) {
+                return [self _handleCtrlEnterBrailleWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            }
+            errorCallback();
+            return YES;
         }
         if (_inputMode == InputModeBopomofo &&
             input.isShiftHold &&
@@ -1022,7 +1029,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
-- (BOOL)_handleCtrlEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (BOOL)_handleCtrlEnterBpmfReadingWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
     if (![state isKindOfClass:[InputStateInputting class]]) {
         return NO;
@@ -1039,6 +1046,46 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     stateCallback(empty);
     return YES;
 }
+
+- (BOOL)_handleCtrlEnterBrailleWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+{
+    if (![state isKindOfClass:[InputStateInputting class]]) {
+        return NO;
+    }
+    NSMutableString *composingBuffer = [[NSMutableString alloc] init];
+    for (const auto& node : _latestWalk.nodes) {
+        std::string value = node->currentUnigram().value();
+        std::string reading = node->reading();
+        if (reading[0] == '_') {
+            NSString *punctuation = [[NSString alloc] initWithUTF8String:value.c_str()];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:punctuation];
+            [composingBuffer appendString:converted];
+        } else {
+            std::string delimiter = "-";
+            size_t pos = 0;
+            std::string token;
+            while ((pos = reading.find(delimiter)) != std::string::npos) {
+                token = reading.substr(0, pos);
+                NSString *tokenString = [[NSString alloc] initWithUTF8String:token.c_str()];
+                NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString];
+                [composingBuffer appendString:converted];
+                reading.erase(0, pos + delimiter.length());
+            }
+            NSString *tokenString = [[NSString alloc] initWithUTF8String:reading.c_str()];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString];
+            [composingBuffer appendString:converted];
+        }
+    }
+
+    [self clear];
+
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    stateCallback(committing);
+    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+    stateCallback(empty);
+    return YES;
+}
+
 
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
 {
@@ -1180,9 +1227,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || input.isDelete;
 
-    if ([state isKindOfClass:[InputStateChoosingCandidate class]] &&
-        Preferences.allowMovingCursorWhenChoosingCandidates
-        ) {
+    BOOL isCursorMovingKey =
+        (Preferences.allowMovingCursorWhenChoosingCandidates && ([input.inputText isEqualToString:@"j"] || [input.inputText isEqualToString:@"k"])) ||
+        (input.isShiftHold && (input.isLeft || input.isRight ));
+
+    if ([state isKindOfClass:[InputStateChoosingCandidate class]] && isCursorMovingKey) {
         if ([input.inputText isEqualToString:@"j"] || (input.isLeft && input.isShiftHold)
             ) {
             size_t cursor = _grid->cursor();
@@ -1193,12 +1242,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 errorCallback();
                 return YES;
             }
-            InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
-            stateCallback(newState);
-            return YES;
-        }
-
-        if ([input.inputText isEqualToString:@"k"]  || (input.isRight && input.isShiftHold)) {
+        } else if ([input.inputText isEqualToString:@"k"]  || (input.isRight && input.isShiftHold)) {
             size_t cursor = _grid->cursor();
             if (cursor < _grid->length()) {
                 cursor++;
@@ -1207,10 +1251,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 errorCallback();
                 return YES;
             }
-            InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
-            stateCallback(newState);
-            return YES;
         }
+        InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
+        stateCallback(newState);
+        return YES;
     }
 
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
@@ -1554,11 +1598,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             {
                 NSString *string = [ChineseNumbers generateWithIntPart:intPart decPart:decPart digitCase:ChineseNumbersCaseUppercase];
                 if (Preferences.chineseConversionEnabled) {
-                    if (Preferences.chineseConversionEngine == 0) {
-                        string = [OpenCCBridge.sharedInstance convertToSimplified:string];
-                    } else if (Preferences.chineseConversionEngine == 0) {
-                        string = [VXHanConvert convertToSimplifiedFrom:string];
-                    }
+                    string = [[OpenCCBridge sharedInstance] convertToSimplified:string];
                 }
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
                 stateCallback(committing);
@@ -1889,11 +1929,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     BOOL scToTc = Preferences.chineseConversionEnabled &&
             Preferences.chineseConversionStyle == 1;
     if (scToTc) {
-        if (Preferences.chineseConversionEngine == 1) {
-            key = [VXHanConvert convertToTraditionalFrom:key];
-        } else {
-            key = [[OpenCCBridge sharedInstance] convertTraditional:key];
-        }
+        key = [[OpenCCBridge sharedInstance] convertToTraditional:key];
     }
     std::string cppKey(key.UTF8String);
 
@@ -1904,11 +1940,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSString *item = @(phrase.c_str());
             NSString *diaplayText = [[NSString alloc] initWithString:item];
             if (scToTc) {
-                if (Preferences.chineseConversionEngine == 1) {
-                    diaplayText = [VXHanConvert convertToSimplifiedFrom:diaplayText];
-                } else {
-                    diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
-                }
+                diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
             }
             InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:@"" value:item displayText:diaplayText];
             [array addObject:candidate];

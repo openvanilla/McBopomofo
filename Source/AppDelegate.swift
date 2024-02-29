@@ -150,6 +150,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
     private var fsStreamHelper: FSEventStreamHelper?
+    private var serviceProvider = ServiceProvider()
+    private var serviceProviderHelper = ServiceProviderInputHelper()
 
     func updateUserPhrases() {
         NSLog("updateUserPhrases called \(LanguageModelManager.dataFolderPath)")
@@ -176,7 +178,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
             self.updateUserPhrases()
         }
 
-        NSApp.servicesProvider = ServiceProvider()
+        serviceProvider.delegate = (serviceProviderHelper as! any ServiceProviderDelegate)
+        NSApp.servicesProvider = serviceProvider
 
         checkForUpdate()
     }

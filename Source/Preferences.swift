@@ -46,7 +46,6 @@ private let kCandidateKeys = "CandidateKeys"
 private let kAllowMovingCursorWhenChoosingCandidates = "AllowMovingCursorWhenChoosingCandidates"
 
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
-private let kChineseConversionEngineKey = "ChineseConversionEngine"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
@@ -94,6 +93,25 @@ struct UserDefaultWithFunction<Value> {
     var wrappedValue: Value {
         get {
             container.object(forKey: key) as? Value ?? defaultValueFunction()
+        }
+        set {
+            container.set(newValue, forKey: key)
+        }
+    }
+}
+
+@propertyWrapper
+struct EnumUserDefault<T: RawRepresentable> {
+    let key: String
+    let defaultValue: T
+    var container: UserDefaults = .standard
+
+    var wrappedValue: T {
+        get {
+            if let value = container.object(forKey: key) as? T.RawValue {
+                return T(rawValue: value) ?? defaultValue
+            }
+            return defaultValue
         }
         set {
             container.set(newValue, forKey: key)
@@ -159,20 +177,6 @@ struct CandidateListTextSize {
     }
 }
 
-@objc enum ChineseConversionEngine: Int {
-    case openCC
-    case vxHanConvert
-
-    var name: String {
-        return switch (self) {
-        case .openCC:
-            "OpenCC"
-        case .vxHanConvert:
-            "VXHanConvert"
-        }
-    }
-}
-
 @objc enum ChineseConversionStyle: Int {
     case output
     case model
@@ -207,7 +211,6 @@ class Preferences: NSObject {
          kCandidateKeyLabelFontName,
          kCandidateKeys,
          kPhraseReplacementEnabledKey,
-         kChineseConversionEngineKey,
          kChineseConversionStyleKey,
          kAssociatedPhrasesEnabledKey,
          kControlEnterOutputKey,
@@ -343,17 +346,6 @@ class Preferences: NSObject {
 }
 
 extension Preferences {
-    /// The conversion engine.
-    ///
-    /// - 0: OpenCC
-    /// - 1: VXHanConvert
-    @UserDefault(key: kChineseConversionEngineKey, defaultValue: 0)
-    @objc static var chineseConversionEngine: Int
-
-    @objc static var chineseConversionEngineName: String? {
-        ChineseConversionEngine(rawValue: chineseConversionEngine)?.name
-    }
-
     /// The conversion style.
     ///
     /// - 0: convert the output
@@ -385,8 +377,14 @@ extension Preferences {
     }
 }
 
-extension Preferences {
 
+@objc enum ControlEnterOutput: Int {
+    case off = 0
+    case bpmfReading = 1
+    case braille = 2
+}
+
+extension Preferences {
     /// The behavior of pressing letter keys.
     ///
     /// - 0: Output upper-cased letters directly.
@@ -398,8 +396,8 @@ extension Preferences {
     ///
     /// - 0: Disabled.
     /// - 1: Output BPMF readings.
-    @UserDefault(key: kControlEnterOutputKey, defaultValue: 0)
-    @objc static var controlEnterOutput: Int
+    @EnumUserDefault(key: kControlEnterOutputKey, defaultValue: .off)
+    @objc static var controlEnterOutput: ControlEnterOutput
 }
 
 @objc class UserPhraseLocationHelper: NSObject {
