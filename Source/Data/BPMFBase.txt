@@ -697,6 +697,7 @@
 濱 ㄅㄧㄣ bin 1up big5
 彬 ㄅㄧㄣ bin 1up big5
 檳 ㄅㄧㄣ bin 1up big5
+殯 ㄅㄧㄣ bin 1up big5
 儐 ㄅㄧㄣ bin 1up big5
 斌 ㄅㄧㄣ bin 1up big5
 繽 ㄅㄧㄣ bin 1up big5
@@ -1862,7 +1863,6 @@
 貯 ㄓㄨˇ zhu3 5j3 big5
 渚 ㄓㄨˇ zhu3 5j3 big5
 矚 ㄓㄨˇ zhu3 5j3 big5
-著 ㄓㄨˇ zhu3 5j3 big5
 麈 ㄓㄨˇ zhu3 5j3 big5
 拄 ㄓㄨˇ zhu3 5j3 big5
 瘃 ㄓㄨˇ zhu3 5j3 big5
@@ -3789,6 +3789,7 @@
 坑 ㄎㄥ keng d/ big5
 硜 ㄎㄥ keng d/ big5
 鏗 ㄎㄥ keng d/ big5
+羥 ㄎㄥ keng d/ big5
 牼 ㄎㄥ keng d/ big5
 吭 ㄎㄥ keng d/ big5
 阬 ㄎㄥ keng d/ big5
@@ -4225,6 +4226,7 @@
 泔 ㄍㄢ gan e0 big5
 咁 ㄍㄢ gan e0 big5
 疳 ㄍㄢ gan e0 big5
+酐 ㄍㄢ gan e0 big5
 玕 ㄍㄢ gan e0 big5
 杆 ㄍㄢ gan e0 big5
 矸 ㄍㄢ gan e0 big5
@@ -5079,7 +5081,6 @@
 檶 ㄑㄧㄢ qian fu0 big5
 鐱 ㄑㄧㄢ qian fu0 big5
 婜 ㄑㄧㄢ qian fu0 big5
-羥 ㄑㄧㄢ qian fu0 big5
 攐 ㄑㄧㄢ qian fu0 big5
 攓 ㄑㄧㄢ qian fu0 big5
 譣 ㄑㄧㄢ qian fu0 big5
@@ -5287,6 +5288,7 @@
 強 ㄑㄧㄤˇ qiang3 fu;3 big5
 搶 ㄑㄧㄤˇ qiang3 fu;3 big5
 襁 ㄑㄧㄤˇ qiang3 fu;3 big5
+羥 ㄑㄧㄤˇ qiang3 fu;3 big5
 磢 ㄑㄧㄤˇ qiang3 fu;3 big5
 傸 ㄑㄧㄤˇ qiang3 fu;3 big5
 墏 ㄑㄧㄤˇ qiang3 fu;3 big5
@@ -7460,6 +7462,7 @@
 莎 ㄙㄨㄛ suo nji big5
 唆 ㄙㄨㄛ suo nji big5
 娑 ㄙㄨㄛ suo nji big5
+羧 ㄙㄨㄛ suo nji big5
 簑 ㄙㄨㄛ suo nji big5
 嗦 ㄙㄨㄛ suo nji big5
 傞 ㄙㄨㄛ suo nji big5
@@ -7569,6 +7572,7 @@
 嫂 ㄙㄠˇ sao3 nl3 big5
 埽 ㄙㄠˇ sao3 nl3 big5
 掃 ㄙㄠˋ sao4 nl4 big5
+燥 ㄙㄠˋ sao4 nl4 big5
 臊 ㄙㄠˋ sao4 nl4 big5
 氉 ㄙㄠˋ sao4 nl4 big5
 瘙 ㄙㄠˋ sao4 nl4 big5
@@ -8579,7 +8583,6 @@
 剄 ㄐㄧㄥˇ jing3 ru/3 big5
 璥 ㄐㄧㄥˇ jing3 ru/3 big5
 丼 ㄐㄧㄥˇ jing3 ru/3 big5
-烴 ㄐㄧㄥˇ jing3 ru/3 big5
 憼 ㄐㄧㄥˇ jing3 ru/3 big5
 暻 ㄐㄧㄥˇ jing3 ru/3 big5
 蟼 ㄐㄧㄥˇ jing3 ru/3 big5
@@ -12075,6 +12078,7 @@
 旲 ㄊㄞˊ tai2 w96 big5
 秮 ㄊㄞˊ tai2 w96 big5
 太 ㄊㄞ˙ tai5 w97 big5
+羰 ㄊㄤ tang w; big5
 湯 ㄊㄤ tang w; big5
 鏜 ㄊㄤ tang w; big5
 鼞 ㄊㄤ tang w; big5
@@ -12389,6 +12393,7 @@
 蛈 ㄊㄧㄝˋ tie4 wu,4 big5
 聽 ㄊㄧㄥ ting wu/ big5
 廳 ㄊㄧㄥ ting wu/ big5
+烴 ㄊㄧㄥ ting wu/ big5
 汀 ㄊㄧㄥ ting wu/ big5
 桯 ㄊㄧㄥ ting wu/ big5
 艼 ㄊㄧㄥ ting wu/ big5
@@ -14142,6 +14147,7 @@
 孚 ㄈㄨˊ fu2 zj6 big5
 袱 ㄈㄨˊ fu2 zj6 big5
 芙 ㄈㄨˊ fu2 zj6 big5
+佛 ㄈㄨˊ fu2 zj6 big5
 輻 ㄈㄨˊ fu2 zj6 big5
 蝠 ㄈㄨˊ fu2 zj6 big5
 匐 ㄈㄨˊ fu2 zj6 big5
