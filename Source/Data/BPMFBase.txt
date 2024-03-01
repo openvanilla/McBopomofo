@@ -3789,7 +3789,6 @@
 坑 ㄎㄥ keng d/ big5
 硜 ㄎㄥ keng d/ big5
 鏗 ㄎㄥ keng d/ big5
-羥 ㄎㄥ keng d/ big5
 牼 ㄎㄥ keng d/ big5
 吭 ㄎㄥ keng d/ big5
 阬 ㄎㄥ keng d/ big5
@@ -3798,6 +3797,7 @@
 娙 ㄎㄥ keng d/ big5
 挳 ㄎㄥ keng d/ big5
 鍞 ㄎㄥ keng d/ big5
+羥 ㄎㄥ keng d/ big5
 挳 ㄎㄥˇ keng3 d/3 big5
 刊 ㄎㄢ kan d0 big5
 堪 ㄎㄢ kan d0 big5
@@ -4226,7 +4226,6 @@
 泔 ㄍㄢ gan e0 big5
 咁 ㄍㄢ gan e0 big5
 疳 ㄍㄢ gan e0 big5
-酐 ㄍㄢ gan e0 big5
 玕 ㄍㄢ gan e0 big5
 杆 ㄍㄢ gan e0 big5
 矸 ㄍㄢ gan e0 big5
@@ -4236,6 +4235,7 @@
 鳱 ㄍㄢ gan e0 big5
 嵅 ㄍㄢ gan e0 big5
 苷 ㄍㄢ gan e0 big5e
+酐 ㄍㄢ gan e0 big5
 敢 ㄍㄢˇ gan3 e03 big5
 感 ㄍㄢˇ gan3 e03 big5
 趕 ㄍㄢˇ gan3 e03 big5
@@ -5288,11 +5288,11 @@
 強 ㄑㄧㄤˇ qiang3 fu;3 big5
 搶 ㄑㄧㄤˇ qiang3 fu;3 big5
 襁 ㄑㄧㄤˇ qiang3 fu;3 big5
-羥 ㄑㄧㄤˇ qiang3 fu;3 big5
 磢 ㄑㄧㄤˇ qiang3 fu;3 big5
 傸 ㄑㄧㄤˇ qiang3 fu;3 big5
 墏 ㄑㄧㄤˇ qiang3 fu;3 big5
 繈 ㄑㄧㄤˇ qiang3 fu;3 big5
+羥 ㄑㄧㄤˇ qiang3 fu;3 big5
 嗆 ㄑㄧㄤˋ qiang4 fu;4 big5
 羻 ㄑㄧㄤˋ qiang4 fu;4 big5
 唴 ㄑㄧㄤˋ qiang4 fu;4 big5
@@ -7462,7 +7462,6 @@
 莎 ㄙㄨㄛ suo nji big5
 唆 ㄙㄨㄛ suo nji big5
 娑 ㄙㄨㄛ suo nji big5
-羧 ㄙㄨㄛ suo nji big5
 簑 ㄙㄨㄛ suo nji big5
 嗦 ㄙㄨㄛ suo nji big5
 傞 ㄙㄨㄛ suo nji big5
@@ -7473,6 +7472,7 @@
 莏 ㄙㄨㄛ suo nji big5
 趖 ㄙㄨㄛ suo nji big5
 摍 ㄙㄨㄛ suo nji big5
+羧 ㄙㄨㄛ suo nji big5
 所 ㄙㄨㄛˇ suo3 nji3 big5
 索 ㄙㄨㄛˇ suo3 nji3 big5
 鎖 ㄙㄨㄛˇ suo3 nji3 big5
@@ -7572,10 +7572,10 @@
 嫂 ㄙㄠˇ sao3 nl3 big5
 埽 ㄙㄠˇ sao3 nl3 big5
 掃 ㄙㄠˋ sao4 nl4 big5
-燥 ㄙㄠˋ sao4 nl4 big5
 臊 ㄙㄠˋ sao4 nl4 big5
 氉 ㄙㄠˋ sao4 nl4 big5
 瘙 ㄙㄠˋ sao4 nl4 big5
+燥 ㄙㄠˋ sao4 nl4 big5
 森 ㄙㄣ sen np big5
 槮 ㄙㄣ sen np big5
 罧 ㄙㄣ sen np big5
@@ -12078,12 +12078,12 @@
 旲 ㄊㄞˊ tai2 w96 big5
 秮 ㄊㄞˊ tai2 w96 big5
 太 ㄊㄞ˙ tai5 w97 big5
-羰 ㄊㄤ tang w; big5
 湯 ㄊㄤ tang w; big5
 鏜 ㄊㄤ tang w; big5
 鼞 ㄊㄤ tang w; big5
 蹚 ㄊㄤ tang w; big5
 蝪 ㄊㄤ tang w; big5
+羰 ㄊㄤ tang w; big5
 倘 ㄊㄤˇ tang3 w;3 big5
 躺 ㄊㄤˇ tang3 w;3 big5
 儻 ㄊㄤˇ tang3 w;3 big5
@@ -12393,11 +12393,11 @@
 蛈 ㄊㄧㄝˋ tie4 wu,4 big5
 聽 ㄊㄧㄥ ting wu/ big5
 廳 ㄊㄧㄥ ting wu/ big5
-烴 ㄊㄧㄥ ting wu/ big5
 汀 ㄊㄧㄥ ting wu/ big5
 桯 ㄊㄧㄥ ting wu/ big5
 艼 ㄊㄧㄥ ting wu/ big5
 耵 ㄊㄧㄥ ting wu/ big5
+烴 ㄊㄧㄥ ting wu/ big5
 挺 ㄊㄧㄥˇ ting3 wu/3 big5
 艇 ㄊㄧㄥˇ ting3 wu/3 big5
 町 ㄊㄧㄥˇ ting3 wu/3 big5
@@ -14147,7 +14147,6 @@
 孚 ㄈㄨˊ fu2 zj6 big5
 袱 ㄈㄨˊ fu2 zj6 big5
 芙 ㄈㄨˊ fu2 zj6 big5
-佛 ㄈㄨˊ fu2 zj6 big5
 輻 ㄈㄨˊ fu2 zj6 big5
 蝠 ㄈㄨˊ fu2 zj6 big5
 匐 ㄈㄨˊ fu2 zj6 big5
@@ -14202,6 +14201,7 @@
 鵩 ㄈㄨˊ fu2 zj6 big5
 鶝 ㄈㄨˊ fu2 zj6 big5
 沸 ㄈㄨˊ fu2 zj6 big5
+佛 ㄈㄨˊ fu2 zj6 big5
 非 ㄈㄟ fei zo big5
 飛 ㄈㄟ fei zo big5
 菲 ㄈㄟ fei zo big5
