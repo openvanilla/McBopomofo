@@ -394,6 +394,7 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ⊿ _punctuation_list 0.0
 ∞ _punctuation_list 0.0
 √ _punctuation_list 0.0
+? _punctuation_list 0.0
 ┌ _punctuation_list 0.0
 ┬ _punctuation_list 0.0
 ┐ _punctuation_list 0.0

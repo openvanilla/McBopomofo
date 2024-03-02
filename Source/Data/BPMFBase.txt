@@ -697,7 +697,6 @@
 濱 ㄅㄧㄣ bin 1up big5
 彬 ㄅㄧㄣ bin 1up big5
 檳 ㄅㄧㄣ bin 1up big5
-殯 ㄅㄧㄣ bin 1up big5
 儐 ㄅㄧㄣ bin 1up big5
 斌 ㄅㄧㄣ bin 1up big5
 繽 ㄅㄧㄣ bin 1up big5
@@ -7575,7 +7574,6 @@
 臊 ㄙㄠˋ sao4 nl4 big5
 氉 ㄙㄠˋ sao4 nl4 big5
 瘙 ㄙㄠˋ sao4 nl4 big5
-燥 ㄙㄠˋ sao4 nl4 big5
 森 ㄙㄣ sen np big5
 槮 ㄙㄣ sen np big5
 罧 ㄙㄣ sen np big5
@@ -14201,7 +14199,6 @@
 鵩 ㄈㄨˊ fu2 zj6 big5
 鶝 ㄈㄨˊ fu2 zj6 big5
 沸 ㄈㄨˊ fu2 zj6 big5
-佛 ㄈㄨˊ fu2 zj6 big5
 非 ㄈㄟ fei zo big5
 飛 ㄈㄟ fei zo big5
 菲 ㄈㄟ fei zo big5
