@@ -1862,7 +1862,6 @@
 貯 ㄓㄨˇ zhu3 5j3 big5
 渚 ㄓㄨˇ zhu3 5j3 big5
 矚 ㄓㄨˇ zhu3 5j3 big5
-著 ㄓㄨˇ zhu3 5j3 big5
 麈 ㄓㄨˇ zhu3 5j3 big5
 拄 ㄓㄨˇ zhu3 5j3 big5
 瘃 ㄓㄨˇ zhu3 5j3 big5
@@ -3797,6 +3796,7 @@
 娙 ㄎㄥ keng d/ big5
 挳 ㄎㄥ keng d/ big5
 鍞 ㄎㄥ keng d/ big5
+羥 ㄎㄥ keng d/ big5
 挳 ㄎㄥˇ keng3 d/3 big5
 刊 ㄎㄢ kan d0 big5
 堪 ㄎㄢ kan d0 big5
@@ -4234,6 +4234,7 @@
 鳱 ㄍㄢ gan e0 big5
 嵅 ㄍㄢ gan e0 big5
 苷 ㄍㄢ gan e0 big5e
+酐 ㄍㄢ gan e0 big5
 敢 ㄍㄢˇ gan3 e03 big5
 感 ㄍㄢˇ gan3 e03 big5
 趕 ㄍㄢˇ gan3 e03 big5
@@ -5079,7 +5080,6 @@
 檶 ㄑㄧㄢ qian fu0 big5
 鐱 ㄑㄧㄢ qian fu0 big5
 婜 ㄑㄧㄢ qian fu0 big5
-羥 ㄑㄧㄢ qian fu0 big5
 攐 ㄑㄧㄢ qian fu0 big5
 攓 ㄑㄧㄢ qian fu0 big5
 譣 ㄑㄧㄢ qian fu0 big5
@@ -5291,6 +5291,7 @@
 傸 ㄑㄧㄤˇ qiang3 fu;3 big5
 墏 ㄑㄧㄤˇ qiang3 fu;3 big5
 繈 ㄑㄧㄤˇ qiang3 fu;3 big5
+羥 ㄑㄧㄤˇ qiang3 fu;3 big5
 嗆 ㄑㄧㄤˋ qiang4 fu;4 big5
 羻 ㄑㄧㄤˋ qiang4 fu;4 big5
 唴 ㄑㄧㄤˋ qiang4 fu;4 big5
@@ -7470,6 +7471,7 @@
 莏 ㄙㄨㄛ suo nji big5
 趖 ㄙㄨㄛ suo nji big5
 摍 ㄙㄨㄛ suo nji big5
+羧 ㄙㄨㄛ suo nji big5
 所 ㄙㄨㄛˇ suo3 nji3 big5
 索 ㄙㄨㄛˇ suo3 nji3 big5
 鎖 ㄙㄨㄛˇ suo3 nji3 big5
@@ -8579,7 +8581,6 @@
 剄 ㄐㄧㄥˇ jing3 ru/3 big5
 璥 ㄐㄧㄥˇ jing3 ru/3 big5
 丼 ㄐㄧㄥˇ jing3 ru/3 big5
-烴 ㄐㄧㄥˇ jing3 ru/3 big5
 憼 ㄐㄧㄥˇ jing3 ru/3 big5
 暻 ㄐㄧㄥˇ jing3 ru/3 big5
 蟼 ㄐㄧㄥˇ jing3 ru/3 big5
@@ -12080,6 +12081,7 @@
 鼞 ㄊㄤ tang w; big5
 蹚 ㄊㄤ tang w; big5
 蝪 ㄊㄤ tang w; big5
+羰 ㄊㄤ tang w; big5
 倘 ㄊㄤˇ tang3 w;3 big5
 躺 ㄊㄤˇ tang3 w;3 big5
 儻 ㄊㄤˇ tang3 w;3 big5
@@ -12393,6 +12395,7 @@
 桯 ㄊㄧㄥ ting wu/ big5
 艼 ㄊㄧㄥ ting wu/ big5
 耵 ㄊㄧㄥ ting wu/ big5
+烴 ㄊㄧㄥ ting wu/ big5
 挺 ㄊㄧㄥˇ ting3 wu/3 big5
 艇 ㄊㄧㄥˇ ting3 wu/3 big5
 町 ㄊㄧㄥˇ ting3 wu/3 big5
