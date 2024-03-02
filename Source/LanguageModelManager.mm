@@ -25,7 +25,6 @@
 #import "LanguageModelManager+Privates.h"
 #import "McBopomofo-Swift.h"
 
-@import VXHanConvert;
 @import OpenCCBridge;
 
 static const int kUserOverrideModelCapacity = 500;
@@ -123,12 +122,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
             return input;
         }
 
-        NSString *text = @(input.c_str());
-        if (Preferences.chineseConversionEngine == 1) {
-            text = [VXHanConvert convertToSimplifiedFrom:text];
-        } else {
-            text = [[OpenCCBridge sharedInstance] convertToSimplified:text];
-        }
+        NSString *text = [[OpenCCBridge sharedInstance] convertToSimplified:@(input.c_str())];
         return std::string(text.UTF8String);
     };
 
