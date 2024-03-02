@@ -25,7 +25,7 @@ import XCTest
 @testable import McBopomofo
 
 class KeyHandlerPlainBopomofoTests: XCTestCase {
-    var savedKeyboardLayout: Int = 0
+    var savedKeyboardLayout: KeyboardLayout = .standard
     var handler = KeyHandler()
 
     override func setUpWithError() throws {
@@ -36,7 +36,7 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
         savedKeyboardLayout = Preferences.keyboardLayout
 
         // Punctuation-related tests only work when the layout is Standard.
-        Preferences.keyboardLayout = KeyboardLayout.standard.rawValue
+        Preferences.keyboardLayout = KeyboardLayout.standard
     }
 
     override func tearDownWithError() throws {

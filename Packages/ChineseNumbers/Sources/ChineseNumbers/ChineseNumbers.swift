@@ -1,3 +1,26 @@
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 import Foundation
 
 /// Helps to convert Arabic numbers to Chinese numbers
@@ -6,7 +29,7 @@ import Foundation
     /// Represents uppercase or lowercase Chinese numbers
     /// - lowercase: like 一、二、三
     /// - uppercase: like 壹、貳、參
-    @objc (ChineseNumbersCase)
+    @objc(ChineseNumbersCase)
     public enum Case: Int {
         case lowercase
         case uppercase
@@ -14,9 +37,15 @@ import Foundation
         fileprivate var digits: [Character: String] {
             return switch self {
             case .lowercase:
-                ["0": "〇", "1": "一", "2": "二", "3": "三", "4": "四", "5": "五", "6": "六", "7": "七", "8": "八", "9": "九"]
+                [
+                    "0": "〇", "1": "一", "2": "二", "3": "三", "4": "四", "5": "五", "6": "六", "7": "七",
+                    "8": "八", "9": "九",
+                ]
             case .uppercase:
-                ["0": "零", "1": "壹", "2": "貳", "3": "參", "4": "肆", "5": "伍", "6": "陸", "7": "柒", "8": "捌", "9": "玖"]
+                [
+                    "0": "零", "1": "壹", "2": "貳", "3": "參", "4": "肆", "5": "伍", "6": "陸", "7": "柒",
+                    "8": "捌", "9": "玖",
+                ]
             }
         }
 
@@ -30,7 +59,9 @@ import Foundation
         }
     }
 
-    fileprivate static let higherPlaces = ["", "萬", "億", "兆", "京", "垓", "秭", "穰", "溝", "澗", "正", "載"]
+    fileprivate static let higherPlaces = [
+        "", "萬", "億", "兆", "京", "垓", "秭", "穰", "溝", "澗", "正", "載",
+    ]
 
     /// Converts an Arabic number to a Chinese number
     /// - Parameters:
@@ -40,7 +71,7 @@ import Foundation
     /// - Returns: The output
     @objc static public func generate(intPart: String, decPart: String, digitCase: Case) -> String {
 
-        func convert4Digits(_ subString: Substring, zeroEverHappened:Bool = false) -> String {
+        func convert4Digits(_ subString: Substring, zeroEverHappened: Bool = false) -> String {
             var zeroHappened = zeroEverHappened
             var output = ""
             for i in 0..<4 {
@@ -72,7 +103,7 @@ import Foundation
             output.append(digitCase.digits["0"]!)
         } else {
             // 4 digits as a section.
-            let intSectionCount = Int(ceil( Double(intTrimmed.count) / 4.0))
+            let intSectionCount = Int(ceil(Double(intTrimmed.count) / 4.0))
             let filledLength = intSectionCount * 4
             let filled = intTrimmed.leftPadding(toLength: filledLength, withPad: " ")
             var readHead = 0
@@ -80,9 +111,9 @@ import Foundation
 
             while readHead < filledLength {
                 let subString = filled[
-                    filled.index(filled.startIndex, offsetBy: readHead)
-                    ..<
-                    filled.index(filled.startIndex, offsetBy: readHead + 4)
+                    filled.index(
+                        filled.startIndex, offsetBy: readHead)..<filled.index(
+                            filled.startIndex, offsetBy: readHead + 4)
                 ]
                 if subString == "0000" {
                     zeroEverHappened = true

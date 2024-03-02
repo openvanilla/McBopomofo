@@ -1,3 +1,26 @@
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 import Foundation
 
 /// Helps to convert Arabic numbers to Sushou numbers (蘇州碼, A kind of
@@ -6,10 +29,10 @@ public class SuzhouNumbers: NSObject {
 
     static private let verticalDigits: [Character: String] = [
         "0": "〇", "1": "〡", "2": "〢", "3": "〣", "4": "〤",
-        "5": "〥", "6": "〦", "7": "〧", "8": "〨", "9": "〩"
+        "5": "〥", "6": "〦", "7": "〧", "8": "〨", "9": "〩",
     ]
     static private let horizontalDigits: [Character: String] = [
-        "1": "一", "2": "二", "3": "三"
+        "1": "一", "2": "二", "3": "三",
     ]
     static private let placeNames = [
         "", "十", "百", "千",
@@ -30,9 +53,11 @@ public class SuzhouNumbers: NSObject {
     ///   - preferInitialVertical: If vertical digits like 〡,〢, and 〣 are
     ///         preferred than 一, 二 and 三.
     /// - Returns: The output
-    @objc static public func generate(intPart: String, decPart: String,
-                               unit: String = "",
-                               preferInitialVertical: Bool = true ) -> String {
+    @objc static public func generate(
+        intPart: String, decPart: String,
+        unit: String = "",
+        preferInitialVertical: Bool = true
+    ) -> String {
         var intTrimmed = intPart.trimmingZerosAtStart()
         let decTrimmed = decPart.trimmingZerosAtEnd()
         var output = ""
@@ -76,8 +101,6 @@ public class SuzhouNumbers: NSObject {
             }
         }
         let place = intTrimmed.count + trimmedZeroCounts - 1
-        return output +
-            (output.count > 1 ? "\n" : "") +
-            placeNames[place] + unit
+        return output + (output.count > 1 ? "\n" : "") + placeNames[place] + unit
     }
 }

@@ -125,7 +125,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         newLanguageModel = [LanguageModelManager languageModelMcBopomofo];
         newLanguageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
     }
-    newLanguageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
+    newLanguageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == ChineseConversionStyleModel);
 
     // Only apply the changes if the value is changed
     if (![_inputMode isEqualToString:newInputMode]) {
@@ -179,7 +179,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (void)syncWithPreferences
 {
-    NSInteger layout = Preferences.keyboardLayout;
+    KeyboardLayout layout = Preferences.keyboardLayout;
     switch (layout) {
         case KeyboardLayoutStandard:
             _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
@@ -203,7 +203,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             _bpmfReadingBuffer->setKeyboardLayout(Formosa::Mandarin::BopomofoKeyboardLayout::StandardLayout());
             Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
-    _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == 1);
+    _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == ChineseConversionStyleModel);
 }
 
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex useMoveCursorAfterSelectionSetting:(BOOL)flag
@@ -470,7 +470,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(inputting);
 
         if (_inputMode == InputModePlainBopomofo) {
-            InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
+            InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateFromInputtingState:inputting useVerticalMode:input.useVerticalMode];
+
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
                 NSString *text = choosingCandidates.candidates.firstObject.value;
@@ -544,7 +545,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             Preferences.moveCursorAfterSelectingCandidate) {
             _grid->setCursor(originalCursorIndex - 1);
         }
-        InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateState:(InputStateNotEmpty *)state useVerticalMode:input.useVerticalMode];
+        InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
         choosingCandidates.originalCursorIndex = originalCursorIndex;
         stateCallback(choosingCandidates);
         return YES;
@@ -598,13 +599,30 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // MARK: Enter
     if (charCode == 13) {
         if (_inputMode == InputModeBopomofo && input.isControlHold) {
-            if (Preferences.controlEnterOutput == ControlEnterOutputBpmfReading) {
-                return [self _handleCtrlEnterBpmfReadingWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            NSString *string = @"";
+            if (Preferences.controlEnterOutput == ControlEnterOutputOff) {
+                errorCallback();
+                return YES;
             }
-            if (Preferences.controlEnterOutput == ControlEnterOutputBraille) {
-                return [self _handleCtrlEnterBrailleWithState:state stateCallback:stateCallback errorCallback:errorCallback];
+            switch (Preferences.controlEnterOutput) {
+                case ControlEnterOutputBpmfReading:
+                    string = [self _currentBpmfReading];
+                    break;
+                case ControlEnterOutputHtmlRuby:
+                    string = [self _currentHtmlRuby];
+                    break;
+                case ControlEnterOutputBraille:
+                    string = [self _currentBraille];
+                    break;
+                default:
+                    break;
             }
-            errorCallback();
+            [self clear];
+
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+            stateCallback(committing);
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
             return YES;
         }
         if (_inputMode == InputModeBopomofo &&
@@ -654,13 +672,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             if (_bpmfReadingBuffer->isEmpty()) {
                 _grid->insertReading("_punctuation_list");
                 [self _walk];
-                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-                stateCallback(inputting);
                 size_t originalCursorIndex = _grid->cursor();
                 if (Preferences.selectPhraseAfterCursorAsCandidate) {
                     _grid->setCursor(originalCursorIndex - 1);
                 }
-                InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateState:inputting useVerticalMode:input.useVerticalMode];
+                InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
                 choosingCandidate.originalCursorIndex = originalCursorIndex;
                 stateCallback(choosingCandidate);
             } else { // If there is still unfinished bpmf reading, ignore the punctuation
@@ -737,7 +753,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    InputStateChoosingCandidate *candidateState = [self _buildCandidateState:(InputStateInputting *)state useVerticalMode:NO];
+    InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:NO];
     NSArray *candidates = candidateState.candidates;
     if (candidates.count == 0) {
         errorCallback();
@@ -1029,29 +1045,38 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
-- (BOOL)_handleCtrlEnterBpmfReadingWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (NSString *)_currentBpmfReading
 {
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
-    }
-
     NSArray *readings = [self _currentReadings];
     NSString *composingBuffer = [readings componentsJoinedByString:@"-"];
-
-    [self clear];
-
-    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-    stateCallback(committing);
-    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-    stateCallback(empty);
-    return YES;
+    return composingBuffer;
 }
 
-- (BOOL)_handleCtrlEnterBrailleWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
+- (NSString *)_currentHtmlRuby
 {
-    if (![state isKindOfClass:[InputStateInputting class]]) {
-        return NO;
+    std::string composed;
+    for (const auto& node : _latestWalk.nodes) {
+        std::string key = node->reading();
+        std::replace(key.begin(), key.end(), '-', ' ');
+        std::string value = node->value();
+
+        // If a key starts with underscore, it is usually for a punctuation or a
+        // symbol but not a Bopomofo reading, so we just ignore such case.
+        if (key.rfind(std::string("_"), 0) == 0) {
+            composed += value;
+        } else {
+            composed += "<ruby>";
+            composed += value;
+            composed += "<rp>(</rp><rt>" + key + "</rt><rp>)</rp>";
+            composed += "</ruby>";
+        }
     }
+    return [NSString stringWithUTF8String:composed.c_str()];
+}
+
+
+- (NSString *)_currentBraille
+{
     NSMutableString *composingBuffer = [[NSMutableString alloc] init];
     for (const auto& node : _latestWalk.nodes) {
         std::string value = node->currentUnigram().value();
@@ -1076,14 +1101,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [composingBuffer appendString:converted];
         }
     }
-
-    [self clear];
-
-    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
-    stateCallback(committing);
-    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-    stateCallback(empty);
-    return YES;
+    return composingBuffer;
 }
 
 
@@ -1123,7 +1141,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     stateCallback(inputting);
 
     if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
-        InputStateChoosingCandidate *candidateState = [self _buildCandidateState:inputting useVerticalMode:useVerticalMode];
+
+        InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:useVerticalMode];
 
         if (candidateState.candidates.count == 1) {
             [self clear];
@@ -1229,7 +1248,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL isCursorMovingKey =
         (Preferences.allowMovingCursorWhenChoosingCandidates && ([input.inputText isEqualToString:@"j"] || [input.inputText isEqualToString:@"k"])) ||
-        (input.isShiftHold && (input.isLeft || input.isRight ));
+        (input.isShiftHold && (input.isLeft || input.isRight));
 
     if ([state isKindOfClass:[InputStateChoosingCandidate class]] && isCursorMovingKey) {
         if ([input.inputText isEqualToString:@"j"] || (input.isLeft && input.isShiftHold)
@@ -1252,7 +1271,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return YES;
             }
         }
-        InputState *newState = [self _buildCandidateState:(InputStateChoosingCandidate *)state useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
+        InputState *newState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:[(InputStateChoosingCandidate *)state useVerticalMode]];
         stateCallback(newState);
         return YES;
     }
@@ -1801,7 +1820,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         // Create a tooltip to warn the user that their cursor is between two
         // readings (syllables) even if the cursor is not in the middle of a
         // composed string due to its being shorter than the number of readings.
-        if (valueCodePointCount < readingLength) {
+        if (valueCodePointCount != readingLength) {
             // builderCursor is guaranteed to be > 0. If it was 0, we wouldn't even
             // reach here due to runningCursor having already "caught up" with
             // builderCursor. It is also guaranteed to be less than the size of the
@@ -1834,7 +1853,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     _latestWalk = _grid->walk();
 }
 
-- (InputStateChoosingCandidate *)_buildCandidateState:(InputStateNotEmpty *)currentState useVerticalMode:(BOOL)useVerticalMode
+- (InputStateChoosingCandidate *)_buildCandidateStateFromInputtingState:(InputStateInputting *)inputting useVerticalMode:(BOOL)useVerticalMode
 {
     auto candidates = _grid->candidatesAt(self.actualCandidateCursorIndex);
 
@@ -1861,7 +1880,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         [candidatesArray addObject:candidate];
     }
 
-    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:_grid->cursor() candidates:candidatesArray useVerticalMode:useVerticalMode];
+    InputStateChoosingCandidate *state = [[InputStateChoosingCandidate alloc] initWithComposingBuffer:inputting.composingBuffer cursorIndex:inputting.cursorIndex candidates:candidatesArray useVerticalMode:useVerticalMode];
     return state;
 }
 
@@ -1927,7 +1946,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     BOOL scToTc = Preferences.chineseConversionEnabled &&
-            Preferences.chineseConversionStyle == 1;
+            Preferences.chineseConversionStyle == ChineseConversionStyleModel;
     if (scToTc) {
         key = [[OpenCCBridge sharedInstance] convertToTraditional:key];
     }
