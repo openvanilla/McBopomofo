@@ -34,66 +34,58 @@
 namespace McBopomofo {
 
 class UserOverrideModel {
-public:
-    UserOverrideModel(size_t capacity, double decayConstant);
+ public:
+  UserOverrideModel(size_t capacity, double decayConstant);
 
-    struct Suggestion {
-        Suggestion() = default;
-        Suggestion(std::string c, bool f)
-            : candidate(std::move(c))
-            , forceHighScoreOverride(f)
-        {
-        }
-        std::string candidate;
-        bool forceHighScoreOverride = false;
+  struct Suggestion {
+    Suggestion() = default;
+    Suggestion(std::string c, bool f)
+        : candidate(std::move(c)), forceHighScoreOverride(f) {}
+    std::string candidate;
+    bool forceHighScoreOverride = false;
 
-        [[nodiscard]] bool empty() const
-        {
-            return candidate.empty();
-        }
-    };
+    [[nodiscard]] bool empty() const { return candidate.empty(); }
+  };
 
-    void observe(
-        const Formosa::Gramambular2::ReadingGrid::WalkResult& walkBeforeUserOverride,
-        const Formosa::Gramambular2::ReadingGrid::WalkResult& walkAfterUserOverride,
-        size_t cursor,
-        double timestamp);
+  void observe(const Formosa::Gramambular2::ReadingGrid::WalkResult&
+                   walkBeforeUserOverride,
+               const Formosa::Gramambular2::ReadingGrid::WalkResult&
+                   walkAfterUserOverride,
+               size_t cursor, double timestamp);
 
-    Suggestion suggest(
-        const Formosa::Gramambular2::ReadingGrid::WalkResult& currentWalk,
-        size_t cursor,
-        double timestamp);
+  Suggestion suggest(
+      const Formosa::Gramambular2::ReadingGrid::WalkResult& currentWalk,
+      size_t cursor, double timestamp);
 
-    void observe(const std::string& key, const std::string& candidate, double timestamp, bool forceHighScoreOverride = false);
+  void observe(const std::string& key, const std::string& candidate,
+               double timestamp, bool forceHighScoreOverride = false);
 
-    Suggestion suggest(const std::string& key, double timestamp);
+  Suggestion suggest(const std::string& key, double timestamp);
 
-private:
-    struct Override {
-        size_t count = 0;
-        double timestamp = 0;
-        bool forceHighScoreOverride = false;
-    };
+ private:
+  struct Override {
+    size_t count = 0;
+    double timestamp = 0;
+    bool forceHighScoreOverride = false;
+  };
 
-    struct Observation {
-        size_t count;
-        std::map<std::string, Override> overrides;
+  struct Observation {
+    size_t count;
+    std::map<std::string, Override> overrides;
 
-        Observation()
-            : count(0)
-        {
-        }
-        void update(const std::string& candidate, double timestamp, bool forceHighScoreOverride);
-    };
+    Observation() : count(0) {}
+    void update(const std::string& candidate, double timestamp,
+                bool forceHighScoreOverride);
+  };
 
-    typedef std::pair<std::string, Observation> KeyObservationPair;
+  typedef std::pair<std::string, Observation> KeyObservationPair;
 
-    size_t m_capacity;
-    double m_decayExponent;
-    std::list<KeyObservationPair> m_lruList;
-    std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
+  size_t m_capacity;
+  double m_decayExponent;
+  std::list<KeyObservationPair> m_lruList;
+  std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
 };
 
-} // namespace McBopomofo
+}  // namespace McBopomofo
 
-#endif // SRC_ENGINE_USEROVERRIDEMODEL_H_
+#endif  // SRC_ENGINE_USEROVERRIDEMODEL_H_

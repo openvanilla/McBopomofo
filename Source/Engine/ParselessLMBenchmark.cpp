@@ -35,29 +35,27 @@ using ParselessLM = McBopomofo::ParselessLM;
 static const char* kDataPath = "data.txt";
 static const char* kUnigramSearchKey = "ㄕˋ-ㄕˊ";
 
-static void BM_ParselessLMOpenClose(benchmark::State& state)
-{
-    assert(std::filesystem::exists(kDataPath));
-    for (auto _ : state) {
-        ParselessLM lm;
-        lm.open(kDataPath);
-        lm.close();
-    }
+static void BM_ParselessLMOpenClose(benchmark::State& state) {
+  assert(std::filesystem::exists(kDataPath));
+  for (auto _ : state) {
+    ParselessLM lm;
+    lm.open(kDataPath);
+    lm.close();
+  }
 }
 BENCHMARK(BM_ParselessLMOpenClose);
 
-static void BM_ParselessLMFindUnigrams(benchmark::State& state)
-{
-    assert(std::filesystem::exists(kDataPath));
-    ParselessLM lm;
-    lm.open(kDataPath);
-    for (auto _ : state) {
-        lm.unigramsForKey(kUnigramSearchKey);
-    }
-    lm.close();
+static void BM_ParselessLMFindUnigrams(benchmark::State& state) {
+  assert(std::filesystem::exists(kDataPath));
+  ParselessLM lm;
+  lm.open(kDataPath);
+  for (auto _ : state) {
+    lm.unigramsForKey(kUnigramSearchKey);
+  }
+  lm.close();
 }
 BENCHMARK(BM_ParselessLMFindUnigrams);
 
-}; // namespace
+};  // namespace
 
 BENCHMARK_MAIN();

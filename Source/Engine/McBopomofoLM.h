@@ -61,82 +61,89 @@ namespace McBopomofo {
 /// files are modified. It does not keep the reference of the data paths but
 /// you have to pass the paths when you ask it to do loading.
 class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
-public:
-    McBopomofoLM();
-    ~McBopomofoLM() override;
+ public:
+  McBopomofoLM();
+  ~McBopomofoLM() override;
 
-    /// Asks to load the primary language model at the given path.
-    /// @param languageModelPath The path of the language model.
-    void loadLanguageModel(const char* languageModelDataPath);
-    /// If the data model is already loaded.
-    bool isDataModelLoaded();
+  /// Asks to load the primary language model at the given path.
+  /// @param languageModelPath The path of the language model.
+  void loadLanguageModel(const char* languageModelDataPath);
+  /// If the data model is already loaded.
+  bool isDataModelLoaded();
 
-    /// Asks to load the associated phrases at the given path.
-    /// @param associatedPhrasesPath The path of the associated phrases.
-    void loadAssociatedPhrases(const char* associatedPhrasesPath);
-    /// If the associated phrases already loaded.
-    bool isAssociatedPhrasesLoaded();
+  /// Asks to load the associated phrases at the given path.
+  /// @param associatedPhrasesPath The path of the associated phrases.
+  void loadAssociatedPhrases(const char* associatedPhrasesPath);
+  /// If the associated phrases already loaded.
+  bool isAssociatedPhrasesLoaded();
 
-    /// Asks to load the user phrases and excluded phrases at the given path.
-    /// @param userPhrasesPath The path of user phrases.
-    /// @param excludedPhrasesPath The path of excluded phrases.
-    void loadUserPhrases(const char* userPhrasesDataPath, const char* excludedPhrasesDataPath);
-    /// Asks to load th phrase replacement table at the given path.
-    /// @param phraseReplacementPath The path of the phrase replacement table.
-    void loadPhraseReplacementMap(const char* phraseReplacementPath);
+  /// Asks to load the user phrases and excluded phrases at the given path.
+  /// @param userPhrasesPath The path of user phrases.
+  /// @param excludedPhrasesPath The path of excluded phrases.
+  void loadUserPhrases(const char* userPhrasesDataPath,
+                       const char* excludedPhrasesDataPath);
+  /// Asks to load th phrase replacement table at the given path.
+  /// @param phraseReplacementPath The path of the phrase replacement table.
+  void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
-    /// Returns a list of available unigram for the given key.
-    /// @param key A string represents the BPMF reading or a symbol key. For
-    ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
-    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(const std::string& key) override;
-    /// If the model has unigrams for the given key.
-    /// @param key The key.
-    bool hasUnigrams(const std::string& key) override;
+  /// Returns a list of available unigram for the given key.
+  /// @param key A string represents the BPMF reading or a symbol key. For
+  ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
+      const std::string& key) override;
+  /// If the model has unigrams for the given key.
+  /// @param key The key.
+  bool hasUnigrams(const std::string& key) override;
 
-    /// Enables or disables phrase replacement.
-    void setPhraseReplacementEnabled(bool enabled);
-    /// If phrase replacement is enabled or not.
-    bool phraseReplacementEnabled() const;
+  /// Enables or disables phrase replacement.
+  void setPhraseReplacementEnabled(bool enabled);
+  /// If phrase replacement is enabled or not.
+  bool phraseReplacementEnabled() const;
 
-    /// Enables or disables the external converter.
-    void setExternalConverterEnabled(bool enabled);
-    /// If the external converted is enabled or not.
-    bool externalConverterEnabled() const;
-    /// Sets a lambda to let the values of unigrams could be converted by it.
-    void setExternalConverter(std::function<std::string(const std::string&)> externalConverter);
+  /// Enables or disables the external converter.
+  void setExternalConverterEnabled(bool enabled);
+  /// If the external converted is enabled or not.
+  bool externalConverterEnabled() const;
+  /// Sets a lambda to let the values of unigrams could be converted by it.
+  void setExternalConverter(
+      std::function<std::string(const std::string&)> externalConverter);
 
-    /// Sets a lambda to convert the macro to a string.
-    void setMacroConverter(std::function<std::string(const std::string&)> macroConverter);
-    std::string convertMacro(const std::string& input);
+  /// Sets a lambda to convert the macro to a string.
+  void setMacroConverter(
+      std::function<std::string(const std::string&)> macroConverter);
+  std::string convertMacro(const std::string& input);
 
-    const std::vector<std::string> associatedPhrasesForKey(const std::string& key);
-    bool hasAssociatedPhrasesForKey(const std::string& key);
+  const std::vector<std::string> associatedPhrasesForKey(
+      const std::string& key);
+  bool hasAssociatedPhrasesForKey(const std::string& key);
 
-    /// Returns the top-scored reading from the base model, given the value.
-    std::string getReading(const std::string& value);
+  /// Returns the top-scored reading from the base model, given the value.
+  std::string getReading(const std::string& value);
 
-protected:
-    /// Filters and converts the input unigrams and return a new list of unigrams.
-    ///
-    /// @param unigrams The unigrams to be processed.
-    /// @param excludedValues The values to excluded unigrams.
-    /// @param insertedValues The values for unigrams already in the results.
-    ///   It helps to prevent duplicated unigrams. Please note that the method
-    ///   has a side effect that it inserts values to `insertedValues`.
-    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> filterAndTransformUnigrams(const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams,
-        const std::unordered_set<std::string>& excludedValues,
-        std::unordered_set<std::string>& insertedValues);
+ protected:
+  /// Filters and converts the input unigrams and return a new list of unigrams.
+  ///
+  /// @param unigrams The unigrams to be processed.
+  /// @param excludedValues The values to excluded unigrams.
+  /// @param insertedValues The values for unigrams already in the results.
+  ///   It helps to prevent duplicated unigrams. Please note that the method
+  ///   has a side effect that it inserts values to `insertedValues`.
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+  filterAndTransformUnigrams(
+      const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams,
+      const std::unordered_set<std::string>& excludedValues,
+      std::unordered_set<std::string>& insertedValues);
 
-    ParselessLM m_languageModel;
-    UserPhrasesLM m_userPhrases;
-    UserPhrasesLM m_excludedPhrases;
-    PhraseReplacementMap m_phraseReplacement;
-    AssociatedPhrases m_associatedPhrases;
-    std::function<std::string(const std::string&)> m_macroConverter;
-    bool m_phraseReplacementEnabled;
-    bool m_externalConverterEnabled;
-    std::function<std::string(const std::string&)> m_externalConverter;
+  ParselessLM m_languageModel;
+  UserPhrasesLM m_userPhrases;
+  UserPhrasesLM m_excludedPhrases;
+  PhraseReplacementMap m_phraseReplacement;
+  AssociatedPhrases m_associatedPhrases;
+  std::function<std::string(const std::string&)> m_macroConverter;
+  bool m_phraseReplacementEnabled;
+  bool m_externalConverterEnabled;
+  std::function<std::string(const std::string&)> m_externalConverter;
 };
-} // namespace McBopomofo
+}  // namespace McBopomofo
 
-#endif // SRC_ENGINE_MCBOPOMOFOLM_H_
+#endif  // SRC_ENGINE_MCBOPOMOFOLM_H_

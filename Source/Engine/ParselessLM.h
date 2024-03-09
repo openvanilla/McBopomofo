@@ -34,31 +34,31 @@
 namespace McBopomofo {
 
 class ParselessLM : public Formosa::Gramambular2::LanguageModel {
-public:
-    ~ParselessLM() override;
+ public:
+  ~ParselessLM() override;
 
-    bool isLoaded();
-    bool open(const std::string_view& path);
-    void close();
+  bool isLoaded();
+  bool open(const std::string_view& path);
+  void close();
 
-    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
-        const std::string& key) override;
-    bool hasUnigrams(const std::string& key) override;
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
+      const std::string& key) override;
+  bool hasUnigrams(const std::string& key) override;
 
-    struct FoundReading {
-        std::string reading;
-        double score;
-    };
-    // Look up reading by value. This is specific to ParselessLM only.
-    std::vector<FoundReading> getReadings(const std::string& value);
+  struct FoundReading {
+    std::string reading;
+    double score;
+  };
+  // Look up reading by value. This is specific to ParselessLM only.
+  std::vector<FoundReading> getReadings(const std::string& value);
 
-private:
-    int fd_ = -1;
-    void* data_ = nullptr;
-    size_t length_ = 0;
-    std::unique_ptr<ParselessPhraseDB> db_;
+ private:
+  int fd_ = -1;
+  void* data_ = nullptr;
+  size_t length_ = 0;
+  std::unique_ptr<ParselessPhraseDB> db_;
 };
 
-} // namespace McBopomofo
+}  // namespace McBopomofo
 
-#endif // SRC_ENGINE_PARSELESSLM_H_
+#endif  // SRC_ENGINE_PARSELESSLM_H_

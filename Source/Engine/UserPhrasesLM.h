@@ -24,45 +24,44 @@
 #ifndef SRC_ENGINE_USERPHRASESLM_H_
 #define SRC_ENGINE_USERPHRASESLM_H_
 
-#include "gramambular2/language_model.h"
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "gramambular2/language_model.h"
+
 namespace McBopomofo {
 
 class UserPhrasesLM : public Formosa::Gramambular2::LanguageModel {
-public:
-    UserPhrasesLM();
-    ~UserPhrasesLM() override;
+ public:
+  UserPhrasesLM();
+  ~UserPhrasesLM() override;
 
-    bool isLoaded();
-    bool open(const char* path);
-    void close();
-    void dump();
+  bool isLoaded();
+  bool open(const char* path);
+  void close();
+  void dump();
 
-    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(const std::string& key) override;
-    bool hasUnigrams(const std::string& key) override;
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
+      const std::string& key) override;
+  bool hasUnigrams(const std::string& key) override;
 
-protected:
-    struct Row {
-        Row(std::string_view k, std::string_view v)
-            : key(std::move(k))
-            , value(std::move(v))
-        {
-        }
-        const std::string_view key;
-        const std::string_view value;
-    };
+ protected:
+  struct Row {
+    Row(std::string_view k, std::string_view v)
+        : key(std::move(k)), value(std::move(v)) {}
+    const std::string_view key;
+    const std::string_view value;
+  };
 
-    std::map<std::string_view, std::vector<Row>> keyRowMap;
-    int fd;
-    void* data;
-    size_t length;
+  std::map<std::string_view, std::vector<Row>> keyRowMap;
+  int fd;
+  void* data;
+  size_t length;
 };
 
-} // namespace McBopomofo
+}  // namespace McBopomofo
 
-#endif // SRC_ENGINE_USERPHRASESLM_H_
+#endif  // SRC_ENGINE_USERPHRASESLM_H_

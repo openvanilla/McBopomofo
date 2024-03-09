@@ -31,21 +31,21 @@
 namespace McBopomofo {
 
 class PhraseReplacementMap {
-public:
-    PhraseReplacementMap();
-    ~PhraseReplacementMap();
+ public:
+  PhraseReplacementMap();
+  ~PhraseReplacementMap();
 
-    bool open(const char* path);
-    void close();
-    const std::string valueForKey(const std::string& key);
+  bool open(const char* path);
+  void close();
+  const std::string valueForKey(const std::string& key);
 
-protected:
-    std::map<std::string_view, std::string_view> keyValueMap;
-    int fd;
-    void* data;
-    size_t length;
+ protected:
+  std::map<std::string_view, std::string_view> keyValueMap;
+  int fd;
+  void* data;
+  size_t length;
 };
 
-} // namespace McBopomofo
+}  // namespace McBopomofo
 
-#endif // SRC_ENGINE_PHRASEREPLACEMENTMAP_H_
+#endif  // SRC_ENGINE_PHRASEREPLACEMENTMAP_H_
