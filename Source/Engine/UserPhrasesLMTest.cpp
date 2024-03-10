@@ -30,30 +30,29 @@
 
 namespace McBopomofo {
 
-TEST(UserPhrasesLMTest, LenientReading)
-{
-    std::string tmp_name
-        = std::string(std::filesystem::temp_directory_path() / "test.txt");
+TEST(UserPhrasesLMTest, LenientReading) {
+  std::string tmp_name =
+      std::string(std::filesystem::temp_directory_path() / "test.txt");
 
-    FILE* f = fopen(tmp_name.c_str(), "w");
-    ASSERT_NE(f, nullptr);
+  FILE* f = fopen(tmp_name.c_str(), "w");
+  ASSERT_NE(f, nullptr);
 
-    fprintf(f, "value1 reading1\n");
-    fprintf(f, "value2 \n"); // error line
-    fprintf(f, "value3 reading2\n");
-    int r = fclose(f);
-    ASSERT_EQ(r, 0);
+  fprintf(f, "value1 reading1\n");
+  fprintf(f, "value2 \n");  // error line
+  fprintf(f, "value3 reading2\n");
+  int r = fclose(f);
+  ASSERT_EQ(r, 0);
 
-    UserPhrasesLM lm;
-    lm.open(tmp_name.c_str());
-    ASSERT_TRUE(lm.hasUnigrams("reading1"));
-    ASSERT_FALSE(lm.hasUnigrams("value2"));
+  UserPhrasesLM lm;
+  lm.open(tmp_name.c_str());
+  ASSERT_TRUE(lm.hasUnigrams("reading1"));
+  ASSERT_FALSE(lm.hasUnigrams("value2"));
 
-    // Anything after the error won't be parsed, so reading2 won't be found.
-    ASSERT_FALSE(lm.hasUnigrams("reading2"));
+  // Anything after the error won't be parsed, so reading2 won't be found.
+  ASSERT_FALSE(lm.hasUnigrams("reading2"));
 
-    r = remove(tmp_name.c_str());
-    ASSERT_EQ(r, 0);
+  r = remove(tmp_name.c_str());
+  ASSERT_EQ(r, 0);
 }
 
-} // namespace McBopomofo
+}  // namespace McBopomofo

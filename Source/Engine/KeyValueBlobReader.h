@@ -46,61 +46,50 @@
 namespace McBopomofo {
 
 class KeyValueBlobReader {
-public:
-    enum class State : int {
-        // There are no more key-value pairs in this blob.
-        END = 0,
-        // The reader has produced a new key-value pair.
-        HAS_PAIR = 1,
-        // An error is encountered and the parsing stopped.
-        ERROR = -1,
-        // Internal-only state: the parser can continue parsing.
-        CAN_CONTINUE = 2
-    };
+ public:
+  enum class State : int {
+    // There are no more key-value pairs in this blob.
+    END = 0,
+    // The reader has produced a new key-value pair.
+    HAS_PAIR = 1,
+    // An error is encountered and the parsing stopped.
+    ERROR = -1,
+    // Internal-only state: the parser can continue parsing.
+    CAN_CONTINUE = 2
+  };
 
-    struct KeyValue {
-        constexpr KeyValue()
-            : key("")
-            , value("")
-        {
-        }
-        constexpr KeyValue(std::string_view k, std::string_view v)
-            : key(k)
-            , value(v)
-        {
-        }
+  struct KeyValue {
+    constexpr KeyValue() : key(""), value("") {}
+    constexpr KeyValue(std::string_view k, std::string_view v)
+        : key(k), value(v) {}
 
-        bool operator==(const KeyValue& another) const
-        {
-            return key == another.key && value == another.value;
-        }
-
-        std::string_view key;
-        std::string_view value;
-    };
-
-    KeyValueBlobReader(const char* blob, size_t size)
-        : current_(blob)
-        , end_(blob + size)
-    {
+    bool operator==(const KeyValue& another) const {
+      return key == another.key && value == another.value;
     }
 
-    // Parse the next key-value pair and return the state of the reader. If
-    // `out` is passed, out will be set to the produced key-value pair if there
-    // is one.
-    State Next(KeyValue* out = nullptr);
+    std::string_view key;
+    std::string_view value;
+  };
 
-private:
-    State SkipUntil(const std::function<bool(char)>& f);
-    State SkipUntilNot(const std::function<bool(char)>& f);
+  KeyValueBlobReader(const char* blob, size_t size)
+      : current_(blob), end_(blob + size) {}
 
-    const char* current_;
-    const char* end_;
-    State state_ = State::CAN_CONTINUE;
+  // Parse the next key-value pair and return the state of the reader. If
+  // `out` is passed, out will be set to the produced key-value pair if there
+  // is one.
+  State Next(KeyValue* out = nullptr);
+
+ private:
+  State SkipUntil(const std::function<bool(char)>& f);
+  State SkipUntilNot(const std::function<bool(char)>& f);
+
+  const char* current_;
+  const char* end_;
+  State state_ = State::CAN_CONTINUE;
 };
 
 std::ostream& operator<<(std::ostream&, const KeyValueBlobReader::KeyValue&);
 
-} // namespace McBopomofo
+}  // namespace McBopomofo
 
-#endif // SRC_ENGINE_KEYVALUEBLOBREADER_H_
+#endif  // SRC_ENGINE_KEYVALUEBLOBREADER_H_

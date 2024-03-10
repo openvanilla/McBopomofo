@@ -35,98 +35,86 @@
 
 namespace McBopomofo {
 
-UserPhrasesLM::UserPhrasesLM()
-    : fd(-1)
-    , data(0)
-    , length(0)
-{
+UserPhrasesLM::UserPhrasesLM() : fd(-1), data(0), length(0) {}
+
+UserPhrasesLM::~UserPhrasesLM() {
+  if (data) {
+    close();
+  }
 }
 
-UserPhrasesLM::~UserPhrasesLM()
-{
-    if (data) {
-        close();
-    }
+bool UserPhrasesLM::isLoaded() { return data != nullptr; }
+
+bool UserPhrasesLM::open(const char* path) {
+  if (data) {
+    return false;
+  }
+
+  fd = ::open(path, O_RDONLY);
+  if (fd == -1) {
+    printf("open:: file not exist");
+    return false;
+  }
+
+  struct stat sb;
+  if (fstat(fd, &sb) == -1) {
+    printf("open:: cannot open file");
+    return false;
+  }
+
+  length = static_cast<size_t>(sb.st_size);
+
+  data = mmap(NULL, length, PROT_READ, MAP_SHARED, fd, 0);
+  if (!data) {
+    ::close(fd);
+    return false;
+  }
+
+  KeyValueBlobReader reader(static_cast<char*>(data), length);
+  KeyValueBlobReader::KeyValue keyValue;
+  while (reader.Next(&keyValue) == KeyValueBlobReader::State::HAS_PAIR) {
+    // We invert the key and value, since in user phrases, "key" is the phrase
+    // value, and "value" is the BPMF reading.
+    keyRowMap[keyValue.value].emplace_back(keyValue.value, keyValue.key);
+  }
+  return true;
 }
 
-bool UserPhrasesLM::isLoaded()
-{
-    return data != nullptr;
+void UserPhrasesLM::close() {
+  if (data) {
+    munmap(data, length);
+    ::close(fd);
+    data = 0;
+  }
+
+  keyRowMap.clear();
 }
 
-bool UserPhrasesLM::open(const char* path)
-{
-    if (data) {
-        return false;
+void UserPhrasesLM::dump() {
+  for (const auto& entry : keyRowMap) {
+    const std::vector<Row>& rows = entry.second;
+    for (const auto& row : rows) {
+      std::cerr << row.key << " " << row.value << "\n";
     }
-
-    fd = ::open(path, O_RDONLY);
-    if (fd == -1) {
-        printf("open:: file not exist");
-        return false;
-    }
-
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) {
-        printf("open:: cannot open file");
-        return false;
-    }
-
-    length = static_cast<size_t>(sb.st_size);
-
-    data = mmap(NULL, length, PROT_READ, MAP_SHARED, fd, 0);
-    if (!data) {
-        ::close(fd);
-        return false;
-    }
-
-    KeyValueBlobReader reader(static_cast<char*>(data), length);
-    KeyValueBlobReader::KeyValue keyValue;
-    while (reader.Next(&keyValue) == KeyValueBlobReader::State::HAS_PAIR) {
-        // We invert the key and value, since in user phrases, "key" is the phrase value, and "value" is the BPMF reading.
-        keyRowMap[keyValue.value].emplace_back(keyValue.value, keyValue.key);
-    }
-    return true;
+  }
 }
 
-void UserPhrasesLM::close()
-{
-    if (data) {
-        munmap(data, length);
-        ::close(fd);
-        data = 0;
+std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+UserPhrasesLM::getUnigrams(const std::string& key) {
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> v;
+  auto iter = keyRowMap.find(key);
+  if (iter != keyRowMap.end()) {
+    const std::vector<Row>& rows = iter->second;
+    for (const auto& row : rows) {
+      v.emplace_back(std::string(row.value), 0);
     }
+  }
 
-    keyRowMap.clear();
+  return v;
 }
 
-void UserPhrasesLM::dump()
-{
-    for (const auto& entry : keyRowMap) {
-        const std::vector<Row>& rows = entry.second;
-        for (const auto& row : rows) {
-            std::cerr << row.key << " " << row.value << "\n";
-        }
-    }
+bool UserPhrasesLM::hasUnigrams(const std::string& key) {
+  return keyRowMap.find(key) != keyRowMap.end();
 }
 
-std::vector<Formosa::Gramambular2::LanguageModel::Unigram> UserPhrasesLM::getUnigrams(const std::string& key)
-{
-    std::vector<Formosa::Gramambular2::LanguageModel::Unigram> v;
-    auto iter = keyRowMap.find(key);
-    if (iter != keyRowMap.end()) {
-        const std::vector<Row>& rows = iter->second;
-        for (const auto& row : rows) {
-            v.emplace_back(std::string(row.value), 0);
-        }
-    }
-
-    return v;
-}
-
-bool UserPhrasesLM::hasUnigrams(const std::string& key)
-{
-    return keyRowMap.find(key) != keyRowMap.end();
-}
-
-} // namespace McBopomofo
+}  // namespace McBopomofo

@@ -29,45 +29,44 @@
 
 namespace McBopomofo {
 
-TEST(ParselessLMTest, SanityCheckTest)
-{
-    constexpr const char* data_path = "data.txt";
-    if (!std::filesystem::exists(data_path)) {
-        GTEST_SKIP();
-    }
+TEST(ParselessLMTest, SanityCheckTest) {
+  constexpr const char* data_path = "data.txt";
+  if (!std::filesystem::exists(data_path)) {
+    GTEST_SKIP();
+  }
 
-    ParselessLM lm;
-    bool status = lm.open(data_path);
-    ASSERT_TRUE(status);
+  ParselessLM lm;
+  bool status = lm.open(data_path);
+  ASSERT_TRUE(status);
 
-    ASSERT_TRUE(lm.hasUnigrams("ㄕ"));
-    ASSERT_TRUE(lm.hasUnigrams("ㄕˋ-ㄕˊ"));
-    ASSERT_TRUE(lm.hasUnigrams("_punctuation_list"));
+  ASSERT_TRUE(lm.hasUnigrams("ㄕ"));
+  ASSERT_TRUE(lm.hasUnigrams("ㄕˋ-ㄕˊ"));
+  ASSERT_TRUE(lm.hasUnigrams("_punctuation_list"));
 
-    auto unigrams = lm.getUnigrams("ㄕ");
-    ASSERT_GT(unigrams.size(), 0);
+  auto unigrams = lm.getUnigrams("ㄕ");
+  ASSERT_GT(unigrams.size(), 0);
 
-    unigrams = lm.getUnigrams("ㄕˋ-ㄕˊ");
-    ASSERT_GT(unigrams.size(), 0);
+  unigrams = lm.getUnigrams("ㄕˋ-ㄕˊ");
+  ASSERT_GT(unigrams.size(), 0);
 
-    unigrams = lm.getUnigrams("_punctuation_list");
-    ASSERT_GT(unigrams.size(), 0);
+  unigrams = lm.getUnigrams("_punctuation_list");
+  ASSERT_GT(unigrams.size(), 0);
 
-    std::vector<ParselessLM::FoundReading> found_readings;
-    found_readings = lm.getReadings("不存在的詞");
-    ASSERT_TRUE(found_readings.empty());
+  std::vector<ParselessLM::FoundReading> found_readings;
+  found_readings = lm.getReadings("不存在的詞");
+  ASSERT_TRUE(found_readings.empty());
 
-    found_readings = lm.getReadings("讀音");
-    ASSERT_EQ(found_readings.size(), 1);
+  found_readings = lm.getReadings("讀音");
+  ASSERT_EQ(found_readings.size(), 1);
 
-    found_readings = lm.getReadings("鑰匙");
-    ASSERT_GT(found_readings.size(), 1);
+  found_readings = lm.getReadings("鑰匙");
+  ASSERT_GT(found_readings.size(), 1);
 
-    found_readings = lm.getReadings("得");
-    ASSERT_GT(found_readings.size(), 1);
-    ASSERT_EQ(found_readings[0].reading, "ㄉㄜˊ");
+  found_readings = lm.getReadings("得");
+  ASSERT_GT(found_readings.size(), 1);
+  ASSERT_EQ(found_readings[0].reading, "ㄉㄜˊ");
 
-    lm.close();
+  lm.close();
 }
 
-} // namespace McBopomofo
+}  // namespace McBopomofo

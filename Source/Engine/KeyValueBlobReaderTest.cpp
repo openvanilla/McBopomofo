@@ -31,175 +31,157 @@ namespace McBopomofo {
 using State = KeyValueBlobReader::State;
 using KeyValue = KeyValueBlobReader::KeyValue;
 
-TEST(KeyValueBlobReaderTest, EmptyBlob)
-{
-    std::string empty;
-    KeyValueBlobReader reader(empty.c_str(), empty.length());
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, EmptyBlob) {
+  std::string empty;
+  KeyValueBlobReader reader(empty.c_str(), empty.length());
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, EmptyBlobIdempotency)
-{
-    char empty[0];
-    KeyValueBlobReader reader(empty, 0);
-    EXPECT_EQ(reader.Next(), State::END);
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, EmptyBlobIdempotency) {
+  char empty[0];
+  KeyValueBlobReader reader(empty, 0);
+  EXPECT_EQ(reader.Next(), State::END);
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, BlankBlob)
-{
-    std::string blank = " ";
-    KeyValueBlobReader reader(blank.c_str(), blank.length());
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, BlankBlob) {
+  std::string blank = " ";
+  KeyValueBlobReader reader(blank.c_str(), blank.length());
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, KeyWithoutValueIsInvalid)
-{
-    std::string empty = "hello";
-    KeyValueBlobReader reader(empty.c_str(), empty.length());
-    EXPECT_EQ(reader.Next(), State::ERROR);
+TEST(KeyValueBlobReaderTest, KeyWithoutValueIsInvalid) {
+  std::string empty = "hello";
+  KeyValueBlobReader reader(empty.c_str(), empty.length());
+  EXPECT_EQ(reader.Next(), State::ERROR);
 }
 
-TEST(KeyValueBlobReaderTest, ErrorStateMakesNoMoreProgress)
-{
-    std::string empty = "hello";
-    KeyValueBlobReader reader(empty.c_str(), empty.length());
-    EXPECT_EQ(reader.Next(), State::ERROR);
-    EXPECT_EQ(reader.Next(), State::ERROR);
+TEST(KeyValueBlobReaderTest, ErrorStateMakesNoMoreProgress) {
+  std::string empty = "hello";
+  KeyValueBlobReader reader(empty.c_str(), empty.length());
+  EXPECT_EQ(reader.Next(), State::ERROR);
+  EXPECT_EQ(reader.Next(), State::ERROR);
 }
 
-TEST(KeyValueBlobReaderTest, KeyValueSeparatedByNullCharIsInvalid)
-{
-    char bad[] = { 'h', 0, 'w' };
-    KeyValueBlobReader reader(bad, sizeof(bad));
-    EXPECT_EQ(reader.Next(), State::ERROR);
+TEST(KeyValueBlobReaderTest, KeyValueSeparatedByNullCharIsInvalid) {
+  char bad[] = {'h', 0, 'w'};
+  KeyValueBlobReader reader(bad, sizeof(bad));
+  EXPECT_EQ(reader.Next(), State::ERROR);
 }
 
-TEST(KeyValueBlobReaderTest, SingleKeyValuePair)
-{
-    std::string empty = "hello world\n";
-    KeyValueBlobReader reader(empty.c_str(), empty.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, SingleKeyValuePair) {
+  std::string empty = "hello world\n";
+  KeyValueBlobReader reader(empty.c_str(), empty.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, SingleKeyValuePairFromButterWithoutNullEnding)
-{
-    char small[] = { 'p', ' ', 'q' };
-    KeyValueBlobReader reader(small, sizeof(small));
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "p", "q" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, SingleKeyValuePairFromButterWithoutNullEnding) {
+  char small[] = {'p', ' ', 'q'};
+  KeyValueBlobReader reader(small, sizeof(small));
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"p", "q"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, NullCharInTheMiddleTerminatesParsing)
-{
-    char small[] = { 'p', ' ', 'q', ' ', 0, '\n', 'r', ' ', 's' };
-    KeyValueBlobReader reader(small, sizeof(small));
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "p", "q" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, NullCharInTheMiddleTerminatesParsing) {
+  char small[] = {'p', ' ', 'q', ' ', 0, '\n', 'r', ' ', 's'};
+  KeyValueBlobReader reader(small, sizeof(small));
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"p", "q"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, SingleKeyValuePairWithoutLFAtEnd)
-{
-    std::string simple = "hello world";
-    KeyValueBlobReader reader(simple.c_str(), simple.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, SingleKeyValuePairWithoutLFAtEnd) {
+  std::string simple = "hello world";
+  KeyValueBlobReader reader(simple.c_str(), simple.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, EncodingAgnostic1)
-{
-    std::string simple = u8"smile ☺️";
-    KeyValueBlobReader reader(simple.c_str(), simple.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "smile", u8"☺️" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, EncodingAgnostic1) {
+  std::string simple = u8"smile ☺️";
+  KeyValueBlobReader reader(simple.c_str(), simple.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"smile", u8"☺️"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, EncodingAgnostic2)
-{
-    std::string simple = "Nobel-Laureate "
-                         "\xe9\x81\x94\xe8\xb3\xb4\xe5\x96\x87\xe5\x98\x9b";
-    KeyValueBlobReader reader(simple.c_str(), simple.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue,
-        (KeyValue { "Nobel-Laureate",
-            "\xe9\x81\x94\xe8\xb3\xb4\xe5\x96\x87\xe5\x98\x9b" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, EncodingAgnostic2) {
+  std::string simple =
+      "Nobel-Laureate "
+      "\xe9\x81\x94\xe8\xb3\xb4\xe5\x96\x87\xe5\x98\x9b";
+  KeyValueBlobReader reader(simple.c_str(), simple.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue,
+            (KeyValue{"Nobel-Laureate",
+                      "\xe9\x81\x94\xe8\xb3\xb4\xe5\x96\x87\xe5\x98\x9b"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, ValueDoesNotIncludeSpace)
-{
-    std::string simple = "hello world and all\nanother value";
-    KeyValueBlobReader reader(simple.c_str(), simple.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "another", "value" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, ValueDoesNotIncludeSpace) {
+  std::string simple = "hello world and all\nanother value";
+  KeyValueBlobReader reader(simple.c_str(), simple.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"another", "value"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, TrailingSpaceInValueIsIgnored)
-{
-    std::string simple
-        = "\thello   world        \n\n    foo bar \t\t\t   \n\n\n";
-    KeyValueBlobReader reader(simple.c_str(), simple.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "foo", "bar" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, TrailingSpaceInValueIsIgnored) {
+  std::string simple = "\thello   world        \n\n    foo bar \t\t\t   \n\n\n";
+  KeyValueBlobReader reader(simple.c_str(), simple.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"foo", "bar"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, WindowsCRLFSupported)
-{
-    std::string simple = "lorem ipsum\r\nhello world";
-    KeyValueBlobReader reader(simple.c_str(), simple.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "lorem", "ipsum" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, WindowsCRLFSupported) {
+  std::string simple = "lorem ipsum\r\nhello world";
+  KeyValueBlobReader reader(simple.c_str(), simple.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"lorem", "ipsum"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, MultipleKeyValuePair)
-{
-    std::string multi = "\n   \nhello world\n  foo \t bar  ";
-    KeyValueBlobReader reader(multi.c_str(), multi.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "foo", "bar" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, MultipleKeyValuePair) {
+  std::string multi = "\n   \nhello world\n  foo \t bar  ";
+  KeyValueBlobReader reader(multi.c_str(), multi.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"foo", "bar"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, ReadUntilNullChar)
-{
-    char buf[] = { 'p', '\t', 'q', '\n', 0, 'r', ' ', 's' };
-    KeyValueBlobReader reader(buf, sizeof(buf));
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "p", "q" }));
-    EXPECT_EQ(reader.Next(), State::END);
+TEST(KeyValueBlobReaderTest, ReadUntilNullChar) {
+  char buf[] = {'p', '\t', 'q', '\n', 0, 'r', ' ', 's'};
+  KeyValueBlobReader reader(buf, sizeof(buf));
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"p", "q"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, MultipleKeyValuePairWithComments)
-{
-    std::string text = R"(
+TEST(KeyValueBlobReaderTest, MultipleKeyValuePairWithComments) {
+  std::string text = R"(
 # comment1
 # comment2
 
@@ -214,20 +196,19 @@ TEST(KeyValueBlobReaderTest, MultipleKeyValuePairWithComments)
 # comment5
 )";
 
-    KeyValueBlobReader reader(text.c_str(), text.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "World" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "caffè", "latte" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "foo", "bar" }));
-    EXPECT_EQ(reader.Next(), State::END);
+  KeyValueBlobReader reader(text.c_str(), text.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "World"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"caffè", "latte"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"foo", "bar"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-TEST(KeyValueBlobReaderTest, ValueCommentSupported)
-{
-    std::string text = R"(
+TEST(KeyValueBlobReaderTest, ValueCommentSupported) {
+  std::string text = R"(
   # empty
 
   hello world#peace
@@ -237,19 +218,19 @@ hello world#peace  // peace
   foo bar
 )";
 
-    KeyValueBlobReader reader(text.c_str(), text.length());
-    KeyValue keyValue;
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world#peace" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world#peace" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "hello", "world#peace" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "caffè", "latte" }));
-    EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
-    EXPECT_EQ(keyValue, (KeyValue { "foo", "bar" }));
-    EXPECT_EQ(reader.Next(), State::END);
+  KeyValueBlobReader reader(text.c_str(), text.length());
+  KeyValue keyValue;
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world#peace"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world#peace"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"hello", "world#peace"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"caffè", "latte"}));
+  EXPECT_EQ(reader.Next(&keyValue), State::HAS_PAIR);
+  EXPECT_EQ(keyValue, (KeyValue{"foo", "bar"}));
+  EXPECT_EQ(reader.Next(), State::END);
 }
 
-} // namespace McBopomofo
+}  // namespace McBopomofo
