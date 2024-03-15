@@ -28,6 +28,15 @@
 
 namespace McBopomofo {
 
+bool ParselessPhraseDB::ValidatePragma(const char* buf, size_t length) {
+  if (length < SORTED_PRAGMA_HEADER.length()) {
+    return false;
+  }
+
+  std::string_view header(buf, SORTED_PRAGMA_HEADER.length());
+  return header == SORTED_PRAGMA_HEADER;
+}
+
 ParselessPhraseDB::ParselessPhraseDB(const char* buf, size_t length,
                                      bool validate_pragma)
     : begin_(buf), end_(buf + length) {
@@ -35,17 +44,17 @@ ParselessPhraseDB::ParselessPhraseDB(const char* buf, size_t length,
   assert(length > 0);
 
   if (validate_pragma) {
-    assert(length > SORTED_PRAGMA_HEADER.length());
-
-    std::string_view header(buf, SORTED_PRAGMA_HEADER.length());
-    assert(header == SORTED_PRAGMA_HEADER);
-
-    begin_ += header.length();
+    if (ValidatePragma(buf, length)) {
+      begin_ += SORTED_PRAGMA_HEADER.length();
+    } else {
+      // Header invalid; makes the db no-op.
+      end_ = begin_;
+    }
   }
 }
 
 std::vector<std::string_view> ParselessPhraseDB::findRows(
-    const std::string_view& key) {
+    const std::string_view& key) const {
   std::vector<std::string_view> rows;
 
   const char* ptr = findFirstMatchingLine(key);
@@ -79,7 +88,7 @@ std::vector<std::string_view> ParselessPhraseDB::findRows(
 // less to the key and the current line starts exactly with the key, then
 // the current line is the first matching line.
 const char* ParselessPhraseDB::findFirstMatchingLine(
-    const std::string_view& key) {
+    const std::string_view& key) const {
   if (key.empty()) {
     return begin_;
   }
@@ -153,7 +162,7 @@ const char* ParselessPhraseDB::findFirstMatchingLine(
 }
 
 std::vector<std::string> ParselessPhraseDB::reverseFindRows(
-    const std::string_view& value) {
+    const std::string_view& value) const {
   std::vector<std::string> rows;
 
   const char* recordBegin = begin_;

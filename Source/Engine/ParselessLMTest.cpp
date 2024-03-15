@@ -29,6 +29,63 @@
 
 namespace McBopomofo {
 
+constexpr char kSample[] = R"(
+# format org.openvanilla.mcbopomofo.sorted
+ㄅㄚ 八 -3.27631260
+ㄅㄚ 吧 -3.59800309
+ㄅㄚ 巴 -3.80233706
+ㄅㄚ-ㄅㄞˇ 八百 -4.67026409
+ㄅㄚ-ㄅㄞˇ 捌佰 -7.26686119
+ㄅㄚ˙ 吧 -3.59800309
+)";
+
+TEST(ParselessLMTest, IdempotentClose) {
+  auto db = std::make_unique<ParselessPhraseDB>(kSample, sizeof(kSample));
+
+  ParselessLM lm;
+  EXPECT_TRUE(lm.open(std::move(db)));
+  lm.close();
+
+  // Safe to do so.
+  lm.close();
+}
+
+TEST(ParselessLMTest, OpenFailsIfAlreadyOpened) {
+  auto db = std::make_unique<ParselessPhraseDB>(kSample, sizeof(kSample));
+
+  ParselessLM lm;
+  EXPECT_TRUE(lm.open(std::move(db)));
+
+  auto db2 = std::make_unique<ParselessPhraseDB>(kSample, sizeof(kSample));
+  EXPECT_FALSE(lm.open(std::move(db2)));
+}
+
+TEST(ParselessLMTest, UnopenedInstanceReturnsNothing) {
+  ParselessLM lm;
+  EXPECT_FALSE(lm.hasUnigrams("八"));
+}
+
+TEST(ParselessLMTest, ReturnsResults) {
+  ParselessLM lm;
+  auto db = std::make_unique<ParselessPhraseDB>(kSample, sizeof(kSample));
+  EXPECT_TRUE(lm.open(std::move(db)));
+
+  using Unigram = Formosa::Gramambular2::LanguageModel::Unigram;
+  std::vector<Unigram> unigrams = lm.getUnigrams("ㄅㄚ-ㄅㄞˇ");
+  EXPECT_EQ(unigrams.size(), 2);
+  EXPECT_EQ(unigrams[0].value(), "八百");
+  EXPECT_NEAR(unigrams[0].score(), -4.67026409, 0.00000001);
+  EXPECT_EQ(unigrams[1].value(), "捌佰");
+  EXPECT_NEAR(unigrams[1].score(), -7.26686119, 0.00000001);
+
+  std::vector<ParselessLM::FoundReading> readings = lm.getReadings("吧");
+  EXPECT_EQ(readings.size(), 2);
+  EXPECT_EQ(readings[0].reading, "ㄅㄚ");
+  EXPECT_NEAR(readings[0].score, -3.59800309, 0.00000001);
+  EXPECT_EQ(readings[1].reading, "ㄅㄚ˙");
+  EXPECT_NEAR(readings[1].score, -3.59800309, 0.00000001);
+}
+
 TEST(ParselessLMTest, SanityCheckTest) {
   constexpr const char* data_path = "data.txt";
   if (!std::filesystem::exists(data_path)) {

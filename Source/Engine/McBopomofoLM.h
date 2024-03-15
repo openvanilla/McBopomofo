@@ -24,13 +24,13 @@
 #ifndef SRC_ENGINE_MCBOPOMOFOLM_H_
 #define SRC_ENGINE_MCBOPOMOFOLM_H_
 
-#include <cstdio>
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-#include "AssociatedPhrases.h"
+#include "AssociatedPhrasesV2.h"
 #include "ParselessLM.h"
 #include "PhraseReplacementMap.h"
 #include "UserPhrasesLM.h"
@@ -38,112 +38,105 @@
 
 namespace McBopomofo {
 
-/// McBopomofoLM is a facade for managing a set of models including
-/// the input method language model, user phrases and excluded phrases.
-///
-/// It is the primary model class that the input controller and grammar builder
-/// of McBopomofo talks to. When the grammar builder starts to build a sentence
-/// from a series of BPMF readings, it passes the readings to the model to see
-/// if there are valid unigrams, and use returned unigrams to produce the final
-/// results.
-///
-/// McBopomofoLM combine and transform the unigrams from the primary language
-/// model and user phrases. The process is
-///
-/// 1) Get the original unigrams.
-/// 2) Drop the unigrams whose value is contained in the exclusion map.
-/// 3) Replace the values of the unigrams using the phrase replacement map.
-/// 4) Replace the values of the unigrams using an external converter lambda.
-/// 5) Drop the duplicated phrases.
-///
-/// The controller can ask the model to load the primary input method language
-/// model while launching and to load the user phrases anytime if the custom
-/// files are modified. It does not keep the reference of the data paths but
-/// you have to pass the paths when you ask it to do loading.
+// McBopomofoLM manages the input method's language models and performs text
+// and macro conversions.
+//
+// When the reading grid requests unigrams from McBopomofoLM, the LM combines
+// and transforms the unigrams from the primary language model and user phrases.
+// The process is
+//
+// 1. Get the original unigrams.
+// 2. Drop the unigrams from the user-exclusion list.
+// 3. Replace the unigram values specified by the user phrase replacement map.
+// 4. Transform the unigram values with an external converter, if supplied.
+// 5. Remove any duplicates.
+//
+// McBopomofoLM itself is not responsible for reloading custom models (user
+// phrases, excluded phrases, and replacement map). The LM's owner, usually the
+// input method controller, needs to take care of checking for updates and
+// telling McBopomofoLM to reload as needed.
 class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
  public:
-  McBopomofoLM();
-  ~McBopomofoLM() override;
+  McBopomofoLM() = default;
 
-  /// Asks to load the primary language model at the given path.
-  /// @param languageModelPath The path of the language model.
+  McBopomofoLM(const McBopomofoLM&) = delete;
+  McBopomofoLM(McBopomofoLM&&) = delete;
+  McBopomofoLM& operator=(const McBopomofoLM&) = delete;
+  McBopomofoLM& operator=(McBopomofoLM&&) = delete;
+
+  // Loads (or reloads, if already loaded) the primary language model data file.
   void loadLanguageModel(const char* languageModelDataPath);
-  /// If the data model is already loaded.
+
   bool isDataModelLoaded();
 
-  /// Asks to load the associated phrases at the given path.
-  /// @param associatedPhrasesPath The path of the associated phrases.
-  void loadAssociatedPhrases(const char* associatedPhrasesPath);
-  /// If the associated phrases already loaded.
-  bool isAssociatedPhrasesLoaded();
+  // Loads (or reloads if already loaded) the associated phrases data file.
+  void loadAssociatedPhrasesV2(const char* associatedPhrasesPath);
 
-  /// Asks to load the user phrases and excluded phrases at the given path.
-  /// @param userPhrasesPath The path of user phrases.
-  /// @param excludedPhrasesPath The path of excluded phrases.
+  // Loads (or reloads if already loaded) both the user phrases and the excluded
+  // phrases files. If one argument is passed a nullptr, that file will not
+  // be loaded or reloaded.
   void loadUserPhrases(const char* userPhrasesDataPath,
                        const char* excludedPhrasesDataPath);
-  /// Asks to load th phrase replacement table at the given path.
-  /// @param phraseReplacementPath The path of the phrase replacement table.
+
+  // Loads (or reloads if already loaded) the phrase replacement mapping file.
   void loadPhraseReplacementMap(const char* phraseReplacementPath);
 
-  /// Returns a list of available unigram for the given key.
-  /// @param key A string represents the BPMF reading or a symbol key. For
-  ///     example, it you pass "ㄇㄚ", it returns "嗎", "媽", and so on.
+  // Returns a list of unigrams for the reading. For example, if the reading is
+  // "ㄇㄚ", the return may be [unigram("嗎"), unigram("媽") and so on.
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
       const std::string& key) override;
-  /// If the model has unigrams for the given key.
-  /// @param key The key.
+
   bool hasUnigrams(const std::string& key) override;
 
-  /// Enables or disables phrase replacement.
+  std::string getReading(const std::string& value) const;
+
+  std::vector<AssociatedPhrasesV2::Phrase> findAssociatedPhrasesV2(
+      const std::string& prefixValue,
+      const std::vector<std::string>& prefixReadings) const;
+
   void setPhraseReplacementEnabled(bool enabled);
-  /// If phrase replacement is enabled or not.
   bool phraseReplacementEnabled() const;
 
-  /// Enables or disables the external converter.
   void setExternalConverterEnabled(bool enabled);
-  /// If the external converted is enabled or not.
   bool externalConverterEnabled() const;
-  /// Sets a lambda to let the values of unigrams could be converted by it.
   void setExternalConverter(
       std::function<std::string(const std::string&)> externalConverter);
 
-  /// Sets a lambda to convert the macro to a string.
   void setMacroConverter(
       std::function<std::string(const std::string&)> macroConverter);
   std::string convertMacro(const std::string& input);
 
-  const std::vector<std::string> associatedPhrasesForKey(
-      const std::string& key);
-  bool hasAssociatedPhrasesForKey(const std::string& key);
-
-  /// Returns the top-scored reading from the base model, given the value.
-  std::string getReading(const std::string& value);
+  // Methods to allow loading in-memory data for testing purposes.
+  void loadLanguageModel(std::unique_ptr<ParselessPhraseDB> db);
+  void loadAssociatedPhrasesV2(std::unique_ptr<ParselessPhraseDB> db);
+  void loadUserPhrases(const char* data, size_t length);
+  void loadExcludedPhrases(const char* data, size_t length);
+  void loadPhraseReplacementMap(const char* data, size_t length);
 
  protected:
-  /// Filters and converts the input unigrams and return a new list of unigrams.
-  ///
-  /// @param unigrams The unigrams to be processed.
-  /// @param excludedValues The values to excluded unigrams.
-  /// @param insertedValues The values for unigrams already in the results.
-  ///   It helps to prevent duplicated unigrams. Please note that the method
-  ///   has a side effect that it inserts values to `insertedValues`.
+  // Filters and converts the input unigrams and returns a new list of unigrams.
+  // Unigrams whose values are found in `excludedValues` are removed, and the
+  // kept values will be inserted to the `insertedValues` set.
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
   filterAndTransformUnigrams(
       const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams,
       const std::unordered_set<std::string>& excludedValues,
       std::unordered_set<std::string>& insertedValues);
 
-  ParselessLM m_languageModel;
-  UserPhrasesLM m_userPhrases;
-  UserPhrasesLM m_excludedPhrases;
-  PhraseReplacementMap m_phraseReplacement;
-  AssociatedPhrases m_associatedPhrases;
-  std::function<std::string(const std::string&)> m_macroConverter;
-  bool m_phraseReplacementEnabled;
-  bool m_externalConverterEnabled;
-  std::function<std::string(const std::string&)> m_externalConverter;
+  ParselessLM languageModel_;
+  UserPhrasesLM userPhrases_;
+  UserPhrasesLM excludedPhrases_;
+  PhraseReplacementMap phraseReplacement_;
+  AssociatedPhrasesV2 associatedPhrasesV2_;
+
+  bool phraseReplacementEnabled_ = false;
+
+  bool externalConverterEnabled_ = false;
+  std::function<std::string(const std::string&)> externalConverter_;
+
+  std::function<std::string(const std::string&)> macroConverter_;
 };
+
 }  // namespace McBopomofo
 
 #endif  // SRC_ENGINE_MCBOPOMOFOLM_H_

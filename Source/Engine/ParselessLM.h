@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "MemoryMappedFile.h"
 #include "ParselessPhraseDB.h"
 #include "gramambular2/language_model.h"
 
@@ -35,11 +36,18 @@ namespace McBopomofo {
 
 class ParselessLM : public Formosa::Gramambular2::LanguageModel {
  public:
-  ~ParselessLM() override;
+  ParselessLM() = default;
+  ParselessLM(const ParselessLM&) = delete;
+  ParselessLM(ParselessLM&&) = delete;
+  ParselessLM& operator=(const ParselessLM&) = delete;
+  ParselessLM& operator=(ParselessLM&&) = delete;
 
   bool isLoaded();
-  bool open(const std::string_view& path);
+  bool open(const char* path);
   void close();
+
+  // Allows the use of existing in-memory db.
+  bool open(std::unique_ptr<ParselessPhraseDB> db);
 
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> getUnigrams(
       const std::string& key) override;
@@ -47,15 +55,14 @@ class ParselessLM : public Formosa::Gramambular2::LanguageModel {
 
   struct FoundReading {
     std::string reading;
-    double score;
+    double score = 0;
   };
+
   // Look up reading by value. This is specific to ParselessLM only.
-  std::vector<FoundReading> getReadings(const std::string& value);
+  std::vector<FoundReading> getReadings(const std::string& value) const;
 
  private:
-  int fd_ = -1;
-  void* data_ = nullptr;
-  size_t length_ = 0;
+  MemoryMappedFile mmapedFile_;
   std::unique_ptr<ParselessPhraseDB> db_;
 };
 

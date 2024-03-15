@@ -138,22 +138,22 @@ class SimpleLM : public LanguageModel {
       linestream >> col0;
       linestream >> col1;
       linestream >> col2;
-      m_db[readingIsFirstColumn ? col0 : col1].emplace_back(
+      db_[readingIsFirstColumn ? col0 : col1].emplace_back(
           readingIsFirstColumn ? col1 : col0, std::stod(col2));
     }
   }
 
   std::vector<Unigram> getUnigrams(const std::string& key) override {
-    const auto f = m_db.find(key);
-    return f == m_db.end() ? std::vector<Unigram>() : (*f).second;
+    const auto f = db_.find(key);
+    return f == db_.end() ? std::vector<Unigram>() : (*f).second;
   }
 
   bool hasUnigrams(const std::string& key) override {
-    return m_db.find(key) != m_db.end();
+    return db_.find(key) != db_.end();
   }
 
  protected:
-  std::map<std::string, std::vector<Unigram>> m_db;
+  std::map<std::string, std::vector<Unigram>> db_;
 };
 
 class MockLM : public LanguageModel {
@@ -742,8 +742,8 @@ TEST(ReadingGridTest, DisambiguateCandidates) {
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高熱", "🔥", "焰", "危險"}));
 
-  ASSERT_TRUE(grid.overrideCandidate(
-      loc, ReadingGrid::Candidate("ㄏㄨㄛˇㄧㄢˋ", "🔥")));
+  ASSERT_TRUE(
+      grid.overrideCandidate(loc, ReadingGrid::Candidate("ㄏㄨㄛˇㄧㄢˋ", "🔥")));
   result = grid.walk();
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高熱", "🔥", "危險"}));

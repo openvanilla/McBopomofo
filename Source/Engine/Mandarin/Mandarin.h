@@ -182,28 +182,28 @@ class BopomofoKeyboardLayout {
 
   BopomofoKeyboardLayout(const BopomofoKeyToComponentMap& ktcm,
                          const std::string& name)
-      : m_name(name), m_keyToComponent(ktcm) {
+      : name_(name), keyToComponent_(ktcm) {
     for (BopomofoKeyToComponentMap::const_iterator miter =
-             m_keyToComponent.begin();
-         miter != m_keyToComponent.end(); ++miter)
+             keyToComponent_.begin();
+         miter != keyToComponent_.end(); ++miter)
       for (std::vector<BPMF::Component>::const_iterator viter =
                (*miter).second.begin();
            viter != (*miter).second.end(); ++viter)
-        m_componentToKey[*viter] = (*miter).first;
+        componentToKey_[*viter] = (*miter).first;
   }
 
-  const std::string name() const { return m_name; }
+  const std::string name() const { return name_; }
 
   char componentToKey(BPMF::Component component) const {
     BopomofoComponentToKeyMap::const_iterator iter =
-        m_componentToKey.find(component);
-    return (iter == m_componentToKey.end()) ? 0 : (*iter).second;
+        componentToKey_.find(component);
+    return (iter == componentToKey_.end()) ? 0 : (*iter).second;
   }
 
   const std::vector<BPMF::Component> keyToComponents(char key) const {
-    BopomofoKeyToComponentMap::const_iterator iter = m_keyToComponent.find(key);
-    return (iter == m_keyToComponent.end()) ? std::vector<BPMF::Component>()
-                                            : (*iter).second;
+    BopomofoKeyToComponentMap::const_iterator iter = keyToComponent_.find(key);
+    return (iter == keyToComponent_.end()) ? std::vector<BPMF::Component>()
+                                           : (*iter).second;
   }
 
   const std::string keySequenceFromSyllable(BPMF syllable) const {
@@ -357,9 +357,9 @@ class BopomofoKeyboardLayout {
     return false;
   }
 
-  std::string m_name;
-  BopomofoKeyToComponentMap m_keyToComponent;
-  BopomofoComponentToKeyMap m_componentToKey;
+  std::string name_;
+  BopomofoKeyToComponentMap keyToComponent_;
+  BopomofoComponentToKeyMap componentToKey_;
 };
 
 class BopomofoReadingBuffer {

@@ -80,10 +80,10 @@ class UserOverrideModel {
 
   typedef std::pair<std::string, Observation> KeyObservationPair;
 
-  size_t m_capacity;
-  double m_decayExponent;
-  std::list<KeyObservationPair> m_lruList;
-  std::map<std::string, std::list<KeyObservationPair>::iterator> m_lruMap;
+  size_t capacity_;
+  double decayExponent_;
+  std::list<KeyObservationPair> lruList_;
+  std::map<std::string, std::list<KeyObservationPair>::iterator> lruMap_;
 };
 
 }  // namespace McBopomofo
