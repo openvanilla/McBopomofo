@@ -53,10 +53,10 @@ static std::string FormObservationKey(
         end);
 
 UserOverrideModel::UserOverrideModel(size_t capacity, double decayConstant)
-    : m_capacity(capacity) {
-  assert(m_capacity > 0);
+    : capacity_(capacity) {
+  assert(capacity_ > 0);
   // NOLINTNEXTLINE(readability-magic-numbers)
-  m_decayExponent = log(0.5) / decayConstant;
+  decayExponent_ = log(0.5) / decayConstant;
 }
 
 void UserOverrideModel::observe(
@@ -156,28 +156,28 @@ UserOverrideModel::Suggestion UserOverrideModel::suggest(
 void UserOverrideModel::observe(const std::string& key,
                                 const std::string& candidate, double timestamp,
                                 bool forceHighScoreOverride) {
-  auto mapIter = m_lruMap.find(key);
-  if (mapIter == m_lruMap.end()) {
+  auto mapIter = lruMap_.find(key);
+  if (mapIter == lruMap_.end()) {
     auto keyValuePair = KeyObservationPair(key, Observation());
     Observation& observation = keyValuePair.second;
     observation.update(candidate, timestamp, forceHighScoreOverride);
 
-    m_lruList.push_front(keyValuePair);
-    auto listIter = m_lruList.begin();
+    lruList_.push_front(keyValuePair);
+    auto listIter = lruList_.begin();
     auto lruKeyValue =
         std::pair<std::string, std::list<KeyObservationPair>::iterator>(
             key, listIter);
-    m_lruMap.insert(lruKeyValue);
+    lruMap_.insert(lruKeyValue);
 
-    if (m_lruList.size() > m_capacity) {
-      auto lastKeyValuePair = m_lruList.end();
+    if (lruList_.size() > capacity_) {
+      auto lastKeyValuePair = lruList_.end();
       --lastKeyValuePair;
-      m_lruMap.erase(lastKeyValuePair->first);
-      m_lruList.pop_back();
+      lruMap_.erase(lastKeyValuePair->first);
+      lruList_.pop_back();
     }
   } else {
     auto listIter = mapIter->second;
-    m_lruList.splice(m_lruList.begin(), m_lruList, listIter);
+    lruList_.splice(lruList_.begin(), lruList_, listIter);
 
     auto& keyValuePair = *listIter;
     Observation& observation = keyValuePair.second;
@@ -187,8 +187,8 @@ void UserOverrideModel::observe(const std::string& key,
 
 UserOverrideModel::Suggestion UserOverrideModel::suggest(const std::string& key,
                                                          double timestamp) {
-  auto mapIter = m_lruMap.find(key);
-  if (mapIter == m_lruMap.end()) {
+  auto mapIter = lruMap_.find(key);
+  if (mapIter == lruMap_.end()) {
     return UserOverrideModel::Suggestion{};
   }
 
@@ -203,7 +203,7 @@ UserOverrideModel::Suggestion UserOverrideModel::suggest(const std::string& key,
        ++i) {
     const Override& o = i->second;
     double overrideScore = Score(o.count, observation.count, o.timestamp,
-                                 timestamp, m_decayExponent);
+                                 timestamp, decayExponent_);
     if (overrideScore == 0.0) {
       continue;
     }

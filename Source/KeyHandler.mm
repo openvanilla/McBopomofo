@@ -32,6 +32,7 @@
 
 #import <algorithm>
 #import <optional>
+#import <sstream>
 #import <string>
 #import <unordered_map>
 #import <utility>
@@ -45,46 +46,6 @@
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
 InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.PlainBopomofo";
-
-@implementation AssociatedPhraseArrayItem
-
-- (instancetype)initWithValue:(NSString *)inCharacter reading:(NSString *)inReading;
-{
-    self = [super init];
-    if (self) {
-        self.value = inCharacter;
-        self.reading = inReading;
-    }
-    return self;
-}
-
-+ (nonnull NSArray<AssociatedPhraseArrayItem *> *)createItemWithModelSearchableText:(nonnull NSString *)modelText readingSearchableText:(nonnull NSString *)readingText
-{
-    NSMutableArray *results = [NSMutableArray array];
-    if (modelText.length != readingText.length) {
-        return results;
-    }
-
-    for (NSInteger i = 0; i < modelText.length; i++) {
-        unichar text = [modelText characterAtIndex:i];
-        unichar key = [readingText characterAtIndex:i];
-        NSString *itemReading = [LanguageModelManager readingFor:[NSString stringWithFormat:@"%C", key]];
-        if (itemReading) {
-            AssociatedPhraseArrayItem *item = [[AssociatedPhraseArrayItem alloc] initWithValue:[NSString stringWithFormat:@"%C", text] reading:itemReading];
-            [results addObject:item];
-        }
-    }
-    return results;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"%@ %@ %@", super.description, self.value, self.reading];
-}
-
-@synthesize value;
-@synthesize reading;
-@end
 
 @implementation KeyHandler {
     std::shared_ptr<Formosa::Gramambular2::LanguageModel> _emptySharedPtr;
@@ -235,38 +196,95 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 }
 
-- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase
+- (void)fixNodeForAssociatedPhraseWithPrefixAt:(size_t)prefixCursorIndex prefixReading:(NSString *)pfxReading prefixValue:(NSString *)pfxValue associatedPhraseReading:(NSString *)phraseReading associatedPhraseValue:(NSString *)phraseValue
 {
-    size_t actualCursor = index;
-    Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
-    BOOL overrideResult = _grid->overrideCandidate(actualCursor, candidate);
-    if (!overrideResult) {
-        NSLog(@"sometimes it may fail after Chinese conversion. Bypass the error anyway");
+
+    if (_grid->length() == 0) {
+      return;
     }
 
-    Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk;
+    // Unlike actualCandidateCursorIndex() which takes the Hanyin/MS IME cursor
+    // modes into consideration, prefixCursorIndex is *already* the actual node
+    // position in the grid. The only boundary condition is when prefixCursorIndex
+    // is at the end. That's when we should decrement by one.
+    size_t actualPrefixCursorIndex = (prefixCursorIndex == _grid->length())
+                                         ? prefixCursorIndex - 1
+                                         : prefixCursorIndex;
+    // First of all, let's find the target node where the prefix is found. The
+    // node may not be exactly the same as the prefix.
+    size_t accumulatedCursor = 0;
+    auto nodeIter =
+        _latestWalk.findNodeAt(actualPrefixCursorIndex, &accumulatedCursor);
+
+    // Should not happen. The end location must be >= the node's spanning length.
+    if (accumulatedCursor < (*nodeIter)->spanningLength()) {
+      return;
+    }
+
+    // Let's do a split override. If a node is now ABCD, let's make four overrides
+    // A-B-C-D, essentially splitting the node. Why? Because we're inserting an
+    // associated phrase. Say the phrase is BCEF with the prefix BC. If we don't
+    // do the override, the nodes that represent A and D may not carry the same
+    // values after the next walk, since the underlying reading is now a-bcef-d
+    // and that does not necessary guarantee that A and D will be there.
+    std::vector<std::string> originalNodeValues = McBopomofo::Split((*nodeIter)->value());
+    if (originalNodeValues.size() == (*nodeIter)->spanningLength()) {
+      // Only performs this if the condition is satisfied.
+      size_t overrideIndex = accumulatedCursor - (*nodeIter)->spanningLength();
+      for (const auto& value : originalNodeValues) {
+        _grid->overrideCandidate(overrideIndex, value);
+        ++overrideIndex;
+      }
+    }
+
+    std::string prefixReading(pfxReading.UTF8String);
+    std::string prefixValue(pfxValue.UTF8String);
+
+    // Now, we override the prefix candidate again. This provides us with
+    // information for how many more we need to fill in to complete the
+    // associated phrase.
+    Formosa::Gramambular2::ReadingGrid::Candidate prefixCandidate{prefixReading,
+                                                                  prefixValue};
+    if (!_grid->overrideCandidate(actualPrefixCursorIndex, prefixCandidate)) {
+      return;
+    }
     [self _walk];
 
-    // Update the user override model if warranted.
-    size_t accumulatedCursor = 0;
-    auto nodeIter = _latestWalk.findNodeAt(actualCursor, &accumulatedCursor);
-    if (nodeIter == _latestWalk.nodes.cend()) {
-        return;
-    }
-    Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
-    if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
-        _userOverrideModel->observe(prevWalk, _latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
-    }
+    // Now we've set ourselves up. Because associated phrases require the strict
+    // one-reading-for-one-value rule, we can comfortably count how many readings
+    // we'll need to insert. First, let's move to the end of the newly overridden
+    // phrase.
+    nodeIter =
+        _latestWalk.findNodeAt(actualPrefixCursorIndex, &accumulatedCursor);
     _grid->setCursor(accumulatedCursor);
 
-    for (NSInteger i = 0; i < associatedPhrase.count; i++) {
-        NSString *itemReading = associatedPhrase[i].reading;
-        _grid->insertReading(itemReading.UTF8String);
-        NSString *phrase = associatedPhrase[i].value;
-        NSInteger candidateIIndex = accumulatedCursor + i;
-        _grid->overrideCandidate(candidateIIndex, phrase.UTF8String);
+    std::string associatedPhraseReading(phraseReading.UTF8String);
+    std::string associatedPhraseValue(phraseValue.UTF8String);
+
+    // Compute how many more reading do we have to insert.
+    size_t nodeSpanningLength = (*nodeIter)->spanningLength();
+    std::vector<std::string> splitReadings =
+        McBopomofo::AssociatedPhrasesV2::SplitReadings(associatedPhraseReading);
+    size_t splitReadingsSize = splitReadings.size();
+    if (nodeSpanningLength >= splitReadingsSize) {
+      // Shouldn't happen
+      return;
     }
+
+    for (size_t i = nodeSpanningLength; i < splitReadingsSize; i++) {
+      _grid->insertReading(splitReadings[i]);
+      ++accumulatedCursor;
+      _grid->setCursor(accumulatedCursor);
+    }
+
+    // Finally, let's override with the full associated phrase's value.
+    if (!_grid->overrideCandidate(actualPrefixCursorIndex,
+                                 associatedPhraseValue)) {
+      // Shouldn't happen
+    }
+
     [self _walk];
+    // Cursor is already at accumulatedCursor, so no more work here.
 }
 
 - (void)clear
@@ -475,6 +493,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             if (choosingCandidates.candidates.count == 1) {
                 [self clear];
                 NSString *text = choosingCandidates.candidates.firstObject.value;
+                NSString *candidateReading = choosingCandidates.candidates.firstObject.reading;
                 InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text];
                 stateCallback(committing);
 
@@ -482,7 +501,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
                 } else {
-                    InputStateAssociatedPhrasesPlain *associatedPhrases = (InputStateAssociatedPhrasesPlain *)[self buildAssociatePhrasePlainStateWithKey:text useVerticalMode:input.useVerticalMode];
+                    InputStateAssociatedPhrasesPlain *associatedPhrases = (InputStateAssociatedPhrasesPlain *)[self buildAssociatedPhrasePlainStateWithReading:candidateReading value:text useVerticalMode:input.useVerticalMode];
                     if (associatedPhrases) {
                         stateCallback(associatedPhrases);
                     } else {
@@ -629,7 +648,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             input.isShiftHold &&
             [state isKindOfClass:[InputStateInputting class]] &&
             Preferences.associatedPhrasesEnabled) {
-            return [self _handleAssociatedPhraseWithState:(InputStateInputting *)state stateCallback:stateCallback errorCallback:errorCallback];
+            return [self _handleAssociatedPhraseWithState:(InputStateInputting *)state useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback];
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
@@ -1337,17 +1356,17 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (charCode == 13 || input.isEnter) {
-        // Start associated phrases
+        // Find associated phrases from the chosen candidate.
         if (_inputMode == InputModeBopomofo &&
             input.isShiftHold &&
             Preferences.associatedPhrasesEnabled) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
                 InputStateChoosingCandidate *current = (InputStateChoosingCandidate *)state;
-                NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
-                InputStateCandidate *candidate = current.candidates[index];
-                NSString *key = candidate.value;
-                NSString *reading = candidate.reading;
-                InputState* newState = [self buildAssociatePhraseStateWithPreviousState:current selectedIndex:index selectedPhrase:key selectedReading:reading useVerticalMode:NO];
+                NSInteger selectedCandidateIndex = gCurrentCandidateController.selectedCandidateIndex;
+                InputStateCandidate *candidate = current.candidates[selectedCandidateIndex];
+                NSString *prefixReading = candidate.reading;
+                NSString *prefixValue = candidate.value;
+                InputState* newState = [self buildAssociatedPhraseStateWithPreviousState:current candidateStateOriginalCursorAt:current.originalCursorIndex prefixReading:prefixReading value:prefixValue selectedCandidateIndex:selectedCandidateIndex useVerticalMode:current.useVerticalMode];
                 if (newState) {
                     stateCallback(newState);
                 } else {
@@ -1725,45 +1744,110 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 }
 
 - (BOOL)_handleAssociatedPhraseWithState:(InputStateInputting *)state
+                useVerticalMode:(BOOL)useVerticalMode
                 stateCallback:(void (^)(InputState *))stateCallback
                 errorCallback:(void (^)(void))errorCallback;
 {
     size_t cursor = _grid->cursor();
+
+    // We need to find the node *before* the cursor, so cursor must be >= 1.
     if (cursor < 1) {
         errorCallback();
         return YES;
     }
-    std::string composingBuffer = std::string(state.composingBuffer.UTF8String);
-    std::string characterBeforeCursor = McBopomofo::GetCodePoint(composingBuffer, cursor - 1);
-    auto candidates = _grid->candidatesAt(cursor - 1);
-    auto candidateIt = std::find_if(candidates.begin(),
-                 candidates.end(),
-                 [characterBeforeCursor](auto candidate){
-        return candidate.value == characterBeforeCursor;
-    });
 
-    if (candidateIt == candidates.end()) {
-        // The character before the cursor is not composed by a single reading.
+    // Find the selected node *before* the cursor.
+    size_t prefixCursorIndex = cursor - 1;
+
+    size_t endCursorIndex = 0;
+    auto nodePtrIt = _latestWalk.findNodeAt(prefixCursorIndex, &endCursorIndex);
+    if (nodePtrIt == _latestWalk.nodes.cend() || endCursorIndex == 0) {
+        // Shouldn't happen.
         errorCallback();
         return YES;
     }
 
-    std::optional<Formosa::Gramambular2::ReadingGrid::NodePtr> oneUnitLongSpan = _grid->findInSpan(cursor - 1, [](const Formosa::Gramambular2::ReadingGrid::NodePtr& node) {
-        return node->spanningLength() == 1;
-    });
-
-    if (!oneUnitLongSpan.has_value()) {
+    // Validate that the value's codepoint count is the same as the number
+    // of readings. This is a strict requirement for the associated phrases.
+    std::vector<std::string> codepoints = McBopomofo::Split((*nodePtrIt)->value());
+    std::vector<std::string> readings = McBopomofo::AssociatedPhrasesV2::SplitReadings((*nodePtrIt)->reading());
+    if (codepoints.size() != readings.size()) {
         errorCallback();
         return YES;
     }
-    std::string reading = (*oneUnitLongSpan)->reading();
 
-    InputState *newState = [self buildAssociatePhraseStateWithPreviousState:state selectedIndex:0 selectedPhrase:@(characterBeforeCursor.c_str()) selectedReading:@(reading.c_str()) useVerticalMode:NO];
-    if (newState) {
-        stateCallback(newState);
-    } else {
+    if (endCursorIndex < readings.size()) {
+        // Shouldn't happen.
         errorCallback();
+        return YES;
     }
+
+    // Try to find the longest associated phrase prefix. Suppose we have
+    // a walk A-B-CD-EFGH and the cursor is between EFG and H. Our job is
+    // to try the prefixes EFG, EF, and G to see which one yields a list
+    // of possible associated phrases.
+    //
+    //             grid_->cursor()
+    //                 |
+    //                 v
+    //     A-B-C-D-|EFG|H|
+    //             ^     ^
+    //             |     |
+    //             |    endCursorIndex
+    //           startCursorIndex
+    //
+    // In this case, the max prefix length is 3. This works because our
+    // association phrases mechanism require that the node's codepoint
+    // length and reading length (i.e. the spanning length) must be equal.
+    //
+    // And say if the prefix "FG" has associated phrases FGPQ, FGRST, and
+    // the user later chooses FGRST, we will first override the FG node
+    // again, essentially breaking that from E and H (the vertical bar
+    // represents the cursor):
+    //
+    //     A-B-C-D-E'-FG|-H'
+    //
+    // And then we add the readings for the RST to the grid, and override
+    // the grid at the cursor position with the value FGRST (and its
+    // corresponding reading) again, so that the process is complete:
+    //
+    //     A-B-C-D-E'-FGRST|-H'
+    //
+    // Notice that after breaking FG from EFGH, the values E and H may
+    // change due to a new walk, hence the notation E' and H'. We address
+    // issue in pinNodeWithAssociatedPhrase() by making sure that the nodes
+    // will be overridden with the values E and H.
+    size_t startCursorIndex = endCursorIndex - readings.size();
+    size_t prefixLength = cursor - startCursorIndex;
+    size_t maxPrefixLength = prefixLength;
+    for (; prefixLength > 0; --prefixLength) {
+        size_t startIndex = maxPrefixLength - prefixLength;
+        auto cpBegin = codepoints.cbegin();
+        auto cpEnd = codepoints.cbegin();
+        std::advance(cpBegin, startIndex);
+        std::advance(cpEnd, maxPrefixLength);
+        auto cpSlice = std::vector<std::string>(cpBegin, cpEnd);
+
+        auto rdBegin = readings.cbegin();
+        auto rdEnd = readings.cbegin();
+        std::advance(rdBegin, startIndex);
+        std::advance(rdEnd, maxPrefixLength);
+        auto rdSlice = std::vector<std::string>(rdBegin, rdEnd);
+
+        std::stringstream value;
+        for (const std::string& cp : cpSlice) {
+            value << cp;
+        }
+
+        NSString *combinedReading = @(McBopomofo::AssociatedPhrasesV2::CombineReadings(rdSlice).c_str());
+        NSString *actualValue = @(value.str().c_str());
+        InputState *newState = [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:prefixCursorIndex reading:combinedReading value:actualValue selectedCandidateIndex:0 useVerticalMode:useVerticalMode];
+        if (newState) {
+            stateCallback(newState);
+            return YES;
+        }
+    }
+    errorCallback();
     return YES;
 }
 
@@ -1884,10 +1968,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return state;
 }
 
-- (NSInteger)actualCandidateCursorIndex
+- (size_t)computeActualCursorIndex:(size_t)cursor
 {
-    size_t cursor = _grid->cursor();
-
     // If the cursor is at the end, always return cursor - 1. Even though
     // ReadingGrid already handles this edge case, we want to use this value
     // consistently. UserOverrideModel also requires the cursor to be this
@@ -1907,6 +1989,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return cursor;
 }
 
+- (NSInteger)actualCandidateCursorIndex
+{
+    return [self computeActualCursorIndex:_grid->cursor()];
+}
+
 - (NSInteger)cursorIndex
 {
     size_t cursor = _grid->cursor();
@@ -1923,15 +2010,42 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return readingsArray;
 }
 
-- (nullable InputState *)buildAssociatePhrasePlainStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode
+- (nullable InputState *)buildAssociatedPhrasePlainStateWithReading:(NSString *)reading value:(NSString *)value useVerticalMode:(BOOL)useVerticalMode;
 {
-    std::string cppKey(key.UTF8String);
-    if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
-        std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
-        NSMutableArray<NSString *> *array = [NSMutableArray array];
-        for (auto phrase : phrases) {
-            NSString *item = @(phrase.c_str());
-            [array addObject:item];
+    // Check if we need to convert the value back to TC.
+    NSString *actualValue = value;
+    BOOL scToTc = Preferences.chineseConversionEnabled &&
+            Preferences.chineseConversionStyle == ChineseConversionStyleModel;
+    if (scToTc) {
+        actualValue = [[OpenCCBridge sharedInstance] convertToTraditional:value];
+    }
+
+    std::string cppValue(actualValue.UTF8String);
+    std::vector<std::string> readings = McBopomofo::AssociatedPhrasesV2::SplitReadings(std::string(reading.UTF8String));
+
+    std::vector<McBopomofo::AssociatedPhrasesV2::Phrase> phrases = _languageModel->findAssociatedPhrasesV2(cppValue, readings);
+    if (!phrases.empty()) {
+        NSMutableArray<InputStateCandidate *> *array = [NSMutableArray array];
+        for (const auto& phrase : phrases) {
+            // AssociatedPhrasesV2::Phrase's value *contains* the prefix, hence this.
+            std::string valueWithoutPrefix = phrase.value.substr(cppValue.length());
+
+            // Ditto for reading; so we need to skip the prefix's readings.
+            auto readingIter = phrase.readings.cbegin();
+            for (auto ri = readings.cbegin(), re = readings.cend(); ri != re && readingIter != phrase.readings.cend(); ++ri) {
+                ++readingIter;
+                if (readingIter == phrase.readings.cend()) {
+                    // Shouldn't happen; mark this as an invalid phrase.
+                    continue;
+                }
+            }
+            std::vector<std::string> readingsWithoutPrefix{readingIter, phrase.readings.cend()};
+            std::string combinedReading = McBopomofo::AssociatedPhrasesV2::CombineReadings(readingsWithoutPrefix);
+
+            NSString *candidateReading = @(combinedReading.c_str());
+            NSString *candidateValue = @(valueWithoutPrefix.c_str());
+            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:candidateValue];
+            [array addObject:candidate];
         }
         InputStateAssociatedPhrasesPlain *associatedPhrases = [[InputStateAssociatedPhrasesPlain alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
         return associatedPhrases;
@@ -1939,35 +2053,50 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return nil;
 }
 
-- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index selectedPhrase:(NSString *)key selectedReading:(NSString *)selectedReading useVerticalMode:(BOOL)useVerticalMode
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state prefixCursorAt:(size_t)prefixCursorIndex reading:(NSString *)reading value:(NSString *)value selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode
 {
-    if (![state isKindOfClass:[InputStateNotEmpty class]]) {
+    BOOL scToTc = Preferences.chineseConversionEnabled &&
+            Preferences.chineseConversionStyle == ChineseConversionStyleModel;
+
+    std::vector<std::string> splitReadings = McBopomofo::AssociatedPhrasesV2::SplitReadings(std::string(reading.UTF8String));
+    NSString *actualValue = value;
+    if (scToTc) {
+        // The data is in Traditional Chinese, and so if ChineseConversionStyleModel is enabled, we need to convert the prefix back.
+        actualValue = [[OpenCCBridge sharedInstance] convertToTraditional:actualValue];
+    }
+    std::string prefixValue(actualValue.UTF8String);
+    std::vector<McBopomofo::AssociatedPhrasesV2::Phrase> phrases = _languageModel->findAssociatedPhrasesV2(prefixValue, splitReadings);
+
+    if (phrases.empty()) {
         return nil;
     }
 
-    BOOL scToTc = Preferences.chineseConversionEnabled &&
-            Preferences.chineseConversionStyle == ChineseConversionStyleModel;
-    if (scToTc) {
-        key = [[OpenCCBridge sharedInstance] convertToTraditional:key];
-    }
-    std::string cppKey(key.UTF8String);
+    NSMutableArray<InputStateCandidate *> *array = [NSMutableArray array];
+    for (const auto& phrase : phrases) {
+        std::string combinedReading = McBopomofo::AssociatedPhrasesV2::CombineReadings(phrase.readings);
+        NSString *candidateReading = @(combinedReading.c_str());
+        NSString *candidateValue = @(phrase.value.c_str());
 
-    if (_languageModel->hasAssociatedPhrasesForKey(cppKey)) {
-        std::vector<std::string> phrases = _languageModel->associatedPhrasesForKey(cppKey);
-        NSMutableArray<InputStateCandidate *> *array = [NSMutableArray array];
-        for (auto phrase : phrases) {
-            NSString *item = @(phrase.c_str());
-            NSString *diaplayText = [[NSString alloc] initWithString:item];
-            if (scToTc) {
-                diaplayText = [[OpenCCBridge sharedInstance] convertToSimplified:diaplayText];
-            }
-            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:@"" value:item displayText:diaplayText];
-            [array addObject:candidate];
+        // Display text chops the prefix.
+        std::string valueWithoutPrefix = phrase.value.substr(prefixValue.length());
+        NSString *displayText = @(valueWithoutPrefix.c_str());
+
+        // Follow the logic of ChineseConversionStyleModel, if enabled.
+        if (scToTc) {
+            candidateValue = [[OpenCCBridge sharedInstance] convertToSimplified:candidateValue];
+            displayText = [[OpenCCBridge sharedInstance] convertToSimplified:displayText];
         }
-        InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state selectedPhrase:key selectedReading:selectedReading selectedIndex:index candidates:array useVerticalMode:useVerticalMode];
-        return associatedPhrases;
+
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:displayText];
+        [array addObject:candidate];
     }
-    return nil;
+    InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state prefixCursorIndex:prefixCursorIndex prefixReading:reading prefixValue:value selectedIndex:candidateIndex candidates:array useVerticalMode:useVerticalMode];
+    return associatedPhrases;
+}
+
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex prefixReading:(NSString *)prefixReading value:(NSString *)prefixValue selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode
+{
+    return [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:[self computeActualCursorIndex:candidtaeStateOriginalCursorIndex] reading:prefixReading value:prefixValue selectedCandidateIndex:candidateIndex useVerticalMode:useVerticalMode];
 }
 
 

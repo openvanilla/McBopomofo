@@ -32,57 +32,37 @@
 #include <string_view>
 #include <utility>
 
-McBopomofo::ParselessLM::~ParselessLM() { close(); }
+namespace McBopomofo {
 
-bool McBopomofo::ParselessLM::isLoaded() { return data_ != nullptr; }
+bool ParselessLM::isLoaded() const { return db_ != nullptr; }
 
-bool McBopomofo::ParselessLM::open(const std::string_view& path) {
-  if (data_) {
+bool ParselessLM::open(const char* path) {
+  if (!mmapedFile_.open(path)) {
     return false;
   }
-
-  fd_ = ::open(path.data(), O_RDONLY);
-  if (fd_ == -1) {
-    return false;
-  }
-
-  struct stat sb;
-  if (fstat(fd_, &sb) == -1) {
-    ::close(fd_);
-    fd_ = -1;
-    return false;
-  }
-
-  length_ = static_cast<size_t>(sb.st_size);
-
-  data_ = mmap(NULL, length_, PROT_READ, MAP_SHARED, fd_, 0);
-  if (data_ == nullptr) {
-    ::close(fd_);
-    fd_ = -1;
-    length_ = 0;
-    return false;
-  }
-
   db_ = std::unique_ptr<ParselessPhraseDB>(new ParselessPhraseDB(
-      static_cast<char*>(data_), length_, /*validate_pragma=*/
-      true));
+      mmapedFile_.data(), mmapedFile_.length(), /*validate_pragma=*/true));
   return true;
 }
 
-void McBopomofo::ParselessLM::close() {
-  if (data_ != nullptr) {
-    munmap(data_, length_);
-    ::close(fd_);
-    fd_ = -1;
-    length_ = 0;
-    data_ = nullptr;
+void ParselessLM::close() {
+  mmapedFile_.close();
+  db_ = nullptr;
+}
+
+bool ParselessLM::open(std::unique_ptr<ParselessPhraseDB> db) {
+  if (db_ != nullptr) {
+    return false;
   }
+
+  db_ = std::move(db);
+  return true;
 }
 
 std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
-McBopomofo::ParselessLM::getUnigrams(const std::string& key) {
+ParselessLM::getUnigrams(const std::string& key) {
   if (db_ == nullptr) {
-    return std::vector<Formosa::Gramambular2::LanguageModel::Unigram>();
+    return {};
   }
 
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results;
@@ -128,7 +108,7 @@ McBopomofo::ParselessLM::getUnigrams(const std::string& key) {
   return results;
 }
 
-bool McBopomofo::ParselessLM::hasUnigrams(const std::string& key) {
+bool ParselessLM::hasUnigrams(const std::string& key) {
   if (db_ == nullptr) {
     return false;
   }
@@ -136,13 +116,13 @@ bool McBopomofo::ParselessLM::hasUnigrams(const std::string& key) {
   return db_->findFirstMatchingLine(key + " ") != nullptr;
 }
 
-std::vector<McBopomofo::ParselessLM::FoundReading>
-McBopomofo::ParselessLM::getReadings(const std::string& value) {
+std::vector<ParselessLM::FoundReading> ParselessLM::getReadings(
+    const std::string& value) const {
   if (db_ == nullptr) {
-    return std::vector<McBopomofo::ParselessLM::FoundReading>();
+    return {};
   }
 
-  std::vector<McBopomofo::ParselessLM::FoundReading> results;
+  std::vector<ParselessLM::FoundReading> results;
 
   // We append a space so that we only find rows with the exact value. We
   // are taking advantage of the fact that a well-form row in this LM must
@@ -182,7 +162,9 @@ McBopomofo::ParselessLM::getReadings(const std::string& value) {
     if (it != row.end()) {
       score = std::stod(std::string(it, row.end()));
     }
-    results.emplace_back(McBopomofo::ParselessLM::FoundReading{key, score});
+    results.emplace_back(ParselessLM::FoundReading{key, score});
   }
   return results;
 }
+
+}  // namespace McBopomofo

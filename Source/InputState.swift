@@ -518,19 +518,21 @@ class InputState: NSObject {
     @objc(InputStateAssociatedPhrases)
     class AssociatedPhrases: NotEmpty, CandidateProvider {
         @objc private(set) var previousState: NotEmpty
-        @objc private(set) var selectedPhrase: String = ""
-        @objc private(set) var selectedReading: String = ""
+        @objc private(set) var prefixCursorIndex: Int = 0
+        @objc private(set) var prefixReading: String = ""
+        @objc private(set) var prefixValue: String = ""
         @objc private(set) var selectedIndex: Int = 0
         @objc private(set) var candidates: [Candidate] = []
         @objc private(set) var useVerticalMode: Bool = false
 
         @objc init(
-            previousState: NotEmpty, selectedPhrase: String, selectedReading: String,
+            previousState: NotEmpty, prefixCursorIndex: Int, prefixReading: String, prefixValue: String,
             selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool
         ) {
             self.previousState = previousState
-            self.selectedPhrase = selectedPhrase
-            self.selectedReading = selectedReading
+            self.prefixCursorIndex = prefixCursorIndex
+            self.prefixReading = prefixReading
+            self.prefixValue = prefixValue
             self.selectedIndex = selectedIndex
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
@@ -540,7 +542,7 @@ class InputState: NSObject {
         }
 
         override var description: String {
-            "<InputState.AssociatedPhrases, previousState:\(previousState), candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
+            "<InputState.AssociatedPhrases, previousState:\(previousState), prefixCursorIndex:\(prefixCursorIndex), prefixReading:\(prefixReading), prefixValue:\(prefixValue), selectedIndex:\(selectedIndex), candidates:\(candidates), useVerticalMode:\(useVerticalMode)>"
         }
 
         var candidateCount: Int {
@@ -558,10 +560,10 @@ class InputState: NSObject {
     /// This is for Plain Bopomofo input mode.
     @objc(InputStateAssociatedPhrasesPlain)
     class AssociatedPhrasesPlain: InputState, CandidateProvider {
-        @objc private(set) var candidates: [String] = []
+        @objc private(set) var candidates: [Candidate] = []
         @objc private(set) var useVerticalMode: Bool = false
 
-        @objc init(candidates: [String], useVerticalMode: Bool) {
+        @objc init(candidates: [Candidate], useVerticalMode: Bool) {
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
             super.init()
@@ -576,7 +578,7 @@ class InputState: NSObject {
         }
 
         func candidate(at index: Int) -> String {
-            candidates[index]
+            candidates[index].displayText
         }
     }
 

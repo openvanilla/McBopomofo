@@ -74,6 +74,11 @@ class KeyValueBlobReader {
   KeyValueBlobReader(const char* blob, size_t size)
       : current_(blob), end_(blob + size) {}
 
+  KeyValueBlobReader(const KeyValueBlobReader&) = delete;
+  KeyValueBlobReader(KeyValueBlobReader&&) = delete;
+  KeyValueBlobReader& operator=(const KeyValueBlobReader&) = delete;
+  KeyValueBlobReader& operator=(KeyValueBlobReader&&) = delete;
+
   // Parse the next key-value pair and return the state of the reader. If
   // `out` is passed, out will be set to the produced key-value pair if there
   // is one.

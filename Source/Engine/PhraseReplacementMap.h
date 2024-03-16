@@ -28,22 +28,30 @@
 #include <map>
 #include <string>
 
+#include "MemoryMappedFile.h"
+
 namespace McBopomofo {
 
 class PhraseReplacementMap {
  public:
-  PhraseReplacementMap();
-  ~PhraseReplacementMap();
+  PhraseReplacementMap() = default;
+  PhraseReplacementMap(const PhraseReplacementMap&) = delete;
+  PhraseReplacementMap(PhraseReplacementMap&&) = delete;
+  PhraseReplacementMap& operator=(const PhraseReplacementMap&) = delete;
+  PhraseReplacementMap& operator=(PhraseReplacementMap&&) = delete;
 
   bool open(const char* path);
   void close();
-  const std::string valueForKey(const std::string& key);
+
+  // Allows loading existing in-memory data. It's the caller's responsibility
+  // to make sure that data outlives this instance.
+  bool load(const char* data, size_t length);
+
+  std::string valueForKey(const std::string& key) const;
 
  protected:
-  std::map<std::string_view, std::string_view> keyValueMap;
-  int fd;
-  void* data;
-  size_t length;
+  std::map<std::string_view, std::string_view> keyValueMap_;
+  MemoryMappedFile mmapedFile_;
 };
 
 }  // namespace McBopomofo

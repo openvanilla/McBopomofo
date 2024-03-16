@@ -122,8 +122,6 @@ TEST(ParselessPhraseDBTest, InvalidConstructorArguments) {
   EXPECT_DEATH((ParselessPhraseDB{nullptr, 1}), "buf != nullptr");
   EXPECT_DEATH((ParselessPhraseDB{nullptr, 0}), "buf != nullptr");
   EXPECT_DEATH((ParselessPhraseDB{"", 0}), "length > 0");
-  EXPECT_DEATH((ParselessPhraseDB{"a", 1, /*validate_pragma=*/true}),
-               "length > SORTED_PRAGMA_HEADER\\.length\\(\\)");
 }
 
 TEST(ParselessPhraseDBTest, PragmaGuard) {
@@ -131,16 +129,27 @@ TEST(ParselessPhraseDBTest, PragmaGuard) {
   std::string buf2 = "#" + buf1;
   std::string buf3 = buf1;
   buf3[3] = 'x';
+  std::string buf4 = "a";
 
-  ParselessPhraseDB{buf1.c_str(), buf1.length(), /*validate_pragma=*/true};
-  EXPECT_DEATH(
-      (ParselessPhraseDB{buf2.c_str(), buf2.length(), /*validate_pragma=*/
-                         true}),
-      "==");
-  EXPECT_DEATH(
-      (ParselessPhraseDB{buf3.c_str(), buf3.length(), /*validate_pragma=*/
-                         true}),
-      "==");
+  auto db1 =
+      ParselessPhraseDB{buf1.c_str(), buf1.length(), /*validate_pragma=*/true};
+  EXPECT_NE(db1.findFirstMatchingLine("a"), nullptr);
+
+  auto db2 =
+      ParselessPhraseDB{buf2.c_str(), buf2.length(), /*validate_pragma=*/true};
+  EXPECT_EQ(db2.findFirstMatchingLine("a"), nullptr);
+
+  auto db3 =
+      ParselessPhraseDB{buf3.c_str(), buf3.length(), /*validate_pragma=*/true};
+  EXPECT_EQ(db3.findFirstMatchingLine("a"), nullptr);
+
+  auto db4_1 =
+      ParselessPhraseDB{buf4.c_str(), buf4.length(), /*validate_pragma=*/true};
+  EXPECT_EQ(db4_1.findFirstMatchingLine("a"), nullptr);
+
+  auto db4_2 =
+      ParselessPhraseDB{buf4.c_str(), buf4.length(), /*validate_pragma=*/false};
+  EXPECT_NE(db4_2.findFirstMatchingLine("a"), nullptr);
 }
 
 TEST(ParselessPhraseDBTest, StressTest) {

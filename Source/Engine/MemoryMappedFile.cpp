@@ -1,4 +1,4 @@
-// Copyright (c) 2022 and onwards The McBopomofo Authors.
+// Copyright (c) 2024 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -21,59 +21,72 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include "PhraseReplacementMap.h"
+#include "MemoryMappedFile.h"
 
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <fstream>
-
-#include "KeyValueBlobReader.h"
+#include <utility>
 
 namespace McBopomofo {
 
-bool PhraseReplacementMap::open(const char* path) {
-  if (!mmapedFile_.open(path)) {
-    return false;
-  }
+MemoryMappedFile::MemoryMappedFile(MemoryMappedFile&& other) noexcept
+    : fd_(std::exchange(other.fd_, -1)),
+      data_(std::exchange(other.data_, nullptr)),
+      length_(std::exchange(other.length_, -1)) {}
 
-  // MemoryMappedFile self-closes, and so this is fine.
-  return load(mmapedFile_.data(), mmapedFile_.length());
+MemoryMappedFile& MemoryMappedFile::operator=(
+    MemoryMappedFile&& other) noexcept {
+  close();
+  fd_ = std::exchange(other.fd_, -1);
+  data_ = std::exchange(other.data_, nullptr);
+  length_ = std::exchange(other.length_, 0);
+  return *this;
 }
 
-void PhraseReplacementMap::close() {
-  keyValueMap_.clear();
-  mmapedFile_.close();
-}
+MemoryMappedFile::~MemoryMappedFile() { close(); }
 
-bool PhraseReplacementMap::load(const char* data, size_t length) {
-  if (mmapedFile_.data() != nullptr) {
-    // Cannot load while mmapedFile_ is already open.
+bool MemoryMappedFile::open(const char* path) {
+  if (data_) {
     return false;
   }
 
-  if (data == nullptr || length == 0) {
+  fd_ = ::open(path, O_RDONLY);
+  if (fd_ == -1) {
     return false;
   }
-  keyValueMap_.clear();
 
-  KeyValueBlobReader reader(data, length);
-  KeyValueBlobReader::KeyValue keyValue;
-  while (reader.Next(&keyValue) == KeyValueBlobReader::State::HAS_PAIR) {
-    keyValueMap_[keyValue.key] = keyValue.value;
+  struct stat sb;
+  if (fstat(fd_, &sb) == -1) {
+    ::close(fd_);
+    fd_ = -1;
+    return false;
   }
+
+  length_ = static_cast<size_t>(sb.st_size);
+
+  data_ = mmap(nullptr, length_, PROT_READ, MAP_SHARED, fd_, 0);
+  if (data_ == nullptr) {
+    ::close(fd_);
+    fd_ = -1;
+    length_ = 0;
+    return false;
+  }
+
   return true;
 }
 
-std::string PhraseReplacementMap::valueForKey(const std::string& key) const {
-  auto iter = keyValueMap_.find(key);
-  if (iter != keyValueMap_.end()) {
-    const std::string_view& v = iter->second;
-    return std::string(v);
+void MemoryMappedFile::close() {
+  if (data_ == nullptr) {
+    return;
   }
-  return {};
+  munmap(data_, length_);
+  ::close(fd_);
+  fd_ = -1;
+  length_ = 0;
+  data_ = nullptr;
 }
 
 }  // namespace McBopomofo

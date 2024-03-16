@@ -40,15 +40,6 @@ extern InputMode InputModePlainBopomofo;
 - (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputState *)state;
 @end
 
-@interface AssociatedPhraseArrayItem : NSObject
-
-+ (NSArray <AssociatedPhraseArrayItem *>*)createItemWithModelSearchableText:(NSString *)modelText readingSearchableText:(NSString *)readingText;
-
-- (instancetype)initWithValue:(NSString *)character reading:(NSString *)reading;
-@property (strong, nonatomic) NSString *value;
-@property (strong, nonatomic) NSString *reading;
-@end
-
 @interface KeyHandler : NSObject
 
 - (BOOL)handleInput:(KeyHandlerInput *)input
@@ -58,16 +49,18 @@ extern InputMode InputModePlainBopomofo;
 
 - (void)syncWithPreferences;
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex  useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:originalCursorIndex:useMoveCursorAfterSelectionSetting:));
-- (void)fixNodeAtIndex:(NSInteger)index Reading:(NSString *)reading value:(NSString *)value associatedPhrase:(NSArray <AssociatedPhraseArrayItem *> *)associatedPhrase NS_SWIFT_NAME(fixNode(index:reading:value:associatedPhrase:));
-
+- (void)fixNodeForAssociatedPhraseWithPrefixAt:(size_t)prefixCursorIndex prefixReading:(NSString *)pfxReading prefixValue:(NSString *)pfxValue associatedPhraseReading:(NSString *)phraseReading associatedPhraseValue:(NSString *)phraseValue;
 - (void)clear;
 
 - (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
     NS_SWIFT_NAME(handleForceCommit(stateCallback:));
 
 - (InputState *)buildInputtingState;
-- (nullable InputState *)buildAssociatePhrasePlainStateWithKey:(NSString *)key useVerticalMode:(BOOL)useVerticalMode;
-- (nullable InputState *)buildAssociatePhraseStateWithPreviousState:(id)state selectedIndex:(NSInteger)index selectedPhrase:(NSString *)key selectedReading:(NSString *)selectedReading useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatedPhrasePlainStateWithReading:(NSString *)reading value:(NSString *)value useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state prefixCursorAt:(size_t)prefixCursorIndex reading:(NSString *)reading value:(NSString *)value selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex prefixReading:(NSString *)prefixReading value:(NSString *)prefixValue selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode;
+
+- (size_t)computeActualCursorIndex:(size_t)cursor;
 
 @property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id<KeyHandlerDelegate> delegate;

@@ -31,8 +31,8 @@ namespace McBopomofo {
 constexpr char32_t kMaxUnicode = 0x10FFFF;
 static inline bool IsContinuationByte(char32_t c) { return (c & 0xC0) == 0x80; }
 
-// Decodes one UTF-8 code point and advances the string iterator past the code
-// point. Returns false if it is already at the end, or if the iterated UTF-8
+// Decodes one UTF-8 code point and advances the iterator `i` past the code
+// point. Returns false if `i` is already at the end, or if the iterated UTF-8
 // sequence is not valid.
 static inline bool DecodeUTF8(std::string::const_iterator& i,
                               const std::string::const_iterator& end) {
@@ -118,24 +118,39 @@ std::string SubstringToCodePoints(const std::string& s, size_t cp) {
   return {s.cbegin(), i};
 }
 
-std::string GetCodePoint(const std::string& s, size_t cp)
-{
-    size_t c = 0;
-    std::string::const_iterator i = s.cbegin();
-    std::string::const_iterator lastUsed = s.cbegin();
-    std::string::const_iterator end = s.cend();
-    while (i != end && c <= cp) {
-        lastUsed = i;
-        bool r = DecodeUTF8(i, end);
-        if (!r) {
-            break;
-        }
-        ++c;
+std::string GetCodePoint(const std::string& s, size_t cp) {
+  size_t c = 0;
+  std::string::const_iterator i = s.cbegin();
+  std::string::const_iterator lastUsed = s.cbegin();
+  std::string::const_iterator end = s.cend();
+  while (i != end && c <= cp) {
+    lastUsed = i;
+    bool r = DecodeUTF8(i, end);
+    if (!r) {
+      break;
     }
+    ++c;
+  }
 
-    return {lastUsed, i};
+  return {lastUsed, i};
 }
 
+std::vector<std::string> Split(const std::string& s) {
+  std::vector<std::string> output;
+  std::string::const_iterator i = s.cbegin();
+  std::string::const_iterator lastUsed = s.cbegin();
+  std::string::const_iterator end = s.cend();
+  while (i != end) {
+    lastUsed = i;
+    bool r = DecodeUTF8(i, end);
+    if (!r) {
+      break;
+    }
+    output.emplace_back(std::string({lastUsed, i}));
+  }
+
+  return output;
+}
 
 // NOLINTEND(readability-magic-numbers)
 }  // namespace McBopomofo

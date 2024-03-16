@@ -31,28 +31,20 @@
 namespace McBopomofo {
 
 TEST(UserPhrasesLMTest, LenientReading) {
-  std::string tmp_name =
-      std::string(std::filesystem::temp_directory_path() / "test.txt");
-
-  FILE* f = fopen(tmp_name.c_str(), "w");
-  ASSERT_NE(f, nullptr);
-
-  fprintf(f, "value1 reading1\n");
-  fprintf(f, "value2 \n");  // error line
-  fprintf(f, "value3 reading2\n");
-  int r = fclose(f);
-  ASSERT_EQ(r, 0);
+  constexpr char kTestData[] = "value1 reading1\nvalue2 \nvalue3 reading2";
 
   UserPhrasesLM lm;
-  lm.open(tmp_name.c_str());
-  ASSERT_TRUE(lm.hasUnigrams("reading1"));
-  ASSERT_FALSE(lm.hasUnigrams("value2"));
+  ASSERT_TRUE(lm.load(kTestData, sizeof(kTestData)));
+  EXPECT_TRUE(lm.hasUnigrams("reading1"));
+  EXPECT_FALSE(lm.hasUnigrams("value2"));
 
   // Anything after the error won't be parsed, so reading2 won't be found.
-  ASSERT_FALSE(lm.hasUnigrams("reading2"));
+  EXPECT_FALSE(lm.hasUnigrams("reading2"));
 
-  r = remove(tmp_name.c_str());
-  ASSERT_EQ(r, 0);
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results =
+      lm.getUnigrams("reading1");
+  EXPECT_EQ(results[0].value(), "value1");
+  EXPECT_EQ(results[0].score(), UserPhrasesLM::kUserUnigramScore);
 }
 
 }  // namespace McBopomofo

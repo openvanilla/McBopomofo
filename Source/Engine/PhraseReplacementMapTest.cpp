@@ -31,27 +31,15 @@
 namespace McBopomofo {
 
 TEST(PhraseReplacementMapTest, LenientReading) {
-  std::string tmp_name =
-      std::string(std::filesystem::temp_directory_path() / "test.txt");
-  FILE* f = fopen(tmp_name.c_str(), "w");
-  ASSERT_NE(f, nullptr);
-
-  fprintf(f, "key value\n");
-  fprintf(f, "key2\n");  // error line
-  fprintf(f, "key3 value2\n");
-  int r = fclose(f);
-  ASSERT_EQ(r, 0);
+  constexpr char kTestData[] = "key value\nkey2\nkey3 value3";
 
   PhraseReplacementMap map;
-  map.open(tmp_name.c_str());
+  ASSERT_TRUE(map.load(kTestData, sizeof(kTestData)));
   ASSERT_EQ(map.valueForKey("key"), "value");
-  ASSERT_EQ(map.valueForKey("key2"), "");
+  ASSERT_TRUE(map.valueForKey("key2").empty());
 
   // key2 causes parsing error, and the line that has key3 won't be parsed.
-  ASSERT_EQ(map.valueForKey("key3"), "");
-
-  r = remove(tmp_name.c_str());
-  ASSERT_EQ(r, 0);
+  ASSERT_TRUE(map.valueForKey("key3").empty());
 }
 
 }  // namespace McBopomofo
