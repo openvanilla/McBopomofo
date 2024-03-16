@@ -572,8 +572,9 @@
 		6A0D4E9415FC0CFA00ABF4B3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1320;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1240;
