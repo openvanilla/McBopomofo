@@ -67,10 +67,12 @@ class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
   // Loads (or reloads, if already loaded) the primary language model data file.
   void loadLanguageModel(const char* languageModelDataPath);
 
-  bool isDataModelLoaded();
+  bool isDataModelLoaded() const;
 
   // Loads (or reloads if already loaded) the associated phrases data file.
   void loadAssociatedPhrasesV2(const char* associatedPhrasesPath);
+
+  bool isAssociatedPhrasesV2Loaded() const;
 
   // Loads (or reloads if already loaded) both the user phrases and the excluded
   // phrases files. If one argument is passed a nullptr, that file will not

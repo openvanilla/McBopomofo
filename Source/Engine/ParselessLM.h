@@ -42,7 +42,7 @@ class ParselessLM : public Formosa::Gramambular2::LanguageModel {
   ParselessLM& operator=(const ParselessLM&) = delete;
   ParselessLM& operator=(ParselessLM&&) = delete;
 
-  bool isLoaded();
+  bool isLoaded() const;
   bool open(const char* path);
   void close();
 

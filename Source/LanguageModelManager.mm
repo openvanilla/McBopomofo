@@ -52,8 +52,8 @@ static void LTLoadLanguageModelFile(NSString *filenameWithoutExtension, McBopomo
 static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 {
     Class cls = NSClassFromString(@"McBopomofoInputMethodController");
-    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases" ofType:@"txt"];
-    lm.loadAssociatedPhrases(dataPath.UTF8String);
+    NSString *dataPath = [[NSBundle bundleForClass:cls] pathForResource:@"associated-phrases-v2" ofType:@"txt"];
+    lm.loadAssociatedPhrasesV2(dataPath.UTF8String);
 }
 
 + (void)loadDataModels
@@ -61,14 +61,14 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
     }
-    if (!gLanguageModelMcBopomofo.isAssociatedPhrasesLoaded()) {
+    if (!gLanguageModelMcBopomofo.isAssociatedPhrasesV2Loaded()) {
         LTLoadAssociatedPhrases(gLanguageModelMcBopomofo);
     }
 
     if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
         LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
     }
-    if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesLoaded()) {
+    if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesV2Loaded()) {
         LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
     }
 }
@@ -79,7 +79,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data", gLanguageModelMcBopomofo);
         }
-        if (!gLanguageModelMcBopomofo.isAssociatedPhrasesLoaded()) {
+        if (!gLanguageModelMcBopomofo.isAssociatedPhrasesV2Loaded()) {
             LTLoadAssociatedPhrases(gLanguageModelMcBopomofo);
         }
     }
@@ -88,7 +88,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         if (!gLanguageModelPlainBopomofo.isDataModelLoaded()) {
             LTLoadLanguageModelFile(@"data-plain-bpmf", gLanguageModelPlainBopomofo);
         }
-        if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesLoaded()) {
+        if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesV2Loaded()) {
             LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
         }
     }

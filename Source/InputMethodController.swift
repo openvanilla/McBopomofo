@@ -576,9 +576,7 @@ extension McBopomofoInputMethodController {
                 candidates = state.candidates
             case let state as InputState.AssociatedPhrasesPlain:
                 useVerticalMode = state.useVerticalMode
-                candidates = state.candidates.map {
-                    InputState.Candidate(reading: "", value: $0, displayText: $0)
-                }
+                candidates = state.candidates
             case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
@@ -623,7 +621,7 @@ extension McBopomofoInputMethodController {
         case let state as InputState.SelectingDictionary:
             String(format:NSLocalizedString("Look up %@", comment: ""), state.selectedPhrase)
         case let state as InputState.AssociatedPhrases:
-            String(format:NSLocalizedString("%@…", comment: ""), state.selectedPhrase)
+            String(format:NSLocalizedString("%@…", comment: ""), state.prefixValue)
         default:
             ""
         }
@@ -800,7 +798,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
                 if Preferences.associatedPhrasesEnabled,
-                   let associatePhrases = keyHandler.buildAssociatePhrasePlainState(withKey: composingBuffer, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
+                   let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(withReading: selectedCandidate.reading, value: selectedCandidate.value, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
                     self.handle(state: associatePhrases, client: client)
                 } else {
                     handle(state: .Empty(), client: client)
@@ -811,36 +809,18 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 break
             }
         case let state as InputState.AssociatedPhrases:
-            let scToTc = Preferences.chineseConversionEnabled && Preferences.chineseConversionStyle == .model
-            let selectedPhrase: String = {
-                let selectedPhrase = state.selectedPhrase
-                return if scToTc {
-                    OpenCCBridge.shared.convertToTraditional(selectedPhrase) ?? ""
-                } else { selectedPhrase }
-            }()
             let candidate = state.candidates[Int(index)]
-            let associatedPhrase = AssociatedPhraseArrayItem.createItem(withModelSearchableText: candidate.displayText, readingSearchableText: candidate.value)
-
-            switch state.previousState {
-            case let previous as InputState.ChoosingCandidate:
-                let selectedIndex = state.selectedIndex
-                let selectedCandidate = previous.candidates[selectedIndex]
-                keyHandler.fixNode(index:keyHandler.actualCandidateCursorIndex, reading: selectedCandidate.reading, value: selectedCandidate.value, associatedPhrase: associatedPhrase)
-            case _ as InputState.Inputting:
-                keyHandler.fixNode(index:keyHandler.cursorIndex - 1, reading: state.selectedReading, value: selectedPhrase, associatedPhrase: associatedPhrase)
-            default:
-                break
-            }
+            keyHandler.fixNodeForAssociatedPhraseWithPrefix(at: state.prefixCursorIndex, prefixReading: state.prefixReading, prefixValue: state.prefixValue, associatedPhraseReading: candidate.reading, associatedPhraseValue: candidate.value)
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return
             }
             handle(state: inputting, client: client)
             break
         case let state as InputState.AssociatedPhrasesPlain:
-            let selectedValue = state.candidates[Int(index)]
-            handle(state: .Committing(poppedText: selectedValue), client: currentClient)
+            let selectedCandidate = state.candidates[Int(index)]
+            handle(state: .Committing(poppedText: selectedCandidate.value), client: currentClient)
             if Preferences.associatedPhrasesEnabled,
-               let associatePhrases = keyHandler.buildAssociatePhrasePlainState(withKey: selectedValue, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
+               let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(withReading: selectedCandidate.reading, value: selectedCandidate.value, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
                 self.handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)

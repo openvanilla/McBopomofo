@@ -34,7 +34,7 @@
 
 namespace McBopomofo {
 
-bool ParselessLM::isLoaded() { return mmapedFile_.data() != nullptr; }
+bool ParselessLM::isLoaded() const { return db_ != nullptr; }
 
 bool ParselessLM::open(const char* path) {
   if (!mmapedFile_.open(path)) {

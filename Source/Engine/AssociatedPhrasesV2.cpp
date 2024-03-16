@@ -121,6 +121,8 @@ void AssociatedPhrasesV2::close() {
   mmapedFile_.close();
 }
 
+bool AssociatedPhrasesV2::isLoaded() const { return db_ != nullptr; }
+
 bool AssociatedPhrasesV2::open(std::unique_ptr<ParselessPhraseDB> db) {
   if (db_ != nullptr) {
     return false;

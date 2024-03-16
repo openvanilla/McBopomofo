@@ -40,6 +40,7 @@ class AssociatedPhrasesV2 {
 
   bool open(const char* path);
   void close();
+  bool isLoaded() const;
 
   // Allows the use of existing in-memory db.
   bool open(std::unique_ptr<ParselessPhraseDB> db);

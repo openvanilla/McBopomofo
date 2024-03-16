@@ -43,7 +43,9 @@ void McBopomofoLM::loadLanguageModel(const char* languageModelDataPath) {
   }
 }
 
-bool McBopomofoLM::isDataModelLoaded() { return languageModel_.isLoaded(); }
+bool McBopomofoLM::isDataModelLoaded() const {
+  return languageModel_.isLoaded();
+}
 
 void McBopomofoLM::loadAssociatedPhrasesV2(const char* associatedPhrasesPath) {
   if (associatedPhrasesPath) {
@@ -62,6 +64,10 @@ void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
     excludedPhrases_.close();
     excludedPhrases_.open(excludedPhrasesDataPath);
   }
+}
+
+bool McBopomofoLM::isAssociatedPhrasesV2Loaded() const {
+  return associatedPhrasesV2_.isLoaded();
 }
 
 void McBopomofoLM::loadPhraseReplacementMap(const char* phraseReplacementPath) {

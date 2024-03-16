@@ -30,9 +30,11 @@
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
 		6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D422793701600F1B140 /* ParselessLM.cpp */; };
 		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
+		6ADF5B192BA513E000577D98 /* AssociatedPhrasesV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF5B132BA513E000577D98 /* AssociatedPhrasesV2.cpp */; };
+		6ADF5B1A2BA513E000577D98 /* MemoryMappedFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF5B152BA513E000577D98 /* MemoryMappedFile.cpp */; };
+		6ADF5B1B2BA513E000577D98 /* UTF8Helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF5B162BA513E000577D98 /* UTF8Helper.cpp */; };
 		6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */; };
 		6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */; };
-		6AE215112A2849BB005A6A02 /* UTF8Helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6AE215102A2849BB005A6A02 /* UTF8Helper.cpp */; };
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */; };
 		B0781B352ACA2655003D9F75 /* ServicesMenu.strings in Resources */ = {isa = PBXBuildFile; fileRef = B0781B372ACA2655003D9F75 /* ServicesMenu.strings */; };
@@ -58,9 +60,8 @@
 		D476CB492827DB6300F48552 /* add-phrase-hook.sh in Resources */ = {isa = PBXBuildFile; fileRef = D476CB482827DB6300F48552 /* add-phrase-hook.sh */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */; };
-		D47D73A827A6C84F00255A50 /* associated-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.txt */; };
-		D47D73A927A6C84F00255A50 /* associated-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases.txt */; };
-		D47D73AC27A6CAE600255A50 /* AssociatedPhrases.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */; };
+		D47D73A827A6C84F00255A50 /* associated-phrases-v2.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases-v2.txt */; };
+		D47D73A927A6C84F00255A50 /* associated-phrases-v2.txt in Resources */ = {isa = PBXBuildFile; fileRef = D47D73A727A6C84F00255A50 /* associated-phrases-v2.txt */; };
 		D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D47D73C227A7200500255A50 /* FSEventStreamHelper */; };
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
@@ -156,10 +157,14 @@
 		6ACC3D422793701600F1B140 /* ParselessLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParselessLM.cpp; sourceTree = "<group>"; };
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParselessLM.h; sourceTree = "<group>"; };
 		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
+		6ADF5B132BA513E000577D98 /* AssociatedPhrasesV2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AssociatedPhrasesV2.cpp; sourceTree = "<group>"; };
+		6ADF5B142BA513E000577D98 /* MemoryMappedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryMappedFile.h; sourceTree = "<group>"; };
+		6ADF5B152BA513E000577D98 /* MemoryMappedFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryMappedFile.cpp; sourceTree = "<group>"; };
+		6ADF5B162BA513E000577D98 /* UTF8Helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTF8Helper.cpp; sourceTree = "<group>"; };
+		6ADF5B172BA513E000577D98 /* UTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTF8Helper.h; sourceTree = "<group>"; };
+		6ADF5B182BA513E000577D98 /* AssociatedPhrasesV2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssociatedPhrasesV2.h; sourceTree = "<group>"; };
 		6AE210B015FC63CC003659FE /* PlainBopomofo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlainBopomofo.tiff; sourceTree = "<group>"; };
 		6AE210B115FC63CC003659FE /* PlainBopomofo@2x.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "PlainBopomofo@2x.tiff"; sourceTree = "<group>"; };
-		6AE2150F2A2849BB005A6A02 /* UTF8Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTF8Helper.h; sourceTree = "<group>"; };
-		6AE215102A2849BB005A6A02 /* UTF8Helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTF8Helper.cpp; sourceTree = "<group>"; };
 		6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NonModalAlertWindowController.xib; sourceTree = "<group>"; };
 		B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
 		B0781B362ACA2655003D9F75 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ServicesMenu.strings; sourceTree = "<group>"; };
@@ -191,9 +196,7 @@
 		D476CB482827DB6300F48552 /* add-phrase-hook.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "add-phrase-hook.sh"; sourceTree = "<group>"; };
 		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerBopomofoTests.swift; sourceTree = "<group>"; };
-		D47D73A727A6C84F00255A50 /* associated-phrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "associated-phrases.txt"; sourceTree = "<group>"; };
-		D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AssociatedPhrases.cpp; sourceTree = "<group>"; };
-		D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AssociatedPhrases.h; sourceTree = "<group>"; };
+		D47D73A727A6C84F00255A50 /* associated-phrases-v2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "associated-phrases-v2.txt"; sourceTree = "<group>"; };
 		D47D73C027A71FFA00255A50 /* FSEventStreamHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FSEventStreamHelper; path = Packages/FSEventStreamHelper; sourceTree = "<group>"; };
 		D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
@@ -298,8 +301,6 @@
 				D41355D7278D7409005E5CBD /* LanguageModelManager.mm */,
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
-				6AE215102A2849BB005A6A02 /* UTF8Helper.cpp */,
-				6AE2150F2A2849BB005A6A02 /* UTF8Helper.h */,
 				D43FC40A2B23788400ED5A1C /* InputMacro.swift */,
 				D4CB1A5A2B3891FB006EA984 /* DictionaryService.swift */,
 				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
@@ -335,22 +336,26 @@
 			children = (
 				6A4F5F8F2879E838008C4307 /* gramambular2 */,
 				6A0D4F1F15FC0EB100ABF4B3 /* Mandarin */,
+				6ADF5B132BA513E000577D98 /* AssociatedPhrasesV2.cpp */,
+				6ADF5B182BA513E000577D98 /* AssociatedPhrasesV2.h */,
 				6ACC3D3E27914F2400F1B140 /* KeyValueBlobReader.cpp */,
 				6ACC3D3C27914AAB00F1B140 /* KeyValueBlobReader.h */,
-				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
-				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
+				D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */,
+				D41355DA278E6D17005E5CBD /* McBopomofoLM.h */,
+				6ADF5B152BA513E000577D98 /* MemoryMappedFile.cpp */,
+				6ADF5B142BA513E000577D98 /* MemoryMappedFile.h */,
 				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
 				6ACC3D432793701600F1B140 /* ParselessLM.h */,
 				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
 				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
 				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */,
 				D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */,
-				D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */,
-				D41355DA278E6D17005E5CBD /* McBopomofoLM.h */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
 				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
-				D47D73AA27A6CAE600255A50 /* AssociatedPhrases.cpp */,
-				D47D73AB27A6CAE600255A50 /* AssociatedPhrases.h */,
+				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
+				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
+				6ADF5B162BA513E000577D98 /* UTF8Helper.cpp */,
+				6ADF5B172BA513E000577D98 /* UTF8Helper.h */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -386,7 +391,7 @@
 		6A38BBDD15FC115800A8A51F /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				D47D73A727A6C84F00255A50 /* associated-phrases.txt */,
+				D47D73A727A6C84F00255A50 /* associated-phrases-v2.txt */,
 				6A38BBF615FC117A00A8A51F /* data.txt */,
 				6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */,
 			);
@@ -632,7 +637,7 @@
 				6AE210B315FC63CC003659FE /* PlainBopomofo@2x.tiff in Resources */,
 				6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
-				D47D73A827A6C84F00255A50 /* associated-phrases.txt in Resources */,
+				D47D73A827A6C84F00255A50 /* associated-phrases-v2.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,7 +662,7 @@
 				D4E569E527A414CB00AC2CEF /* data.txt in Resources */,
 				D4EE675B2B399D0200F062DE /* dictionary_service.json in Resources */,
 				D4E569E427A414CB00AC2CEF /* data-plain-bpmf.txt in Resources */,
-				D47D73A927A6C84F00255A50 /* associated-phrases.txt in Resources */,
+				D47D73A927A6C84F00255A50 /* associated-phrases-v2.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,7 +707,6 @@
 				D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */,
 				D456576E279E4F7B00DF6BC9 /* KeyHandlerInput.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */,
-				D47D73AC27A6CAE600255A50 /* AssociatedPhrases.cpp in Sources */,
 				D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
@@ -710,9 +714,11 @@
 				D4CB1A5B2B389B78006EA984 /* DictionaryService.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */,
-				6AE215112A2849BB005A6A02 /* UTF8Helper.cpp in Sources */,
+				6ADF5B1A2BA513E000577D98 /* MemoryMappedFile.cpp in Sources */,
 				6ACC3D3F27914F2400F1B140 /* KeyValueBlobReader.cpp in Sources */,
 				B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */,
+				6ADF5B192BA513E000577D98 /* AssociatedPhrasesV2.cpp in Sources */,
+				6ADF5B1B2BA513E000577D98 /* UTF8Helper.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
