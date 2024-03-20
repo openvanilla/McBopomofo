@@ -286,17 +286,25 @@ public class VerticalCandidateController: CandidateController {
                 return
             }
 
-            var lastVisibleRow = newValue
+            if itemCount > labelCount {
+                var rowToScroll = Int(newValue)
 
-            if selectedRow != -1 && itemCount > 0 && itemCount > labelCount {
-                if newIndex > selectedRow && (Int(newIndex) - selectedRow) > 1 {
-                    lastVisibleRow = min(newIndex + UInt(labelCount) - 1, itemCount - 1)
+                if selectedRow != -1 && itemCount > 0 {
+                    let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
+                    // If it's not single row movement, trigger forward page switching.
+                    if newIndex > selectedRow && (Int(newIndex) - selectedRow) > 1 {
+                        let lastVisibleRow = firstVisibleRow + labelCount - 1
+                        rowToScroll = min(lastVisibleRow + labelCount, Int(itemCount) - 1)
+                    }
+                    // If it's not single row movement, trigger backward page switching.
+                    if newIndex < selectedRow && (selectedRow - Int(newIndex)) > 1 {
+                        rowToScroll = max(0, firstVisibleRow - labelCount)
+                    }
                 }
-                // no need to handle the backward case: (newIndex < selectedRow && selectedRow - newIndex > 1)
-            }
 
-            if itemCount > labelCount && lastVisibleRow < Int.max {
-                tableView.scrollRowToVisible(Int(lastVisibleRow))
+                if rowToScroll < Int.max {
+                    tableView.scrollRowToVisible(rowToScroll)
+                }
             }
             tableView.selectRowIndexes(IndexSet(integer: Int(newIndex)), byExtendingSelection: false)
         }
