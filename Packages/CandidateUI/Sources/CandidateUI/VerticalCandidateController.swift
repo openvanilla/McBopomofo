@@ -291,10 +291,13 @@ public class VerticalCandidateController: CandidateController {
 
                 if selectedRow != -1 && itemCount > 0 {
                     let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
+                    // If it's not single row movement, trigger forward page switching.
                     if newIndex > selectedRow && (Int(newIndex) - selectedRow) > 1 {
                         let lastVisibleRow = firstVisibleRow + labelCount - 1
                         rowToScroll = min(lastVisibleRow + labelCount, Int(itemCount) - 1)
-                    } else if newIndex < selectedRow && (selectedRow - Int(newIndex)) > 1 {
+                    }
+                    // If it's not single row movement, trigger backward page switching.
+                    if newIndex < selectedRow && (selectedRow - Int(newIndex)) > 1 {
                         rowToScroll = max(0, firstVisibleRow - labelCount)
                     }
                 }
