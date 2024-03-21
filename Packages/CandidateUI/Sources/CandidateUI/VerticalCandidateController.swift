@@ -320,7 +320,7 @@ public class VerticalCandidateController: CandidateController {
             self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
 
             let finalSelected = self.selectedCandidateIndex
-            if finalSelected != UInt.max && visibleRowIndexes.contains(Int(finalSelected)) == true {
+            if finalSelected != UInt.max && visibleRowIndexes.contains(Int(finalSelected)) {
                 // Reset the key label strip highlight after the scroll.
                 self.keyLabelStripView.highlightedIndex = Int(finalSelected) - visibleRowIndexes.location
                 self.keyLabelStripView.setNeedsDisplay(self.keyLabelStripView.frame)
