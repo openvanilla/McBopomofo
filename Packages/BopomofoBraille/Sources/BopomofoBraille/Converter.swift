@@ -53,7 +53,7 @@ import Foundation
                 let start = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
                 let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead)
                 let substring = bopomofo[start...end]
-                if let punctuation = Punctuation(rawValue: String(substring)) {
+                if let punctuation = FullWidthPunctuation(rawValue: String(substring)) {
                     output += punctuation.braille
                     readHead += 1
                     found = true
@@ -103,7 +103,7 @@ import Foundation
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
-                    if let punc = Punctuation(braille: String(substring)) {
+                    if let punc = FullWidthPunctuation(braille: String(substring)) {
                         output += punc.rawValue
                         readHead += i + 1
                         found = true
@@ -159,7 +159,7 @@ import Foundation
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
-                    if let punctuation = Punctuation(braille: String(substring)) {
+                    if let punctuation = FullWidthPunctuation(braille: String(substring)) {
                         text += punctuation.rawValue
                         readHead += i + 1
                         found = true
