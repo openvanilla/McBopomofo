@@ -236,14 +236,14 @@ private enum ㄧ_Combination: String, CaseIterable, Combination {
 
 private enum ㄨ_Combination: String, CaseIterable, Combination {
     static let bpmfBrailleMap: [ㄨ_Combination: (String, String)] = [
-        .ㄨㄚ: ("⠔", ""),
-        .ㄨㄛ: ("⠒", ""),
-        .ㄨㄞ: ("⠶", ""),
-        .ㄨㄟ: ("⠫", ""),
-        .ㄨㄢ: ("⠻", ""),
-        .ㄨㄣ: ("⠿", ""),
-        .ㄨㄤ: ("⠸", ""),
-        .ㄨㄥ: ("⠯", ""),
+        .ㄨㄚ: ("⠔", "35"),
+        .ㄨㄛ: ("⠒", "25"),
+        .ㄨㄞ: ("⠶", "2356"),
+        .ㄨㄟ: ("⠫", "1246"),
+        .ㄨㄢ: ("⠻", "12456"),
+        .ㄨㄣ: ("⠿", "123456"),
+        .ㄨㄤ: ("⠸", "456"),
+        .ㄨㄥ: ("⠯", "12346"),
     ]
 
     fileprivate var bopomofo: String {
