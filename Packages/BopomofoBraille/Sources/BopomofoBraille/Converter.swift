@@ -42,7 +42,9 @@ import Foundation
 
         while readHead < length {
             if String(bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)]) == " " {
-                if output[output.index(output.endIndex, offsetBy: -1)] != " " {
+                if output.isEmpty {
+                    output += " "
+                } else if output[output.index(output.endIndex, offsetBy: -1)] != " " {
                     output += " "
                 }
                 readHead += 1
