@@ -173,28 +173,6 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
             menuItem.title = localizedName
             menuItem.representedObject = sourceID
 
-            if let iconPtr = TISGetInputSourceProperty(source, kTISPropertyIconRef) {
-                let icon = IconRef(iconPtr)
-                let image = NSImage(iconRef: icon)
-
-                func resize(_ image: NSImage) -> NSImage {
-                    let newImage = NSImage(size: NSSize(width: 16, height: 16))
-                    newImage.lockFocus()
-                    image.draw(in: NSRect(x: 0, y: 0, width: 16, height: 16))
-                    newImage.unlockFocus()
-                    return newImage
-                }
-
-                let resizedImage = resize(image)
-                // On newer version of macOS, the icons became black and white
-                // so we make them template images so it could look better
-                // on dark mode.
-                if #available(macOS 10.16, *) {
-                    resizedImage.isTemplate = true
-                }
-                menuItem.image = resizedImage
-            }
-
             if sourceID == "com.apple.keylayout.US" {
                 usKeyboardLayoutItem = menuItem
             }
