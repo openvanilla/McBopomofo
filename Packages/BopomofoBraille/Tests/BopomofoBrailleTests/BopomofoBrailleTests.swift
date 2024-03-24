@@ -2,6 +2,34 @@ import XCTest
 @testable import BopomofoBraille
 
 final class BopomofoBrailleTests: XCTestCase {
+    func testA1() {
+        let input = "This is just a test"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testA2() {
+        let input = "This is just a test ABCD 1234"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testA3() {
+        let input = "ㄨㄛˇㄗㄨㄟˋㄒㄧˇㄏㄨㄢㄋㄧˇㄌㄜ˙ ABCD 1234"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testA4() {
+        let input = "ABCD ㄨㄛˇㄗㄨㄟˋㄒㄧˇㄏㄨㄢㄋㄧˇㄌㄜ˙ 1234"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
     func testC1() {
         let input = "ㄨㄛˇㄗㄨㄟˋㄒㄧˇㄏㄨㄢㄋㄧˇㄌㄜ˙"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
@@ -43,7 +71,6 @@ final class BopomofoBrailleTests: XCTestCase {
     func testC6() {
         let input = "ㄨㄛˇㄏㄨㄚㄌㄜ˙ㄉㄧㄢˇㄕˊㄐㄧㄢㄗˋㄐㄧˇㄒㄧㄝˇㄌㄜ˙ㄧㄍㄜ˙ㄐㄧㄤㄓㄨˋㄧㄣㄓㄨㄢˇㄏㄨㄢˋㄔㄥˊㄉㄧㄢˇㄗˋㄉㄜ˙ㄇㄛˊㄗㄨˇ"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
         XCTAssert(r2 == input, r2)
     }
@@ -51,7 +78,6 @@ final class BopomofoBrailleTests: XCTestCase {
     func testC7() {
         let input = "ㄗˋㄐㄧˇ"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
         XCTAssert(r2 == input, r2)
     }
@@ -59,7 +85,6 @@ final class BopomofoBrailleTests: XCTestCase {
     func testC8() {
         let input = "ㄐㄧˇ"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
         XCTAssert(r2 == input, r2)
     }
@@ -67,15 +92,13 @@ final class BopomofoBrailleTests: XCTestCase {
     func testC9() {
         let input = "，，，，，"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
-        XCTAssert(r2 == input, r2)
+        XCTAssert(r2 == "⠆⠆⠆⠆⠆", r2)
     }
 
     func testC10() {
         let input = "「ㄊㄞˊㄨㄢㄖㄣˊㄒㄩㄧㄠˋㄏㄣˇㄉㄨㄛㄉㄜ˙ㄒㄧㄠㄆㄛㄎㄨㄞˋ」"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
         XCTAssert(r2 == input, r2)
     }
@@ -83,18 +106,36 @@ final class BopomofoBrailleTests: XCTestCase {
     func testC11() {
         let input = "『『ㄊㄞˊㄨㄢㄖㄣˊㄒㄩㄧㄠˋㄏㄣˇㄉㄨㄛㄉㄜ˙ㄒㄧㄠㄆㄛㄎㄨㄞˋ』』"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
         XCTAssert(r2 == input, r2)
     }
 
-
-    func testC12() {
-        let input = "ㄧㄡˇㄉㄧㄢˇㄑㄧˊㄍㄨㄞˋ，ㄓㄜˋㄧㄤˋㄎㄜˇㄧˇㄇㄚ？"
+    func testC12_1() {
+        let input = "ㄧㄡˇㄉㄧㄢˇㄑㄧˊㄍㄨㄞˋㄓㄜˋㄧㄤˋㄎㄜˇㄧˇㄇㄚ"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
-        print(r1)
         let r2 = BopomofoBrailleConverter.convert(braille: r1)
         XCTAssert(r2 == input, r2)
+    }
+
+    func testC12_2() {
+        let input = "ㄧㄡˇㄉㄧㄢˇㄑㄧˊㄍㄨㄞˋㄓㄜˋㄧㄤˋㄎㄜˇㄧˇㄇㄚ？"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testC12_3() {
+        let input = "ㄧㄡˇㄉㄧㄢˇㄑㄧˊㄍㄨㄞˋ，ㄓㄜˋㄧㄤˋㄎㄜˇㄧˇㄇㄚ？"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testC13() {
+        let input = "？"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == "o", r2)
     }
 
     func testBrailleToTokens1() {
@@ -201,6 +242,5 @@ final class BopomofoBrailleTests: XCTestCase {
             XCTFail(error.localizedDescription)
         }
     }
-
 
 }

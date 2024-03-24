@@ -92,6 +92,24 @@ public enum FullWidthPunctuation: String, CaseIterable {
         }
     }
 
+    var supposedToBeAtStart: Bool {
+        switch self {
+        case .singleQuotationMarkLeft:
+            true
+        case .doubleQuotationMarkLeft:
+            true
+        case .parenthesesLeft:
+            true
+        case .bracketLeft:
+            true
+        case .braceLeft:
+            true
+        default:
+            false
+        }
+
+    }
+
     case period = "。"
     case dot = "·"
     case comma = "，"

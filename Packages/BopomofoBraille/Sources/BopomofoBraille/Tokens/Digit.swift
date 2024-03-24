@@ -25,6 +25,17 @@ import Foundation
 
 enum Digit: String, CaseIterable {
 
+    init?(braille: String) {
+        let aCase = Digit.allCases.first { aCase in
+            aCase.braille == braille
+        }
+        if let aCase {
+            self = aCase
+        } else {
+            return nil
+        }
+    }
+
     var digit: String {
         return rawValue
     }
@@ -67,6 +78,17 @@ enum Digit: String, CaseIterable {
 }
 
 enum DigitRelated: String, CaseIterable {
+    init?(braille: String) {
+        let aCase = DigitRelated.allCases.first { aCase in
+            aCase.braille == braille
+        }
+        if let aCase {
+            self = aCase
+        } else {
+            return nil
+        }
+    }
+
     var braille: String {
         switch self {
         case .point:
