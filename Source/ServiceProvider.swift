@@ -190,7 +190,10 @@ extension ServiceProvider {
         else {
             return
         }
-        let output = addReading(string: converted)
+        let output = converted.components(separatedBy: "\n").map { input in
+            addReading(string: input)
+        }.joined(separator: "\n")
+
         if output.isEmpty {
             return
         }
@@ -214,7 +217,10 @@ extension ServiceProvider {
         else {
             return
         }
-        let output = convertToReadings(string: string)
+        let output = string.components(separatedBy: "\n").map { input in
+            convertToReadings(string: input)
+        }.joined(separator: "\n")
+
         pasteboard.clearContents()
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
@@ -237,7 +243,9 @@ extension ServiceProvider {
         else {
             return
         }
-        let output = convertToBraille(string: string)
+        let output = string.components(separatedBy: "\n").map { input in
+            convertToBraille(string: input)
+        }.joined(separator: "\n")
         pasteboard.clearContents()
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
