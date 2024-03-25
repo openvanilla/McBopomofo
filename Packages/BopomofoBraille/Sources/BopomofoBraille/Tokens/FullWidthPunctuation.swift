@@ -23,9 +23,9 @@
 
 import Foundation
 
-public enum Punctuation: String, CaseIterable {
+public enum FullWidthPunctuation: String, CaseIterable {
     init?(braille: String) {
-        let aCase = Punctuation.allCases.first { aCase in
+        let aCase = FullWidthPunctuation.allCases.first { aCase in
             aCase.braille == braille
         }
         if let aCase {
@@ -38,6 +38,7 @@ public enum Punctuation: String, CaseIterable {
     var bopomofo: String {
         return rawValue
     }
+
     var braille: String {
         switch self {
         case .period:
@@ -89,6 +90,24 @@ public enum Punctuation: String, CaseIterable {
         case .braceRight:
             "⠴"
         }
+    }
+
+    var supposedToBeAtStart: Bool {
+        switch self {
+        case .singleQuotationMarkLeft:
+            true
+        case .doubleQuotationMarkLeft:
+            true
+        case .parenthesesLeft:
+            true
+        case .bracketLeft:
+            true
+        case .braceLeft:
+            true
+        default:
+            false
+        }
+
     }
 
     case period = "。"

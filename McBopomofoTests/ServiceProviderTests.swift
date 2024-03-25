@@ -117,4 +117,22 @@ final class ServiceProviderTests: XCTestCase {
         XCTAssert(output == expected, output)
     }
 
+    func testLetters1() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let result = provider.convertToBraille(string: "This is a test")
+        XCTAssert(result == "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞")
+    }
+
+    func testLetters2() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let result = provider.convertToBraille(string: "This is a test 台灣人最需要的就是消波塊")
+        XCTAssert(result == "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞ ⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐")
+    }
+
 }
