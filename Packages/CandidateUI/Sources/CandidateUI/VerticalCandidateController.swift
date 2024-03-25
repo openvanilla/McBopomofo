@@ -269,20 +269,12 @@ public class VerticalCandidateController: CandidateController {
             guard let delegate = delegate else {
                 return
             }
-            var newIndex = newValue
             let selectedRow = tableView.selectedRow
             let labelCount = keyLabels.count
             let itemCount = delegate.candidateCountForController(self)
 
-            if newIndex == UInt.max {
-                if itemCount == 0 {
-                    tableView.deselectAll(self)
-                    return
-                }
-                newIndex = 0
-            }
-
-            if newIndex == UInt.max {
+            if newValue == UInt.max {
+                tableView.deselectAll(self)
                 return
             }
 
@@ -292,12 +284,12 @@ public class VerticalCandidateController: CandidateController {
                 if selectedRow != -1 && itemCount > 0 {
                     let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
                     // If it's not single row movement, trigger forward page switching.
-                    if newIndex > selectedRow && (Int(newIndex) - selectedRow) > 1 {
+                    if newValue > selectedRow && (Int(newValue) - selectedRow) > 1 {
                         let lastVisibleRow = firstVisibleRow + labelCount - 1
                         rowToScroll = min(lastVisibleRow + labelCount, Int(itemCount) - 1)
                     }
                     // If it's not single row movement, trigger backward page switching.
-                    if newIndex < selectedRow && (selectedRow - Int(newIndex)) > 1 {
+                    if newValue < selectedRow && (selectedRow - Int(newValue)) > 1 {
                         rowToScroll = max(0, firstVisibleRow - labelCount)
                     }
                 }
@@ -306,7 +298,7 @@ public class VerticalCandidateController: CandidateController {
                     tableView.scrollRowToVisible(rowToScroll)
                 }
             }
-            tableView.selectRowIndexes(IndexSet(integer: Int(newIndex)), byExtendingSelection: false)
+            tableView.selectRowIndexes(IndexSet(integer: Int(newValue)), byExtendingSelection: false)
         }
     }
 
@@ -315,18 +307,24 @@ public class VerticalCandidateController: CandidateController {
     @objc func boundsChange() {
         let visibleRect = tableView.visibleRect
         let visibleRowIndexes = tableView.rows(in: visibleRect)
-        let selected = selectedCandidateIndex
 
-        if selected == UInt.max || visibleRowIndexes.contains(Int(selected)) == false {
-            keyLabelStripView.highlightedIndex = -1
-            keyLabelStripView.setNeedsDisplay(keyLabelStripView.frame)
-        }
+        // Hide the key label strip highlight during scrolling.
+        keyLabelStripView.highlightedIndex = -1
+        keyLabelStripView.setNeedsDisplay(self.keyLabelStripView.frame)
 
         scrollTimer?.invalidate()
         scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { timer in
-            self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
             self.scrollTimer?.invalidate()
             self.scrollTimer = nil
+
+            self.tableView.scrollRowToVisible(visibleRowIndexes.lowerBound)
+
+            let finalSelected = self.selectedCandidateIndex
+            if finalSelected != UInt.max && visibleRowIndexes.contains(Int(finalSelected)) {
+                // Reset the key label strip highlight after the scroll.
+                self.keyLabelStripView.highlightedIndex = Int(finalSelected) - visibleRowIndexes.location
+                self.keyLabelStripView.setNeedsDisplay(self.keyLabelStripView.frame)
+            }
         }
     }
 }
