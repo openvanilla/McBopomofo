@@ -119,6 +119,10 @@ TEST(ParselessPhraseDBTest, FindFirstMatchingLineLongerExample) {
 }
 
 TEST(ParselessPhraseDBTest, InvalidConstructorArguments) {
+#ifdef NDEBUG
+  GTEST_SKIP();
+#endif
+
   EXPECT_DEATH((ParselessPhraseDB{nullptr, 1}), "buf != nullptr");
   EXPECT_DEATH((ParselessPhraseDB{nullptr, 0}), "buf != nullptr");
   EXPECT_DEATH((ParselessPhraseDB{"", 0}), "length > 0");
