@@ -49,11 +49,6 @@ void PhraseReplacementMap::close() {
 }
 
 bool PhraseReplacementMap::load(const char* data, size_t length) {
-  if (mmapedFile_.data() != nullptr) {
-    // Cannot load while mmapedFile_ is already open.
-    return false;
-  }
-
   if (data == nullptr || length == 0) {
     return false;
   }
