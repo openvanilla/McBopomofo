@@ -413,7 +413,7 @@
                 </matrix>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YR5-r0-KVo">
                     <rect key="frame" x="66" y="80" width="114" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + Enter 按键：" id="euS-8m-1LM">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + Enter 按鍵：" id="euS-8m-1LM">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -421,7 +421,7 @@
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QYl-R0-PIq">
                     <rect key="frame" x="90" y="53" width="88" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + ` 按键：" id="ezl-df-SwH">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + ` 按鍵：" id="ezl-df-SwH">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
