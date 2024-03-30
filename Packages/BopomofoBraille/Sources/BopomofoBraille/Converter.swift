@@ -277,15 +277,17 @@ import Foundation
 
                 let target = min(3, length - readHead - 1)
                 var found = false
-                for i in (1...target).reversed() {
-                    let start = braille.index(braille.startIndex, offsetBy: readHead)
-                    let end = braille.index(braille.startIndex, offsetBy: readHead + i)
-                    let substring = braille[start...end]
-                    if let punctuation = HalfWidthPunctuation(braille: String(substring)) {
-                        nonBpmfText += punctuation.rawValue
-                        readHead += i + 1
-                        found = true
-                        break
+                if target >= 1 {
+                    for i in (1...target).reversed() {
+                        let start = braille.index(braille.startIndex, offsetBy: readHead)
+                        let end = braille.index(braille.startIndex, offsetBy: readHead + i)
+                        let substring = braille[start...end]
+                        if let punctuation = HalfWidthPunctuation(braille: String(substring)) {
+                            nonBpmfText += punctuation.rawValue
+                            readHead += i + 1
+                            found = true
+                            break
+                        }
                     }
                 }
                 if found {

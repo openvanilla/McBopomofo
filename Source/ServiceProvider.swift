@@ -144,28 +144,33 @@ extension ServiceProvider {
 
     func process(
         string: String,
+        addSpace: Bool,
         readingFoundCallback: (String, String) -> String,
-        readingNotFoundCallback: (String) -> String,
-        addSpace: Bool = false
+        readingNotFoundCallback: (String) -> String
     ) -> String {
         var output = ""
         let tokens = tokenize(string: string)
+        
+        var previousToken: String?
         var previousTokenType: CFStringTokenizerTokenType?
 
         for tokenTuple in tokens {
             let token = tokenTuple.0
             let type = tokenTuple.1
-            if let previousTokenType = previousTokenType {
-                let lastChar = output[output.index(output.endIndex, offsetBy: -1)]
+            if addSpace, let previousToken, let previousTokenType {
+                let lastChar = output[output.index(before: output.endIndex)]
                 if lastChar != " " {
-                    if previousTokenType.contains(.isCJWordMask) && !type.contains(.isCJWordMask) {
+                    if previousTokenType.contains(.isCJWordMask) && 
+                        (!type.contains(.isCJWordMask) && token[token.startIndex].isASCII) {
                         output.append(" ")
                     }
-                    else if !previousTokenType.contains(.isCJWordMask) && type.contains(.isCJWordMask) {
+                    else if (!previousTokenType.contains(.isCJWordMask) && previousToken[previousToken.index(before: previousToken.endIndex)].isASCII)
+                                && type.contains(.isCJWordMask) {
                         output.append(" ")
                     }
                 }
             }
+            previousToken = token
             previousTokenType = type
 
             if let reading = LanguageModelManager.reading(for: token) {
@@ -195,7 +200,7 @@ extension ServiceProvider {
     }
 
     func addReading(string: String) -> String {
-        process(string: string) {
+        process(string: string, addSpace: false) {
             "\($0)(\($1))"
         } readingNotFoundCallback: {
             $0
@@ -221,7 +226,7 @@ extension ServiceProvider {
     }
 
     func convertToReadings(string: String) -> String {
-        process(string: string) {
+        process(string: string, addSpace: false) {
             $1
         } readingNotFoundCallback: {
             $0
@@ -247,11 +252,13 @@ extension ServiceProvider {
     // MARK: - Braille
 
     func convertToBraille(string: String) -> String {
-        process(string: string) {
+        process(string: string, addSpace: true) {
             BopomofoBrailleConverter.convert(bopomofo: $1)
         } readingNotFoundCallback: {
             BopomofoBrailleConverter.convert(bopomofo: $0)
         }
+
+
     }
 
     @objc func convertToBraille(

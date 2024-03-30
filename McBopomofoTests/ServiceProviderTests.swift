@@ -124,6 +124,7 @@ final class ServiceProviderTests: XCTestCase {
         provider.delegate = helper as? any ServiceProviderDelegate
         let input = "由「小麥」的作者";
         let r1 = provider.convertToBraille(string: input)
+        print(r1)
         let r2 = provider.convertBrailleToChineseText(string: r1)
         XCTAssert(r2 == input, r2)
     }
