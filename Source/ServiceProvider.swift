@@ -108,20 +108,20 @@ extension ServiceProvider {
     // MARK: -
 
     /// Use Apple's tokenizer to tokenize the input string.
-    func tokenize(string: String) -> [String] {
+    func tokenize(string: String) -> [(String, CFStringTokenizerTokenType)] {
         let cfString = string as CFString
         let tokenizer = CFStringTokenizerCreate(
             nil, cfString, CFRange(location: 0, length: CFStringGetLength(cfString)), 0, nil)
         var readHead = 0
-        var output: [String] = []
+        var output: [(String, CFStringTokenizerTokenType)] = []
         while readHead < CFStringGetLength(cfString) {
-            _ = CFStringTokenizerAdvanceToNextToken(tokenizer)
+            let type = CFStringTokenizerAdvanceToNextToken(tokenizer)
             let range = CFStringTokenizerGetCurrentTokenRange(tokenizer)
             if range.location == kCFNotFound {
                 if let subString = CFStringCreateWithSubstring(
                     nil, cfString, CFRangeMake(readHead, 1))
                 {
-                    output.append(subString as String)
+                    output.append((subString as String, CFStringTokenizerTokenType.normal))
                 }
                 readHead += 1
                 continue
@@ -131,11 +131,11 @@ extension ServiceProvider {
                 if let subString = CFStringCreateWithSubstring(
                     nil, cfString, CFRange(location: readHead, length: range.location - readHead))
                 {
-                    output.append(subString as String)
+                    output.append((subString as String, CFStringTokenizerTokenType.normal))
                 }
             }
             if let subString = CFStringCreateWithSubstring(nil, cfString, range) {
-                output.append(subString as String)
+                output.append((subString as String, type))
             }
             readHead = range.location + range.length
         }
@@ -145,11 +145,29 @@ extension ServiceProvider {
     func process(
         string: String,
         readingFoundCallback: (String, String) -> String,
-        readingNotFoundCallback: (String) -> String
+        readingNotFoundCallback: (String) -> String,
+        addSpace: Bool = false
     ) -> String {
         var output = ""
         let tokens = tokenize(string: string)
-        for token in tokens {
+        var previousTokenType: CFStringTokenizerTokenType?
+
+        for tokenTuple in tokens {
+            let token = tokenTuple.0
+            let type = tokenTuple.1
+            if let previousTokenType = previousTokenType {
+                let lastChar = output[output.index(output.endIndex, offsetBy: -1)]
+                if lastChar != " " {
+                    if previousTokenType.contains(.isCJWordMask) && !type.contains(.isCJWordMask) {
+                        output.append(" ")
+                    }
+                    else if !previousTokenType.contains(.isCJWordMask) && type.contains(.isCJWordMask) {
+                        output.append(" ")
+                    }
+                }
+            }
+            previousTokenType = type
+
             if let reading = LanguageModelManager.reading(for: token) {
                 if reading.isEmpty == false && reading.starts(with: "_") == false {
                     let readings = reading.components(separatedBy: "-")

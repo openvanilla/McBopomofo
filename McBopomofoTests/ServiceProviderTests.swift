@@ -75,14 +75,14 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let output = provider.tokenize(string: "『『』『』『")
         let expected = ["『", "『", "』", "『", "』", "『"]
-        XCTAssert(output == expected, "\(output)")
+        XCTAssert(output.map { $0.0 } == expected, "\(output)")
     }
 
     func testTokenize2() {
         let provider = ServiceProvider()
         let output = provider.tokenize(string: "『這樣可以嗎？』")
         let expected = ["『", "這樣", "可以", "嗎", "？", "』"]
-        XCTAssert(output == expected, "\(output)")
+        XCTAssert(output.map { $0.0 }  == expected, "\(output)")
     }
 
     func testAddReading2() {
@@ -117,6 +117,73 @@ final class ServiceProviderTests: XCTestCase {
         XCTAssert(output == expected, output)
     }
 
+    func testConvertBrailleThenBack1() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "由「小麥」的作者";
+        let r1 = provider.convertToBraille(string: input)
+        let r2 = provider.convertBrailleToChineseText(string: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testConvertBrailleThenBack2() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "This is a test";
+        let r1 = provider.convertToBraille(string: input)
+        let r2 = provider.convertBrailleToChineseText(string: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
+    func testConvertBrailleThenBack3() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "第1名";
+        let r1 = provider.convertToBraille(string: input)
+        XCTAssert(r1 == "⠙⠡⠐ ⠼⠂ ⠍⠽⠂", r1)
+        let r2 = provider.convertBrailleToChineseText(string: r1)
+        XCTAssert(r2 == "地 1 明", r2)
+    }
+
+    func testConvertBrailleThenBack4() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "第A名";
+        let r1 = provider.convertToBraille(string: input)
+        let r2 = provider.convertBrailleToChineseText(string: r1)
+        XCTAssert(r2 == "地 A 明", r2)
+    }
+
+    func testConvertBrailleThenBack5() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "第AB名";
+        let r1 = provider.convertToBraille(string: input)
+        let r2 = provider.convertBrailleToChineseText(string: r1)
+        XCTAssert(r2 == "地 AB 明", r2)
+    }
+
+    func testConvertBrailleThenBack6() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = "第A1名";
+        let r1 = provider.convertToBraille(string: input)
+        let r2 = provider.convertBrailleToChineseText(string: r1)
+        XCTAssert(r2 == "地 A1 明", r2)
+    }
+
     func testLetters1() {
         LanguageModelManager.loadDataModels()
         let provider = ServiceProvider()
@@ -132,7 +199,7 @@ final class ServiceProviderTests: XCTestCase {
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
         let result = provider.convertToBraille(string: "This is a test 台灣人最需要的就是消波塊")
-        XCTAssert(result == "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞ ⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐")
+        XCTAssert(result == "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞ ⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐", result)
     }
 
 }
