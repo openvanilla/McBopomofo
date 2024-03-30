@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import XCTest
+
 @testable import McBopomofo
 
 class InputMacroTests: XCTestCase {
@@ -63,7 +64,6 @@ class InputMacroTests: XCTestCase {
         let output = InputMacroController.shared.handle(macro)
         XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
-
 
     func testLastYear() {
         let macro = "MACRO@LAST_YEAR_PLAIN_WITH_ERA"
@@ -310,4 +310,3 @@ class InputMacroTests: XCTestCase {
     }
 
 }
-

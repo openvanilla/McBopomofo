@@ -150,7 +150,7 @@ extension ServiceProvider {
     ) -> String {
         var output = ""
         let tokens = tokenize(string: string)
-        
+
         var previousToken: String?
         var previousTokenType: CFStringTokenizerTokenType?
 
@@ -160,12 +160,15 @@ extension ServiceProvider {
             if addSpace, let previousToken, let previousTokenType {
                 let lastChar = output[output.index(before: output.endIndex)]
                 if lastChar != " " {
-                    if previousTokenType.contains(.isCJWordMask) && 
-                        (!type.contains(.isCJWordMask) && token[token.startIndex].isASCII) {
+                    if previousTokenType.contains(.isCJWordMask)
+                        && (!type.contains(.isCJWordMask) && token[token.startIndex].isASCII)
+                    {
                         output.append(" ")
-                    }
-                    else if (!previousTokenType.contains(.isCJWordMask) && previousToken[previousToken.index(before: previousToken.endIndex)].isASCII)
-                                && type.contains(.isCJWordMask) {
+                    } else if (!previousTokenType.contains(.isCJWordMask)
+                        && previousToken[previousToken.index(before: previousToken.endIndex)]
+                            .isASCII)
+                        && type.contains(.isCJWordMask)
+                    {
                         output.append(" ")
                     }
                 }
@@ -257,7 +260,6 @@ extension ServiceProvider {
         } readingNotFoundCallback: {
             BopomofoBrailleConverter.convert(bopomofo: $0)
         }
-
 
     }
 

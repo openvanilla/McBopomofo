@@ -82,7 +82,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let output = provider.tokenize(string: "『這樣可以嗎？』")
         let expected = ["『", "這樣", "可以", "嗎", "？", "』"]
-        XCTAssert(output.map { $0.0 }  == expected, "\(output)")
+        XCTAssert(output.map { $0.0 } == expected, "\(output)")
     }
 
     func testAddReading2() {
@@ -122,7 +122,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let input = "由「小麥」的作者";
+        let input = "由「小麥」的作者"
         let r1 = provider.convertToBraille(string: input)
         print(r1)
         let r2 = provider.convertBrailleToChineseText(string: r1)
@@ -134,7 +134,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let input = "This is a test";
+        let input = "This is a test"
         let r1 = provider.convertToBraille(string: input)
         let r2 = provider.convertBrailleToChineseText(string: r1)
         XCTAssert(r2 == input, r2)
@@ -145,7 +145,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let input = "第1名";
+        let input = "第1名"
         let r1 = provider.convertToBraille(string: input)
         XCTAssert(r1 == "⠙⠡⠐ ⠼⠂ ⠍⠽⠂", r1)
         let r2 = provider.convertBrailleToChineseText(string: r1)
@@ -157,7 +157,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let input = "第A名";
+        let input = "第A名"
         let r1 = provider.convertToBraille(string: input)
         let r2 = provider.convertBrailleToChineseText(string: r1)
         XCTAssert(r2 == "地 A 明", r2)
@@ -168,7 +168,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let input = "第AB名";
+        let input = "第AB名"
         let r1 = provider.convertToBraille(string: input)
         let r2 = provider.convertBrailleToChineseText(string: r1)
         XCTAssert(r2 == "地 AB 明", r2)
@@ -179,7 +179,7 @@ final class ServiceProviderTests: XCTestCase {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let input = "第A1名";
+        let input = "第A1名"
         let r1 = provider.convertToBraille(string: input)
         let r2 = provider.convertBrailleToChineseText(string: r1)
         XCTAssert(r2 == "地 A1 明", r2)
