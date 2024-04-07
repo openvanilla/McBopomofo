@@ -68,7 +68,7 @@ import Foundation
                     let substring = bopomofo[start...end]
                     if let aCase = DigitRelated(rawValue: String(substring)) {
                         output += aCase.braille
-                        readHead += 1
+                        readHead += i + 1
                         found = true
                         break
                     }
@@ -237,7 +237,7 @@ import Foundation
                 }
                 let target = min(7, length - readHead - 1)
                 var found = false
-                for i in (1...target).reversed() {
+                for i in (0...target).reversed() {
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
