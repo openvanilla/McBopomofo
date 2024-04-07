@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import XCTest
+
 @testable import McBopomofo
 
 class PreferencesTests: XCTestCase {
@@ -40,7 +41,7 @@ class PreferencesTests: XCTestCase {
         return dict
     }
 
-    func restore(from snapshot:[String: Any]) {
+    func restore(from snapshot: [String: Any]) {
         Preferences.allKeys.forEach {
             UserDefaults.standard.set(snapshot[$0], forKey: $0)
         }
@@ -188,7 +189,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.empty)  {
+        } catch (Preferences.CandidateKeyError.empty) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -198,7 +199,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "    ")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.empty)  {
+        } catch (Preferences.CandidateKeyError.empty) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -208,7 +209,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "中文字元")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.invalidCharacters)  {
+        } catch (Preferences.CandidateKeyError.invalidCharacters) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -218,7 +219,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "üåçøöacpo")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.invalidCharacters)  {
+        } catch (Preferences.CandidateKeyError.invalidCharacters) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -228,7 +229,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "1 2 3 4")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.containSpace)  {
+        } catch (Preferences.CandidateKeyError.containSpace) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -238,7 +239,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "aabbccdd")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.duplicatedCharacters)  {
+        } catch (Preferences.CandidateKeyError.duplicatedCharacters) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -248,7 +249,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "abc")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.tooShort)  {
+        } catch (Preferences.CandidateKeyError.tooShort) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -266,7 +267,7 @@ class CandidateKeyValidationTests: XCTestCase {
         do {
             try Preferences.validate(candidateKeys: "qwertyuiopasdfgh")
             XCTFail("exception not thrown")
-        } catch(Preferences.CandidateKeyError.tooLong)  {
+        } catch (Preferences.CandidateKeyError.tooLong) {
         } catch {
             XCTFail("exception not thrown")
         }
@@ -275,8 +276,7 @@ class CandidateKeyValidationTests: XCTestCase {
     func testTooLong2() {
         do {
             try Preferences.validate(candidateKeys: "qwertyuiopasdfg")
-        }
-        catch {
+        } catch {
             XCTFail("Should be safe")
         }
     }

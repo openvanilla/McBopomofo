@@ -108,20 +108,20 @@ extension ServiceProvider {
     // MARK: -
 
     /// Use Apple's tokenizer to tokenize the input string.
-    func tokenize(string: String) -> [String] {
+    func tokenize(string: String) -> [(String, CFStringTokenizerTokenType)] {
         let cfString = string as CFString
         let tokenizer = CFStringTokenizerCreate(
             nil, cfString, CFRange(location: 0, length: CFStringGetLength(cfString)), 0, nil)
         var readHead = 0
-        var output: [String] = []
+        var output: [(String, CFStringTokenizerTokenType)] = []
         while readHead < CFStringGetLength(cfString) {
-            _ = CFStringTokenizerAdvanceToNextToken(tokenizer)
+            let type = CFStringTokenizerAdvanceToNextToken(tokenizer)
             let range = CFStringTokenizerGetCurrentTokenRange(tokenizer)
             if range.location == kCFNotFound {
                 if let subString = CFStringCreateWithSubstring(
                     nil, cfString, CFRangeMake(readHead, 1))
                 {
-                    output.append(subString as String)
+                    output.append((subString as String, CFStringTokenizerTokenType.normal))
                 }
                 readHead += 1
                 continue
@@ -131,11 +131,11 @@ extension ServiceProvider {
                 if let subString = CFStringCreateWithSubstring(
                     nil, cfString, CFRange(location: readHead, length: range.location - readHead))
                 {
-                    output.append(subString as String)
+                    output.append((subString as String, CFStringTokenizerTokenType.normal))
                 }
             }
             if let subString = CFStringCreateWithSubstring(nil, cfString, range) {
-                output.append(subString as String)
+                output.append((subString as String, type))
             }
             readHead = range.location + range.length
         }
@@ -144,12 +144,38 @@ extension ServiceProvider {
 
     func process(
         string: String,
+        addSpace: Bool,
         readingFoundCallback: (String, String) -> String,
         readingNotFoundCallback: (String) -> String
     ) -> String {
         var output = ""
         let tokens = tokenize(string: string)
-        for token in tokens {
+
+        var previousToken: String?
+        var previousTokenType: CFStringTokenizerTokenType?
+
+        for tokenTuple in tokens {
+            let token = tokenTuple.0
+            let type = tokenTuple.1
+            if addSpace, let previousToken, let previousTokenType {
+                let lastChar = output[output.index(before: output.endIndex)]
+                if lastChar != " " {
+                    if previousTokenType.contains(.isCJWordMask)
+                        && (!type.contains(.isCJWordMask) && token[token.startIndex].isASCII)
+                    {
+                        output.append(" ")
+                    } else if (!previousTokenType.contains(.isCJWordMask)
+                        && previousToken[previousToken.index(before: previousToken.endIndex)]
+                            .isASCII)
+                        && type.contains(.isCJWordMask)
+                    {
+                        output.append(" ")
+                    }
+                }
+            }
+            previousToken = token
+            previousTokenType = type
+
             if let reading = LanguageModelManager.reading(for: token) {
                 if reading.isEmpty == false && reading.starts(with: "_") == false {
                     let readings = reading.components(separatedBy: "-")
@@ -177,7 +203,7 @@ extension ServiceProvider {
     }
 
     func addReading(string: String) -> String {
-        process(string: string) {
+        process(string: string, addSpace: false) {
             "\($0)(\($1))"
         } readingNotFoundCallback: {
             $0
@@ -203,7 +229,7 @@ extension ServiceProvider {
     }
 
     func convertToReadings(string: String) -> String {
-        process(string: string) {
+        process(string: string, addSpace: false) {
             $1
         } readingNotFoundCallback: {
             $0
@@ -229,11 +255,12 @@ extension ServiceProvider {
     // MARK: - Braille
 
     func convertToBraille(string: String) -> String {
-        process(string: string) {
+        process(string: string, addSpace: true) {
             BopomofoBrailleConverter.convert(bopomofo: $1)
         } readingNotFoundCallback: {
             BopomofoBrailleConverter.convert(bopomofo: $0)
         }
+
     }
 
     @objc func convertToBraille(

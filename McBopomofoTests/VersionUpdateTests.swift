@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import XCTest
+
 @testable import McBopomofo
 
 class VersionUpdateApiTests: XCTestCase {
