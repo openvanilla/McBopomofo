@@ -60,7 +60,7 @@ class NonModalAlertWindowController: NSWindowController {
             var adjustFrame = cancelButton.frame
             adjustFrame.size.width = max(90, adjustFrame.size.width + 10)
             adjustFrame.origin.x = newFrame.origin.x - adjustFrame.size.width
-            confirmButton.frame = adjustFrame
+            cancelButton.frame = adjustFrame
             cancelButton.isHidden = false
         } else {
             cancelButton.isHidden = true
