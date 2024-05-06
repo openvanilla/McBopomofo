@@ -9371,6 +9371,8 @@
 擰 ㄋㄧㄥˇ ning3 su/3 big5
 濘 ㄋㄧㄥˋ ning4 su/4 big5
 佞 ㄋㄧㄥˋ ning4 su/4 big5
+甯 ㄋㄧㄥˋ ning4 su/4 big5
+寗 ㄋㄧㄥˋ ning4 su/4 big5
 寧 ㄋㄧㄥˊ ning2 su/6 big5
 凝 ㄋㄧㄥˊ ning2 su/6 big5
 獰 ㄋㄧㄥˊ ning2 su/6 big5
@@ -9383,6 +9385,7 @@
 寍 ㄋㄧㄥˊ ning2 su/6 big5
 聹 ㄋㄧㄥˊ ning2 su/6 big5
 嬣 ㄋㄧㄥˊ ning2 su/6 big5
+寗 ㄋㄧㄥˊ ning2 su/6 big5
 捻 ㄋㄧㄢˇ nian3 su03 big5
 撚 ㄋㄧㄢˇ nian3 su03 big5
 攆 ㄋㄧㄢˇ nian3 su03 big5
