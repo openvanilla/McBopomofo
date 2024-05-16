@@ -3836,9 +3836,11 @@
 喀 ㄎㄚ ka d8 big5
 哈 ㄎㄚ ka d8 big5
 鉲 ㄎㄚ ka d8 big5
+咔 ㄎㄚ ka d8 big5
 卡 ㄎㄚˇ ka3 d83 big5
 咳 ㄎㄚˇ ka3 d83 big5
 佧 ㄎㄚˇ ka3 d83 big5
+咔 ㄎㄚˇ ka3 d83 big5
 喀 ㄎㄚˋ ka4 d84 big5
 髂 ㄎㄚˋ ka4 d84 big5
 開 ㄎㄞ kai d9 big5
@@ -12716,6 +12718,7 @@
 哢 ㄌㄨㄥˋ long4 xj/4 big5
 徿 ㄌㄨㄥˋ long4 xj/4 big5
 梇 ㄌㄨㄥˋ long4 xj/4 big5
+咔 ㄌㄨㄥˋ long4 xj/4 big5
 龍 ㄌㄨㄥˊ long2 xj/6 big5
 隆 ㄌㄨㄥˊ long2 xj/6 big5
 籠 ㄌㄨㄥˊ long2 xj/6 big5
