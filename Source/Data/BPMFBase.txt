@@ -9046,6 +9046,7 @@
 鷍 ㄐㄧㄠ jiao rul big5
 嶕 ㄐㄧㄠ jiao rul big5
 蟭 ㄐㄧㄠ jiao rul big5
+噍 ㄐㄧㄠ jiao rul utf8
 腳 ㄐㄧㄠˇ jiao3 rul3 big5
 角 ㄐㄧㄠˇ jiao3 rul3 big5
 繳 ㄐㄧㄠˇ jiao3 rul3 big5
@@ -9097,6 +9098,7 @@
 嘂 ㄐㄧㄠˋ jiao4 rul4 big5
 潐 ㄐㄧㄠˋ jiao4 rul4 big5
 譥 ㄐㄧㄠˋ jiao4 rul4 big5
+噍 ㄐㄧㄠˋ jiao4 rul4 utf8
 嚼 ㄐㄧㄠˊ jiao2 rul6 big5
 今 ㄐㄧㄣ jin rup big5
 金 ㄐㄧㄣ jin rup big5
