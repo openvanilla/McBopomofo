@@ -7811,6 +7811,7 @@
 奅 ㄆㄠˋ pao4 ql4 big5
 麭 ㄆㄠˋ pao4 ql4 big5
 髱 ㄆㄠˋ pao4 ql4 big5
+疱 ㄆㄠˋ pao4 ql4 utf8
 袍 ㄆㄠˊ pao2 ql6 big5
 咆 ㄆㄠˊ pao2 ql6 big5
 刨 ㄆㄠˊ pao2 ql6 big5
