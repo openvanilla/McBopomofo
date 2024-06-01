@@ -1879,7 +1879,6 @@
 眝 ㄓㄨˇ zhu3 5j3 big5
 住 ㄓㄨˋ zhu4 5j4 big5
 著 ㄓㄨˋ zhu4 5j4 big5
-着 ㄓㄨˋ zhu4 5j4 big5
 助 ㄓㄨˋ zhu4 5j4 big5
 注 ㄓㄨˋ zhu4 5j4 big5
 祝 ㄓㄨˋ zhu4 5j4 big5
@@ -1911,6 +1910,7 @@
 櫡 ㄓㄨˋ zhu4 5j4 big5
 殶 ㄓㄨˋ zhu4 5j4 big5
 諔 ㄓㄨˋ zhu4 5j4 big5
+着 ㄓㄨˋ zhu4 5j4 big5
 竹 ㄓㄨˊ zhu2 5j6 big5
 築 ㄓㄨˊ zhu2 5j6 big5
 逐 ㄓㄨˊ zhu2 5j6 big5
@@ -1965,7 +1965,6 @@
 酌 ㄓㄨㄛˊ zhuo2 5ji6 big5
 灼 ㄓㄨㄛˊ zhuo2 5ji6 big5
 著 ㄓㄨㄛˊ zhuo2 5ji6 big5
-着 ㄓㄨㄛˊ zhuo2 5ji6 big5
 啄 ㄓㄨㄛˊ zhuo2 5ji6 big5
 鐲 ㄓㄨㄛˊ zhuo2 5ji6 big5
 擢 ㄓㄨㄛˊ zhuo2 5ji6 big5
@@ -1996,6 +1995,7 @@
 圴 ㄓㄨㄛˊ zhuo2 5ji6 big5
 剢 ㄓㄨㄛˊ zhuo2 5ji6 big5
 灂 ㄓㄨㄛˊ zhuo2 5ji6 big5
+着 ㄓㄨㄛˊ zhuo2 5ji6 big5
 追 ㄓㄨㄟ zhui 5jo big5
 錐 ㄓㄨㄟ zhui 5jo big5
 椎 ㄓㄨㄟ zhui 5jo big5
@@ -2069,16 +2069,15 @@
 瓋 ㄓㄜˊ zhe2 5k6 big5
 喆 ㄓㄜˊ zhe2 5k6 big5
 著 ㄓㄜ˙ zhe5 5k7 big5
-着 ㄓㄜ˙ zhe5 5k7 big5
 遮 ㄓㄜ˙ zhe5 5k7 big5
 晢 ㄓㄜ˙ zhe5 5k7 big5
 嫬 ㄓㄜ˙ zhe5 5k7 big5
+着 ㄓㄜ˙ zhe5 5k7 big5
 朝 ㄓㄠ zhao 5l big5
 招 ㄓㄠ zhao 5l big5
 昭 ㄓㄠ zhao 5l big5
 召 ㄓㄠ zhao 5l big5
 著 ㄓㄠ zhao 5l big5
-着 ㄓㄠ zhao 5l big5
 嘲 ㄓㄠ zhao 5l big5
 釗 ㄓㄠ zhao 5l big5
 駋 ㄓㄠ zhao 5l big5
@@ -2087,6 +2086,7 @@
 盄 ㄓㄠ zhao 5l big5
 鍣 ㄓㄠ zhao 5l big5
 妱 ㄓㄠ zhao 5l big5
+着 ㄓㄠ zhao 5l big5
 找 ㄓㄠˇ zhao3 5l3 big5
 沼 ㄓㄠˇ zhao3 5l3 big5
 爪 ㄓㄠˇ zhao3 5l3 big5
