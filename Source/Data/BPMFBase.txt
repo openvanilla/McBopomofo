@@ -1879,6 +1879,7 @@
 眝 ㄓㄨˇ zhu3 5j3 big5
 住 ㄓㄨˋ zhu4 5j4 big5
 著 ㄓㄨˋ zhu4 5j4 big5
+着 ㄓㄨˋ zhu4 5j4 big5
 助 ㄓㄨˋ zhu4 5j4 big5
 注 ㄓㄨˋ zhu4 5j4 big5
 祝 ㄓㄨˋ zhu4 5j4 big5
@@ -1964,6 +1965,7 @@
 酌 ㄓㄨㄛˊ zhuo2 5ji6 big5
 灼 ㄓㄨㄛˊ zhuo2 5ji6 big5
 著 ㄓㄨㄛˊ zhuo2 5ji6 big5
+着 ㄓㄨㄛˊ zhuo2 5ji6 big5
 啄 ㄓㄨㄛˊ zhuo2 5ji6 big5
 鐲 ㄓㄨㄛˊ zhuo2 5ji6 big5
 擢 ㄓㄨㄛˊ zhuo2 5ji6 big5
@@ -2067,6 +2069,7 @@
 瓋 ㄓㄜˊ zhe2 5k6 big5
 喆 ㄓㄜˊ zhe2 5k6 big5
 著 ㄓㄜ˙ zhe5 5k7 big5
+着 ㄓㄜ˙ zhe5 5k7 big5
 遮 ㄓㄜ˙ zhe5 5k7 big5
 晢 ㄓㄜ˙ zhe5 5k7 big5
 嫬 ㄓㄜ˙ zhe5 5k7 big5
@@ -2075,6 +2078,7 @@
 昭 ㄓㄠ zhao 5l big5
 召 ㄓㄠ zhao 5l big5
 著 ㄓㄠ zhao 5l big5
+着 ㄓㄠ zhao 5l big5
 嘲 ㄓㄠ zhao 5l big5
 釗 ㄓㄠ zhao 5l big5
 駋 ㄓㄠ zhao 5l big5
@@ -2108,6 +2112,7 @@
 旐 ㄓㄠˋ zhao4 5l4 big5
 曌 ㄓㄠˋ zhao4 5l4 big5
 著 ㄓㄠˊ zhao2 5l6 big5
+着 ㄓㄠˊ zhao2 5l6 big5
 真 ㄓㄣ zhen 5p big5
 針 ㄓㄣ zhen 5p big5
 珍 ㄓㄣ zhen 5p big5
