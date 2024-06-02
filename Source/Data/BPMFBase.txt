@@ -5174,6 +5174,7 @@
 邔 ㄑㄧˇ qi3 fu3 big5
 芞 ㄑㄧˇ qi3 fu3 big5
 呇 ㄑㄧˇ qi3 fu3 big5
+啓 ㄑㄧˇ qi3 fu3 utf8
 企 ㄑㄧˋ qi4 fu4 big5
 氣 ㄑㄧˋ qi4 fu4 big5
 器 ㄑㄧˋ qi4 fu4 big5
@@ -6687,6 +6688,7 @@
 搵 ㄨㄣˋ wen4 jp4 big5
 璺 ㄨㄣˋ wen4 jp4 big5
 妏 ㄨㄣˋ wen4 jp4 big5
+彣 ㄨㄣˋ wen4 jp4 utf8
 文 ㄨㄣˊ wen2 jp6 big5
 聞 ㄨㄣˊ wen2 jp6 big5
 紋 ㄨㄣˊ wen2 jp6 big5
@@ -6703,6 +6705,7 @@
 駇 ㄨㄣˊ wen2 jp6 big5
 魰 ㄨㄣˊ wen2 jp6 big5
 鳼 ㄨㄣˊ wen2 jp6 big5
+彣 ㄨㄣˊ wen2 jp6 utf8
 阿 ㄜ e k big5
 婀 ㄜ e k big5
 痾 ㄜ e k big5
@@ -6911,6 +6914,7 @@
 涌 ㄩㄥˇ yong3 m/3 big5
 悀 ㄩㄥˇ yong3 m/3 big5
 銢 ㄩㄥˇ yong3 m/3 big5
+咏 ㄩㄥˇ yong3 m/3 utf8
 用 ㄩㄥˋ yong4 m/4 big5
 佣 ㄩㄥˋ yong4 m/4 big5
 醟 ㄩㄥˋ yong4 m/4 big5
@@ -7199,6 +7203,7 @@
 旟 ㄩˊ yu2 m6 big5
 鰅 ㄩˊ yu2 m6 big5
 齵 ㄩˊ yu2 m6 big5
+伃 ㄩˊ yu2 m6 utf8
 暈 ㄩㄣ yun mp big5
 氳 ㄩㄣ yun mp big5
 縕 ㄩㄣ yun mp big5
@@ -8623,6 +8628,7 @@
 葝 ㄐㄧㄥˋ jing4 ru/4 big5
 擏 ㄐㄧㄥˋ jing4 ru/4 big5
 弳 ㄐㄧㄥˋ jing4 ru/4 big5
+瀞 ㄐㄧㄥˋ jing4 ru/4 utf8
 間 ㄐㄧㄢ jian ru0 big5
 監 ㄐㄧㄢ jian ru0 big5
 堅 ㄐㄧㄢ jian ru0 big5
@@ -12261,6 +12267,7 @@
 廜 ㄊㄨˊ tu2 wj6 big5
 潳 ㄊㄨˊ tu2 wj6 big5
 鷵 ㄊㄨˊ tu2 wj6 big5
+凃 ㄊㄨˊ tu2 wj6 utf8
 脫 ㄊㄨㄛ tuo wji big5
 拖 ㄊㄨㄛ tuo wji big5
 托 ㄊㄨㄛ tuo wji big5
@@ -13143,6 +13150,7 @@
 蓅 ㄌㄧㄡˊ liu2 xu.6 big5
 鰡 ㄌㄧㄡˊ liu2 xu.6 big5
 巰 ㄌㄧㄡˊ liu2 xu.6 big5
+瑠 ㄌㄧㄡˊ liu2 xu.6 utf8
 拎 ㄌㄧㄥ ling xu/ big5
 領 ㄌㄧㄥˇ ling3 xu/3 big5
 嶺 ㄌㄧㄥˇ ling3 xu/3 big5
@@ -13932,6 +13940,7 @@
 飌 ㄈㄥ feng z/ big5
 麷 ㄈㄥ feng z/ big5
 猦 ㄈㄥ feng z/ big5
+峯 ㄈㄥ feng z/ utf8
 唪 ㄈㄥˇ feng3 z/3 big5
 覂 ㄈㄥˇ feng3 z/3 big5
 奉 ㄈㄥˋ feng4 z/4 big5
