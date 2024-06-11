@@ -267,6 +267,7 @@
 岥 ㄅㄛ bo 1i big5
 蔔 ㄅㄛ bo 1i big5
 波 ㄅㄛ bo 1i big5
+鉢 ㄅㄛ bo 1i utf8
 跛 ㄅㄛˇ bo3 1i3 big5
 簸 ㄅㄛˇ bo3 1i3 big5
 蚾 ㄅㄛˇ bo3 1i3 big5
@@ -1032,6 +1033,8 @@
 鬌 ㄉㄨㄛˇ duo3 2ji3 big5
 痑 ㄉㄨㄛˇ duo3 2ji3 big5
 趓 ㄉㄨㄛˇ duo3 2ji3 big5
+朶 ㄉㄨㄛˇ duo3 2ji3 utf8
+躱 ㄉㄨㄛˇ duo3 2ji3 utf8
 惰 ㄉㄨㄛˋ duo4 2ji4 big5
 墮 ㄉㄨㄛˋ duo4 2ji4 big5
 舵 ㄉㄨㄛˋ duo4 2ji4 big5
@@ -1673,6 +1676,7 @@
 瓡 ㄓˊ zhi2 56 big5
 嬂 ㄓˊ zhi2 56 big5
 蘵 ㄓˊ zhi2 56 big5
+値 ㄓˊ zhi2 56 utf8
 渣 ㄓㄚ zha 58 big5
 扎 ㄓㄚ zha 58 big5
 喳 ㄓㄚ zha 58 big5
@@ -2150,6 +2154,7 @@
 堻 ㄓㄣ zhen 5p big5
 𡻈 ㄓㄣ zhen 5p big5
 錱 ㄓㄣ zhen 5p cns
+眞 ㄓㄣ zhen 5p utf8
 診 ㄓㄣˇ zhen3 5p3 big5
 枕 ㄓㄣˇ zhen3 5p3 big5
 疹 ㄓㄣˇ zhen3 5p3 big5
@@ -4776,6 +4781,7 @@
 皵 ㄑㄩㄝˋ que4 fm,4 big5
 毃 ㄑㄩㄝˋ que4 fm,4 big5
 礭 ㄑㄩㄝˋ que4 fm,4 big5
+却 ㄑㄩㄝˋ que4 fm,4 utf8
 瘸 ㄑㄩㄝˊ que2 fm,6 big5
 芎 ㄑㄩㄥ qiong fm/ big5
 穹 ㄑㄩㄥ qiong fm/ big5
@@ -4905,6 +4911,7 @@
 群 ㄑㄩㄣˊ qun2 fmp6 big5
 裙 ㄑㄩㄣˊ qun2 fmp6 big5
 宭 ㄑㄩㄣˊ qun2 fmp6 big5
+羣 ㄑㄩㄣˊ qun2 fmp6 utf8
 七 ㄑㄧ qi fu big5
 妻 ㄑㄧ qi fu big5
 欺 ㄑㄧ qi fu big5
@@ -5305,6 +5312,7 @@
 墏 ㄑㄧㄤˇ qiang3 fu;3 big5
 繈 ㄑㄧㄤˇ qiang3 fu;3 big5
 羥 ㄑㄧㄤˇ qiang3 fu;3 big5
+强 ㄑㄧㄤˇ qiang3 fu;3 utf8
 嗆 ㄑㄧㄤˋ qiang4 fu;4 big5
 羻 ㄑㄧㄤˋ qiang4 fu;4 big5
 唴 ㄑㄧㄤˋ qiang4 fu;4 big5
@@ -5322,6 +5330,7 @@
 蘠 ㄑㄧㄤˊ qiang2 fu;6 big5
 廧 ㄑㄧㄤˊ qiang2 fu;6 big5
 彊 ㄑㄧㄤˊ qiang2 fu;6 big5
+强 ㄑㄧㄤˊ qiang2 fu;6 utf8
 敲 ㄑㄧㄠ qiao ful big5
 鍬 ㄑㄧㄠ qiao ful big5
 橇 ㄑㄧㄠ qiao ful big5
@@ -5976,6 +5985,7 @@
 抻 ㄕㄣˋ shen4 gp4 big5
 侺 ㄕㄣˋ shen4 gp4 big5
 鋠 ㄕㄣˋ shen4 gp4 big5
+愼 ㄕㄣˋ shen4 gp4 utf8
 神 ㄕㄣˊ shen2 gp6 big5
 甚 ㄕㄣˊ shen2 gp6 big5
 什 ㄕㄣˊ shen2 gp6 big5
@@ -8230,6 +8240,7 @@
 袓 ㄐㄩˇ ju3 rm3 big5
 跙 ㄐㄩˇ ju3 rm3 big5
 蝺 ㄐㄩˇ ju3 rm3 big5
+擧 ㄐㄩˇ ju3 rm3 utf8
 據 ㄐㄩˋ ju4 rm4 big5
 句 ㄐㄩˋ ju4 rm4 big5
 具 ㄐㄩˋ ju4 rm4 big5
@@ -8416,6 +8427,7 @@
 隮 ㄐㄧ ji ru big5
 鸄 ㄐㄧ ji ru big5
 癪 ㄐㄧ ji ru big5
+鷄 ㄐㄧ ji ru utf8
 街 ㄐㄧㄝ jie ru, big5
 接 ㄐㄧㄝ jie ru, big5
 皆 ㄐㄧㄝ jie ru, big5
@@ -9024,6 +9036,7 @@
 弶 ㄐㄧㄤˋ jiang4 ru;4 big5
 袶 ㄐㄧㄤˋ jiang4 ru;4 big5
 漿 ㄐㄧㄤˋ jiang4 ru;4 big5
+强 ㄐㄧㄤˋ jiang4 ru;4 utf8
 教 ㄐㄧㄠ jiao rul big5
 交 ㄐㄧㄠ jiao rul big5
 膠 ㄐㄧㄠ jiao rul big5
@@ -9967,6 +9980,7 @@
 幢 ㄔㄨㄤˊ chuang2 tj;6 big5
 撞 ㄔㄨㄤˊ chuang2 tj;6 big5
 橦 ㄔㄨㄤˊ chuang2 tj;6 big5
+牀 ㄔㄨㄤˊ chuang2 tj;6 utf8
 戳 ㄔㄨㄛ chuo tji big5
 綽 ㄔㄨㄛˋ chuo4 tji4 big5
 輟 ㄔㄨㄛˋ chuo4 tji4 big5
@@ -10376,6 +10390,7 @@
 嬮 ㄧㄢ yan u0 big5
 酀 ㄧㄢ yan u0 big5
 腌 ㄧㄢ yan u0 big5
+烟 ㄧㄢ yan u0 utf8
 眼 ㄧㄢˇ yan3 u03 big5
 演 ㄧㄢˇ yan3 u03 big5
 掩 ㄧㄢˇ yan3 u03 big5
@@ -12099,6 +12114,7 @@
 籉 ㄊㄞˊ tai2 w96 big5
 旲 ㄊㄞˊ tai2 w96 big5
 秮 ㄊㄞˊ tai2 w96 big5
+擡 ㄊㄞˊ tai2 w96 utf8
 太 ㄊㄞ˙ tai5 w97 big5
 湯 ㄊㄤ tang w; big5
 鏜 ㄊㄤ tang w; big5
@@ -13745,6 +13761,7 @@
 艐 ㄗㄨㄥ zong yj/ big5
 嵕 ㄗㄨㄥ zong yj/ big5
 蝬 ㄗㄨㄥ zong yj/ big5
+踪 ㄗㄨㄥ zong yj/ utf8
 總 ㄗㄨㄥˇ zong3 yj/3 big5
 摠 ㄗㄨㄥˇ zong3 yj/3 big5
 傯 ㄗㄨㄥˇ zong3 yj/3 big5
