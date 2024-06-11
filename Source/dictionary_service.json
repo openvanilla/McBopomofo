@@ -34,7 +34,7 @@
     },
     {
       "name": "教育部異體字字典",
-      "url_template": "https://dict.variants.moe.edu.tw/variants/rbt/query_result.do?from=standard&search_text=(encoded)"
+      "url_template": "https://dict.variants.moe.edu.tw/search.jsp?QTP=0&WORD=(encoded)#searchL"
     },
     {
       "name": "教育部國字標準字體筆順學習網",
