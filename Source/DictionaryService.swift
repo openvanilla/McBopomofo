@@ -69,8 +69,8 @@ fileprivate struct CharacterInfo: DictionaryService {
 }
 
 fileprivate struct HttpBasedDictionary: DictionaryService, Codable {
-    private (set) var name: String
-    private (set) var urlTemplate: String
+    private(set) var name: String
+    private(set) var urlTemplate: String
 
     init(name: String, urlTemplate: String) {
         self.name = name
