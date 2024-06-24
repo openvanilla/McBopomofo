@@ -685,10 +685,8 @@ BopomofoCharacterMap::BopomofoCharacterMap() {
   characterToComponent[u8"ˋ"] = BPMF::Tone4;
   characterToComponent[u8"˙"] = BPMF::Tone5;
 
-  for (std::map<std::string, BPMF::Component>::iterator iter =
-           characterToComponent.begin();
-       iter != characterToComponent.end(); ++iter) {
-    componentToCharacter[(*iter).second] = (*iter).first;
+  for (const auto& [character, component] : characterToComponent) {
+    componentToCharacter[component] = character;
   }
 }
 
