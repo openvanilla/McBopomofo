@@ -12423,6 +12423,7 @@
 貼 ㄊㄧㄝ tie wu, big5
 帖 ㄊㄧㄝ tie wu, big5
 怗 ㄊㄧㄝ tie wu, big5
+萜 ㄊㄧㄝ tie wu, utf8
 鐵 ㄊㄧㄝˇ tie3 wu,3 big5
 帖 ㄊㄧㄝˇ tie3 wu,3 big5
 驖 ㄊㄧㄝˇ tie3 wu,3 big5
