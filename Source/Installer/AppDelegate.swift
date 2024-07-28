@@ -35,7 +35,7 @@ private let kTranslocationRemovalTickInterval: TimeInterval = 0.5
 private let kTranslocationRemovalDeadline: TimeInterval = 60.0
 
 @NSApplicationMain
-@objc (AppDelegate)
+@objc(AppDelegate)
 class AppDelegate: NSWindowController, NSApplicationDelegate {
     @IBOutlet weak private var actionButton: NSButton!
     @IBOutlet weak private var cancelButton: NSButton!
