@@ -112,7 +112,7 @@ extension ServiceProvider {
     // MARK: -
 
     /// Use Apple's tokenizer to tokenize the input string.
-    private func tokenize(string: String) -> [(String, CFStringTokenizerTokenType)] {
+    func tokenize(string: String) -> [(String, CFStringTokenizerTokenType)] {
         let cfString = string as CFString
         let tokenizer = CFStringTokenizerCreate(
             nil, cfString, CFRange(location: 0, length: CFStringGetLength(cfString)), 0, nil)
