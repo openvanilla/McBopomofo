@@ -25,6 +25,7 @@ import Foundation
 
 /// Convert Bopomofo to Braille and vice versa.
 @objc public class BopomofoBrailleConverter: NSObject {
+
     private enum ConverterState {
         case initial
         case bpmf
@@ -33,6 +34,9 @@ import Foundation
     }
 
     /// Convert from Bopomofo to Braille.
+    ///
+    /// - Parameter bopomofo: the input text in Bopomofo.
+    /// - Returns: Converted Taiwanese Braille.
     @objc(convertFromBopomofo:)
     public static func convert(bopomofo: String) -> String {
         var state = ConverterState.initial
@@ -41,7 +45,8 @@ import Foundation
         let length = bopomofo.count
 
         while readHead < length {
-            let currentChar = String(bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)])
+            let currentChar = String(
+                bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)])
             if currentChar == "\n" || currentChar == "\t" {
                 output += currentChar
                 readHead += 1
@@ -204,6 +209,9 @@ import Foundation
     }
 
     /// Convert from Bopomofo to Braille.
+    ///
+    /// - Parameter braille: The text in Taiwanese Barille.
+    /// - Returns: The converted text in Bopomofo.
     @objc(convertFromBraille:)
     public static func convert(braille: String) -> String {
         var output = ""
@@ -219,6 +227,11 @@ import Foundation
         return output
     }
 
+    /// Converts the text in Taiwanese Braille to tokens. The tokens are in two types,
+    /// one is Bopomofo while another one is for all other kinds of texts.
+    ///
+    /// - Parameter braille: The text in Taiwanese Braille.
+    /// - Returns: <#description#>
     @objc(convertBrailleToTokens:)
     public static func convert(brailleToTokens braille: String) -> [Any] {
         var state = ConverterState.initial
@@ -242,8 +255,8 @@ import Foundation
             if currentChar == " " {
                 if nonBpmfText.isEmpty {
                     nonBpmfText += " "
-                }
-                else if nonBpmfText[nonBpmfText.index(nonBpmfText.endIndex, offsetBy: -1)] != " " {
+                } else if nonBpmfText[nonBpmfText.index(nonBpmfText.endIndex, offsetBy: -1)] != " "
+                {
                     nonBpmfText += " "
                 }
                 readHead += 1
