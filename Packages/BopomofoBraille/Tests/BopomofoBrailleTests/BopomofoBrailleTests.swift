@@ -3,6 +3,21 @@ import XCTest
 
 final class BopomofoBrailleTests: XCTestCase {
 
+    func testSpace() {
+        let input = "ㄎㄜˇ、IBM"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == "ㄎㄜˇ、 IBM", r2)
+    }
+
+    func testDigit() {
+        let input = "24"
+        let r1 = BopomofoBrailleConverter.convert(bopomofo: input)
+        XCTAssert(r1 == "⠼⠆⠲", r1)
+        let r2 = BopomofoBrailleConverter.convert(braille: r1)
+        XCTAssert(r2 == input, r2)
+    }
+
     func testConvertDigits1() {
         let input = "1"
         let r1 = BopomofoBrailleConverter.convert(bopomofo: input)

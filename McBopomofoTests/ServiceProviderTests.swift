@@ -203,4 +203,14 @@ final class ServiceProviderTests: XCTestCase {
         XCTAssert(result == "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞ ⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐", result)
     }
 
+    func testDigit() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let result = provider.convertToBraille(string: "24")
+        XCTAssert(result == "⠼⠆⠲", result)
+    }
+
+
 }

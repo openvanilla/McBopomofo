@@ -41,7 +41,15 @@ import Foundation
         let length = bopomofo.count
 
         while readHead < length {
-            if String(bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)]) == " " {
+            let currentChar = String(bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)])
+            if currentChar == "\n" || currentChar == "\t" {
+                output += currentChar
+                readHead += 1
+                state = .initial
+                continue
+            }
+
+            if currentChar == " " {
                 if output.isEmpty {
                     output += " "
                 } else if output[output.index(output.endIndex, offsetBy: -1)] != " " {
@@ -112,6 +120,9 @@ import Foundation
                     let substring = bopomofo[start...end]
                     do {
                         let syllable = try BopomofoSyllable(rawValue: String(substring))
+                        if state != .bpmf && state != .initial {
+                            output += " "
+                        }
                         output += syllable.braille
                         readHead += i + 1
                         state = .bpmf
@@ -130,6 +141,9 @@ import Foundation
                 let substring = String(
                     bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)])
                 if let punctuation = FullWidthPunctuation(rawValue: substring) {
+                    if state != .bpmf && state != .initial {
+                        output += " "
+                    }
                     output += punctuation.braille
                     readHead += 1
                     state = .bpmf
@@ -141,7 +155,7 @@ import Foundation
                 bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)])
 
             if ("0"..."9").contains(substring) {
-                if state != .initial {
+                if state != .initial && state != .digits {
                     output += " "
                 }
                 output += "⠼"
@@ -156,7 +170,7 @@ import Foundation
             let lowered = substring.lowercased()
 
             if ("a"..."z").contains(lowered) {
-                if state != .initial {
+                if state != .initial && state != .letters {
                     output += " "
                 }
                 if ("A"..."Z").contains(substring) {
@@ -171,7 +185,7 @@ import Foundation
             }
 
             if let punctuation = HalfWidthPunctuation(rawValue: substring) {
-                if state != .initial {
+                if state != .initial && state != .letters {
                     output += " "
                 }
                 output += punctuation.braille
@@ -215,7 +229,17 @@ import Foundation
 
         while readHead < length {
 
-            if String(braille[braille.index(braille.startIndex, offsetBy: readHead)]) == " " {
+            let currentChar = String(braille[braille.index(braille.startIndex, offsetBy: readHead)])
+            if currentChar == "\n" || currentChar == "\t" {
+                if nonBpmfText.isEmpty {
+                    nonBpmfText += currentChar
+                }
+                readHead += 1
+                state = .initial
+                continue
+            }
+
+            if currentChar == " " {
                 if nonBpmfText.isEmpty {
                     nonBpmfText += " "
                 }
