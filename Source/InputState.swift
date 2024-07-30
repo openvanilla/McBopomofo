@@ -121,6 +121,7 @@ class InputState: NSObject {
         var featureList: [(String, () -> InputState)] = [
             (NSLocalizedString("Big5 Code", comment: ""), { .Big5(code: "") }),
             (NSLocalizedString("Date and Time", comment: ""), { .SelectingDateMacro() }),
+            (NSLocalizedString("Enclosed Numbers", comment: ""), { .EnclosedNumber(number: "") }),
             (
                 NSLocalizedString("Lowercase Chinese Numbers", comment: ""),
                 { .ChineseNumber(style: .lower, number: "") }
@@ -253,6 +254,23 @@ class InputState: NSObject {
 
         @objc public var composingBuffer: String {
             return "[內碼] \(code)"
+        }
+    }
+
+    @objc(InputStateEnclosedNumber)
+    class EnclosedNumber: InputState {
+        @objc private(set) var number: String
+
+        @objc init(number: String) {
+            self.number = number
+        }
+
+        override var description: String {
+            "<InputState.EnclosedNumber, code:\(number)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[標題數字] \(number)"
         }
     }
 
