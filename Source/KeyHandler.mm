@@ -339,6 +339,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return [self _handleNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
+    if ([state isKindOfClass:[InputStateEnclosedNumber class]]) {
+        return [self _handleEnclosedNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+
     // if the inputText is empty, it's a function key combination, we ignore it
     if (!input.inputText.length) {
         return NO;
@@ -1687,6 +1692,82 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
+- (BOOL)_handleEnclosedNumberState:(InputState *)state
+                   input:(KeyHandlerInput *)input
+           stateCallback:(void (^)(InputState *))stateCallback
+           errorCallback:(void (^)(void))errorCallback;
+{
+    InputStateEnclosedNumber *enclosedNumber = (InputStateEnclosedNumber *)state;
+    UniChar charCode = input.charCode;
+    BOOL cancelKey = (charCode == 27);
+    if (cancelKey) {
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+    if ((charCode == 8) || input.isDelete) {
+        NSString *number = enclosedNumber.number;
+        if (number.length > 0) {
+            number = [number substringToIndex:number.length - 1];
+        }
+        InputStateEnclosedNumber *newState = [[InputStateEnclosedNumber alloc] initWithNumber:number];
+        stateCallback(newState);
+        return YES;
+    }
+
+    if (charCode == 13 || charCode == 32) {
+        NSString *number = enclosedNumber.number;
+        std::string key = std::string("_number_") + std::string([number UTF8String]);
+
+        if (_languageModel->hasUnigrams(key)) {
+            if (_bpmfReadingBuffer->isEmpty()) {
+
+                auto unigrams = _languageModel->getUnigrams(key);
+                if (unigrams.size() == 1) {
+                    auto unigram = unigrams[0];
+                    NSString *string = [[NSString alloc] initWithUTF8String:unigram.value().c_str()];
+                    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+                    stateCallback(committing);
+                    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                    stateCallback(empty);
+                    return YES;
+                }
+
+                _grid->insertReading(key);
+                [self _walk];
+                size_t originalCursorIndex = _grid->cursor();
+                if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                    _grid->setCursor(originalCursorIndex - 1);
+                }
+                InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
+                choosingCandidate.originalCursorIndex = originalCursorIndex;
+                stateCallback(choosingCandidate);
+            } else { // If there is still unfinished bpmf reading, ignore the punctuation
+                errorCallback();
+            }
+        } else {
+            errorCallback();
+        }
+        return YES;
+    }
+
+    if (charCode >= '0' && charCode <= '9') {
+        if (enclosedNumber.number.length > 2) {
+            errorCallback();
+            return YES;
+        }
+
+        NSString *appended = [NSString stringWithFormat:@"%@%c", enclosedNumber.number, charCode];
+        InputStateEnclosedNumber *newState = [[InputStateEnclosedNumber alloc] initWithNumber:appended];
+        stateCallback(newState);
+    } else {
+        errorCallback();
+    }
+
+    return YES;
+}
+
+
 - (BOOL)_handleBig5State:(InputState *)state
                    input:(KeyHandlerInput *)input
            stateCallback:(void (^)(InputState *))stateCallback
@@ -1742,6 +1823,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     errorCallback();
     return YES;
 }
+
+
 
 - (BOOL)_handleAssociatedPhraseWithState:(InputStateInputting *)state
                 useVerticalMode:(BOOL)useVerticalMode

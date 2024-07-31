@@ -25,6 +25,8 @@ import AppKit
 import BopomofoBraille
 import OpenCCBridge
 
+
+/// Provides text services.
 class ServiceProvider: NSObject {
     weak var delegate: ServiceProviderDelegate? {
         didSet {
@@ -68,6 +70,8 @@ class ServiceProvider: NSObject {
         return reading
     }
 
+
+    /// Adds the selected text to the user phrases.
     @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string),
             let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
@@ -142,9 +146,10 @@ extension ServiceProvider {
         return output
     }
 
-    func process(
+    private func process(
         string: String,
         addSpace: Bool,
+        convertEachCharacter: Bool,
         readingFoundCallback: (String, String) -> String,
         readingNotFoundCallback: (String) -> String
     ) -> String {
@@ -187,29 +192,48 @@ extension ServiceProvider {
                     }
                 }
             }
+            
+            var buffer = ""
+
             for c in token {
                 if let reading = LanguageModelManager.reading(for: String(c)) {
                     if reading.isEmpty == false && reading.starts(with: "_") == false {
+                        if convertEachCharacter == false && buffer.isEmpty == false {
+                            output += readingNotFoundCallback(buffer)
+                            buffer = ""
+                        }
                         output += readingFoundCallback(String(c), reading)
                     } else {
-                        output += readingNotFoundCallback("\(c)")
+                        if convertEachCharacter {
+                            output += readingNotFoundCallback("\(c)")
+                        } else {
+                            buffer += "\(c)"
+                        }
                     }
                 } else {
-                    output += readingNotFoundCallback("\(c)")
+                    if convertEachCharacter {
+                        output += readingNotFoundCallback("\(c)")
+                    } else {
+                        buffer += "\(c)"
+                    }
                 }
+            }
+            if convertEachCharacter == false && buffer.isEmpty == false {
+                output += readingNotFoundCallback(buffer)
             }
         }
         return output
     }
 
     func addReading(string: String) -> String {
-        process(string: string, addSpace: false) {
+        process(string: string, addSpace: true, convertEachCharacter: true) {
             "\($0)(\($1))"
         } readingNotFoundCallback: {
             $0
         }
     }
 
+    /// Add Bopomofo readings to selected text.
     @objc func addReading(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string), string.count < kMaxLength,
             let converted = OpenCCBridge.shared.convertToTraditional(String(string))
@@ -229,13 +253,14 @@ extension ServiceProvider {
     }
 
     func convertToReadings(string: String) -> String {
-        process(string: string, addSpace: false) {
+        process(string: string, addSpace: false, convertEachCharacter: true) {
             $1
         } readingNotFoundCallback: {
             $0
         }
     }
 
+    /// Converts selected text to Bopomofo readings.
     @objc func convertToReadings(
         _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
     ) {
@@ -255,7 +280,7 @@ extension ServiceProvider {
     // MARK: - Braille
 
     func convertToBraille(string: String) -> String {
-        process(string: string, addSpace: true) {
+        process(string: string, addSpace: true, convertEachCharacter: false) {
             BopomofoBrailleConverter.convert(bopomofo: $1)
         } readingNotFoundCallback: {
             BopomofoBrailleConverter.convert(bopomofo: $0)
@@ -263,6 +288,7 @@ extension ServiceProvider {
 
     }
 
+    /// Converts selected text to Taiwanese Braille.
     @objc func convertToBraille(
         _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
     ) {
@@ -302,6 +328,8 @@ extension ServiceProvider {
         return output
     }
 
+
+    /// Converts selected Taiwanese Braille to Chinese characters.
     @objc func convertBrailleToChineseText(
         _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
     ) {
