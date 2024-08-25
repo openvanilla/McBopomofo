@@ -5963,6 +5963,7 @@
 峷 ㄕㄣ shen gp big5
 眒 ㄕㄣ shen gp big5
 鯓 ㄕㄣ shen gp big5
+孞 ㄕㄣ shen gp utf8
 沈 ㄕㄣˇ shen3 gp3 big5
 審 ㄕㄣˇ shen3 gp3 big5
 嬸 ㄕㄣˇ shen3 gp3 big5
@@ -11960,6 +11961,7 @@
 妡 ㄒㄧㄣˋ xin4 vup4 big5
 煡 ㄒㄧㄣˋ xin4 vup4 big5
 阠 ㄒㄧㄣˋ xin4 vup4 big5
+孞 ㄒㄧㄣˋ xin4 vup4 utf8
 尋 ㄒㄧㄣˊ xin2 vup6 big5
 鄩 ㄒㄧㄣˊ xin2 vup6 big5
 杺 ㄒㄧㄣˊ xin2 vup6 big5
