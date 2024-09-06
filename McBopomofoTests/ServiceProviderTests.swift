@@ -34,8 +34,8 @@ final class ServiceProviderTests: XCTestCase {
 
     func testExtractReading1() {
         let provider = ServiceProvider()
-        let output = provider.extractReading(from: "消波塊")
-        XCTAssert(output == "ㄒㄧㄠ-ㄆㄛ-ㄎㄨㄞˋ")
+        let output = provider.extractReading(from: "電腦")
+        XCTAssert(output == "ㄉㄧㄢˋ-ㄋㄠˇ")
     }
 
     func testExtractReading2() {
