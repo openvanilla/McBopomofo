@@ -23,6 +23,7 @@
 
 import Foundation
 
+/// Represents the full-width punctuations
 public enum FullWidthPunctuation: String, CaseIterable {
     init?(braille: String) {
         let aCase = FullWidthPunctuation.allCases.first { aCase in

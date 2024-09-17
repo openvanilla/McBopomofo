@@ -23,8 +23,9 @@
 
 import Foundation
 
+/// Represents the letters.
 public enum Letter: String, CaseIterable {
-    
+
     static let bpmfBrailleMap: [Letter: (String, String)] = [
         .a: ("⠁", "1"),
         .b: ("⠃", "12"),
@@ -53,7 +54,7 @@ public enum Letter: String, CaseIterable {
         .y: ("⠽", "13456"),
         .z: ("⠵", "1356"),
     ]
-    
+
     init?(braille: String) {
         let aCase = Letter.allCases.first { aCase in
             aCase.braille == braille
@@ -64,19 +65,19 @@ public enum Letter: String, CaseIterable {
             return nil
         }
     }
-    
+
     var bopomofo: String {
         return rawValue
     }
-    
+
     var braille: String {
         Letter.bpmfBrailleMap[self]!.0
     }
-    
+
     var brailleCode: String {
         Letter.bpmfBrailleMap[self]!.1
     }
-    
+
     case a = "a"
     case b = "b"
     case c = "c"

@@ -23,6 +23,7 @@
 
 import Foundation
 
+/// Represents the half-width punctuations
 public enum HalfWidthPunctuation: String, CaseIterable {
 
     init?(braille: String) {

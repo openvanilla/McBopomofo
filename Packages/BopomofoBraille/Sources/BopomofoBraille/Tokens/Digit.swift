@@ -23,6 +23,7 @@
 
 import Foundation
 
+/// Represents the digits.
 enum Digit: String, CaseIterable {
 
     init?(braille: String) {

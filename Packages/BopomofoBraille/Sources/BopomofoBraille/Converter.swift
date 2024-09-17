@@ -231,7 +231,7 @@ import Foundation
     /// one is Bopomofo while another one is for all other kinds of texts.
     ///
     /// - Parameter braille: The text in Taiwanese Braille.
-    /// - Returns: <#description#>
+    /// - Returns: The tokens.
     @objc(convertBrailleToTokens:)
     public static func convert(brailleToTokens braille: String) -> [Any] {
         var state = ConverterState.initial
@@ -350,13 +350,13 @@ import Foundation
                         }
 
                         do {
-                            let b = try BopomofoSyllable(braille: String(substring))
+                            let bpmf = try BopomofoSyllable(braille: String(substring))
                             readHead += i + 1
                             if !nonBpmfText.isEmpty {
                                 output.append(nonBpmfText)
                                 nonBpmfText = ""
                             }
-                            output.append(b)
+                            output.append(bpmf)
                             state = .bpmf
                             found = true
                             break
