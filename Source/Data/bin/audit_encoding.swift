@@ -1,6 +1,6 @@
 #!/usr/bin/env swift
 
-// Run: `swift inspect.swift` under command line`
+// Run: `swift audit_encoding.swift` under command line`
 
 import CoreFoundation
 import Foundation
