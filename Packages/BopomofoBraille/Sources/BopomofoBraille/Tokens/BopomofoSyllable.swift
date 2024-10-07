@@ -23,8 +23,8 @@
 
 import Foundation
 
-let kMinimalBopomofoLength = 1
-let kMinimalBrailleLength = 2
+private let kMinimalBopomofoLength = 1
+private let kMinimalBrailleLength = 2
 
 private protocol Syllable {
     var bopomofo: String { get }
