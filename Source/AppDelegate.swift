@@ -174,6 +174,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
             UserDefaults.standard.synchronize()
         }
 
+        if UserDefaults.standard.object(forKey: kBeepUponInputErrorKey) == nil {
+            UserDefaults.standard.set(true, forKey: kBeepUponInputErrorKey)
+            UserDefaults.standard.synchronize()
+        }
+
         NotificationCenter.default.addObserver(forName: .userPhraseLocationDidChange, object: nil, queue: OperationQueue.main) { notification in
             self.updateUserPhrases()
         }
