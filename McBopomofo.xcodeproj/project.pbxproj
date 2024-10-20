@@ -21,6 +21,7 @@
 		6A6ED16C2797650A0012872E /* template-data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1652797650A0012872E /* template-data.txt */; };
 		6A6ED16D2797650A0012872E /* template-exclude-phrases-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1672797650A0012872E /* template-exclude-phrases-plain-bpmf.txt */; };
 		6A6ED16E2797650A0012872E /* template-exclude-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1692797650A0012872E /* template-exclude-phrases.txt */; };
+		6A7C450C2CC571D00076AECA /* template-data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A7C450A2CC571D00076AECA /* template-data-plain-bpmf.txt */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
 		6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EC15FC1D9000935EF6 /* License.rtf */; };
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
@@ -139,6 +140,8 @@
 		6A6ED170279765140012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6A6ED171279765170012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-exclude-phrases.txt"; sourceTree = "<group>"; };
 		6A6ED1722797651A0012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-phrases-replacement.txt"; sourceTree = "<group>"; };
+		6A7C450B2CC571D00076AECA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text; name = Base; path = "Base.lproj/template-data-plain-bpmf.txt"; sourceTree = "<group>"; };
+		6A7C450D2CC571E10076AECA /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -412,6 +415,7 @@
 			isa = PBXGroup;
 			children = (
 				6A6ED1652797650A0012872E /* template-data.txt */,
+				6A7C450A2CC571D00076AECA /* template-data-plain-bpmf.txt */,
 				6A6ED1672797650A0012872E /* template-exclude-phrases-plain-bpmf.txt */,
 				6A6ED1692797650A0012872E /* template-exclude-phrases.txt */,
 				6A6ED1632797650A0012872E /* template-phrases-replacement.txt */,
@@ -632,6 +636,7 @@
 				6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */,
 				D4EE675A2B39968900F062DE /* dictionary_service.json in Resources */,
 				6AE210B215FC63CC003659FE /* PlainBopomofo.tiff in Resources */,
+				6A7C450C2CC571D00076AECA /* template-data-plain-bpmf.txt in Resources */,
 				D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */,
 				D476CB492827DB6300F48552 /* add-phrase-hook.sh in Resources */,
 				6A6ED16C2797650A0012872E /* template-data.txt in Resources */,
@@ -823,6 +828,15 @@
 				6A6ED171279765170012872E /* zh-Hant */,
 			);
 			name = "template-exclude-phrases.txt";
+			sourceTree = "<group>";
+		};
+		6A7C450A2CC571D00076AECA /* template-data-plain-bpmf.txt */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A7C450B2CC571D00076AECA /* Base */,
+				6A7C450D2CC571E10076AECA /* zh-Hant */,
+			);
+			name = "template-data-plain-bpmf.txt";
 			sourceTree = "<group>";
 		};
 		6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */ = {

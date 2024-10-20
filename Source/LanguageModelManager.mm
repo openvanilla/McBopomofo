@@ -35,6 +35,7 @@ static McBopomofo::McBopomofoLM gLanguageModelPlainBopomofo;
 static McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
 static NSString *const kUserDataTemplateName = @"template-data";
+static NSString *const kUserDataPlainBopomofoTemplateName = @"template-data-plain-bpmf";
 static NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
 static NSString *const kExcludedPhrasesPlainBopomofoTemplateName = @"template-exclude-phrases-plain-bpmf";
 static NSString *const kPhraseReplacementTemplateName = @"template-phrases-replacement";
@@ -94,10 +95,12 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     }
 }
 
-+ (void)loadUserPhrases
++ (void)loadUserPhrasesWithPlainBopomofoEnabled:(BOOL)userPhraseForPlainBopomofo
 {
     gLanguageModelMcBopomofo.loadUserPhrases([self userPhrasesDataPathMcBopomofo].UTF8String, [self excludedPhrasesDataPathMcBopomofo].UTF8String);
-    gLanguageModelPlainBopomofo.loadUserPhrases(NULL, [self excludedPhrasesDataPathPlainBopomofo].UTF8String);
+    gLanguageModelPlainBopomofo.loadUserPhrases(userPhraseForPlainBopomofo ?
+                                                [self userPhrasesDataPathPlainBopomofo].UTF8String : NULL,
+                                                [self excludedPhrasesDataPathPlainBopomofo].UTF8String);
 }
 
 + (void)loadUserPhraseReplacement
@@ -183,6 +186,9 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         return NO;
     }
     if (![self ensureFileExists:[self userPhrasesDataPathMcBopomofo] populateWithTemplate:kUserDataTemplateName extension:kTemplateExtension]) {
+        return NO;
+    }
+    if (![self ensureFileExists:[self userPhrasesDataPathPlainBopomofo] populateWithTemplate:kUserDataPlainBopomofoTemplateName extension:kTemplateExtension]) {
         return NO;
     }
     if (![self ensureFileExists:[self excludedPhrasesDataPathMcBopomofo] populateWithTemplate:kExcludedPhrasesMcBopomofoTemplateName extension:kTemplateExtension]) {
@@ -271,6 +277,11 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 + (NSString *)userPhrasesDataPathMcBopomofo
 {
     return [[self dataFolderPath] stringByAppendingPathComponent:@"data.txt"];
+}
+
++ (NSString *)userPhrasesDataPathPlainBopomofo
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"data-plain-bpmf.txt"];
 }
 
 + (NSString *)excludedPhrasesDataPathMcBopomofo
