@@ -186,7 +186,9 @@ class McBopomofoInputMethodController: IMKInputController {
         let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
         } errorCallback: {
-            NSSound.beep()
+            if (Preferences.BeepUponInputError) {
+                NSSound.beep()
+            }
         }
         return result
     }
