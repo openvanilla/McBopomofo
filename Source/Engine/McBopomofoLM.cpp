@@ -56,12 +56,13 @@ void McBopomofoLM::loadAssociatedPhrasesV2(const char* associatedPhrasesPath) {
 
 void McBopomofoLM::loadUserPhrases(const char* userPhrasesDataPath,
                                    const char* excludedPhrasesDataPath) {
+  userPhrases_.close();
+  excludedPhrases_.close();
+
   if (userPhrasesDataPath) {
-    userPhrases_.close();
     userPhrases_.open(userPhrasesDataPath);
   }
   if (excludedPhrasesDataPath) {
-    excludedPhrases_.close();
     excludedPhrases_.open(excludedPhrasesDataPath);
   }
 }

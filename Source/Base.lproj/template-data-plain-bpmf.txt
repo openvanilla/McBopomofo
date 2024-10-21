@@ -1,0 +1,10 @@
+# Custom Characters (for Plain Bopomofo).
+#
+# See https://github.com/openvanilla/McBopomofo/wiki/使用手冊#手動加詞 for usage.
+#
+# Add your characters and their respective Bopomofo reading below.
+#
+#     㵘 ㄇㄢˋ
+#
+# Any line that starts with "#" is treated as comment.
+
