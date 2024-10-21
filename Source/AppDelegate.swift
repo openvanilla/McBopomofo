@@ -155,7 +155,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 
     func updateUserPhrases() {
         NSLog("updateUserPhrases called \(LanguageModelManager.dataFolderPath)")
-        LanguageModelManager.loadUserPhrases()
+        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.EnableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
 
         fsStreamHelper?.delegate = nil
@@ -274,7 +274,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 extension AppDelegate: FSEventStreamHelperDelegate {
     func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
         DispatchQueue.main.async {
-            LanguageModelManager.loadUserPhrases()
+            LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.EnableUserPhrasesInPlainBopomofo)
             LanguageModelManager.loadUserPhraseReplacement()
         }
     }
@@ -300,6 +300,10 @@ extension AppDelegate {
 
     @objc func openUserPhrases(_ sender: Any?) {
         open(userFileAt: LanguageModelManager.userPhrasesDataPathMcBopomofo)
+    }
+
+    @objc func openUserPhrasesPlainBopomofo(_ sender: Any?) {
+        open(userFileAt: LanguageModelManager.userPhrasesDataPathPlainBopomofo)
     }
 
     @objc func openExcludedPhrasesPlainBopomofo(_ sender: Any?) {

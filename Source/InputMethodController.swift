@@ -86,6 +86,9 @@ class McBopomofoInputMethodController: IMKInputController {
         menu.addItem(withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil, keyEquivalent: "")
 
         if inputMode == .plainBopomofo {
+            if (Preferences.EnableUserPhrasesInPlainBopomofo) {
+                menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrasesPlainBopomofo(_:)), keyEquivalent: "")
+            }
             menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesPlainBopomofo(_:)), keyEquivalent: "")
         } else {
             menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
@@ -234,6 +237,10 @@ class McBopomofoInputMethodController: IMKInputController {
         (NSApp.delegate as? AppDelegate)?.openUserPhrases(sender)
     }
 
+    @objc func openUserPhrasesPlainBopomofo(_ sender: Any?) {
+        (NSApp.delegate as? AppDelegate)?.openUserPhrasesPlainBopomofo(sender)
+    }
+
     @objc func openExcludedPhrasesPlainBopomofo(_ sender: Any?) {
         (NSApp.delegate as? AppDelegate)?.openExcludedPhrasesPlainBopomofo(sender)
     }
@@ -247,7 +254,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {
-        LanguageModelManager.loadUserPhrases()
+        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.EnableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
     }
 

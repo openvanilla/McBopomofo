@@ -70,6 +70,8 @@ private let kBig5InputEnabledKey = "Big5InputEnabled"
 // Need to be populated to true by default upon first start, so the key is not private.
 let kBeepUponInputErrorKey = "BeepUponInputError"
 
+private let kEnableUserPhrasesInPlainBopomofo = "EnableUserPhrasesInPlainBopomofo"
+
 // MARK: Property wrappers
 
 @propertyWrapper
@@ -487,4 +489,9 @@ extension Preferences {
 extension Preferences {
     @UserDefault(key: kBeepUponInputErrorKey, defaultValue: true)
     @objc static var BeepUponInputError: Bool
+}
+
+extension Preferences {
+    @UserDefault(key: kEnableUserPhrasesInPlainBopomofo, defaultValue: false)
+    @objc static var EnableUserPhrasesInPlainBopomofo: Bool
 }
