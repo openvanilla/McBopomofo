@@ -21,6 +21,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+import CandidateUI
 import XCTest
 
 @testable import McBopomofo
@@ -1811,8 +1812,169 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
     }
 
+    func testEscKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState)
+    }
+
+    func testEscKeyWithCandidate() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let down = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.down.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: down, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.ChoosingCandidate)
+
+        let esc = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: esc, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+    }
+
+    func testHomeKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.home.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssertTrue(state.cursorIndex == 0)
+        }
+    }
+
+    func testHomeAndEndKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let home = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.home.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: home, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        let end = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.end.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: end, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssertTrue(state.cursorIndex == 1)
+        }
+    }
+
+    func testTabKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting)
+    }
+
     func testMacroAndTabKey() {
-        // zonble
         var state: InputState = InputState.Empty()
         // 今天
         let keys = Array("rup wu0 ").map {
@@ -1846,7 +2008,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        NSLog("\(state)")
+        XCTAssertTrue(state is InputState.Inputting)
     }
 
     func testLookUpCandidateInDictionaryAndCancelWithTabKey() {
@@ -1931,4 +2093,585 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssert(state is InputState.ChoosingCandidate)
     }
 
+}
+
+extension KeyHandlerBopomofoTests {
+    func testSelectingFeature() {
+        var state: InputState = InputState.Empty()
+        let input = KeyHandlerInput(
+            inputText: "\\", keyCode: 42, charCode: charCode("\\"), flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.SelectingFeature)
+    }
+}
+
+extension KeyHandlerBopomofoTests {
+    func testEnterBig5() {
+        let big5InputEnabled = Preferences.big5InputEnabled
+        Preferences.big5InputEnabled = true
+        var state: InputState = InputState.Big5(code: "")
+
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.Big5)
+        Preferences.big5InputEnabled = big5InputEnabled
+    }
+
+    func testBig5Input() {
+        var state: InputState = InputState.Big5(code: "")
+        var commitState: InputState?
+        XCTAssert(state is InputState.Big5)
+        let keys = Array("a143").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "。")
+        }
+    }
+
+    func testBig5Cancel() {
+        var state: InputState = InputState.Big5(code: "")
+        XCTAssert(state is InputState.Big5)
+        let keys = Array("a14").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.Empty)
+    }
+
+    func testBig5Delete() {
+        var state: InputState = InputState.Big5(code: "")
+        XCTAssert(state is InputState.Big5)
+        let keys = Array("a14").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.delete.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.Big5)
+        if let state = state as? InputState.Big5 {
+            XCTAssertTrue(state.code == "A1")
+        }
+    }
+
+}
+
+extension KeyHandlerBopomofoTests {
+    func testCtrlEnter1() {
+        let controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.controlEnterOutput = .bpmfReading
+        var state: InputState = InputState.Empty()
+        var commitState: InputState?
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "ㄋㄧˇ")
+        }
+        Preferences.controlEnterOutput = controlEnterOutput
+    }
+
+    func testCtrlEnter2() {
+        let controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.controlEnterOutput = .htmlRuby
+        var state: InputState = InputState.Empty()
+        var commitState: InputState?
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(
+                commitState.poppedText == "<ruby>你<rp>(</rp><rt>ㄋㄧˇ</rt><rp>)</rp></ruby>")
+        }
+        Preferences.controlEnterOutput = controlEnterOutput
+    }
+
+    func testCtrlEnter3() {
+        let controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.controlEnterOutput = .braille
+        var state: InputState = InputState.Empty()
+        var commitState: InputState?
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "⠝⠡⠈")
+        }
+        Preferences.controlEnterOutput = controlEnterOutput
+    }
+}
+
+extension KeyHandlerBopomofoTests {
+
+    func testChineseNumberCancel() {
+        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Empty)
+    }
+
+    func testChineseNumberDelete() {
+        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.delete.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.ChineseNumber)
+
+        if let state = state as? InputState.ChineseNumber {
+            XCTAssertTrue(state.number == "1234.")
+        }
+    }
+
+    func testChineseNumber1() {
+        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
+        var commitState: InputState?
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "一千二百三十四點五")
+        }
+
+    }
+
+    func testChineseNumber2() {
+        var state: InputState = InputState.ChineseNumber(style: .upper, number: "")
+        var commitState: InputState?
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "壹仟貳佰參拾肆點伍")
+        }
+
+    }
+
+    func testChineseNumber3() {
+        var state: InputState = InputState.ChineseNumber(style: .suzhou, number: "")
+        var commitState: InputState?
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "〡二〣〤〥\n千[單位]")
+        }
+
+    }
+}
+
+extension KeyHandlerBopomofoTests {
+    func testEnclosingNumbers() {
+        var state: InputState = InputState.EnclosedNumber(number: "1")
+        let enter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: enter, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.ChoosingCandidate)
+        let input = KeyHandlerInput(
+            inputText: "1", keyCode: 0, charCode: charCode("1"), flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.ChoosingCandidate)
+        if let candidateState = state as? InputState.ChoosingCandidate {
+            XCTAssert(candidateState.composingBuffer == "１")
+            let selected = candidateState.candidates[5]
+            handler.fixNode(
+                reading: selected.reading, value: selected.value,
+                originalCursorIndex: Int(candidateState.cursorIndex),
+                useMoveCursorAfterSelectionSetting: true)
+            state = handler.buildInputtingState()
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssertTrue(state.composingBuffer == "①")
+            XCTAssertTrue(state.cursorIndex == 1)
+        }
+    }
+
+    func testEnclosingNumbers30() {
+        var state: InputState = InputState.EnclosedNumber(number: "30")
+        var commitingState: InputState.Committing?
+        let enter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: enter, state: state) { newState in
+            state = newState
+            if let newState = newState as? InputState.Committing {
+                commitingState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssertNotNil(commitingState)
+        if let commitingState = commitingState {
+            XCTAssert(commitingState.poppedText == "㉚")
+        }
+    }
+}
+
+extension KeyHandlerBopomofoTests {
+    func testEnterAssocatedPhrases() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        if let state = state as? InputState.AssociatedPhrases {
+            XCTAssert(state.composingBuffer == "中華")
+            XCTAssert(state.prefixReading == "ㄓㄨㄥ-ㄏㄨㄚˊ")
+            XCTAssert(state.candidate(at: 0) == "民國")
+        }
+
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+    }
+
+    func testCancelAssocatedPhrases() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let shiftEnter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: shiftEnter, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssert(state.composingBuffer == "中華")
+        }
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+    }
+
+    func testSelectAssocatedPhrases() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let shitEnter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: shitEnter, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        let input = KeyHandlerInput(
+            inputText: "1", keyCode: 0, charCode: charCode("1"), flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        guard let associatedPhrasesState = state as? InputState.AssociatedPhrases else {
+            XCTFail()
+            return
+        }
+        handler.fixNodeForAssociatedPhraseWithPrefix(
+            at: Int(associatedPhrasesState.cursorIndex),
+            prefixReading: associatedPhrasesState.prefixReading,
+            prefixValue: associatedPhrasesState.prefixValue,
+            associatedPhraseReading: associatedPhrasesState.candidates[0].reading,
+            associatedPhraseValue: associatedPhrasesState.candidates[0].value)
+        let finalState = handler.buildInputtingState()
+        XCTAssert(finalState is InputState.Inputting)
+        if let finalState = finalState as? InputState.Inputting {
+            XCTAssertTrue(finalState.composingBuffer == "中華民國")
+        }
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+
+    }
 }
