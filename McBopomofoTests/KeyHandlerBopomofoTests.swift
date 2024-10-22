@@ -22,10 +22,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+import CandidateUI
 import XCTest
 
 @testable import McBopomofo
-import CandidateUI
 
 func charCode(_ string: String) -> UInt16 {
     let scalars = string.unicodeScalars
@@ -1939,7 +1939,6 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
     }
 
-
     func testTabKey() {
         var state: InputState = InputState.Empty()
         let keys = Array("w8 ").map {
@@ -2095,7 +2094,10 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssert(state is InputState.ChoosingCandidate)
     }
 
-    func testSelectingFeature () {
+}
+
+extension KeyHandlerBopomofoTests {
+    func testSelectingFeature() {
         var state: InputState = InputState.Empty()
         let input = KeyHandlerInput(
             inputText: "\\", keyCode: 42, charCode: charCode("\\"), flags: [.control],
@@ -2106,11 +2108,13 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
         XCTAssert(state is InputState.SelectingFeature)
     }
+}
 
+extension KeyHandlerBopomofoTests {
     func testEnterBig5() {
         let big5InputEnabled = Preferences.big5InputEnabled
         Preferences.big5InputEnabled = true
-        var state: InputState = InputState.Big5(code:"")
+        var state: InputState = InputState.Big5(code: "")
 
         let input = KeyHandlerInput(
             inputText: "`", keyCode: 0, charCode: charCode("`"), flags: [.control],
@@ -2124,7 +2128,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testBig5Input() {
-        var state: InputState = InputState.Big5(code:"")
+        var state: InputState = InputState.Big5(code: "")
         var commitState: InputState?
         XCTAssert(state is InputState.Big5)
         let keys = Array("a143").map {
@@ -2148,7 +2152,9 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertTrue(commitState.poppedText == "。")
         }
     }
+}
 
+extension KeyHandlerBopomofoTests {
     func testCtrlEnter1() {
         let controlEnterOutput = Preferences.controlEnterOutput
         Preferences.controlEnterOutput = .bpmfReading
@@ -2222,7 +2228,8 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssert(state is InputState.Empty)
         XCTAssert(commitState is InputState.Committing)
         if let commitState = commitState as? InputState.Committing {
-            XCTAssertTrue(commitState.poppedText == "<ruby>你<rp>(</rp><rt>ㄋㄧˇ</rt><rp>)</rp></ruby>")
+            XCTAssertTrue(
+                commitState.poppedText == "<ruby>你<rp>(</rp><rt>ㄋㄧˇ</rt><rp>)</rp></ruby>")
         }
         Preferences.controlEnterOutput = controlEnterOutput
     }
@@ -2265,6 +2272,117 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
         Preferences.controlEnterOutput = controlEnterOutput
     }
+}
 
+extension KeyHandlerBopomofoTests {
+    func testChineseNumber1() {
+        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
+        var commitState: InputState?
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
 
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "一千二百三十四點五")
+        }
+
+    }
+
+    func testChineseNumber2() {
+        var state: InputState = InputState.ChineseNumber(style: .upper, number: "")
+        var commitState: InputState?
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "壹仟貳佰參拾肆點伍")
+        }
+
+    }
+
+    func testChineseNumber3() {
+        var state: InputState = InputState.ChineseNumber(style: .suzhou, number: "")
+        var commitState: InputState?
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "〡二〣〤〥\n千[單位]")
+        }
+
+    }
 }
