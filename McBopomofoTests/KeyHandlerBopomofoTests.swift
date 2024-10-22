@@ -2294,7 +2294,7 @@ extension KeyHandlerBopomofoTests {
             }
         }
         let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            inputText: " ", keyCode: 0, charCode: 13, flags: [],
             isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
@@ -2331,7 +2331,7 @@ extension KeyHandlerBopomofoTests {
             }
         }
         let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            inputText: " ", keyCode: 0, charCode: 13, flags: [],
             isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
@@ -2368,7 +2368,7 @@ extension KeyHandlerBopomofoTests {
             }
         }
         let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            inputText: " ", keyCode: 0, charCode: 13, flags: [],
             isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
             state = newState
@@ -2383,6 +2383,43 @@ extension KeyHandlerBopomofoTests {
         if let commitState = commitState as? InputState.Committing {
             XCTAssertTrue(commitState.poppedText == "〡二〣〤〥\n千[單位]")
         }
+
+    }
+}
+
+extension KeyHandlerBopomofoTests {
+    func testAssocatedPhrases() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        if let state = state as? InputState.AssociatedPhrases {
+            XCTAssert(state.composingBuffer == "中華")
+            XCTAssert(state.prefixReading == "ㄓㄨㄥ-ㄏㄨㄚˊ")
+            XCTAssert(state.candidate(at: 0) == "民國")
+        }
+
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
 
     }
 }
