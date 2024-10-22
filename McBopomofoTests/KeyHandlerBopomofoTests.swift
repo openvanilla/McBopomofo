@@ -2388,7 +2388,7 @@ extension KeyHandlerBopomofoTests {
 }
 
 extension KeyHandlerBopomofoTests {
-    func testAssocatedPhrases() {
+    func testEnterAssocatedPhrases() {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         Preferences.associatedPhrasesEnabled = true
         var state: InputState = InputState.Empty()
@@ -2419,6 +2419,56 @@ extension KeyHandlerBopomofoTests {
             XCTAssert(state.candidate(at: 0) == "民國")
         }
 
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+    }
+
+    func testSelectAssocatedPhrases() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let shitEnter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: shitEnter, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        let input = KeyHandlerInput(
+            inputText: "1", keyCode: 0, charCode: charCode("1"), flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        guard let associatedPhrasesState = state as? InputState.AssociatedPhrases else {
+            XCTFail()
+            return
+        }
+        handler.fixNodeForAssociatedPhraseWithPrefix(
+            at: Int(associatedPhrasesState.cursorIndex),
+            prefixReading: associatedPhrasesState.prefixReading,
+            prefixValue: associatedPhrasesState.prefixValue,
+            associatedPhraseReading: associatedPhrasesState.candidates[0].reading,
+            associatedPhraseValue: associatedPhrasesState.candidates[0].value)
+        let finalState = handler.buildInputtingState()
+        XCTAssert(finalState is InputState.Inputting)
+        if let finalState = finalState as? InputState.Inputting {
+            XCTAssertTrue(finalState.composingBuffer == "中華民國")
+        }
         Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
 
     }
