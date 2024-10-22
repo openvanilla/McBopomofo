@@ -1811,6 +1811,44 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
     }
 
+    func testMacroAndTabKey() {
+        // zonble
+        var state: InputState = InputState.Empty()
+        // 今天
+        let keys = Array("rup wu0 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        NSLog("\(state)")
+    }
+
     func testLookUpCandidateInDictionaryAndCancelWithTabKey() {
         var state: InputState = InputState.Empty()
         let keys = Array("wu0 dj/ ").map {

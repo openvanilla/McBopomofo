@@ -830,7 +830,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     InputStateCandidate *candidate = candidates[currentIndex];
-    [self fixNodeWithReading:candidate.reading value:candidate.value originalCursorIndex:candidateState.originalCursorIndex useMoveCursorAfterSelectionSetting:NO];
+    size_t originalCursorIndex = _grid->cursor();
+    [self fixNodeWithReading:candidate.reading value:candidate.value originalCursorIndex:originalCursorIndex useMoveCursorAfterSelectionSetting:NO];
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     stateCallback(inputting);
     return YES;
