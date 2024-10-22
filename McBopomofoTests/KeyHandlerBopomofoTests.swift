@@ -2152,6 +2152,59 @@ extension KeyHandlerBopomofoTests {
             XCTAssertTrue(commitState.poppedText == "。")
         }
     }
+
+    func testBig5Cancel() {
+        var state: InputState = InputState.Big5(code: "")
+        XCTAssert(state is InputState.Big5)
+        let keys = Array("a14").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.Empty)
+    }
+
+    func testBig5Delete() {
+        var state: InputState = InputState.Big5(code: "")
+        XCTAssert(state is InputState.Big5)
+        let keys = Array("a14").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.delete.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.Big5)
+        if let state = state as? InputState.Big5 {
+            XCTAssertTrue(state.code == "A1")
+        }
+    }
+
 }
 
 extension KeyHandlerBopomofoTests {
@@ -2275,6 +2328,60 @@ extension KeyHandlerBopomofoTests {
 }
 
 extension KeyHandlerBopomofoTests {
+
+    func testChineseNumberCancel() {
+        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Empty)
+    }
+
+    func testChineseNumberDelete() {
+        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
+        let keys = Array("1234.5").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.delete.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.ChineseNumber)
+
+        if let state = state as? InputState.ChineseNumber {
+            XCTAssertTrue(state.number == "1234.")
+        }
+    }
+
     func testChineseNumber1() {
         var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
         var commitState: InputState?
@@ -2423,6 +2530,27 @@ extension KeyHandlerBopomofoTests {
             XCTAssertTrue(state.cursorIndex == 1)
         }
     }
+
+    func testEnclosingNumbers30() {
+        var state: InputState = InputState.EnclosedNumber(number: "30")
+        var commitingState: InputState.Committing?
+        let enter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: enter, state: state) { newState in
+            state = newState
+            if let newState = newState as? InputState.Committing {
+                commitingState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssertNotNil(commitingState)
+        if let commitingState = commitingState {
+            XCTAssert(commitingState.poppedText == "㉚")
+        }
+    }
 }
 
 extension KeyHandlerBopomofoTests {
@@ -2456,6 +2584,44 @@ extension KeyHandlerBopomofoTests {
             XCTAssert(state.candidate(at: 0) == "民國")
         }
 
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+    }
+
+    func testCancelAssocatedPhrases() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let shiftEnter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: shiftEnter, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssert(state.composingBuffer == "中華")
+        }
         Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
     }
 
