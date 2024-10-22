@@ -1811,8 +1811,170 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
     }
 
+    func testEscKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState)
+    }
+
+    func testEscKeyWithCandidate() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let down = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.down.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: down, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.ChoosingCandidate)
+
+        let esc = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: esc, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+    }
+
+    func testHomeKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.home.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssertTrue(state.cursorIndex == 0)
+        }
+    }
+
+    func testHomeAndEndKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let home = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.home.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: home, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        let end = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.end.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: end, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssertTrue(state.cursorIndex == 1)
+        }
+    }
+
+
+    func testTabKey() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("w8 ").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.tab.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.Inputting)
+    }
+
     func testMacroAndTabKey() {
-        // zonble
         var state: InputState = InputState.Empty()
         // 今天
         let keys = Array("rup wu0 ").map {
@@ -1846,7 +2008,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         } errorCallback: {
         }
 
-        NSLog("\(state)")
+        XCTAssertTrue(state is InputState.Inputting)
     }
 
     func testLookUpCandidateInDictionaryAndCancelWithTabKey() {
