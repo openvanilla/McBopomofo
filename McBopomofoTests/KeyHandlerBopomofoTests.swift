@@ -2097,7 +2097,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
 
     func testSelectingFeature () {
         var state: InputState = InputState.Empty()
-        var input = KeyHandlerInput(
+        let input = KeyHandlerInput(
             inputText: "\\", keyCode: 42, charCode: charCode("\\"), flags: [.control],
             isVerticalMode: false)
         handler.handle(input: input, state: state) { newState in
@@ -2107,7 +2107,23 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssert(state is InputState.SelectingFeature)
     }
 
-    func testBig5Input () {
+    func testEnterBig5() {
+        let big5InputEnabled = Preferences.big5InputEnabled
+        Preferences.big5InputEnabled = true
+        var state: InputState = InputState.Big5(code:"")
+
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.Big5)
+        Preferences.big5InputEnabled = big5InputEnabled
+    }
+
+    func testBig5Input() {
         var state: InputState = InputState.Big5(code:"")
         var commitState: InputState?
         XCTAssert(state is InputState.Big5)
@@ -2132,5 +2148,123 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertTrue(commitState.poppedText == "。")
         }
     }
+
+    func testCtrlEnter1() {
+        let controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.controlEnterOutput = .bpmfReading
+        var state: InputState = InputState.Empty()
+        var commitState: InputState?
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "ㄋㄧˇ")
+        }
+        Preferences.controlEnterOutput = controlEnterOutput
+    }
+
+    func testCtrlEnter2() {
+        let controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.controlEnterOutput = .htmlRuby
+        var state: InputState = InputState.Empty()
+        var commitState: InputState?
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "<ruby>你<rp>(</rp><rt>ㄋㄧˇ</rt><rp>)</rp></ruby>")
+        }
+        Preferences.controlEnterOutput = controlEnterOutput
+    }
+
+    func testCtrlEnter3() {
+        let controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.controlEnterOutput = .braille
+        var state: InputState = InputState.Empty()
+        var commitState: InputState?
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+            if newState is InputState.Committing {
+                commitState = newState
+            }
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "⠝⠡⠈")
+        }
+        Preferences.controlEnterOutput = controlEnterOutput
+    }
+
 
 }
