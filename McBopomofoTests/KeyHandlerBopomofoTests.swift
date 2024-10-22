@@ -1,4 +1,5 @@
 // Copyright (c) 2022 and onwards The McBopomofo Authors.
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -24,6 +25,7 @@
 import XCTest
 
 @testable import McBopomofo
+import CandidateUI
 
 func charCode(_ string: String) -> UInt16 {
     let scalars = string.unicodeScalars
@@ -2091,6 +2093,44 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
 
         XCTAssert(state is InputState.ChoosingCandidate)
+    }
+
+    func testSelectingFeature () {
+        var state: InputState = InputState.Empty()
+        var input = KeyHandlerInput(
+            inputText: "\\", keyCode: 42, charCode: charCode("\\"), flags: [.control],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.SelectingFeature)
+    }
+
+    func testBig5Input () {
+        var state: InputState = InputState.Big5(code:"")
+        var commitState: InputState?
+        XCTAssert(state is InputState.Big5)
+        let keys = Array("a143").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+                if newState is InputState.Committing {
+                    commitState = newState
+                }
+            } errorCallback: {
+            }
+        }
+        XCTAssert(state is InputState.Empty)
+        XCTAssert(commitState is InputState.Committing)
+        if let commitState = commitState as? InputState.Committing {
+            XCTAssertTrue(commitState.poppedText == "。")
+        }
     }
 
 }
