@@ -2388,6 +2388,44 @@ extension KeyHandlerBopomofoTests {
 }
 
 extension KeyHandlerBopomofoTests {
+    func testEnclosingNumbers() {
+        var state: InputState = InputState.EnclosedNumber(number: "1")
+        let enter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: enter, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssert(state is InputState.ChoosingCandidate)
+        let input = KeyHandlerInput(
+            inputText: "1", keyCode: 0, charCode: charCode("1"), flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+
+        XCTAssertTrue(state is InputState.ChoosingCandidate)
+        if let candidateState = state as? InputState.ChoosingCandidate {
+            XCTAssert(candidateState.composingBuffer == "１")
+            let selected = candidateState.candidates[5]
+            handler.fixNode(
+                reading: selected.reading, value: selected.value,
+                originalCursorIndex: Int(candidateState.cursorIndex),
+                useMoveCursorAfterSelectionSetting: true)
+            state = handler.buildInputtingState()
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+        if let state = state as? InputState.Inputting {
+            XCTAssertTrue(state.composingBuffer == "①")
+            XCTAssertTrue(state.cursorIndex == 1)
+        }
+    }
+}
+
+extension KeyHandlerBopomofoTests {
     func testEnterAssocatedPhrases() {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         Preferences.associatedPhrasesEnabled = true
@@ -2407,7 +2445,6 @@ extension KeyHandlerBopomofoTests {
         let input = KeyHandlerInput(
             inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
             isVerticalMode: false)
-
         handler.handle(input: input, state: state) { newState in
             state = newState
         } errorCallback: {
