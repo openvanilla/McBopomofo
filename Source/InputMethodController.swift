@@ -838,8 +838,22 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                     handle(state: .Empty(), client: client)
                 }
             case .bopomofo:
-                // assocated phrase?
-                handle(state: inputting, client: client)
+                if Preferences.associatedPhrasesEnabled {
+                    var textFrame = NSRect.zero
+                    let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
+                    let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+
+                    let state = keyHandler.buildInputtingState()
+                    keyHandler.handleAssociatedPhrase(with: state, useVerticalMode: useVerticalMode, stateCallback: { newState in
+                        self.handle(state: newState, client: client)
+                    }, errorCallback: {
+                        if (Preferences.BeepUponInputError) {
+                            NSSound.beep()
+                        }
+                    }, useShiftKey: true)
+                } else {
+                    handle(state: inputting, client: client)
+                }
             default:
                 break
             }

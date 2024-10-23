@@ -505,7 +505,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(inputting);
 
         if (_inputMode == InputModeBopomofo && Preferences.associatedPhrasesEnabled) {
-            [self _handleAssociatedPhraseWithState:(InputStateInputting *)inputting useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback useShiftKey:YES];
+            [self handleAssociatedPhraseWithState:(InputStateInputting *)inputting useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback useShiftKey:YES];
         }
         else if (_inputMode == InputModePlainBopomofo) {
             InputStateChoosingCandidate *choosingCandidates = [self _buildCandidateStateFromInputtingState:inputting useVerticalMode:input.useVerticalMode];
@@ -667,7 +667,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         if (_inputMode == InputModeBopomofo &&
             input.isShiftHold &&
             [state isKindOfClass:[InputStateInputting class]]) {
-            return [self _handleAssociatedPhraseWithState:(InputStateInputting *)state useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback useShiftKey:NO];
+            return [self handleAssociatedPhraseWithState:(InputStateInputting *)state useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback useShiftKey:NO];
         }
         return [self _handleEnterWithState:state stateCallback:stateCallback errorCallback:errorCallback];
     }
@@ -1354,6 +1354,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+            if ([(InputStateAssociatedPhrases *)state useShiftKey]) {
+                return NO;
+            }
+
             InputStateAssociatedPhrases *current = (InputStateAssociatedPhrases *)state;
             NSInteger selectedIndex = current.selectedIndex;
             InputStateNotEmpty *newState = current.previousState;
@@ -1435,6 +1439,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isLeft) {
+        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+            if ([(InputStateAssociatedPhrases *)state useShiftKey] && input.isShiftHold) {
+                return NO;
+            }
+        }
+
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
@@ -1458,6 +1468,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isRight) {
+        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+            if ([(InputStateAssociatedPhrases *)state useShiftKey] && input.isShiftHold) {
+                return NO;
+            }
+        }
+
         if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
@@ -1860,7 +1876,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 
 
-- (BOOL)_handleAssociatedPhraseWithState:(InputStateInputting *)state
+- (BOOL)handleAssociatedPhraseWithState:(InputStateInputting *)state
                 useVerticalMode:(BOOL)useVerticalMode
                 stateCallback:(void (^)(InputState *))stateCallback
                 errorCallback:(void (^)(void))errorCallback
