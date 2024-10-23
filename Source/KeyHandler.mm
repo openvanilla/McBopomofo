@@ -1364,15 +1364,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     if (charCode == 13 || input.isEnter) {
         // Find associated phrases from the chosen candidate.
         if (_inputMode == InputModeBopomofo &&
-            input.isShiftHold &&
-            Preferences.associatedPhrasesEnabled) {
+            input.isShiftHold) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
                 InputStateChoosingCandidate *current = (InputStateChoosingCandidate *)state;
                 NSInteger selectedCandidateIndex = gCurrentCandidateController.selectedCandidateIndex;
                 InputStateCandidate *candidate = current.candidates[selectedCandidateIndex];
                 NSString *prefixReading = candidate.reading;
                 NSString *prefixValue = candidate.value;
-                InputState* newState = [self buildAssociatedPhraseStateWithPreviousState:current candidateStateOriginalCursorAt:current.originalCursorIndex prefixReading:prefixReading value:prefixValue selectedCandidateIndex:selectedCandidateIndex useVerticalMode:current.useVerticalMode];
+                InputState* newState = [self buildAssociatedPhraseStateWithPreviousState:current candidateStateOriginalCursorAt:current.originalCursorIndex prefixReading:prefixReading value:prefixValue selectedCandidateIndex:selectedCandidateIndex useVerticalMode:current.useVerticalMode useShiftKey:NO];
                 if (newState) {
                     stateCallback(newState);
                 } else {
@@ -1925,7 +1924,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         NSString *combinedReading = @(McBopomofo::AssociatedPhrasesV2::CombineReadings(rdSlice).c_str());
         NSString *actualValue = @(value.str().c_str());
-        InputState *newState = [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:prefixCursorIndex reading:combinedReading value:actualValue selectedCandidateIndex:0 useVerticalMode:useVerticalMode];
+        InputState *newState = [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:prefixCursorIndex reading:combinedReading value:actualValue selectedCandidateIndex:0 useVerticalMode:useVerticalMode useShiftKey:NO];
         if (newState) {
             stateCallback(newState);
             return YES;
@@ -2137,7 +2136,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return nil;
 }
 
-- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state prefixCursorAt:(size_t)prefixCursorIndex reading:(NSString *)reading value:(NSString *)value selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state prefixCursorAt:(size_t)prefixCursorIndex reading:(NSString *)reading value:(NSString *)value selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode useShiftKey:(BOOL)useShiftKey
 {
     BOOL scToTc = Preferences.chineseConversionEnabled &&
             Preferences.chineseConversionStyle == ChineseConversionStyleModel;
@@ -2174,13 +2173,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:displayText];
         [array addObject:candidate];
     }
-    InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state prefixCursorIndex:prefixCursorIndex prefixReading:reading prefixValue:value selectedIndex:candidateIndex candidates:array useVerticalMode:useVerticalMode];
+    InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state prefixCursorIndex:prefixCursorIndex prefixReading:reading prefixValue:value selectedIndex:candidateIndex candidates:array useVerticalMode:useVerticalMode useShiftKey:useShiftKey];
     return associatedPhrases;
 }
 
-- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex prefixReading:(NSString *)prefixReading value:(NSString *)prefixValue selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex prefixReading:(NSString *)prefixReading value:(NSString *)prefixValue selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode useShiftKey:(BOOL)useShiftKey
 {
-    return [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:[self computeActualCursorIndex:candidtaeStateOriginalCursorIndex] reading:prefixReading value:prefixValue selectedCandidateIndex:candidateIndex useVerticalMode:useVerticalMode];
+    return [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:[self computeActualCursorIndex:candidtaeStateOriginalCursorIndex] reading:prefixReading value:prefixValue selectedCandidateIndex:candidateIndex useVerticalMode:useVerticalMode useShiftKey:useShiftKey];
 }
 
 
