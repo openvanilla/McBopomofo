@@ -667,7 +667,16 @@ extension McBopomofoInputMethodController {
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count >= 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
-        let keyLabelPrefix = state is InputState.AssociatedPhrasesPlain ? "⇧ " : ""
+        let shouldUseShift = {
+            if let state = state as? InputState.AssociatedPhrases {
+                return state.useShiftKey
+            }
+            if state is InputState.AssociatedPhrasesPlain {
+                return true
+            }
+            return false
+        }()
+        let keyLabelPrefix = shouldUseShift ? "⇧ " : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
             CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))
         }
@@ -829,6 +838,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                     handle(state: .Empty(), client: client)
                 }
             case .bopomofo:
+                // assocated phrase?
                 handle(state: inputting, client: client)
             default:
                 break
