@@ -353,6 +353,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     BOOL isFunctionKey = (input.isCommandHold || input.isOptionHold || input.isNumericPad) || input.isControlHotKey;
     if (![state isKindOfClass:[InputStateNotEmpty class]] &&
         ![state isKindOfClass:[InputStateAssociatedPhrasesPlain class]] &&
+        !([state isKindOfClass:[InputStateAssociatedPhrases class]] && [(InputStateAssociatedPhrases*)state useShiftKey]) &&
         isFunctionKey) {
         return NO;
     }
@@ -1389,6 +1390,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
             if ([(InputStateAssociatedPhrases *)state useShiftKey]) {
+                if (input.isShiftHold) {
+                    return YES;
+                }
                 return NO;
             }
         }
