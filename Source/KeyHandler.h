@@ -61,7 +61,7 @@ extern InputMode InputModePlainBopomofo;
     NS_SWIFT_NAME(handleForceCommit(stateCallback:));
 
 - (InputState *)buildInputtingState;
-//- (InputState * __nullable)buildAssociatedPhraseStateIfPossible;
+
 - (nullable InputState *)buildAssociatedPhrasePlainStateWithReading:(NSString *)reading value:(NSString *)value useVerticalMode:(BOOL)useVerticalMode;
 - (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state prefixCursorAt:(size_t)prefixCursorIndex reading:(NSString *)reading value:(NSString *)value selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode useShiftKey:(BOOL)useShiftKey;
 - (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex prefixReading:(NSString *)prefixReading value:(NSString *)prefixValue selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode useShiftKey:(BOOL)useShiftKey;
