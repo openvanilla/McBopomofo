@@ -838,6 +838,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                     handle(state: .Empty(), client: client)
                 }
             case .bopomofo:
+                handle(state: inputting, client: client)
                 if Preferences.associatedPhrasesEnabled {
                     var textFrame = NSRect.zero
                     let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
@@ -851,8 +852,6 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                             NSSound.beep()
                         }
                     }, useShiftKey: true)
-                } else {
-                    handle(state: inputting, client: client)
                 }
             default:
                 break
