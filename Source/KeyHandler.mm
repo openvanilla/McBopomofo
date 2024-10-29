@@ -1180,8 +1180,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     stateCallback(inputting);
 
-    if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
+//    if (_inputMode == InputModeBopomofo && Preferences.associatedPhrasesEnabled) {
+//        InputStateAssociatedPhrasesPlain *associatedPhrases = (InputStateAssociatedPhrasesPlain *)[self buildAssociatedPhrasePlainStateWithReading:customPunctuation value:text useVerticalMode:input.useVerticalMode];
+//
+//    }
 
+
+    if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:useVerticalMode];
 
         if (candidateState.candidates.count == 1) {
@@ -1424,6 +1429,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         [self.delegate keyHandler:self didSelectCandidateAtIndex:gCurrentCandidateController.selectedCandidateIndex candidateController:gCurrentCandidateController];
         return YES;
+    }
+
+
+    if (charCode == 32 && [state isKindOfClass:[InputStateAssociatedPhrases class]]) {
+        if ([(InputStateAssociatedPhrases *)state useShiftKey]) {
+            return NO;
+        }
     }
 
     if (charCode == 32 || input.isPageDown || input.emacsKey == McBopomofoEmacsKeyNextPage) {
