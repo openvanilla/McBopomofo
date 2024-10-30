@@ -605,6 +605,10 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testInvalidBpmf() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        let keepReadingUponCompositionError = Preferences.keepReadingUponCompositionError
+        Preferences.keepReadingUponCompositionError = false
         var state: InputState = InputState.Empty()
         let keys = Array("ni4").map {
             String($0)
@@ -619,6 +623,8 @@ class KeyHandlerBopomofoTests: XCTestCase {
             }
         }
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        Preferences.keepReadingUponCompositionError = keepReadingUponCompositionError
     }
 
     func testInputting() {
@@ -2626,7 +2632,7 @@ extension KeyHandlerBopomofoTests {
 
     func testSelectAssocatedPhrases() {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
-        Preferences.associatedPhrasesEnabled = true
+        Preferences.associatedPhrasesEnabled = false
         var state: InputState = InputState.Empty()
         let keys = Array("5j/ cj86").map {
             String($0)

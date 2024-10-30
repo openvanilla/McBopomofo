@@ -1180,12 +1180,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
     stateCallback(inputting);
 
-//    if (_inputMode == InputModeBopomofo && Preferences.associatedPhrasesEnabled) {
-//        InputStateAssociatedPhrasesPlain *associatedPhrases = (InputStateAssociatedPhrasesPlain *)[self buildAssociatedPhrasePlainStateWithReading:customPunctuation value:text useVerticalMode:input.useVerticalMode];
-//
-//    }
-
-
     if (_inputMode == InputModePlainBopomofo && _bpmfReadingBuffer->isEmpty()) {
         InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:useVerticalMode];
 
