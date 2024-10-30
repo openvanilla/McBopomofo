@@ -2743,6 +2743,8 @@
 爢 ㄇㄧˊ mi2 au6 big5
 麊 ㄇㄧˊ mi2 au6 big5
 鸍 ㄇㄧˊ mi2 au6 big5
+禰 ㄇㄧˊ mi2 au6 big5
+祢 ㄇㄧˊ mi2 au6 big5
 喵 ㄇㄧㄠ miao aul big5
 秒 ㄇㄧㄠˇ miao3 aul3 big5
 渺 ㄇㄧㄠˇ miao3 aul3 big5
@@ -9460,6 +9462,7 @@
 馜 ㄋㄧˇ ni3 su3 big5
 隬 ㄋㄧˇ ni3 su3 big5
 譺 ㄋㄧˇ ni3 su3 big5
+祢 ㄋㄧˇ ni3 su3 big5
 逆 ㄋㄧˋ ni4 su4 big5
 溺 ㄋㄧˋ ni4 su4 big5
 匿 ㄋㄧˋ ni4 su4 big5
