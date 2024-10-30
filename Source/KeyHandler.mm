@@ -260,6 +260,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     std::string associatedPhraseReading(phraseReading.UTF8String);
     std::string associatedPhraseValue(phraseValue.UTF8String);
+    std::vector<std::string> associatedPhraseValues = McBopomofo::Split(associatedPhraseValue);
 
     // Compute how many more reading do we have to insert.
     size_t nodeSpanningLength = (*nodeIter)->spanningLength();
@@ -274,6 +275,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     for (size_t i = nodeSpanningLength; i < splitReadingsSize; i++) {
       _grid->insertReading(splitReadings[i]);
       ++accumulatedCursor;
+      if (i <  associatedPhraseValues.size()) {
+        _grid->overrideCandidate(accumulatedCursor, associatedPhraseValues[i]);
+      }
       _grid->setCursor(accumulatedCursor);
     }
 

@@ -12,8 +12,8 @@ data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
           heterophony1.list heterophony2.list heterophony3.list
 	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt BPMFPunctuations.txt Symbols.txt Macros.txt $@
 
-associated-phrases-v2.txt: data.txt bin/derive_associated_phrases.py
-		bin/derive_associated_phrases.py $< $@
+associated-phrases-v2.txt: data.txt bin/derive_associated_phrases.py associated-punctuation.txt
+		bin/derive_associated_phrases.py $< $@ associated-punctuation.txt
 
 PhraseFreq.txt: bin/buildFreq.py phrase.occ exclusion.txt
 	bin/buildFreq.py
