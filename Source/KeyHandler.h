@@ -47,14 +47,21 @@ extern InputMode InputModePlainBopomofo;
       stateCallback:(void (^)(InputState *))stateCallback
       errorCallback:(void (^)(void))errorCallback NS_SWIFT_NAME(handle(input:state:stateCallback:errorCallback:));
 - (BOOL)handleAssociatedPhraseWithState:(InputState *)state
-                useVerticalMode:(BOOL)useVerticalMode
-                stateCallback:(void (^)(InputState *))stateCallback
-                errorCallback:(void (^)(void))errorCallback
+                        useVerticalMode:(BOOL)useVerticalMode
+                          stateCallback:(void (^)(InputState *))stateCallback
+                          errorCallback:(void (^)(void))errorCallback
                             useShiftKey:(BOOL)useShiftKey;
 
 - (void)syncWithPreferences;
-- (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex  useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:originalCursorIndex:useMoveCursorAfterSelectionSetting:));
-- (void)fixNodeForAssociatedPhraseWithPrefixAt:(size_t)prefixCursorIndex prefixReading:(NSString *)pfxReading prefixValue:(NSString *)pfxValue associatedPhraseReading:(NSString *)phraseReading associatedPhraseValue:(NSString *)phraseValue;
+- (void)fixNodeWithReading:(NSString *)reading
+                                 value:(NSString *)value
+                   originalCursorIndex:(size_t)originalCursorIndex
+    useMoveCursorAfterSelectionSetting:(BOOL)flag NS_SWIFT_NAME(fixNode(reading:value:originalCursorIndex:useMoveCursorAfterSelectionSetting:));
+- (void)fixNodeForAssociatedPhraseWithPrefixAt:(size_t)prefixCursorIndex
+                                 prefixReading:(NSString *)pfxReading
+                                   prefixValue:(NSString *)pfxValue
+                       associatedPhraseReading:(NSString *)phraseReading
+                         associatedPhraseValue:(NSString *)phraseValue;
 - (void)clear;
 
 - (void)handleForceCommitWithStateCallback:(void (^)(InputState *))stateCallback
@@ -62,9 +69,23 @@ extern InputMode InputModePlainBopomofo;
 
 - (InputState *)buildInputtingState;
 
-- (nullable InputState *)buildAssociatedPhrasePlainStateWithReading:(NSString *)reading value:(NSString *)value useVerticalMode:(BOOL)useVerticalMode;
-- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state prefixCursorAt:(size_t)prefixCursorIndex reading:(NSString *)reading value:(NSString *)value selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode useShiftKey:(BOOL)useShiftKey;
-- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex prefixReading:(NSString *)prefixReading value:(NSString *)prefixValue selectedCandidateIndex:(NSInteger)candidateIndex useVerticalMode:(BOOL)useVerticalMode useShiftKey:(BOOL)useShiftKey;
+- (nullable InputState *)buildAssociatedPhrasePlainStateWithReading:(NSString *)reading
+                                                              value:(NSString *)value
+                                                    useVerticalMode:(BOOL)useVerticalMode;
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state
+                                                      prefixCursorAt:(size_t)prefixCursorIndex
+                                                             reading:(NSString *)reading
+                                                               value:(NSString *)value
+                                              selectedCandidateIndex:(NSInteger)candidateIndex
+                                                     useVerticalMode:(BOOL)useVerticalMode
+                                                         useShiftKey:(BOOL)useShiftKey;
+- (nullable InputState *)buildAssociatedPhraseStateWithPreviousState:(id)state
+                                      candidateStateOriginalCursorAt:(size_t)candidtaeStateOriginalCursorIndex
+                                                       prefixReading:(NSString *)prefixReading
+                                                               value:(NSString *)prefixValue
+                                              selectedCandidateIndex:(NSInteger)candidateIndex
+                                                     useVerticalMode:(BOOL)useVerticalMode
+                                                         useShiftKey:(BOOL)useShiftKey;
 
 - (size_t)computeActualCursorIndex:(size_t)cursor;
 

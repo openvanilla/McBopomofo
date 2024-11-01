@@ -1,3 +1,16 @@
+「-_punctuation_list-」-_punctuation_list -4
+『-_punctuation_list-』-_punctuation_list -4
+《-_punctuation_list-》-_punctuation_list -4
+〔-_punctuation_list-〕-_punctuation_list -4
+｛-_punctuation_list-｝-_punctuation_list -4
+〈-_punctuation_list-〉-_punctuation_list -4
+【-_punctuation_list-】-_punctuation_list -4
+〖-_punctuation_list-〗-_punctuation_list -4
+〈-_punctuation_list-〉-_punctuation_list -4
+《-_punctuation_list-》-_punctuation_list -4
+︿-_punctuation_list-﹀-_punctuation_list -4
+︽-_punctuation_list-︾-_punctuation_list -4
+（-_punctuation_list-）-_punctuation_list -4
 「-_punctuation_[-」-_punctuation_] -4
 『-_punctuation_{-』-_punctuation_} -4
 《-_punctuation_{-》-_punctuation_} -4
