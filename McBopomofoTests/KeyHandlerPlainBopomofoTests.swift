@@ -341,4 +341,71 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
         Preferences.associatedPhrasesEnabled = enabled
     }
 
+    func testPunctuationInCandidate1() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
+        if let state = state as? InputState.ChoosingCandidate {
+            XCTAssertTrue(state.candidates.map { $0.value }.contains("你"))
+        }
+
+        let input = KeyHandlerInput(
+            inputText: "<", keyCode: 0, charCode: charCode("<"), flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.ChoosingCandidate)
+    }
+
+    func testPunctuationInCandidate2() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("su3").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+
+        XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
+        if let state = state as? InputState.ChoosingCandidate {
+            XCTAssertTrue(state.candidates.map { $0.value }.contains("你"))
+        }
+
+        let input = KeyHandlerInput(
+            inputText: ".", keyCode: 0, charCode: charCode("."), flags: [.control],
+            isVerticalMode: false)
+        var committing: InputState.Committing? = nil
+        handler.handle(input: input, state: state) { newState in
+            if let newState = newState as? InputState.Committing {
+                committing = newState
+            }
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(committing != nil)
+        if let committing = committing {
+            XCTAssertTrue(committing.poppedText == "。")
+        }
+        XCTAssertTrue(state is InputState.Empty)
+    }
 }

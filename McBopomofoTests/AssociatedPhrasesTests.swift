@@ -39,7 +39,7 @@ class AssociatedPhrasesTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func testAssociatedPhraasesState() {
+    func testBuildingAssociatedPhrasesState() {
         var state: InputState = InputState.Empty()
         let keys = Array("u6").map {
             String($0)
@@ -53,14 +53,19 @@ class AssociatedPhrasesTests: XCTestCase {
             } errorCallback: {
             }
         }
-        guard let associatedPheases = handler.buildAssociatedPhraseState(withPreviousState: state, prefixCursorAt: 1, reading: "ㄧ", value: "一", selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false) as? InputState.AssociatedPhrases else {
-            XCTFail("There should be an assocaited phrase state")
+        guard
+            let associatedPhrases = handler.buildAssociatedPhraseState(
+                withPreviousState: state, prefixCursorAt: 1, reading: "ㄧ", value: "一",
+                selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false)
+                as? InputState.AssociatedPhrases
+        else {
+            XCTFail("There should be an associated phrase state")
             return
         }
-        XCTAssert(associatedPheases.candidates.count > 0)
+        XCTAssert(associatedPhrases.candidates.count > 0)
     }
 
-    func testAssociatedPhraasesStatePunctuation1() {
+    func testAssociatedPhrasesStatePunctuation1() {
         var state: InputState = InputState.Empty()
         let keys = Array("{").map {
             String($0)
@@ -74,14 +79,22 @@ class AssociatedPhrasesTests: XCTestCase {
             } errorCallback: {
             }
         }
-        guard let associatedPheases = handler.buildAssociatedPhraseState(withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{", value: "『", selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false) as? InputState.AssociatedPhrases else {
-            XCTFail("There should be an assocaited phrase state")
+        guard
+            let associatedPhrases = handler.buildAssociatedPhraseState(
+                withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{", value: "『",
+                selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false)
+                as? InputState.AssociatedPhrases
+        else {
+            XCTFail("There should be an associated phrase state")
             return
         }
-        XCTAssert(associatedPheases.candidates.count > 0)
-        let candidate = associatedPheases.candidates[0]
+        XCTAssert(associatedPhrases.candidates.count > 0)
+        let candidate = associatedPhrases.candidates[0]
 
-        handler.fixNodeForAssociatedPhraseWithPrefix(at: associatedPheases.prefixCursorIndex, prefixReading: associatedPheases.prefixReading, prefixValue: associatedPheases.prefixValue, associatedPhraseReading: candidate.reading, associatedPhraseValue: candidate.value)
+        handler.fixNodeForAssociatedPhraseWithPrefix(
+            at: associatedPhrases.prefixCursorIndex, prefixReading: associatedPhrases.prefixReading,
+            prefixValue: associatedPhrases.prefixValue, associatedPhraseReading: candidate.reading,
+            associatedPhraseValue: candidate.value)
         guard let inputting = handler.buildInputtingState() as? InputState.Inputting else {
             XCTFail("There should be an inputting state")
             return
@@ -89,7 +102,7 @@ class AssociatedPhrasesTests: XCTestCase {
         XCTAssertTrue(inputting.composingBuffer == "『』")
     }
 
-    func testAssociatedPhraasesStatePunctuation2() {
+    func testAssociatedPhrasesStatePunctuation2() {
         var state: InputState = InputState.Empty()
         let keys = Array("{").map {
             String($0)
@@ -103,14 +116,22 @@ class AssociatedPhrasesTests: XCTestCase {
             } errorCallback: {
             }
         }
-        guard let associatedPheases = handler.buildAssociatedPhraseState(withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{", value: "《", selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false) as? InputState.AssociatedPhrases else {
-            XCTFail("There should be an assocaited phrase state")
+        guard
+            let associatedPhrases = handler.buildAssociatedPhraseState(
+                withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{", value: "《",
+                selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false)
+                as? InputState.AssociatedPhrases
+        else {
+            XCTFail("There should be an associated phrase state")
             return
         }
-        XCTAssert(associatedPheases.candidates.count > 0)
-        let candidate = associatedPheases.candidates[0]
+        XCTAssert(associatedPhrases.candidates.count > 0)
+        let candidate = associatedPhrases.candidates[0]
 
-        handler.fixNodeForAssociatedPhraseWithPrefix(at: associatedPheases.prefixCursorIndex, prefixReading: associatedPheases.prefixReading, prefixValue: associatedPheases.prefixValue, associatedPhraseReading: candidate.reading, associatedPhraseValue: candidate.value)
+        handler.fixNodeForAssociatedPhraseWithPrefix(
+            at: associatedPhrases.prefixCursorIndex, prefixReading: associatedPhrases.prefixReading,
+            prefixValue: associatedPhrases.prefixValue, associatedPhraseReading: candidate.reading,
+            associatedPhraseValue: candidate.value)
         guard let inputting = handler.buildInputtingState() as? InputState.Inputting else {
             XCTFail("There should be an inputting state")
             return
