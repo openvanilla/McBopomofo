@@ -33,8 +33,10 @@ func charCode(_ string: String) -> UInt16 {
 
 class KeyHandlerBopomofoTests: XCTestCase {
     var handler = KeyHandler()
+    var chineseConversionEnabled: Bool  = false
 
     override func setUpWithError() throws {
+        chineseConversionEnabled = Preferences.chineseConversionEnabled
         Preferences.chineseConversionEnabled = false
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
@@ -42,6 +44,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        Preferences.chineseConversionEnabled = chineseConversionEnabled
     }
 
     func testSyncWithPreferences() {
@@ -605,6 +608,15 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testInvalidBpmf() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        let keepReadingUponCompositionError = Preferences.keepReadingUponCompositionError
+        Preferences.associatedPhrasesEnabled = false
+        Preferences.keepReadingUponCompositionError = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+            Preferences.keepReadingUponCompositionError = keepReadingUponCompositionError
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("ni4").map {
             String($0)
@@ -622,6 +634,13 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testInputting() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("vul3a945j4up gj bj4z83").map {
             String($0)
@@ -642,6 +661,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testInputtingNihao() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
             String($0)
@@ -662,6 +687,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testInputtingTianKong() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("wu0 dj/ ").map {
             String($0)
@@ -682,6 +713,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testCommittingNihao() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
             String($0)
@@ -727,6 +764,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testDelete() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
             String($0)
@@ -846,6 +889,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testBackspaceAtBegin() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
             String($0)
@@ -929,6 +978,12 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testBackspace() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
             String($0)
@@ -968,6 +1023,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
         }
 
         XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+
     }
 
     func testCursorWithReading() {
@@ -1010,6 +1066,10 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     func testCursor() {
+
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+
         var state: InputState = InputState.Empty()
         let keys = Array("su3cl3").map {
             String($0)
@@ -1102,12 +1162,15 @@ class KeyHandlerBopomofoTests: XCTestCase {
             XCTAssertEqual(state.cursorIndex, 2)
         }
         XCTAssertTrue(errorCalled)
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
     }
 
     func testCandidateWithDown() {
         var state: InputState = InputState.Empty()
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         let selectPhraseAfterCursorAsCandidate = Preferences.selectPhraseAfterCursorAsCandidate
         let moveCursorAfterSelectingCandidate = Preferences.moveCursorAfterSelectingCandidate
+        Preferences.associatedPhrasesEnabled = false
         Preferences.selectPhraseAfterCursorAsCandidate = false
         Preferences.moveCursorAfterSelectingCandidate = false
 
@@ -1149,19 +1212,24 @@ class KeyHandlerBopomofoTests: XCTestCase {
             let candidates = state.candidates
             XCTAssertTrue(candidates.map { $0.value }.contains("你"))
         }
+
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
     }
 
     func testCandidateWithSpace() {
         let enabled = Preferences.chooseCandidateUsingSpace
         let selectPhraseAfterCursorAsCandidate = Preferences.selectPhraseAfterCursorAsCandidate
         let moveCursorAfterSelectingCandidate = Preferences.moveCursorAfterSelectingCandidate
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         Preferences.chooseCandidateUsingSpace = true
         Preferences.selectPhraseAfterCursorAsCandidate = false
         Preferences.moveCursorAfterSelectingCandidate = false
+        Preferences.associatedPhrasesEnabled = false
         defer {
             Preferences.chooseCandidateUsingSpace = enabled
             Preferences.selectPhraseAfterCursorAsCandidate = selectPhraseAfterCursorAsCandidate
             Preferences.moveCursorAfterSelectingCandidate = moveCursorAfterSelectingCandidate
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
         }
 
         var state: InputState = InputState.Empty()
@@ -2586,6 +2654,39 @@ extension KeyHandlerBopomofoTests {
         Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
     }
 
+    func testEnterAssocatedPunctuaton() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = true
+        var state: InputState = InputState.Empty()
+        let keys = Array("{").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        let input = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
+            isVerticalMode: false)
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssert(state is InputState.AssociatedPhrases)
+        if let state = state as? InputState.AssociatedPhrases {
+            XCTAssert(state.composingBuffer == "『")
+            XCTAssert(state.prefixReading == "_punctuation_{")
+            XCTAssert(state.candidate(at: 0) == "』")
+        }
+
+        Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+    }
+
     func testCancelAssocatedPhrases() {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         Preferences.associatedPhrasesEnabled = true
@@ -2626,7 +2727,7 @@ extension KeyHandlerBopomofoTests {
 
     func testSelectAssocatedPhrases() {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
-        Preferences.associatedPhrasesEnabled = true
+        Preferences.associatedPhrasesEnabled = false
         var state: InputState = InputState.Empty()
         let keys = Array("5j/ cj86").map {
             String($0)
@@ -2672,6 +2773,30 @@ extension KeyHandlerBopomofoTests {
             XCTAssertTrue(finalState.composingBuffer == "中華民國")
         }
         Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+    }
+}
 
+extension KeyHandlerBopomofoTests {
+    func testForceCommit() {
+        var state: InputState = InputState.Empty()
+        let keys = Array("5j/ cj86").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        handler.handleForceCommit { newState in
+            state = newState
+        }
+        XCTAssertTrue(state is InputState.Committing)
+        if let state = state as? InputState.Committing {
+            XCTAssertTrue(state.poppedText == "中華")
+        }
     }
 }

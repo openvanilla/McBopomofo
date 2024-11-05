@@ -70,11 +70,14 @@ class Entry:
         return cls(reading, value, float(score))
 
 
-def main(source_file, target_file):
+def main(source_file, target_file, punctuation_file):
     with open(source_file, "r") as f:
         if f.readline().strip() != PRAGMA:
             raise ValueError("Invalid source file")
         lines = [line.strip() for line in f]
+
+    with open(punctuation_file, "r") as f:
+        punctuation_lines = [line.strip() for line in f]
 
     entries = [Entry.from_line(line) for line in lines[1:]]
 
@@ -92,11 +95,11 @@ def main(source_file, target_file):
     keys = sorted(prefix_entry_map.keys(), key=lambda k: k.encode("utf-8"))
     for k in keys:
         entries = sorted(prefix_entry_map[k], key=lambda e: e.score, reverse=True)
-
         output_lines.extend(
             [e.associated_phrase_line() for e in entries[:MAX_ENTRIES_PER_PREFIX]]
         )
 
+    output_lines += punctuation_lines
     byte_sorted_output_lines = sorted(output_lines, key=lambda x: x.encode("utf-8"))
 
     with open(target_file, "w") as f:
@@ -109,6 +112,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="source file")
     parser.add_argument("target", help="target file")
+    parser.add_argument("punctuation", help="punctuation file")
     args = parser.parse_args()
 
-    main(args.source, args.target)
+    main(args.source, args.target, args.punctuation)

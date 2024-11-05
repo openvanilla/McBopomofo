@@ -51,6 +51,7 @@
 		D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7B3279086DC004A2160 /* InputSourceHelper */; };
 		D427F7B6279086F6004A2160 /* InputSourceHelper in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7B5279086F6004A2160 /* InputSourceHelper */; };
 		D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7C027908EFC004A2160 /* OpenCCBridge */; };
+		D436E23F2CD20BA700C6155D /* AssociatedPhrasesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D436E23E2CD20B9E00C6155D /* AssociatedPhrasesTests.swift */; };
 		D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43FC40A2B23788400ED5A1C /* InputMacro.swift */; };
 		D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD5E2B393C00000C5812 /* InputMacroTests.swift */; };
 		D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD602B39506D000C5812 /* ServiceProviderTests.swift */; };
@@ -188,6 +189,7 @@
 		D427F7AC27907B7E004A2160 /* NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = NotifierUI; path = Packages/NotifierUI; sourceTree = "<group>"; };
 		D427F7B2279086B5004A2160 /* InputSourceHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InputSourceHelper; path = Packages/InputSourceHelper; sourceTree = "<group>"; };
 		D427F7BF27908EAC004A2160 /* OpenCCBridge */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OpenCCBridge; path = Packages/OpenCCBridge; sourceTree = "<group>"; };
+		D436E23E2CD20B9E00C6155D /* AssociatedPhrasesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssociatedPhrasesTests.swift; sourceTree = "<group>"; };
 		D43FC40A2B23788400ED5A1C /* InputMacro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacro.swift; sourceTree = "<group>"; };
 		D449AD5E2B393C00000C5812 /* InputMacroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMacroTests.swift; sourceTree = "<group>"; };
 		D449AD602B39506D000C5812 /* ServiceProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProviderTests.swift; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 		D485D3B72796A8A000657FF3 /* McBopomofoTests */ = {
 			isa = PBXGroup;
 			children = (
+				D436E23E2CD20B9E00C6155D /* AssociatedPhrasesTests.swift */,
 				D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */,
 				D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */,
 				D485D3B82796A8A000657FF3 /* PreferencesTests.swift */,
@@ -744,6 +747,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */,
+				D436E23F2CD20BA700C6155D /* AssociatedPhrasesTests.swift in Sources */,
 				D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */,
 				D4C2A9872B4309D700113711 /* UTF8HelperTest.mm in Sources */,
 				D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */,

@@ -667,7 +667,16 @@ extension McBopomofoInputMethodController {
 
         let candidateKeys = Preferences.candidateKeys
         let keyLabels = candidateKeys.count >= 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
-        let keyLabelPrefix = state is InputState.AssociatedPhrasesPlain ? "⇧ " : ""
+        let shouldUseShift = {
+            if let state = state as? InputState.AssociatedPhrases {
+                return state.useShiftKey
+            }
+            if state is InputState.AssociatedPhrasesPlain {
+                return true
+            }
+            return false
+        }()
+        let keyLabelPrefix = shouldUseShift ? "⇧ " : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
             CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))
         }
@@ -830,6 +839,20 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 }
             case .bopomofo:
                 handle(state: inputting, client: client)
+                if Preferences.associatedPhrasesEnabled {
+                    var textFrame = NSRect.zero
+                    let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
+                    let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+
+                    let state = keyHandler.buildInputtingState()
+                    keyHandler.handleAssociatedPhrase(with: state, useVerticalMode: useVerticalMode, stateCallback: { newState in
+                        self.handle(state: newState, client: client)
+                    }, errorCallback: {
+                        if (Preferences.BeepUponInputError) {
+                            NSSound.beep()
+                        }
+                    }, useShiftKey: true)
+                }
             default:
                 break
             }

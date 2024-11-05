@@ -542,10 +542,11 @@ class InputState: NSObject {
         @objc private(set) var selectedIndex: Int = 0
         @objc private(set) var candidates: [Candidate] = []
         @objc private(set) var useVerticalMode: Bool = false
+        @objc private(set) var useShiftKey: Bool = false
 
         @objc init(
             previousState: NotEmpty, prefixCursorIndex: Int, prefixReading: String, prefixValue: String,
-            selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool
+            selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool, useShiftKey: Bool
         ) {
             self.previousState = previousState
             self.prefixCursorIndex = prefixCursorIndex
@@ -554,6 +555,7 @@ class InputState: NSObject {
             self.selectedIndex = selectedIndex
             self.candidates = candidates
             self.useVerticalMode = useVerticalMode
+            self.useShiftKey = useShiftKey
             super.init(
                 composingBuffer: previousState.composingBuffer,
                 cursorIndex: previousState.cursorIndex)
