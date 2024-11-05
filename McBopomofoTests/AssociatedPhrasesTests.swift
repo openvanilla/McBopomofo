@@ -28,8 +28,10 @@ import XCTest
 class AssociatedPhrasesTests: XCTestCase {
 
     var handler = KeyHandler()
+    var chineseConversionEnabled: Bool = false
 
     override func setUpWithError() throws {
+        chineseConversionEnabled = Preferences.chineseConversionEnabled
         Preferences.chineseConversionEnabled = false
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
@@ -37,6 +39,7 @@ class AssociatedPhrasesTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        Preferences.chineseConversionEnabled = chineseConversionEnabled
     }
 
     func testBuildingAssociatedPhrasesState() {

@@ -211,6 +211,4 @@ final class ServiceProviderTests: XCTestCase {
         let result = provider.convertToBraille(string: "24")
         XCTAssert(result == "⠼⠆⠲", result)
     }
-
-
 }

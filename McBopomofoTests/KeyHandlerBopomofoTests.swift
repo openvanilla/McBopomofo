@@ -33,8 +33,10 @@ func charCode(_ string: String) -> UInt16 {
 
 class KeyHandlerBopomofoTests: XCTestCase {
     var handler = KeyHandler()
+    var chineseConversionEnabled: Bool  = false
 
     override func setUpWithError() throws {
+        chineseConversionEnabled = Preferences.chineseConversionEnabled
         Preferences.chineseConversionEnabled = false
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
@@ -42,6 +44,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        Preferences.chineseConversionEnabled = chineseConversionEnabled
     }
 
     func testSyncWithPreferences() {
