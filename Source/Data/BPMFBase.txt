@@ -4223,6 +4223,7 @@
 菮 ㄍㄥ geng e/ big5
 揯 ㄍㄥ geng e/ big5
 焿 ㄍㄥ geng e/ big5
+畊 ㄍㄥ geng e/ utf8
 梗 ㄍㄥˇ geng3 e/3 big5
 耿 ㄍㄥˇ geng3 e/3 big5
 哽 ㄍㄥˇ geng3 e/3 big5
@@ -8605,6 +8606,7 @@
 麠 ㄐㄧㄥ jing ru/ big5
 仱 ㄐㄧㄥ jing ru/ big5
 惊 ㄐㄧㄥ jing ru/ big5
+畊 ㄐㄧㄥ jing ru/ utf8
 景 ㄐㄧㄥˇ jing3 ru/3 big5
 警 ㄐㄧㄥˇ jing3 ru/3 big5
 井 ㄐㄧㄥˇ jing3 ru/3 big5
