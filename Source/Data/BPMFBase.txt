@@ -4601,6 +4601,7 @@
 溈 ㄍㄨㄟ gui ejo big5
 嫢 ㄍㄨㄟ gui ejo big5
 摫 ㄍㄨㄟ gui ejo big5
+硅 ㄍㄨㄟ gui ejo big5
 鬼 ㄍㄨㄟˇ gui3 ejo3 big5
 軌 ㄍㄨㄟˇ gui3 ejo3 big5
 詭 ㄍㄨㄟˇ gui3 ejo3 big5
