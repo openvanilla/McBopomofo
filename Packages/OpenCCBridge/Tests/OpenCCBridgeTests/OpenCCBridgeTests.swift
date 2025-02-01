@@ -21,13 +21,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Testing
+
 @testable import OpenCCBridge
 
-final class OpenCCBridgeTests: XCTestCase {
-    func testTC2SC() throws {
+@Suite("Test OpenCCBridge")
+final class OpenCCBridgeTests {
+
+    @Test("Test Traditional Chinese to Simplified Chinese")
+    func testTC2SC()  {
         let text = "繁體中文轉簡體中文"
         let converted = OpenCCBridge.shared.convertToSimplified(text)
-        XCTAssert(converted == "繁体中文转简体中文")
+        #expect(converted == "繁体中文转简体中文")
     }
+
+    @Test("Test Simplified Chinese to Traditional Chinese")
+    func testSC2TC()  {
+        let text = "繁体中文转简体中文"
+        let converted = OpenCCBridge.shared.convertToTraditional(text)
+        #expect(converted == "繁體中文轉簡體中文")
+    }
+
 }

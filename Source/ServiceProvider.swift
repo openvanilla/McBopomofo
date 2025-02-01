@@ -148,7 +148,7 @@ extension ServiceProvider {
         return output
     }
 
-    /// Convvert to desired output
+    /// Convert to desired output
     /// - string: The input string
     /// - addSpace: Should add space in each tokens or not
     /// - convertEachCharacter: Split a phrase into characters to convert or not
@@ -262,7 +262,8 @@ extension ServiceProvider {
 
     func addHanyuPinyin(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
-            "\($0)(\(delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? ""))"
+            let pinyin = delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? ""
+            return "\($0)(\(pinyin))"
         } readingNotFoundCallback: {
             $0
         }
@@ -276,7 +277,7 @@ extension ServiceProvider {
             return
         }
         let output = converted.components(separatedBy: "\n").map { input in
-            addReading(string: input)
+            addHanyuPinyin(string: input)
         }.joined(separator: "\n")
 
         if output.isEmpty {
@@ -313,7 +314,7 @@ extension ServiceProvider {
     }
 
     func convertToHanyuPinyin(string: String) -> String {
-        process(string: string, addSpace: false, convertEachCharacter: true) {
+        process(string: string, addSpace: true, convertEachCharacter: true) {
             delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? $1
         } readingNotFoundCallback: {
             $0
@@ -329,7 +330,7 @@ extension ServiceProvider {
             return
         }
         let output = string.components(separatedBy: "\n").map { input in
-            convertToReadings(string: input)
+            convertToHanyuPinyin(string: input)
         }.joined(separator: "\n")
 
         pasteboard.clearContents()

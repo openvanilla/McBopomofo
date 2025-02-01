@@ -1162,7 +1162,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [array addObject:[NSString stringWithUTF8String:hanyuPinyin.c_str()]];
         }
     }
-    return [array componentsJoinedByString:@" "];
+    return [array componentsJoinedByString:@""];
 }
 
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback

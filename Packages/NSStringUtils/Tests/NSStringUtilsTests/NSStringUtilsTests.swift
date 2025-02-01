@@ -21,84 +21,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Cocoa
+import Testing
+
 @testable import NSStringUtils
 
-final class NSStringUtilsTests: XCTestCase {
+@Suite("Test NSStringUtils")
+final class NSStringUtilsTests {
 
-    func testNextNormal_0() {
-        let s = NSString("中文")
-        XCTAssertEqual(s.nextUtf16Position(for: 0), 1)
+    @Test("Test nextUtf16Position", arguments: [
+        ("中文", 0, 1),
+        ("中文", 1, 2),
+        ("🌳🌳", 0, 2),
+        ("🌳🌳", 1, 2),
+        ("🌳🌳", 2, 4),
+        ("🌳🌳", 3, 4),
+        ("🌳🌳", 4, 4),
+        ("🌳🌳🌳", 4, 6),
+    ])
+    func testNextUtf16Position(text: String, from: Int, expected: Int) {
+        let s = NSString(string: text)
+        #expect(s.nextUtf16Position(for: from) == expected)
     }
 
-    func testNextNormal_1() {
-        let s = NSString("中文")
-        XCTAssertEqual(s.nextUtf16Position(for: 1), 2)
+    @Test("Test previousUtf16Position", arguments: [
+        ("中文", 1, 0),
+        ("中文", 2, 1),
+        ("🌳🌳", 0, 0),
+        ("🌳🌳", 1, 0),
+        ("🌳🌳", 2, 0),
+        ("🌳🌳", 3, 0),
+        ("🌳🌳", 4, 2),
+    ])
+    func testPrevNormal_0(text: String, from: Int, expected: Int) {
+        let s = NSString(string: text)
+        #expect(s.previousUtf16Position(for: from) == expected)
     }
-
-    func testNextWith🌳_0() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.nextUtf16Position(for: 0), 2)
-    }
-
-    func testNextWith🌳_1() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.nextUtf16Position(for: 1), 2)
-    }
-
-    func testNextWith🌳_2() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.nextUtf16Position(for: 2), 4)
-    }
-
-    func testNextWith🌳_3() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.nextUtf16Position(for: 3), 4)
-    }
-
-    func testNextWith🌳_4() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.nextUtf16Position(for: 4), 4)
-    }
-
-    func testNextWith🌳_5() {
-        let s = NSString("🌳🌳🌳")
-        XCTAssertEqual(s.nextUtf16Position(for: 4), 6)
-    }
-
-    func testPrevNormal_0() {
-        let s = NSString("中文")
-        XCTAssertEqual(s.previousUtf16Position(for: 1), 0)
-    }
-
-    func testPrevNormal_1() {
-        let s = NSString("中文")
-        XCTAssertEqual(s.previousUtf16Position(for: 2), 1)
-    }
-
-    func testPrevWith🌳_0() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.previousUtf16Position(for: 0), 0)
-    }
-
-    func testPrevWith🌳_1() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.previousUtf16Position(for: 1), 0)
-    }
-
-    func testPrevWith🌳_2() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.previousUtf16Position(for: 2), 0)
-    }
-
-    func testPrevWith🌳_3() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.previousUtf16Position(for: 3), 0)
-    }
-
-    func testPrevWith🌳_4() {
-        let s = NSString("🌳🌳")
-        XCTAssertEqual(s.previousUtf16Position(for: 4), 2)
-    }
-
 }

@@ -4,14 +4,14 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build and Test with Latest Xcode
-    runs-on: macOS-13
+    runs-on: macOS-15
     # env:
     #   DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "^15.1.0"
+          xcode-version: "^16.1.0"
       - name: Build McBopomofoLMLibTest
         run: cmake -DENABLE_TEST=1 -S . -B build
         working-directory: Source/Engine
@@ -30,22 +30,20 @@ jobs:
       - name: Run Gramambular2Test
         run: make runGramambular2Test
         working-directory: Source/Engine/gramambular2/build
-      - name: Test McBopomofo App Bundle
-        run: xcodebuild -scheme McBopomofo -configuration Debug test
       - name: Test CandidateUI
-        run: swift test
+        run: swift test --enable-code-coverage
         working-directory: Packages/CandidateUI
       - name: Test OpenCCBridge
-        run: swift test
+        run: swift test --enable-code-coverage
         working-directory: Packages/OpenCCBridge
       - name: Test BopomofoBraille
-        run: swift test
-        working-directory: Packages/OpenCCBridge
+        run: swift test --enable-code-coverage
+        working-directory: Packages/BopomofoBraille
       - name: Test NSStringUtils
-        run: swift test
+        run: swift test --enable-code-coverage
         working-directory: Packages/NSStringUtils
       - name: Test ChineseNumbers
-        run: swift test
+        run: swift test --enable-code-coverage
         working-directory: Packages/ChineseNumbers
       - name: Clean McBopomofo for testing
         run: xcodebuild -scheme McBopomofo -configuration Debug clean
@@ -62,3 +60,11 @@ jobs:
       - name: Test data files
         run: make check
         working-directory: Source/Data
+      - name: "Collect test results"
+        if: github.event_name == 'push'
+        run: bash .github/collect_swift_coverage.sh
+      - name: Create commit comment
+        if: github.event_name == 'push'
+        uses: peter-evans/commit-comment@v3
+        with:
+          body-path: 'codecov_comment.md' 

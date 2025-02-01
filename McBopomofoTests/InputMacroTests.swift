@@ -21,97 +21,98 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Testing
 
 @testable import McBopomofo
 
-class InputMacroTests: XCTestCase {
+@Suite("Test macros")
+final class InputMacroTests {
 
-    func testNotMacro() {
+    @Test func testNotMacro() {
         let macro = "MACRO@NONE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(macro == output)
+        #expect(macro == output)
     }
 
-    func testThisYearPlain() {
+    @Test func testThisYearPlain() {
         let macro = "MACRO@THIS_YEAR_PLAIN"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testThisYear() {
+    @Test func testThisYear() {
         let macro = "MACRO@THIS_YEAR_PLAIN_WITH_ERA"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output.starts(with: "西元"))
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output.starts(with: "西元"))
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testThisYearRoc() {
+    @Test func testThisYearRoc() {
         let macro = "MACRO@THIS_YEAR_ROC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output.starts(with: "民國"))
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output.starts(with: "民國"))
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testThisYearJapanese() {
+    @Test func testThisYearJapanese() {
         let macro = "MACRO@THIS_YEAR_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testLastYearPlain() {
+    @Test func testLastYearPlain() {
         let macro = "MACRO@LAST_YEAR_PLAIN"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testLastYear() {
+    @Test func testLastYear() {
         let macro = "MACRO@LAST_YEAR_PLAIN_WITH_ERA"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output.starts(with: "西元"))
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output.starts(with: "西元"))
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testLastYearRoc() {
+    @Test func testLastYearRoc() {
         let macro = "MACRO@LAST_YEAR_ROC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output.starts(with: "民國"))
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output.starts(with: "民國"))
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testLastYearJapanese() {
+    @Test func testLastYearJapanese() {
         let macro = "MACRO@LAST_YEAR_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testNextYearPlain() {
+    @Test func testNextYearPlain() {
         let macro = "MACRO@NEXT_YEAR_PLAIN"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testNextYear() {
+    @Test func testNextYear() {
         let macro = "MACRO@NEXT_YEAR_PLAIN_WITH_ERA"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output.starts(with: "西元"))
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output.starts(with: "西元"))
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testNextYearRoc() {
+    @Test func testNextYearRoc() {
         let macro = "MACRO@NEXT_YEAR_ROC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output.starts(with: "民國"))
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output.starts(with: "民國"))
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testNextYearJapanese() {
+    @Test func testNextYearJapanese() {
         let macro = "MACRO@NEXT_YEAR_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testTodayShort() {
+    @Test func testTodayShort() {
         let macro = "MACRO@DATE_TODAY_SHORT"
         let output = InputMacroController.shared.handle(macro)
         let components = output.split(separator: "/").map { substring in
@@ -120,12 +121,12 @@ class InputMacroTests: XCTestCase {
         let year = components[0]
         let month = components[1]
         let day = components[2]
-        XCTAssertTrue(Int(year) ?? 0 >= 2023)
-        XCTAssertTrue(Int(month) ?? 0 >= 1 && Int(month) ?? 0 <= 12)
-        XCTAssertTrue(Int(day) ?? 0 >= 1 && Int(month) ?? 0 <= 31)
+        #expect(Int(year) ?? 0 >= 2023)
+        #expect(Int(month) ?? 0 >= 1 && Int(month) ?? 0 <= 12)
+        #expect(Int(day) ?? 0 >= 1 && Int(month) ?? 0 <= 31)
     }
 
-    func testYesterdayShort() {
+    @Test func testYesterdayShort() {
         let macro = "MACRO@DATE_YESTERDAY_SHORT"
         let output = InputMacroController.shared.handle(macro)
         let components = output.split(separator: "/").map { substring in
@@ -134,12 +135,12 @@ class InputMacroTests: XCTestCase {
         let year = components[0]
         let month = components[1]
         let day = components[2]
-        XCTAssertTrue(Int(year) ?? 0 >= 2023)
-        XCTAssertTrue(Int(month) ?? 0 >= 1 && Int(month) ?? 0 <= 12)
-        XCTAssertTrue(Int(day) ?? 0 >= 1 && Int(month) ?? 0 <= 31)
+        #expect(Int(year) ?? 0 >= 2023)
+        #expect(Int(month) ?? 0 >= 1 && Int(month) ?? 0 <= 12)
+        #expect(Int(day) ?? 0 >= 1 && Int(month) ?? 0 <= 31)
     }
 
-    func testTomorrowShort() {
+    @Test func testTomorrowShort() {
         let macro = "MACRO@DATE_TOMORROW_SHORT"
         let output = InputMacroController.shared.handle(macro)
         let components = output.split(separator: "/").map { substring in
@@ -148,119 +149,119 @@ class InputMacroTests: XCTestCase {
         let year = components[0]
         let month = components[1]
         let day = components[2]
-        XCTAssertTrue(Int(year) ?? 0 >= 2023)
-        XCTAssertTrue(Int(month) ?? 0 >= 1 && Int(month) ?? 0 <= 12)
-        XCTAssertTrue(Int(day) ?? 0 >= 1 && Int(month) ?? 0 <= 31)
+        #expect(Int(year) ?? 0 >= 2023)
+        #expect(Int(month) ?? 0 >= 1 && Int(month) ?? 0 <= 12)
+        #expect(Int(day) ?? 0 >= 1 && Int(month) ?? 0 <= 31)
     }
 
-    func testTodayMedium() {
+    @Test func testTodayMedium() {
         let macro = "MACRO@DATE_TODAY_MEDIUM"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testYesterdayMedium() {
+    @Test func testYesterdayMedium() {
         let macro = "MACRO@DATE_YESTERDAY_MEDIUM"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testTomorrowMedium() {
+    @Test func testTomorrowMedium() {
         let macro = "MACRO@DATE_TOMORROW_MEDIUM"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testTodayMediumRoc() {
+    @Test func testTodayMediumRoc() {
         let macro = "MACRO@DATE_TODAY_MEDIUM_ROC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("民國"))
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("民國"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testYesterdayMediumRoc() {
+    @Test func testYesterdayMediumRoc() {
         let macro = "MACRO@DATE_YESTERDAY_MEDIUM_ROC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("民國"))
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("民國"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testYesterdayTomorrowRoc() {
+    @Test func testYesterdayTomorrowRoc() {
         let macro = "MACRO@DATE_TOMORROW_MEDIUM_ROC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("民國"))
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("民國"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testTodayMediumChinese() {
+    @Test func testTodayMediumChinese() {
         let macro = "MACRO@DATE_TODAY_MEDIUM_CHINESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
     }
 
-    func testYesterdayMediumChinese() {
+    @Test func testYesterdayMediumChinese() {
         let macro = "MACRO@DATE_YESTERDAY_MEDIUM_CHINESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
     }
 
-    func testTomorrowMediumChinese() {
+    @Test func testTomorrowMediumChinese() {
         let macro = "MACRO@DATE_TOMORROW_MEDIUM_CHINESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
     }
 
-    func testTodayLongJapanese() {
+    @Test func testTodayLongJapanese() {
         let macro = "MACRO@DATE_TODAY_MEDIUM_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testYesterdayLongJapanese() {
+    @Test func testYesterdayLongJapanese() {
         let macro = "MACRO@DATE_YESTERDAY_MEDIUM_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testTomorrowLongJapanese() {
+    @Test func testTomorrowLongJapanese() {
         let macro = "MACRO@DATE_TOMORROW_MEDIUM_JAPANESE"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssert(output.contains("年"))
-        XCTAssert(output.contains("月"))
-        XCTAssert(output.contains("日"))
+        #expect(output.contains("年"))
+        #expect(output.contains("月"))
+        #expect(output.contains("日"))
     }
 
-    func testTimeNowShort() {
+    @Test func testTimeNowShort() {
         let macro = "MACRO@TIME_NOW_SHORT"
         let output = InputMacroController.shared.handle(macro)
         let numberPath = output[output.index(output.startIndex, offsetBy: 2)...]
         let numberComponents = String(numberPath).split(separator: ":")
         let hour = numberComponents[0]
         let min = numberComponents[1]
-        XCTAssert(Int(hour) ?? -1 >= 0 && Int(hour) ?? -1 <= 12)
-        XCTAssert(Int(min) ?? -1 >= 0 && Int(min) ?? -1 <= 59)
+        #expect(Int(hour) ?? -1 >= 0 && Int(hour) ?? -1 <= 12)
+        #expect(Int(min) ?? -1 >= 0 && Int(min) ?? -1 <= 59)
     }
 
-    func testTimeNowMedium() {
+    @Test func testTimeNowMedium() {
         let macro = "MACRO@TIME_NOW_MEDIUM"
         let output = InputMacroController.shared.handle(macro)
         let numberPath = output[output.index(output.startIndex, offsetBy: 2)...]
@@ -268,45 +269,45 @@ class InputMacroTests: XCTestCase {
         let hour = numberComponents[0]
         let min = numberComponents[1]
         let sec = numberComponents[2]
-        XCTAssert(Int(hour) ?? -1 >= 0 && Int(hour) ?? -1 <= 12)
-        XCTAssert(Int(min) ?? -1 >= 0 && Int(min) ?? -1 <= 59)
-        XCTAssert(Int(sec) ?? -1 >= 0 && Int(sec) ?? -1 <= 59)
+        #expect(Int(hour) ?? -1 >= 0 && Int(hour) ?? -1 <= 12)
+        #expect(Int(min) ?? -1 >= 0 && Int(min) ?? -1 <= 59)
+        #expect(Int(sec) ?? -1 >= 0 && Int(sec) ?? -1 <= 59)
     }
 
-    func testThisYearGanzhi() {
+    @Test func testThisYearGanzhi() {
         let macro = "MACRO@THIS_YEAR_GANZHI"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testLastYearGanzhi() {
+    @Test func testLastYearGanzhi() {
         let macro = "MACRO@LAST_YEAR_GANZHI"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testNextYearGanzhi() {
+    @Test func testNextYearGanzhi() {
         let macro = "MACRO@NEXT_YEAR_GANZHI"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testThisYearChineseZodiac() {
+    @Test func testThisYearChineseZodiac() {
         let macro = "MACRO@THIS_YEAR_CHINESE_ZODIAC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testLastYearChineseZodiac() {
+    @Test func testLastYearChineseZodiac() {
         let macro = "MACRO@LAST_YEAR_CHINESE_ZODIAC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
-    func testNextYearChineseZodiac() {
+    @Test func testNextYearChineseZodiac() {
         let macro = "MACRO@NEXT_YEAR_CHINESE_ZODIAC"
         let output = InputMacroController.shared.handle(macro)
-        XCTAssertTrue(output[output.index(output.endIndex, offsetBy: -1)] == "年")
+        #expect(output[output.index(output.endIndex, offsetBy: -1)] == "年")
     }
 
 }
