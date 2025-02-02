@@ -124,6 +124,12 @@ if __name__ == '__main__':
 
     output = []
 
+    # Populate phrases dict with entries from BPMFBase.txt first: this is so
+    # that the resulting phrases dict will maintain the order from
+    # BPMFBase.txt; this is important for rarely used characters.
+    for key in bpmf_chars:
+        phrases[key] = UNK_LOG_FREQ
+
     while True:
         line = handle.readline()
         if not line: break
@@ -135,7 +141,14 @@ if __name__ == '__main__':
             readings = bpmf_phrases[mykey]
         except:
             sys.exit('[ERROR] %s key mismatches.' % mykey)
-        phrases[mykey] = True
+        phrases[mykey] = myvalue
+
+    for (mykey, myvalue) in phrases.items():
+        try:
+            readings = bpmf_phrases[mykey]
+        except:
+            sys.exit('[ERROR] %s key mismatches.' % mykey)
+
         # print mykey
         if readings:
             # 剛好一個中文字字的長度目前還是 3 (標點、聲調好像都是2)
