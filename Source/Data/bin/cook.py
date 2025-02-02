@@ -144,12 +144,8 @@ if __name__ == '__main__':
         phrases[mykey] = myvalue
 
     for (mykey, myvalue) in phrases.items():
-        try:
-            readings = bpmf_phrases[mykey]
-        except:
-            sys.exit('[ERROR] %s key mismatches.' % mykey)
+        readings = bpmf_phrases.get(mykey)
 
-        # print mykey
         if readings:
             # 剛好一個中文字字的長度目前還是 3 (標點、聲調好像都是2)
             if len(mykey) > 3:
