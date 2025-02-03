@@ -124,6 +124,12 @@ if __name__ == '__main__':
 
     output = []
 
+    # Populate phrases dict with entries from BPMFBase.txt first: this is so
+    # that the resulting phrases dict will maintain the order from
+    # BPMFBase.txt; this is important for rarely used characters.
+    for key in bpmf_chars:
+        phrases[key] = UNK_LOG_FREQ
+
     while True:
         line = handle.readline()
         if not line: break
@@ -135,8 +141,11 @@ if __name__ == '__main__':
             readings = bpmf_phrases[mykey]
         except:
             sys.exit('[ERROR] %s key mismatches.' % mykey)
-        phrases[mykey] = True
-        # print mykey
+        phrases[mykey] = myvalue
+
+    for mykey, myvalue in phrases.items():
+        readings = bpmf_phrases.get(mykey)
+
         if readings:
             # 剛好一個中文字字的長度目前還是 3 (標點、聲調好像都是2)
             if len(mykey) > 3:
@@ -182,11 +191,6 @@ if __name__ == '__main__':
                     # 很罕用的注音建議不要列入 heterophony?.list，這樣的話
                     # 就可以直接進來這個 condition
     handle.close()
-    for k in bpmf_chars:
-        if k not in phrases:
-            for v in bpmf_chars[k]:
-                output.append((k, v, UNK_LOG_FREQ))
-                pass
 
     with open(sys.argv[4]) as punctuations_file:
         for line in punctuations_file:
