@@ -143,7 +143,7 @@ if __name__ == '__main__':
             sys.exit('[ERROR] %s key mismatches.' % mykey)
         phrases[mykey] = myvalue
 
-    for (mykey, myvalue) in phrases.items():
+    for mykey, myvalue in phrases.items():
         readings = bpmf_phrases.get(mykey)
 
         if readings:
@@ -191,11 +191,6 @@ if __name__ == '__main__':
                     # 很罕用的注音建議不要列入 heterophony?.list，這樣的話
                     # 就可以直接進來這個 condition
     handle.close()
-    for k in bpmf_chars:
-        if k not in phrases:
-            for v in bpmf_chars[k]:
-                output.append((k, v, UNK_LOG_FREQ))
-                pass
 
     with open(sys.argv[4]) as punctuations_file:
         for line in punctuations_file:
