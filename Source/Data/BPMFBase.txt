@@ -4360,6 +4360,7 @@
 家 ㄍㄨ gu ej big5
 嫴 ㄍㄨ gu ej big5
 橭 ㄍㄨ gu ej big5
+姑 ㄍㄨ˙ gu5 ej7 big5
 工 ㄍㄨㄥ gong ej/ big5
 公 ㄍㄨㄥ gong ej/ big5
 功 ㄍㄨㄥ gong ej/ big5
@@ -9511,6 +9512,7 @@
 釀 ㄋㄧㄤˋ niang4 su;4 big5
 娘 ㄋㄧㄤˊ niang2 su;6 big5
 孃 ㄋㄧㄤˊ niang2 su;6 big5
+娘 ㄋㄧㄤ˙ niang5 su;7 big5
 鳥 ㄋㄧㄠˇ niao3 sul3 big5
 裊 ㄋㄧㄠˇ niao3 sul3 big5
 嬲 ㄋㄧㄠˇ niao3 sul3 big5
