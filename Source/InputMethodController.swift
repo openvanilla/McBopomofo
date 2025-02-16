@@ -86,7 +86,7 @@ class McBopomofoInputMethodController: IMKInputController {
         menu.addItem(withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil, keyEquivalent: "")
 
         if inputMode == .plainBopomofo {
-            if (Preferences.EnableUserPhrasesInPlainBopomofo) {
+            if (Preferences.enableUserPhrasesInPlainBopomofo) {
                 menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrasesPlainBopomofo(_:)), keyEquivalent: "")
             }
             menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesPlainBopomofo(_:)), keyEquivalent: "")
@@ -189,7 +189,7 @@ class McBopomofoInputMethodController: IMKInputController {
         let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
         } errorCallback: {
-            if (Preferences.BeepUponInputError) {
+            if (Preferences.beepUponInputError) {
                 NSSound.beep()
             }
         }
@@ -254,7 +254,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {
-        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.EnableUserPhrasesInPlainBopomofo)
+        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
     }
 
@@ -848,7 +848,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                     keyHandler.handleAssociatedPhrase(with: state, useVerticalMode: useVerticalMode, stateCallback: { newState in
                         self.handle(state: newState, client: client)
                     }, errorCallback: {
-                        if (Preferences.BeepUponInputError) {
+                        if (Preferences.beepUponInputError) {
                             NSSound.beep()
                         }
                     }, useShiftKey: true)

@@ -51,6 +51,7 @@ private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
+private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
 private let kUseCustomUserPhraseLocation = "UseCustomUserPhraseLocation"
 private let kCustomUserPhraseLocation = "CustomUserPhraseLocation"
 
@@ -221,9 +222,34 @@ class Preferences: NSObject {
             kChineseConversionStyleKey,
             kAssociatedPhrasesEnabledKey,
             kControlEnterOutputKey,
+            kShiftEnterEnabledKey,
             kUseCustomUserPhraseLocation,
             kCustomUserPhraseLocation,
         ]
+    }
+
+    @objc static func populateDefaults() {
+        Preferences.keyboardLayout = Preferences.keyboardLayout
+        Preferences.basisKeyboardLayout = Preferences.basisKeyboardLayout
+        Preferences.functionKeyboardLayout = Preferences.functionKeyboardLayout
+        Preferences.candidateKeys = Preferences.candidateKeys
+        Preferences.selectPhraseAfterCursorAsCandidate = Preferences.selectPhraseAfterCursorAsCandidate
+        Preferences.moveCursorAfterSelectingCandidate = Preferences.moveCursorAfterSelectingCandidate
+        Preferences.useHorizontalCandidateList = Preferences.useHorizontalCandidateList
+        Preferences.chineseConversionEnabled = Preferences.chineseConversionEnabled
+        Preferences.halfWidthPunctuationEnabled = Preferences.halfWidthPunctuationEnabled
+        Preferences.selectCandidateWithNumericKeypad = Preferences.selectCandidateWithNumericKeypad
+        Preferences.big5InputEnabled = Preferences.big5InputEnabled
+        Preferences.chineseConversionStyle = Preferences.chineseConversionStyle
+        Preferences.phraseReplacementEnabled = Preferences.phraseReplacementEnabled
+        Preferences.associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.letterBehavior = Preferences.letterBehavior
+        Preferences.controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.shiftEnterEnabled = Preferences.shiftEnterEnabled
+        Preferences.addPhraseHookEnabled = Preferences.addPhraseHookEnabled
+        Preferences.addPhraseHookPath = Preferences.addPhraseHookPath
+        Preferences.beepUponInputError = Preferences.beepUponInputError
+        Preferences.enableUserPhrasesInPlainBopomofo = Preferences.enableUserPhrasesInPlainBopomofo
     }
 
     @EnumUserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: KeyboardLayout.standard)
@@ -386,6 +412,9 @@ extension Preferences {
         associatedPhrasesEnabled = !associatedPhrasesEnabled
         return associatedPhrasesEnabled
     }
+
+    @UserDefault(key: kShiftEnterEnabledKey, defaultValue: true)
+    @objc static var shiftEnterEnabled: Bool
 }
 
 @objc enum ControlEnterOutput: Int {
@@ -488,10 +517,10 @@ extension Preferences {
 
 extension Preferences {
     @UserDefault(key: kBeepUponInputErrorKey, defaultValue: true)
-    @objc static var BeepUponInputError: Bool
+    @objc static var beepUponInputError: Bool
 }
 
 extension Preferences {
     @UserDefault(key: kEnableUserPhrasesInPlainBopomofo, defaultValue: false)
-    @objc static var EnableUserPhrasesInPlainBopomofo: Bool
+    @objc static var enableUserPhrasesInPlainBopomofo: Bool
 }
