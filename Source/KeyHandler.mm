@@ -659,7 +659,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             stateCallback(empty);
             return YES;
         }
-        if (_inputMode == InputModeBopomofo && input.isShiftHold &&
+        if (Preferences.shiftEnterEnabled &&
+            _inputMode == InputModeBopomofo && input.isShiftHold &&
             [state isKindOfClass:[InputStateInputting class]]) {
             return [self handleAssociatedPhraseWithState:(InputStateInputting *)state useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback useShiftKey:NO];
         }
@@ -1383,7 +1384,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             }
         }
 
-        if (_inputMode == InputModeBopomofo && input.isShiftHold) {
+        if (Preferences.shiftEnterEnabled &&
+            _inputMode == InputModeBopomofo && input.isShiftHold) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
                 InputStateChoosingCandidate *current = (InputStateChoosingCandidate *)state;
                 NSInteger selectedCandidateIndex = gCurrentCandidateController.selectedCandidateIndex;

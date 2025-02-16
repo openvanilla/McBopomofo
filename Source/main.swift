@@ -95,4 +95,5 @@ guard let bundleID = Bundle.main.bundleIdentifier, let server = IMKServer(name: 
     exit(-1)
 }
 
+Preferences.populateDefaults()
 NSApp.run()
