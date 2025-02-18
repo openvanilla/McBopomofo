@@ -422,6 +422,7 @@ extension Preferences {
     case bpmfReading = 1
     case htmlRuby = 2
     case braille = 3
+    case hanyuPinyin = 4
 }
 
 extension Preferences {

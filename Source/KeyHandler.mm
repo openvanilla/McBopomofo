@@ -648,6 +648,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             case ControlEnterOutputBraille:
                 string = [self _currentBraille];
                 break;
+            case ControlEnterOutputHanyuPinyin:
+                string = [self _currentHanyuPinyin];
+                break;
             default:
                 break;
             }
@@ -1132,6 +1135,34 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
     return composingBuffer;
+}
+
+- (NSString *)_currentHanyuPinyin
+{
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    for (const auto& node : _latestWalk.nodes) {
+        std::string key = node->reading();
+        std::string value = node->value();
+
+        if (key.rfind(std::string("_"), 0) == 0) {
+            [array addObject:[NSString stringWithUTF8String:value.c_str()]];
+        } else {
+            size_t start = 0, end;
+            std::string delimiter = "-";
+            while ((end = key.find(delimiter, start)) != std::string::npos) {
+                auto component = key.substr(start, end - start);
+                Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(component);
+                std::string hanyuPinyin = syllable.HanyuPinyinString(false, false);
+                [array addObject:[NSString stringWithUTF8String:hanyuPinyin.c_str()]];
+                start = end + 1;
+            }
+            auto component = key.substr(start);
+            Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(component);
+            std::string hanyuPinyin = syllable.HanyuPinyinString(false, false);
+            [array addObject:[NSString stringWithUTF8String:hanyuPinyin.c_str()]];
+        }
+    }
+    return [array componentsJoinedByString:@" "];
 }
 
 - (BOOL)_handleEnterWithState:(InputState *)state stateCallback:(void (^)(InputState *))stateCallback errorCallback:(void (^)(void))errorCallback
