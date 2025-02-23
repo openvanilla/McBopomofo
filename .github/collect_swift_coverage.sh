@@ -9,11 +9,11 @@ function convert_to_markdown_table() {
     }
     {
         if (NR == 1) {
-            # 處理表頭，確保每個欄位之間有空格
+            # Process the header, ensuring there is space between each column
             gsub(/  +/, " | ", $0)
             print table_border $0 " |"
 
-            # 生成分隔線
+            # Generate the separator line
             n = split($0, headers, /\|/)
             sep_line = "|"
             for (i = 1; i <= n; i++) {
@@ -21,7 +21,7 @@ function convert_to_markdown_table() {
             }
             print sep_line
         } else if ($0 !~ /^-+$/) {
-            # 處理數據行，確保每個欄位之間有空格
+            # Process data rows, ensuring there is space between each column
             gsub(/  +/, " | ", $0)
             print table_border $0 " |"
         }
