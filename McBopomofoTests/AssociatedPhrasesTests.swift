@@ -21,16 +21,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Testing
 
 @testable import McBopomofo
 
-class AssociatedPhrasesTests: XCTestCase {
+@Suite("Associated Phrases Testing")
+final class AssociatedPhrasesTests {
 
     var handler = KeyHandler()
     var chineseConversionEnabled: Bool = false
 
-    override func setUpWithError() throws {
+    init() async throws {
         chineseConversionEnabled = Preferences.chineseConversionEnabled
         Preferences.chineseConversionEnabled = false
         LanguageModelManager.loadDataModels()
@@ -38,13 +39,18 @@ class AssociatedPhrasesTests: XCTestCase {
         handler.inputMode = .bopomofo
     }
 
-    override func tearDownWithError() throws {
+    deinit {
         Preferences.chineseConversionEnabled = chineseConversionEnabled
     }
 
-    func testBuildingAssociatedPhrasesState() {
+    @Test(
+        "Test building an associated phrase from characters",
+        arguments: [
+            ("u6", "ㄧ", "一")
+        ])
+    func testBuildingAssociatedPhrasesState(keySequence: String, reading: String, value: String) {
         var state: InputState = InputState.Empty()
-        let keys = Array("u6").map {
+        let keys = Array(keySequence).map {
             String($0)
         }
         for key in keys {
@@ -58,17 +64,23 @@ class AssociatedPhrasesTests: XCTestCase {
         }
         guard
             let associatedPhrases = handler.buildAssociatedPhraseState(
-                withPreviousState: state, prefixCursorAt: 1, reading: "ㄧ", value: "一",
+                withPreviousState: state, prefixCursorAt: 1, reading: reading, value: value,
                 selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false)
                 as? InputState.AssociatedPhrases
         else {
-            XCTFail("There should be an associated phrase state")
+            Issue.record("There should be an associated phrase state")
             return
         }
-        XCTAssert(associatedPhrases.candidates.count > 0)
+        #expect(associatedPhrases.candidates.count > 0)
     }
 
-    func testAssociatedPhrasesStatePunctuation1() {
+    @Test(
+        "Test building an associated phrase from punctuations",
+        arguments: [
+            ("『", "『』"),
+            ("《", "《》"),
+        ])
+    func testAssociatedPhrasesStatePunctuation1(input: String, result: String) {
         var state: InputState = InputState.Empty()
         let keys = Array("{").map {
             String($0)
@@ -84,14 +96,15 @@ class AssociatedPhrasesTests: XCTestCase {
         }
         guard
             let associatedPhrases = handler.buildAssociatedPhraseState(
-                withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{", value: "『",
+                withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{",
+                value: input,
                 selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false)
                 as? InputState.AssociatedPhrases
         else {
-            XCTFail("There should be an associated phrase state")
+            Issue.record("There should be an associated phrase state")
             return
         }
-        XCTAssert(associatedPhrases.candidates.count > 0)
+        #expect(associatedPhrases.candidates.count > 0)
         let candidate = associatedPhrases.candidates[0]
 
         handler.fixNodeForAssociatedPhraseWithPrefix(
@@ -99,47 +112,10 @@ class AssociatedPhrasesTests: XCTestCase {
             prefixValue: associatedPhrases.prefixValue, associatedPhraseReading: candidate.reading,
             associatedPhraseValue: candidate.value)
         guard let inputting = handler.buildInputtingState() as? InputState.Inputting else {
-            XCTFail("There should be an inputting state")
+            Issue.record("There should be an inputting state")
             return
         }
-        XCTAssertTrue(inputting.composingBuffer == "『』")
-    }
-
-    func testAssociatedPhrasesStatePunctuation2() {
-        var state: InputState = InputState.Empty()
-        let keys = Array("{").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-            } errorCallback: {
-            }
-        }
-        guard
-            let associatedPhrases = handler.buildAssociatedPhraseState(
-                withPreviousState: state, prefixCursorAt: 1, reading: "_punctuation_{", value: "《",
-                selectedCandidateIndex: 0, useVerticalMode: false, useShiftKey: false)
-                as? InputState.AssociatedPhrases
-        else {
-            XCTFail("There should be an associated phrase state")
-            return
-        }
-        XCTAssert(associatedPhrases.candidates.count > 0)
-        let candidate = associatedPhrases.candidates[0]
-
-        handler.fixNodeForAssociatedPhraseWithPrefix(
-            at: associatedPhrases.prefixCursorIndex, prefixReading: associatedPhrases.prefixReading,
-            prefixValue: associatedPhrases.prefixValue, associatedPhraseReading: candidate.reading,
-            associatedPhraseValue: candidate.value)
-        guard let inputting = handler.buildInputtingState() as? InputState.Inputting else {
-            XCTFail("There should be an inputting state")
-            return
-        }
-        XCTAssertTrue(inputting.composingBuffer == "《》")
+        #expect(inputting.composingBuffer == result)
     }
 
 }

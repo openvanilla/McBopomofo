@@ -21,21 +21,24 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Testing
 
 @testable import McBopomofo
 
-final class DictionaryServiceTests: XCTestCase {
+@Suite("Dictionary Service Tests")
+final class DictionaryServiceTests {
 
+    @Test
     func testSpeak() {
         let result = DictionaryServices.shared.lookUp(
             phrase: "你", withServiceAtIndex: 0, state: InputState.Empty()
         ) { _ in
 
         }
-        XCTAssertTrue(result)
+        #expect(result)
     }
 
+    @Test
     func testDictionaryService() {
         let count = DictionaryServices.shared.services.count
         for index in 0..<count {
@@ -57,7 +60,7 @@ final class DictionaryServiceTests: XCTestCase {
                 callbackCalled = true
             }
             if !callbackCalled {
-                XCTAssertTrue(result)
+                #expect(result)
             }
         }
     }

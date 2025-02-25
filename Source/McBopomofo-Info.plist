@@ -169,11 +169,53 @@
         </dict>
         <dict>
             <key>NSMessage</key>
+            <string>addHanyuPinyin</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Add Hanyu Pinyin to Text</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>NSMessage</key>
             <string>convertToReadings</string>
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
                 <string>Convert Text to Bopomofo Readings</string>
+            </dict>
+            <key>NSReturnTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSPasteboardTypeString</string>
+                <string>NSStringPboardType</string>
+            </array>
+            <key>NSRequiredContext</key>
+            <dict/>
+        </dict>
+        <dict>
+            <key>NSMessage</key>
+            <string>convertToHanyuPinyin</string>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Convert Text to Hanyu Pinyin</string>
             </dict>
             <key>NSReturnTypes</key>
             <array>

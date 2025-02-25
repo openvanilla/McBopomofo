@@ -21,11 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Testing
 
 @testable import McBopomofo
 
-class PreferencesTests: XCTestCase {
+@Suite("Preference Tests", .serialized)
+final class PreferencesTests {
 
     func reset() {
         Preferences.allKeys.forEach {
@@ -49,235 +50,262 @@ class PreferencesTests: XCTestCase {
 
     var snapshot: [String: Any]?
 
-    override func setUpWithError() throws {
+    init() async throws {
         snapshot = makeSnapshot()
         reset()
     }
 
-    override func tearDownWithError() throws {
+    deinit {
         if let snapshot = snapshot {
             restore(from: snapshot)
         }
     }
 
+    @Test("Test keyboard layout setting")
     func testKeyboardLayout() {
-        XCTAssert(Preferences.keyboardLayout == .standard)
+        #expect(Preferences.keyboardLayout == .standard)
         Preferences.keyboardLayout = .eten
-        XCTAssert(Preferences.keyboardLayout == .eten)
+        #expect(Preferences.keyboardLayout == .eten)
     }
 
+    @Test("Test keyboard layout name conversion")
     func testKeyboardLayoutName() {
-        XCTAssert(Preferences.keyboardLayoutName == "Standard")
+        #expect(Preferences.keyboardLayoutName == "Standard")
         Preferences.keyboardLayout = .eten
-        XCTAssert(Preferences.keyboardLayoutName == "ETen")
+        #expect(Preferences.keyboardLayoutName == "ETen")
     }
 
+    @Test("Test basis keyboard layout preference key")
     func testBasisKeyboardLayoutPreferenceKey() {
-        XCTAssert(Preferences.basisKeyboardLayout == "com.apple.keylayout.US")
+        #expect(Preferences.basisKeyboardLayout == "com.apple.keylayout.US")
         Preferences.basisKeyboardLayout = "com.apple.keylayout.ABC"
-        XCTAssert(Preferences.basisKeyboardLayout == "com.apple.keylayout.ABC")
+        #expect(Preferences.basisKeyboardLayout == "com.apple.keylayout.ABC")
     }
 
+    @Test("Test function keyboard layout setting")
     func testFunctionKeyboardLayout() {
-        XCTAssert(Preferences.functionKeyboardLayout == "com.apple.keylayout.US")
+        #expect(Preferences.functionKeyboardLayout == "com.apple.keylayout.US")
         Preferences.functionKeyboardLayout = "com.apple.keylayout.ABC"
-        XCTAssert(Preferences.functionKeyboardLayout == "com.apple.keylayout.ABC")
+        #expect(Preferences.functionKeyboardLayout == "com.apple.keylayout.ABC")
     }
 
+    @Test("Test shift key override for function keyboard layout")
     func testFunctionKeyKeyboardLayoutOverrideIncludeShiftKey() {
-        XCTAssert(Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey == false)
+        #expect(Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey == false)
         Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey = true
-        XCTAssert(Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey == true)
+        #expect(Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey == true)
     }
 
+    @Test("Test candidate text size constraints and changes")
     func testCandidateTextSize() {
-        XCTAssert(Preferences.candidateListTextSize == 16)
+        #expect(Preferences.candidateListTextSize == 16)
 
         Preferences.candidateListTextSize = 18
-        XCTAssert(Preferences.candidateListTextSize == 18)
+        #expect(Preferences.candidateListTextSize == 18)
 
         Preferences.candidateListTextSize = 11
-        XCTAssert(Preferences.candidateListTextSize == 12)
+        #expect(Preferences.candidateListTextSize == 12)
         Preferences.candidateListTextSize = 197
-        XCTAssert(Preferences.candidateListTextSize == 196)
+        #expect(Preferences.candidateListTextSize == 196)
 
         Preferences.candidateListTextSize = 12
-        XCTAssert(Preferences.candidateListTextSize == 12)
+        #expect(Preferences.candidateListTextSize == 12)
         Preferences.candidateListTextSize = 196
-        XCTAssert(Preferences.candidateListTextSize == 196)
+        #expect(Preferences.candidateListTextSize == 196)
 
         Preferences.candidateListTextSize = 13
-        XCTAssert(Preferences.candidateListTextSize == 13)
+        #expect(Preferences.candidateListTextSize == 13)
         Preferences.candidateListTextSize = 195
-        XCTAssert(Preferences.candidateListTextSize == 195)
+        #expect(Preferences.candidateListTextSize == 195)
     }
 
+    @Test("Test phrase selection after cursor as candidate")
     func testSelectPhraseAfterCursorAsCandidate() {
-        XCTAssert(Preferences.selectPhraseAfterCursorAsCandidate == false)
+        #expect(Preferences.selectPhraseAfterCursorAsCandidate == false)
         Preferences.selectPhraseAfterCursorAsCandidate = true
-        XCTAssert(Preferences.selectPhraseAfterCursorAsCandidate == true)
+        #expect(Preferences.selectPhraseAfterCursorAsCandidate == true)
     }
 
+    @Test("Test horizontal candidate list preference")
     func testUseHorizontalCandidateList() {
-        XCTAssert(Preferences.useHorizontalCandidateList == false)
+        #expect(Preferences.useHorizontalCandidateList == false)
         Preferences.useHorizontalCandidateList = true
-        XCTAssert(Preferences.useHorizontalCandidateList == true)
+        #expect(Preferences.useHorizontalCandidateList == true)
     }
 
+    @Test("Test space key candidate selection")
     func testChooseCandidateUsingSpace() {
-        XCTAssert(Preferences.chooseCandidateUsingSpace == true)
+        #expect(Preferences.chooseCandidateUsingSpace == true)
         Preferences.chooseCandidateUsingSpace = false
-        XCTAssert(Preferences.chooseCandidateUsingSpace == false)
+        #expect(Preferences.chooseCandidateUsingSpace == false)
     }
 
+    @Test("Test Chinese conversion toggle")
     func testChineseConversionEnabled() {
-        XCTAssert(Preferences.chineseConversionEnabled == false)
+        #expect(Preferences.chineseConversionEnabled == false)
         Preferences.chineseConversionEnabled = true
-        XCTAssert(Preferences.chineseConversionEnabled == true)
+        #expect(Preferences.chineseConversionEnabled == true)
         _ = Preferences.toggleChineseConversionEnabled()
-        XCTAssert(Preferences.chineseConversionEnabled == false)
+        #expect(Preferences.chineseConversionEnabled == false)
     }
 
+    @Test("Test half-width punctuation toggle")
     func testHalfWidthPunctuationEnabled() {
-        XCTAssert(Preferences.halfWidthPunctuationEnabled == false)
+        #expect(Preferences.halfWidthPunctuationEnabled == false)
         Preferences.halfWidthPunctuationEnabled = true
-        XCTAssert(Preferences.halfWidthPunctuationEnabled == true)
+        #expect(Preferences.halfWidthPunctuationEnabled == true)
         _ = Preferences.toggleHalfWidthPunctuationEnabled()
-        XCTAssert(Preferences.halfWidthPunctuationEnabled == false)
+        #expect(Preferences.halfWidthPunctuationEnabled == false)
     }
 
+    @Test("Test ESC key clearing input buffer")
     func testEscToCleanInputBuffer() {
-        XCTAssert(Preferences.escToCleanInputBuffer == false)
+        #expect(Preferences.escToCleanInputBuffer == false)
         Preferences.escToCleanInputBuffer = true
-        XCTAssert(Preferences.escToCleanInputBuffer == true)
+        #expect(Preferences.escToCleanInputBuffer == true)
     }
 
+    @Test("Test candidate text font name setting")
     func testCandidateTextFontName() {
-        XCTAssert(Preferences.candidateTextFontName == nil)
+        #expect(Preferences.candidateTextFontName == nil)
         Preferences.candidateTextFontName = "Helvetica"
-        XCTAssert(Preferences.candidateTextFontName == "Helvetica")
+        #expect(Preferences.candidateTextFontName == "Helvetica")
     }
 
+    @Test("Test candidate key label font name setting")
     func testCandidateKeyLabelFontName() {
-        XCTAssert(Preferences.candidateKeyLabelFontName == nil)
+        #expect(Preferences.candidateKeyLabelFontName == nil)
         Preferences.candidateKeyLabelFontName = "Helvetica"
-        XCTAssert(Preferences.candidateKeyLabelFontName == "Helvetica")
+        #expect(Preferences.candidateKeyLabelFontName == "Helvetica")
     }
 
+    @Test("Test candidate keys configuration")
     func testCandidateKeys() {
-        XCTAssert(Preferences.candidateKeys == Preferences.defaultCandidateKeys)
+        #expect(Preferences.candidateKeys == Preferences.defaultCandidateKeys)
         Preferences.candidateKeys = "abcd"
-        XCTAssert(Preferences.candidateKeys == "abcd")
+        #expect(Preferences.candidateKeys == "abcd")
     }
 
+    @Test("Test phrase replacement toggle")
     func testPhraseReplacementEnabledKey() {
-        XCTAssert(Preferences.phraseReplacementEnabled == false)
+        #expect(Preferences.phraseReplacementEnabled == false)
         Preferences.phraseReplacementEnabled = true
-        XCTAssert(Preferences.phraseReplacementEnabled == true)
+        #expect(Preferences.phraseReplacementEnabled == true)
     }
 
+    @Test("Test Chinese conversion style setting")
     func testChineseConversionStyle() {
-        XCTAssert(Preferences.chineseConversionStyle == .output)
+        #expect(Preferences.chineseConversionStyle == .output)
         Preferences.chineseConversionStyle = .model
-        XCTAssert(Preferences.chineseConversionStyle == .model)
+        #expect(Preferences.chineseConversionStyle == .model)
     }
 
 }
 
-class CandidateKeyValidationTests: XCTestCase {
+final class CandidateKeyValidationTests {
+    @Test("Test empty candidate keys validation")
     func testEmpty() {
         do {
             try Preferences.validate(candidateKeys: "")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.empty) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test spaces in candidate keys validation")
     func testSpaces() {
         do {
             try Preferences.validate(candidateKeys: "    ")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.empty) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test invalid characters in candidate keys")
     func testInvalidKeys() {
         do {
             try Preferences.validate(candidateKeys: "中文字元")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.invalidCharacters) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test invalid Latin letters in candidate keys")
     func testInvalidLatinLetters() {
         do {
             try Preferences.validate(candidateKeys: "üåçøöacpo")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.invalidCharacters) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test spaces between candidate keys")
     func testSpaceInBetween() {
         do {
             try Preferences.validate(candidateKeys: "1 2 3 4")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.containSpace) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test duplicated candidate keys")
     func testDuplicatedKeys() {
         do {
             try Preferences.validate(candidateKeys: "aabbccdd")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.duplicatedCharacters) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test too short candidate keys string")
     func testTooShort1() {
         do {
             try Preferences.validate(candidateKeys: "abc")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.tooShort) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test minimum length candidate keys string")
     func testTooShort2() {
         do {
             try Preferences.validate(candidateKeys: "abcd")
         } catch {
-            XCTFail("Should be safe")
+            Issue.record("Should be safe")
         }
     }
 
+    @Test("Test too long candidate keys string")
     func testTooLong1() {
         do {
             try Preferences.validate(candidateKeys: "qwertyuiopasdfgh")
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         } catch (Preferences.CandidateKeyError.tooLong) {
         } catch {
-            XCTFail("exception not thrown")
+            Issue.record("exception not thrown")
         }
     }
 
+    @Test("Test maximum length candidate keys string")
     func testTooLong2() {
         do {
             try Preferences.validate(candidateKeys: "qwertyuiopasdfg")
         } catch {
-            XCTFail("Should be safe")
+            Issue.record("Should be safe")
         }
     }
 }

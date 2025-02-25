@@ -101,6 +101,8 @@ class ServiceProvider: NSObject {
     func serviceProvider(didRequestCommitting provider: ServiceProvider) -> String
     @objc(serviceProviderDidRequestReset:)
     func serviceProvider(didRequestReset provider: ServiceProvider)
+    @objc(service:didRequestConvertReadintToHanyuPinyin:)
+    func serviceProvider(_ provider: ServiceProvider, didRequestConvertReadintToHanyuPinyin: String) -> String
 }
 
 // MARK: -
@@ -146,6 +148,12 @@ extension ServiceProvider {
         return output
     }
 
+    /// Convert to desired output
+    /// - string: The input string
+    /// - addSpace: Should add space in each tokens or not
+    /// - convertEachCharacter: Split a phrase into characters to convert or not
+    /// - readingFoundCallback: The callback for a reading
+    /// - readingNotFoundCallback: The callback for a non-reading component
     private func process(
         string: String,
         addSpace: Bool,
@@ -252,6 +260,34 @@ extension ServiceProvider {
         pasteboard.writeObjects([output as NSString])
     }
 
+    func addHanyuPinyin(string: String) -> String {
+        process(string: string, addSpace: true, convertEachCharacter: true) {
+            let pinyin = delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? ""
+            return "\($0)(\(pinyin))"
+        } readingNotFoundCallback: {
+            $0
+        }
+    }
+
+    /// Add Hanyu Pinyin readings to selected text.
+    @objc func addHanyuPinyin(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength,
+            let converted = OpenCCBridge.shared.convertToTraditional(String(string))
+        else {
+            return
+        }
+        let output = converted.components(separatedBy: "\n").map { input in
+            addHanyuPinyin(string: input)
+        }.joined(separator: "\n")
+
+        if output.isEmpty {
+            return
+        }
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
     func convertToReadings(string: String) -> String {
         process(string: string, addSpace: false, convertEachCharacter: true) {
             $1
@@ -270,6 +306,31 @@ extension ServiceProvider {
         }
         let output = string.components(separatedBy: "\n").map { input in
             convertToReadings(string: input)
+        }.joined(separator: "\n")
+
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
+    func convertToHanyuPinyin(string: String) -> String {
+        process(string: string, addSpace: true, convertEachCharacter: true) {
+            delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? $1
+        } readingNotFoundCallback: {
+            $0
+        }
+    }
+
+    /// Converts selected text to Bopomofo readings.
+    @objc func convertToHanyuPinyin(
+        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+    ) {
+        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength
+        else {
+            return
+        }
+        let output = string.components(separatedBy: "\n").map { input in
+            convertToHanyuPinyin(string: input)
         }.joined(separator: "\n")
 
         pasteboard.clearContents()

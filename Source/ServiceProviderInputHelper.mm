@@ -24,6 +24,7 @@
 #import "ServiceProviderInputHelper.h"
 #import "McBopomofo-Swift.h"
 #import "McBopomofoLM.h"
+#import "Mandarin.h"
 #import "LanguageModelManager+Privates.h"
 
 @interface ServiceProviderInputHelper()
@@ -82,6 +83,14 @@
 - (void)serviceProviderDidRequestReset:(ServiceProvider * _Nonnull)provider
 {
     [self reset];
+}
+
+- (NSString * _Nonnull)service:(ServiceProvider * _Nonnull)provider didRequestConvertReadintToHanyuPinyin:(NSString * _Nonnull)input
+{
+    std::string reading = std::string([input UTF8String]);
+    Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
+    std::string hanyuPinyin = syllable.HanyuPinyinString(false, false);
+    return [[NSString alloc] initWithUTF8String:hanyuPinyin.c_str()];
 }
 
 @end

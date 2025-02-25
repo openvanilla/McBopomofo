@@ -21,22 +21,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import XCTest
+import Testing
 
 @testable import McBopomofo
 
-class VersionUpdateApiTests: XCTestCase {
-    func testFetchVersionUpdateInfo() {
-        let exp = self.expectation(description: "wait for 3 seconds")
-        _ = VersionUpdateApi.check(forced: true) { result in
-            exp.fulfill()
-            switch result {
-            case .success(_):
-                break
-            case .failure(let error):
-                XCTFail(error.localizedDescription)
+@Suite("Version Update API Tests")
+final class VersionUpdateApiTests {
+    @Test("Version Update API Test")
+    func testFetchVersionUpdateInfo() async  {
+        let result = await withCheckedContinuation { continuation in
+            _ = VersionUpdateApi.check(forced: true) { result in
+                continuation.resume(returning: result)
             }
         }
-        self.wait(for: [exp], timeout: 20.0)
+
+        switch result {
+        case let .failure(error):
+            Issue.record(error)
+        case .success:
+            break
+        }
     }
 }
