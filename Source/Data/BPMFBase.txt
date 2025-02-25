@@ -6000,6 +6000,7 @@
 神 ㄕㄣˊ shen2 gp6 big5
 甚 ㄕㄣˊ shen2 gp6 big5
 什 ㄕㄣˊ shen2 gp6 big5
+嬸 ㄕㄣ˙ shen5 gp7 big5
 疵 ㄘ ci h big5
 庛 ㄘ ci h big5
 雌 ㄘ ci h big5
@@ -7612,6 +7613,7 @@
 臊 ㄙㄠˋ sao4 nl4 big5
 氉 ㄙㄠˋ sao4 nl4 big5
 瘙 ㄙㄠˋ sao4 nl4 big5
+嫂 ㄙㄠ˙ sao5 nl7 big5
 森 ㄙㄣ sen np big5
 槮 ㄙㄣ sen np big5
 罧 ㄙㄣ sen np big5
@@ -7787,6 +7789,7 @@
 鄱 ㄆㄛˊ po2 qi6 big5
 皤 ㄆㄛˊ po2 qi6 big5
 櫇 ㄆㄛˊ po2 qi6 big5
+婆 ㄆㄛ˙ po5 qi7 big5
 撲 ㄆㄨ pu qj big5
 仆 ㄆㄨ pu qj big5
 鋪 ㄆㄨ pu qj big5
