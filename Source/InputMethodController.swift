@@ -151,7 +151,7 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     override func recognizedEvents(_ sender: Any!) -> Int {
-        let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged]
+        let events: NSEvent.EventTypeMask = [.keyDown, .keyUp, .flagsChanged]
         return Int(events.rawValue)
     }
 
@@ -160,6 +160,19 @@ class McBopomofoInputMethodController: IMKInputController {
         guard let event = maybeEvent else {
             commitComposition(client)
             return false
+        }
+
+        if event.type == .flagsChanged {
+            if state is InputState.Empty {
+                return false
+            }
+            // Handle key up events during active input state.
+            //
+            // This prevents double-space from affecting the current input.
+            // While macOS may normally insert a period on double space, this
+            // should be suppressed when there is an active composing buffer or
+            // candidate window.
+            return true
         }
 
         if event.type == .flagsChanged {
