@@ -31,6 +31,7 @@
 
 "Fatal Error" = "Fatal Error";
 "Abort" = "Abort";
+"No installable packagess found." = "No installable packagess found.";
 "Cannot register input source %@ at %@." = "Cannot register input source %@ at %@.";
 "Cannot find input source %@ after registration." = "Cannot find input source %@ after registration.";
 "Cannot remove the existing version at %@, error: %@" = "Cannot remove the existing version at %@, error: %@";

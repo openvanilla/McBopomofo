@@ -180,6 +180,9 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
     func installInputMethod(previousExists: Bool, previousVersionNotFullyDeactivatedWarning warning: Bool) {
         guard let targetBundle = archiveUtil?.unzipNotarizedArchive() ?? Bundle.main.path(forResource: kTargetBin, ofType: kTargetType) else {
+            let message = NSLocalizedString("No installable packagess found.", comment: "")
+            runAlertPanel(title: NSLocalizedString("Fatal Error", comment: ""), message: message, buttonTitle: NSLocalizedString("Abort", comment: ""))
+            endAppWithDelay()
             return
         }
         let cpTask = Process()
@@ -193,6 +196,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
                           message: NSLocalizedString("Cannot copy the file to the destination.", comment: ""),
                           buttonTitle: NSLocalizedString("Cancel", comment: ""))
             endAppWithDelay()
+            return
         }
 
         guard let imeBundle = Bundle(path: (kTargetPartialPath as NSString).expandingTildeInPath),
