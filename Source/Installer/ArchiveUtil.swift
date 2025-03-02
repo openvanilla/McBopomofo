@@ -87,6 +87,17 @@ struct ArchiveUtil {
             return nil
         }
         let tempFilePath = (NSTemporaryDirectory() as NSString).appendingPathComponent(UUID().uuidString)
+
+        // applefeedback://FB16686738 unzip -d behavior change breaks scripts
+        // and apps depending on its creating non-existent target directories;
+        // we now create the directory ourselves.
+        do {
+            try FileManager.default.createDirectory(atPath: tempFilePath, withIntermediateDirectories: true)
+        } catch {
+            NSLog("fatal: could not create directory \(tempFilePath)")
+            return nil
+        }
+
         let arguments: [String] = [notarizedArchive, "-d", tempFilePath]
         let unzipTask = Process()
         unzipTask.launchPath = "/usr/bin/unzip"
@@ -95,9 +106,16 @@ struct ArchiveUtil {
         unzipTask.launch()
         unzipTask.waitUntilExit()
 
-        assert(unzipTask.terminationStatus == 0, "Must successfully unzipped")
+        guard unzipTask.terminationStatus == 0 else {
+            NSLog("fatal: could not unzip \(notarizedArchive) to \(tempFilePath)")
+            return nil
+        }
+
         let result = (tempFilePath as NSString).appendingPathComponent(targetAppBundleName)
-        assert(FileManager.default.fileExists(atPath: result), "App bundle must be unzipped at \(result).")
+        guard FileManager.default.fileExists(atPath: result) else {
+            NSLog("fatal: \(result) does not exist")
+            return nil
+        }
         return result
     }
 
