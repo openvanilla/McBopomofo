@@ -2378,6 +2378,7 @@
 脈 ㄇㄞˋ mai4 a94 big5
 勱 ㄇㄞˋ mai4 a94 big5
 蝐 ㄇㄞˋ mai4 a94 big5
+脉 ㄇㄞˋ mai4 a94 utf8
 埋 ㄇㄞˊ mai2 a96 big5
 霾 ㄇㄞˊ mai2 a96 big5
 薶 ㄇㄞˊ mai2 a96 big5
@@ -2461,6 +2462,7 @@
 縸 ㄇㄛˋ mo4 ai4 big5
 嘜 ㄇㄛˋ mo4 ai4 big5
 魩 ㄇㄛˋ mo4 ai4 big5
+脉 ㄇㄛˋ mo4 ai4 utf8
 模 ㄇㄛˊ mo2 ai6 big5
 磨 ㄇㄛˊ mo2 ai6 big5
 摩 ㄇㄛˊ mo2 ai6 big5
