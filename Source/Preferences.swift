@@ -52,6 +52,7 @@ private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
 private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
+private let kRepeatedPunctuationToSelectCandidateEnabledKey = "RepeatedPunctuationToSelectCandidateEnabled"
 private let kUseCustomUserPhraseLocation = "UseCustomUserPhraseLocation"
 private let kCustomUserPhraseLocation = "CustomUserPhraseLocation"
 
@@ -223,6 +224,7 @@ class Preferences: NSObject {
             kAssociatedPhrasesEnabledKey,
             kControlEnterOutputKey,
             kShiftEnterEnabledKey,
+            kRepeatedPunctuationToSelectCandidateEnabledKey,
             kUseCustomUserPhraseLocation,
             kCustomUserPhraseLocation,
         ]
@@ -246,6 +248,7 @@ class Preferences: NSObject {
         Preferences.letterBehavior = Preferences.letterBehavior
         Preferences.controlEnterOutput = Preferences.controlEnterOutput
         Preferences.shiftEnterEnabled = Preferences.shiftEnterEnabled
+        Preferences.repeatedPunctuationToSelectCandidateEnabled = Preferences.repeatedPunctuationToSelectCandidateEnabled
         Preferences.addPhraseHookEnabled = Preferences.addPhraseHookEnabled
         Preferences.addPhraseHookPath = Preferences.addPhraseHookPath
         Preferences.beepUponInputError = Preferences.beepUponInputError
@@ -415,6 +418,9 @@ extension Preferences {
 
     @UserDefault(key: kShiftEnterEnabledKey, defaultValue: true)
     @objc static var shiftEnterEnabled: Bool
+
+    @UserDefault(key: kRepeatedPunctuationToSelectCandidateEnabledKey, defaultValue: false)
+    @objc static var repeatedPunctuationToSelectCandidateEnabled: Bool
 }
 
 @objc enum ControlEnterOutput: Int {
