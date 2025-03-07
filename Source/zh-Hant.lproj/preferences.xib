@@ -422,11 +422,11 @@
             <point key="canvasLocation" x="168" y="-350"/>
         </view>
         <view id="L2Q-IX-SXc">
-            <rect key="frame" x="0.0" y="0.0" width="436" height="163"/>
+            <rect key="frame" x="0.0" y="0.0" width="436" height="208"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cks-CZ-m7g">
-                    <rect key="frame" x="60" y="127" width="118" height="16"/>
+                    <rect key="frame" x="60" y="172" width="118" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="中文簡繁轉換模式：" id="bX9-g7-U8G">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -434,7 +434,7 @@
                     </textFieldCell>
                 </textField>
                 <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PuO-lM-5fF">
-                    <rect key="frame" x="184" y="105" width="206" height="38"/>
+                    <rect key="frame" x="184" y="150" width="206" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="206" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -459,7 +459,7 @@
                     </connections>
                 </matrix>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YR5-r0-KVo">
-                    <rect key="frame" x="65" y="80" width="113" height="16"/>
+                    <rect key="frame" x="65" y="125" width="113" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + Enter 按鍵：" id="euS-8m-1LM">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -467,7 +467,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QYl-R0-PIq">
-                    <rect key="frame" x="91" y="53" width="87" height="16"/>
+                    <rect key="frame" x="91" y="98" width="87" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + ` 按鍵：" id="ezl-df-SwH">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -475,7 +475,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Toh-FQ-MTf">
-                    <rect key="frame" x="181" y="73" width="219" height="25"/>
+                    <rect key="frame" x="181" y="118" width="219" height="25"/>
                     <popUpButtonCell key="cell" type="push" title="關閉" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4VD-Kh-SxN" id="Gcx-5r-kDK">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -494,7 +494,7 @@
                     </connections>
                 </popUpButton>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bAc-Eh-8y4">
-                    <rect key="frame" x="182" y="52" width="189" height="18"/>
+                    <rect key="frame" x="182" y="97" width="189" height="18"/>
                     <buttonCell key="cell" type="check" title="使用 Ctrl + ` 輸入 Big5 內碼" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="29h-4W-Qux">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -503,13 +503,53 @@
                         <binding destination="32" name="value" keyPath="values.Big5InputEnabled" id="aQr-XB-Bhd"/>
                     </connections>
                 </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92X-g9-wsi">
+                    <rect key="frame" x="182" y="70" width="168" height="18"/>
+                    <buttonCell key="cell" type="check" title="連續輸入標點切換候選字" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uza-2x-Yem">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="166" id="y8j-De-CVX"/>
+                    </constraints>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.RepeatedPunctuationToSelectCandidateEnabled" id="adV-vU-QSD"/>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="i1G-1y-ihS">
+                    <rect key="frame" x="182" y="17" width="236" height="48"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="232" id="W9j-gd-BG6"/>
+                    </constraints>
+                    <textFieldCell key="cell" selectable="YES" title="啟用這個選項後，在標準鍵盤配置下，可以用連續按下「Shift+,」後，從輸入逗號（，），變成輸入書名號（〈、《）等。" id="WQa-gU-mHZ">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mgj-mT-xZ6">
+                    <rect key="frame" x="113" y="70" width="69" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="65" id="fFl-lX-SN3"/>
+                    </constraints>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="標點符號：" id="fPb-yt-gYA">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="cks-CZ-m7g" secondAttribute="trailing" constant="20" symbolic="YES" id="2vN-7H-kMX"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="i1G-1y-ihS" secondAttribute="trailing" constant="20" symbolic="YES" id="55u-1x-Gza"/>
                 <constraint firstItem="QYl-R0-PIq" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="93" id="654-qr-PVz"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="8RB-nU-gsQ"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="YR5-r0-KVo" secondAttribute="trailing" symbolic="YES" id="ESR-FZ-iAA"/>
+                <constraint firstAttribute="trailing" secondItem="mgj-mT-xZ6" secondAttribute="trailing" constant="256" id="Ag7-HU-Mrb"/>
+                <constraint firstItem="mgj-mT-xZ6" firstAttribute="top" secondItem="QYl-R0-PIq" secondAttribute="bottom" constant="12" id="Aip-Mp-4m8"/>
+                <constraint firstItem="mgj-mT-xZ6" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="122" id="D7L-yX-vG6"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="YR5-r0-KVo" secondAttribute="trailing" constant="20" symbolic="YES" id="ESR-FZ-iAA"/>
                 <constraint firstItem="Toh-FQ-MTf" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="KGW-K6-XaH"/>
+                <constraint firstItem="92X-g9-wsi" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="LMl-dP-vPI"/>
                 <constraint firstItem="Toh-FQ-MTf" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="66" id="LgU-Eg-k6g"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="62" id="LhQ-97-Vta"/>
                 <constraint firstItem="bAc-Eh-8y4" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="94" id="MEG-f7-9CC"/>
@@ -518,12 +558,15 @@
                 <constraint firstItem="QYl-R0-PIq" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="94" id="Uxa-bX-L63"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Toh-FQ-MTf" secondAttribute="trailing" constant="20" symbolic="YES" id="bHq-Ek-dwH"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bAc-Eh-8y4" secondAttribute="trailing" constant="20" symbolic="YES" id="blE-3q-IHj"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QYl-R0-PIq" secondAttribute="trailing" symbolic="YES" id="clc-vZ-J9H"/>
+                <constraint firstItem="92X-g9-wsi" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="121" id="cWS-6m-SvY"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QYl-R0-PIq" secondAttribute="trailing" constant="20" symbolic="YES" id="clc-vZ-J9H"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="d9p-FP-caF"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="ePS-tF-QAw"/>
+                <constraint firstItem="i1G-1y-ihS" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="g9S-38-Fym"/>
+                <constraint firstItem="i1G-1y-ihS" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="143" id="jMJ-rU-Z9P"/>
                 <constraint firstItem="YR5-r0-KVo" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="67" id="lPb-qK-5c7"/>
             </constraints>
-            <point key="canvasLocation" x="651" y="-145.5"/>
+            <point key="canvasLocation" x="651" y="-121.5"/>
         </view>
         <customView id="M7i-Af-lNp">
             <rect key="frame" x="0.0" y="0.0" width="436" height="334"/>

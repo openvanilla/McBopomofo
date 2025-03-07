@@ -1188,6 +1188,28 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return NO;
     }
 
+    if (Preferences.repeatedPunctuationToSelectCandidateEnabled) {
+        size_t prefixCursorIndex = _grid->cursor();
+        size_t actualPrefixCursorIndex = prefixCursorIndex > 0 ? prefixCursorIndex - 1 : 0;
+        size_t accumulatedCursor = 0;
+        auto nodeIter = _latestWalk.findNodeAt(actualPrefixCursorIndex, &accumulatedCursor);
+        if (nodeIter != _latestWalk.nodes.cend()) {
+            Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
+            if (currentNode != nullptr && currentNode->reading() == customPunctuation) {
+                auto candidates = _grid->candidatesAt(actualPrefixCursorIndex);
+                if (candidates.size() > 1) {
+                    if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                        _grid->setCursor(actualPrefixCursorIndex);
+                    }
+                    [self _handleTabState:state shiftIsHold:NO stateCallback:stateCallback errorCallback:errorCallback];
+                    _grid->setCursor(prefixCursorIndex);
+                    stateCallback([self buildInputtingState]);
+                    return YES;
+                }
+            }
+        }
+    }
+
     if (_bpmfReadingBuffer->isEmpty()) {
         _grid->insertReading(customPunctuation);
         [self _walk];
