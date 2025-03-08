@@ -19,10 +19,12 @@ bpmf_phon3 = {}
 bpmf_hetero = {}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt data.txt"""
     if len(sys.argv) < 7:
-        sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base punctuations symbols output')
+        sys.exit(
+            "Usage: cook.py phrase-freqs bpmf-mappings bpmf-base punctuations symbols output"
+        )
     #  Read a list of heterophonic singulars and its estimated frequency
     #  not active yet
     # try:
@@ -45,37 +47,43 @@ if __name__ == '__main__':
     #  Reading-in a list of heterophonic words and
     #  its most frequent pronunciation
     try:
-        handle = open('heterophony1.list', "r")
+        handle = open("heterophony1.list", "r")
     except IOError as e:
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon1[elements[0]] = elements[1]
     handle.close()
     try:
-        handle = open('heterophony2.list', "r")
+        handle = open("heterophony2.list", "r")
     except IOError as e:
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon2[elements[0]] = elements[1]
     handle.close()
     try:
-        handle = open('heterophony3.list', "r")
+        handle = open("heterophony3.list", "r")
     except IOError as e:
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon3[elements[0]] = elements[1]
@@ -84,8 +92,10 @@ if __name__ == '__main__':
     handle = open(sys.argv[3], "r")
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         mytype = elements[4]
         mykey = elements[0]
@@ -106,8 +116,10 @@ if __name__ == '__main__':
     handle = open(sys.argv[2], "r")
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = "-".join(elements)
@@ -132,15 +144,17 @@ if __name__ == '__main__':
 
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = elements.pop(0)
         try:
             readings = bpmf_phrases[mykey]
         except:
-            sys.exit('[ERROR] %s key mismatches.' % mykey)
+            sys.exit("[ERROR] %s key mismatches." % mykey)
         phrases[mykey] = myvalue
 
     for mykey, myvalue in phrases.items():
@@ -181,7 +195,9 @@ if __name__ == '__main__':
                         # l(3/4*3/4) = -0.28768207245178*2
                         # l(1/2*1/2) = -0.69314718055994*2
                         if float(myvalue) - 0.69314718055994 * 2 > H_DEFLT_FREQ:
-                            output.append((mykey, r, float(myvalue) - 0.69314718055994 * 2))
+                            output.append(
+                                (mykey, r, float(myvalue) - 0.69314718055994 * 2)
+                            )
                             continue
                         else:
                             output.append((mykey, r, H_DEFLT_FREQ))
@@ -213,8 +229,9 @@ if __name__ == '__main__':
     output = convert_vks_rows_to_sorted_kvs_rows(output)
     with open(sys.argv[-1], "w") as fout:
         fout.write(HEADER)
+
         for row in output:
             if type(row[-1]) is float:
-                fout.write('%s %s %f\n' % row)
+                fout.write("%s %s %f\n" % row)
             else:
-                fout.write('%s %s %s\n' % row)
+                fout.write("%s %s %s\n" % row)
