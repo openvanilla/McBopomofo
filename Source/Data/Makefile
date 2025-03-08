@@ -10,7 +10,17 @@ data-plain-bpmf.txt: bin/cook-plain-bpmf.py BPMFBase.txt BPMFPunctuations.txt
 data.txt: bin/cook.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
           PhraseFreq.txt phrase.occ Symbols.txt Macros.txt\
           heterophony1.list heterophony2.list heterophony3.list
-	bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt BPMFPunctuations.txt Symbols.txt Macros.txt $@
+	bin/cook.py \
+		--heterophony1 heterophony1.list \
+		--heterophony2 heterophony2.list \
+		--heterophony3 heterophony3.list \
+		--phrase_freq PhraseFreq.txt \
+		--bpmf_mappings BPMFMappings.txt \
+		--bpmf_base BPMFBase.txt \
+		--punctuations BPMFPunctuations.txt \
+		--symbols Symbols.txt \
+		--macros Macros.txt \
+		--output data.txt
 
 associated-phrases-v2.txt: data.txt bin/derive_associated_phrases.py associated-punctuation.txt
 		bin/derive_associated_phrases.py $< $@ associated-punctuation.txt
