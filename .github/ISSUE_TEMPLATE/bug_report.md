@@ -1,15 +1,15 @@
 ---
 name: 功能問題回報
-about: 請告訴我們您遇到什麼問題
+about: 請告訴我們您遇到什麼問題（無法打字、功能異常）
 title: "[功能問題回報]"
-labels: ""
+labels: "bug"
 assignees: ""
 ---
 
 在您回報問題之前，建議也可以先參考 Wiki 上的 [常見問題](https://github.com/openvanilla/McBopomofo/wiki/%E5%B8%B8%E8%A6%8B%E5%95%8F%E9%A1%8C) 與 [使用手冊](https://github.com/openvanilla/McBopomofo/wiki/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8A)
 
 **摘要**
-請簡單說明您遇到了什麼問題。這份表格雖然是中文的（我們相信注音輸入法的用戶應該都能看懂中文），但開發團隊可以使用中英文溝通，您也可以使用英文回報問題。如果您現在沒有中文輸入法可以使用的話，也可以試試看我們的 [瀏覽器版本](https://openvanilla.github.io/McBopomofoWeb/) 打字後，再複製貼上到這裡。
+請簡單說明您遇到了什麼問題。這份表格雖然是中文的（我們相信注音輸入法的用戶應該都能看懂中文），但開發團隊可以使用中英文溝通，您也可以使用英文回報問題。如果您現在沒有中文輸入法可以使用的話，也可以試試看先我們的 [瀏覽器版本](https://openvanilla.github.io/McBopomofoWeb/) 打字；之後，再複製貼上到這裡。
 
 **快速分類**
 請問您遇到的是：
