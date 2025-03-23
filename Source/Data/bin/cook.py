@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from cook_util import HEADER, convert_vks_rows_to_sorted_kvs_rows
+import argparse
 import sys
+
+from cook_util import HEADER, convert_vks_rows_to_sorted_kvs_rows
 
 __author__ = "Mengjuei Hsieh and The McBopomofo Authors"
 __copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
@@ -19,73 +20,68 @@ bpmf_phon3 = {}
 bpmf_hetero = {}
 
 
-if __name__ == '__main__':
-    """bin/cook.py PhraseFreq.txt BPMFMappings.txt BPMFBase.txt data.txt"""
-    if len(sys.argv) < 7:
-        sys.exit('Usage: cook.py phrase-freqs bpmf-mappings bpmf-base punctuations symbols output')
-    #  Read a list of heterophonic singulars and its estimated frequency
-    #  not active yet
-    # try:
-    #     handle = open('heterophony.list', "r")
-    # except IOError as e:
-    #     print("({})".format(e))
-    # while True:
-    #     line = handle.readline()
-    #     if not line: break
-    #     if line[0] == '#': continue
-    #     elements = line.rstrip().split()
-    #     myword = elements[0]
-    #     myvalue = {elements[1], elements[2]}
-    #     if myword in bpmf_hetero:
-    #         bpmf_hetero[myword].append(myvalue)
-    #     else:
-    #         bpmf_hetero[myword] = []
-    #         bpmf_hetero[myword].append(myvalue)
-    # handle.close()
-    #  Reading-in a list of heterophonic words and
-    #  its most frequent pronunciation
+def cook(
+    heterophony1_path,
+    heterophony2_path,
+    heterophony3_path,
+    phrase_freq_path,
+    bpmf_mappings_path,
+    bpmf_base_path,
+    punctuations_path,
+    symbols_path,
+    macros_path,
+    output_path,
+):
     try:
-        handle = open('heterophony1.list', "r")
+        handle = open(heterophony1_path, "r")
     except IOError as e:
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon1[elements[0]] = elements[1]
     handle.close()
     try:
-        handle = open('heterophony2.list', "r")
+        handle = open(heterophony2_path, "r")
     except IOError as e:
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon2[elements[0]] = elements[1]
     handle.close()
     try:
-        handle = open('heterophony3.list', "r")
+        handle = open(heterophony3_path, "r")
     except IOError as e:
         print("({})".format(e))
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         # if elements[0] in bpmf_hetero: break
         bpmf_phon3[elements[0]] = elements[1]
     handle.close()
     # bpmfbase
-    handle = open(sys.argv[3], "r")
+    handle = open(bpmf_base_path, "r")
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         mytype = elements[4]
         mykey = elements[0]
@@ -103,11 +99,13 @@ if __name__ == '__main__':
             bpmf_phrases[mykey].append(myvalue)
     handle.close()
     # bpmf-mappings
-    handle = open(sys.argv[2], "r")
+    handle = open(bpmf_mappings_path, "r")
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = "-".join(elements)
@@ -120,7 +118,7 @@ if __name__ == '__main__':
             bpmf_phrases[mykey].append(myvalue)
     handle.close()
     # phrase-freqs
-    handle = open(sys.argv[1], "r")
+    handle = open(phrase_freq_path, "r")
 
     output = []
 
@@ -132,15 +130,17 @@ if __name__ == '__main__':
 
     while True:
         line = handle.readline()
-        if not line: break
-        if line[0] == '#': continue
+        if not line:
+            break
+        if line[0] == "#":
+            continue
         elements = line.rstrip().split()
         mykey = elements.pop(0)
         myvalue = elements.pop(0)
         try:
             readings = bpmf_phrases[mykey]
         except:
-            sys.exit('[ERROR] %s key mismatches.' % mykey)
+            sys.exit("[ERROR] %s key mismatches." % mykey)
         phrases[mykey] = myvalue
 
     for mykey, myvalue in phrases.items():
@@ -181,7 +181,9 @@ if __name__ == '__main__':
                         # l(3/4*3/4) = -0.28768207245178*2
                         # l(1/2*1/2) = -0.69314718055994*2
                         if float(myvalue) - 0.69314718055994 * 2 > H_DEFLT_FREQ:
-                            output.append((mykey, r, float(myvalue) - 0.69314718055994 * 2))
+                            output.append(
+                                (mykey, r, float(myvalue) - 0.69314718055994 * 2)
+                            )
                             continue
                         else:
                             output.append((mykey, r, H_DEFLT_FREQ))
@@ -192,29 +194,58 @@ if __name__ == '__main__':
                     # 就可以直接進來這個 condition
     handle.close()
 
-    with open(sys.argv[4]) as punctuations_file:
+    with open(punctuations_path) as punctuations_file:
         for line in punctuations_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3
             output.append(tuple(row))
 
-    with open(sys.argv[5]) as symbols_file:
+    with open(symbols_path) as symbols_file:
         for line in symbols_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3, row
             output.append(tuple(row))
 
-    with open(sys.argv[6]) as macro_file:
+    with open(macros_path) as macro_file:
         for line in macro_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3, row
             output.append(tuple(row))
 
     output = convert_vks_rows_to_sorted_kvs_rows(output)
-    with open(sys.argv[-1], "w") as fout:
+    with open(output_path, "w") as fout:
         fout.write(HEADER)
+
         for row in output:
             if type(row[-1]) is float:
-                fout.write('%s %s %f\n' % row)
+                fout.write("%s %s %f\n" % row)
             else:
-                fout.write('%s %s %s\n' % row)
+                fout.write("%s %s %s\n" % row)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="cook phrases database")
+    parser.add_argument("--heterophony1", required=True)
+    parser.add_argument("--heterophony2", required=True)
+    parser.add_argument("--heterophony3", required=True)
+    parser.add_argument("--phrase_freq", required=True)
+    parser.add_argument("--bpmf_mappings", required=True)
+    parser.add_argument("--bpmf_base", required=True)
+    parser.add_argument("--punctuations", required=True)
+    parser.add_argument("--symbols", required=True)
+    parser.add_argument("--macros", required=True)
+    parser.add_argument("--output", required=True)
+
+    args = parser.parse_args()
+    cook(
+        heterophony1_path=args.heterophony1,
+        heterophony2_path=args.heterophony2,
+        heterophony3_path=args.heterophony3,
+        phrase_freq_path=args.phrase_freq,
+        bpmf_mappings_path=args.bpmf_mappings,
+        bpmf_base_path=args.bpmf_base,
+        punctuations_path=args.punctuations,
+        symbols_path=args.symbols,
+        macros_path=args.macros,
+        output_path=args.output,
+    )

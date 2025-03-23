@@ -2,7 +2,7 @@
 name: 詞庫問題回報
 about: 請告訴我們詞庫的相關問題
 title: "[詞庫問題回報]"
-labels: ""
+labels: "phrase"
 assignees: ""
 ---
 

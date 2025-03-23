@@ -2,7 +2,7 @@
 name: 功能建議
 about: 告訴我們您還有什麼沒被滿足的需求
 title: "[功能建議]"
-labels: ""
+labels: "feature"
 assignees: ""
 ---
 
