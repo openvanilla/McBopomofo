@@ -321,7 +321,7 @@ class InputState: NSObject {
     // MARK: -
 
     private let kMinMarkRangeLength = 2
-    private let kMaxMarkRangeLength = 6
+    private let kMaxMarkRangeLength = 8
 
     /// Represents that the user is marking a range in the composing buffer.
     @objc(InputStateMarking)

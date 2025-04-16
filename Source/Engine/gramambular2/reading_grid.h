@@ -75,7 +75,7 @@ class ReadingGrid {
   // Delete the reading after the cursor, like Del. Cursor is unmoved.
   bool deleteReadingAfterCursor();
 
-  static constexpr size_t kMaximumSpanLength = 6;
+  static constexpr size_t kMaximumSpanLength = 8;
   static constexpr char kDefaultSeparator[] = "-";
 
   // A Node consists of a set of unigrams, a reading, and a spanning length.
