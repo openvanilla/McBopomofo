@@ -207,6 +207,7 @@
 琶 ㄅㄚ˙ ba5 187 big5
 杷 ㄅㄚ˙ ba5 187 big5
 爸 ㄅㄚ˙ ba5 187 big5
+巴 ㄅㄚ˙ ba5 187 big5
 掰 ㄅㄞ bai 19 big5
 百 ㄅㄞˇ bai3 193 big5
 擺 ㄅㄞˇ bai3 193 big5
@@ -5879,6 +5880,7 @@
 裞 ㄕㄨㄟˋ shui4 gjo4 big5
 誰 ㄕㄨㄟˊ shui2 gjo6 big5
 脽 ㄕㄨㄟˊ shui2 gjo6 big5
+水 ㄕㄨㄟ˙ shui5 gjo7 big5
 盾 ㄕㄨㄣˇ shun3 gjp3 big5
 楯 ㄕㄨㄣˇ shun3 gjp3 big5
 吮 ㄕㄨㄣˇ shun3 gjp3 big5
@@ -11854,6 +11856,7 @@
 赮 ㄒㄧㄚˊ xia2 vu86 big5
 魻 ㄒㄧㄚˊ xia2 vu86 big5
 蕸 ㄒㄧㄚˊ xia2 vu86 big5
+下 ㄒㄧㄚ˙ xia5 vu87 big5
 鄉 ㄒㄧㄤ xiang vu; big5
 相 ㄒㄧㄤ xiang vu; big5
 香 ㄒㄧㄤ xiang vu; big5
