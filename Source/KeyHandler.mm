@@ -1363,7 +1363,23 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
-            NSString *selectedPhrase = currentState.candidates[index].displayText;
+            InputStateCandidate *candidate = currentState.candidates[index];
+            NSString *reading = candidate.reading;
+            NSArray *invalidPrefixArray = @[
+                @"_half_punctuation_",
+                @"_ctrl_punctuation_",
+                @"_letter_",
+                @"_number_",
+                @"_punctuation_",
+            ];
+            for (NSString *invalidPrefix in invalidPrefixArray) {
+                if ([reading hasPrefix:invalidPrefix]) {
+                    errorCallback();
+                    return YES;
+                }
+            }
+
+            NSString *selectedPhrase = candidate.displayText;
             InputStateSelectingDictionary *newState = [[InputStateSelectingDictionary alloc] initWithPreviousState:currentState selectedString:selectedPhrase selectedIndex:index];
             stateCallback(newState);
             return YES;
