@@ -323,38 +323,38 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     InputState *state = inState;
     UniChar charCode = input.charCode;
     McBopomofoEmacsKey emacsKey = input.emacsKey;
-
+    
     // MARK: Handle Selecting Feature
     if ([state isKindOfClass:[InputStateSelectingFeature class]] ||
         [state isKindOfClass:[InputStateSelectingDateMacro class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
-
+    
     // MARK: Handle Big5 Input
     if ([state isKindOfClass:[InputStateBig5 class]]) {
         return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
-
+    
     // MARK: Handle Chinese Number Input
     if ([state isKindOfClass:[InputStateChineseNumber class]]) {
         return [self _handleNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
-
+    
     if ([state isKindOfClass:[InputStateEnclosedNumber class]]) {
         return [self _handleEnclosedNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
-
+    
     // if the inputText is empty, it's a function key combination, we ignore it
     if (!input.inputText.length) {
         return NO;
     }
-
+    
     // if the composing buffer is empty and there's no reading, and there is some function key combination, we ignore it
     BOOL isFunctionKey = (input.isCommandHold || input.isOptionHold || input.isNumericPad) || input.isControlHotKey;
     if (![state isKindOfClass:[InputStateNotEmpty class]] && ![state isKindOfClass:[InputStateAssociatedPhrasesPlain class]] && !([state isKindOfClass:[InputStateAssociatedPhrases class]] && [(InputStateAssociatedPhrases *)state useShiftKey]) && isFunctionKey) {
         return NO;
     }
-
+    
     // Caps Lock processing : if Caps Lock is on, temporarily disable bopomofo.
     if (charCode == 8 || charCode == 13 || input.isAbsorbedArrowKey || input.isExtraChooseCandidateKey || input.isCursorForward || input.isCursorBackward) {
         // do nothing if backspace is pressed -- we ignore the key
@@ -363,24 +363,24 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         [self clear];
         InputStateEmpty *emptyState = [[InputStateEmpty alloc] init];
         stateCallback(emptyState);
-
+        
         // first commit everything in the buffer.
         if (input.isShiftHold) {
             return NO;
         }
-
+        
         // if ASCII but not printable, don't use insertText:replacementRange: as many apps don't handle non-ASCII char insertions.
         if (charCode < 0x80 && !isprint(charCode)) {
             return NO;
         }
-
+        
         // when shift is pressed, don't do further processing, since it outputs capital letter anyway.
         InputStateCommitting *committingState = [[InputStateCommitting alloc] initWithPoppedText:input.inputText.lowercaseString];
         stateCallback(committingState);
         stateCallback(emptyState);
         return YES;
     }
-
+    
     if (input.isNumericPad && !Preferences.selectCandidateWithNumericKeypad) {
         if (!input.isLeft && !input.isRight && !input.isDown && !input.isUp && charCode != 32 && isprint(charCode)) {
             [self clear];
@@ -392,7 +392,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
     }
-
+    
     // MARK: Handle Associated Phrases
     if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]]) {
         BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
@@ -402,7 +402,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         state = [[InputStateEmpty alloc] init];
         stateCallback(state);
     }
-
+    
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         BOOL result = [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
         if (result) {
@@ -415,15 +415,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
     }
-
+    
     // MARK: Handle Candidates
     if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
-
+    
     // MARK: Handle Other States with Menu
     if ([state isKindOfClass:[InputStateSelectingDictionary class]] ||
-        [state isKindOfClass:[InputStateShowingCharInfo class]]) {
+        [state isKindOfClass:[InputStateShowingCharInfo class]] ||
+        [state isKindOfClass:[InputStateCustomMenu class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -1355,7 +1356,83 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         stateCallback(newState);
         return YES;
     }
+    
+    NSArray *invalidPrefixArray = @[
+        @"_half_punctuation_",
+        @"_ctrl_punctuation_",
+        @"_letter_",
+        @"_number_",
+        @"_punctuation_",
+    ];
 
+    if (_inputMode == InputModeBopomofo &&
+        ([input.inputText isEqualToString:@"+"] || [input.inputText isEqualToString:@"="])) {
+        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
+            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+            InputStateCandidate *candidate = currentState.candidates[index];
+            NSString *reading = candidate.reading;
+            for (NSString *invalidPrefix in invalidPrefixArray) {
+                if ([reading hasPrefix:invalidPrefix]) {
+                    errorCallback();
+                    return YES;
+                }
+            }
+            if ([reading containsString:@"-"] == NO) {
+                errorCallback();
+                return YES;
+            }
+            NSArray *entries = @[
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost",
+                @"") callback:^{
+                    stateCallback(currentState);
+                }],
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
+                @"") callback:^{
+                    stateCallback(currentState);
+                }],
+                ];
+            NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?",@""), candidate.value];
+            InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
+            stateCallback(confirm);
+            return YES;
+        }
+    }
+
+    if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"+"]) {
+        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
+            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+            InputStateCandidate *candidate = currentState.candidates[index];
+            NSString *reading = candidate.reading;
+            for (NSString *invalidPrefix in invalidPrefixArray) {
+                if ([reading hasPrefix:invalidPrefix]) {
+                    errorCallback();
+                    return YES;
+                }
+            }
+            if ([reading containsString:@"-"] == NO) {
+                errorCallback();
+                return YES;
+            }
+            NSArray *entries = @[
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Lower",
+                @"") callback:^{
+                    stateCallback(currentState);
+                }],
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
+                @"") callback:^{
+                    stateCallback(currentState);
+                }],
+                ];
+            NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to lower the score of the phrase \"%@\"?",@""), candidate.value];
+            InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
+            stateCallback(confirm);
+            return YES;
+        }
+    }
+
+    
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateShowingCharInfo class]] ||
             [state isKindOfClass:[InputStateSelectingDictionary class]]) {
@@ -1365,13 +1442,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
             InputStateCandidate *candidate = currentState.candidates[index];
             NSString *reading = candidate.reading;
-            NSArray *invalidPrefixArray = @[
-                @"_half_punctuation_",
-                @"_ctrl_punctuation_",
-                @"_letter_",
-                @"_number_",
-                @"_punctuation_",
-            ];
             for (NSString *invalidPrefix in invalidPrefixArray) {
                 if ([reading hasPrefix:invalidPrefix]) {
                     errorCallback();
@@ -1405,7 +1475,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             stateCallback(newState);
             gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
-        } else if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
+        }
+        else if ([state isKindOfClass:[InputStateCustomMenu class]]) {
+           InputStateCustomMenu *current = (InputStateCustomMenu *)state;
+           NSInteger selectedIndex = current.selectedIndex;
+           InputStateNotEmpty *newState = current.previousState;
+           stateCallback(newState);
+           gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+           gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+       } else if ([state isKindOfClass:[InputStateSelectingFeature class]]) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
@@ -1452,7 +1530,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return NO;
             }
         }
-
+        if ([state isKindOfClass:[InputStateCustomMenu class]]) {
+            InputStateCustomMenu *customMenu = (InputStateCustomMenu *)state;
+            InputStateCustomMenuEntry *entry = customMenu.entries[gCurrentCandidateController.selectedCandidateIndex];
+            entry.callback();
+            return YES;
+        }
+        
         if (Preferences.shiftEnterEnabled &&
             _inputMode == InputModeBopomofo && input.isShiftHold) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
