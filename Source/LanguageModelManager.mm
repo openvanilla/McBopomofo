@@ -317,6 +317,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         NSArray *lineComponents = [trimmed componentsSeparatedByString:@" "];
         if (lineComponents.count != 2) {
             [mutableString appendString:line];
+            [mutableString appendString:@"\n"];
             continue;
         }
         if ([lineComponents[0] isEqualToString:exactPhrase] &&
@@ -325,6 +326,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
             continue;
         }
         [mutableString appendString:line];
+        [mutableString appendString:@"\n"];
     }
     if (result) {
         NSError *writeError;

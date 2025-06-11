@@ -1391,8 +1391,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
                     [strongSelf _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
-                    InputStateChoosingCandidate *newState = [strongSelf _buildCandidateStateFromInputtingState:inputting useVerticalMode:currentState.useVerticalMode];
-                    stateCallback(newState);
+                    stateCallback(inputting);
+//                    InputStateCommitting *committing = [[InputStateCommitting alloc] init];
+//                    stateCallback(committing);
                 }],
                 [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
                 @"") callback:^{
@@ -1435,8 +1436,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
                     [strongSelf _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
-                    InputStateChoosingCandidate *newState = [strongSelf _buildCandidateStateFromInputtingState:inputting useVerticalMode:currentState.useVerticalMode];
-                    stateCallback(newState);
+                    stateCallback(inputting);
+//                    InputStateCommitting *committing = [[InputStateCommitting alloc] init];
+//                    stateCallback(committing);
                 }],
                 [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
                 @"") callback:^{
