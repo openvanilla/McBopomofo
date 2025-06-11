@@ -36,9 +36,9 @@ private extension Bool {
 
 private let kMinKeyLabelSize: CGFloat = 10
 
-private var gCurrentCandidateController: CandidateController?
+internal var gCurrentCandidateController: CandidateController?
 
-private extension CandidateController {
+internal extension CandidateController {
     static let horizontal = HorizontalCandidateController()
     static let vertical = VerticalCandidateController()
 }
@@ -50,10 +50,9 @@ class McBopomofoInputMethodController: IMKInputController {
 
     // MARK: -
 
-    private var currentClient: Any?
-
-    private var keyHandler: KeyHandler = KeyHandler()
-    private var state: InputState = InputState.Empty()
+    var currentClient: Any?
+    var keyHandler: KeyHandler = KeyHandler()
+    var state: InputState = InputState.Empty()
 
     // MARK: - IMKInputController methods
 
@@ -282,7 +281,7 @@ class McBopomofoInputMethodController: IMKInputController {
 
 extension McBopomofoInputMethodController {
 
-    private func handle(state newState: InputState, client: Any?) {
+    func handle(state newState: InputState, client: Any?) {
         let previous = state
         state = newState
 
@@ -319,6 +318,8 @@ extension McBopomofoInputMethodController {
         case let newState as InputState.SelectingDictionary:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.ShowingCharInfo:
+            handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.CustomMenu:
             handle(state: newState, previous: previous, client: client)
         default:
             break
@@ -572,12 +573,14 @@ extension McBopomofoInputMethodController {
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
 
-        if let candidateDate = previousState as? InputState.ChoosingCandidate {
-            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
-        } else if let candidateDate = previousState as? InputState.Marking {
-            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        switch previousState {
+        case let previousState as InputState.ChoosingCandidate:
+            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        case let previousState as InputState.Marking:
+            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        default:
+            break
         }
-
         show(candidateWindowWith: state, client: client)
     }
 
@@ -591,11 +594,36 @@ extension McBopomofoInputMethodController {
         let previousState = state.previousState.previousState
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        if let candidateDate = previousState as? InputState.ChoosingCandidate {
-            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
-        } else if let candidateDate = previousState as? InputState.Marking {
-            client.setMarkedText(candidateDate.attributedString, selectionRange: NSMakeRange(Int(candidateDate.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        switch previousState {
+        case let previousState as InputState.ChoosingCandidate:
+            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        case let previousState as InputState.Marking:
+            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        default:
+            break
         }
+        show(candidateWindowWith: state, client: client)
+    }
+
+    private func handle(state: InputState.CustomMenu, previous: InputState, client: Any?) {
+        hideTooltip()
+        guard let client = client as? IMKTextInput else {
+            gCurrentCandidateController?.visible = false
+            return
+        }
+//        let previousState = state.previousState
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put this composing buffer
+
+//        switch previousState {
+//        case let previousState as InputState.ChoosingCandidate:
+//            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+//        case let previousState as InputState.Marking:
+//            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+//        default:
+//            break
+//        }
+
         show(candidateWindowWith: state, client: client)
     }
 }
@@ -660,6 +688,8 @@ extension McBopomofoInputMethodController {
             String(format:NSLocalizedString("Look up %@", comment: ""), state.selectedPhrase)
         case let state as InputState.AssociatedPhrases:
             String(format:NSLocalizedString("%@…", comment: ""), state.prefixValue)
+        case let state as InputState.CustomMenu:
+            state.title
         default:
             ""
         }
@@ -737,191 +767,5 @@ extension McBopomofoInputMethodController {
 
     private func hideTooltip() {
         McBopomofoInputMethodController.tooltipController.hide()
-    }
-}
-
-// MARK: -
-
-extension McBopomofoInputMethodController: KeyHandlerDelegate {
-    func candidateController(for keyHandler: KeyHandler) -> Any {
-        gCurrentCandidateController ?? .vertical
-    }
-
-    func keyHandler(_ keyHandler: KeyHandler, didSelectCandidateAt index: Int, candidateController controller: Any) {
-        if index < 0 {
-            return
-        }
-        if let controller = controller as? CandidateController {
-            self.candidateController(controller, didSelectCandidateAtIndex: UInt(index))
-        }
-    }
-
-    func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState) -> Bool {
-        guard let state = state as? InputState.Marking else {
-            return false
-        }
-        if !state.validToWrite {
-            return false
-        }
-        LanguageModelManager.writeUserPhrase(state.userPhrase)
-
-        if !Preferences.addPhraseHookEnabled {
-            return true
-        }
-
-        func run(_ script: String, arguments: [String]) {
-            let process = Process()
-            process.launchPath = script
-            process.arguments = arguments
-            // Some user may sign the git commits with gpg, and gpg is often
-            // installed by homebrew, so we add the path of homebrew here.
-            process.environment = ["PATH": "/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin"]
-
-            let path = LanguageModelManager.dataFolderPath
-            if #available(macOS 10.13, *) {
-                process.currentDirectoryURL = URL(fileURLWithPath: path)
-            } else {
-                FileManager.default.changeCurrentDirectoryPath(path)
-            }
-
-            #if DEBUG
-            let pipe = Pipe()
-            process.standardError = pipe
-            #endif
-            process.launch()
-            process.waitUntilExit()
-            #if DEBUG
-            let read = pipe.fileHandleForReading
-            let data = read.readDataToEndOfFile()
-            let s = String(data: data, encoding: .utf8)
-            NSLog("result \(String(describing: s))")
-            #endif
-        }
-
-        let script = Preferences.addPhraseHookPath
-
-        DispatchQueue.global().async {
-            run("/bin/sh", arguments: [script, state.selectedText])
-        }
-
-        return true
-    }
-}
-
-// MARK: -
-
-extension McBopomofoInputMethodController: CandidateControllerDelegate {
-    func candidateCountForController(_ controller: CandidateController) -> UInt {
-        return if let state = state as? CandidateProvider {
-            UInt(state.candidateCount)
-        } else {
-            0
-        }
-    }
-
-    func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
-        return if let state = state as? CandidateProvider {
-            state.candidate(at: Int(index))
-        } else {
-            ""
-        }
-    }
-
-    func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
-        let client = currentClient
-
-        switch state {
-        case let state as InputState.ChoosingCandidate:
-            let selectedCandidate = state.candidates[Int(index)]
-            keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, originalCursorIndex: Int(state.originalCursorIndex), useMoveCursorAfterSelectionSetting: true)
-
-            guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
-                return
-            }
-
-            switch keyHandler.inputMode {
-            case .plainBopomofo:
-                keyHandler.clear()
-                let composingBuffer = inputting.composingBuffer
-                handle(state: .Committing(poppedText: composingBuffer), client: client)
-                if Preferences.associatedPhrasesEnabled,
-                   let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(withReading: selectedCandidate.reading, value: selectedCandidate.value, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
-                    self.handle(state: associatePhrases, client: client)
-                } else {
-                    handle(state: .Empty(), client: client)
-                }
-            case .bopomofo:
-                handle(state: inputting, client: client)
-                if Preferences.associatedPhrasesEnabled {
-                    var textFrame = NSRect.zero
-                    let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
-                    let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-
-                    let state = keyHandler.buildInputtingState()
-                    keyHandler.handleAssociatedPhrase(with: state, useVerticalMode: useVerticalMode, stateCallback: { newState in
-                        self.handle(state: newState, client: client)
-                    }, errorCallback: {
-                        if (Preferences.beepUponInputError) {
-                            NSSound.beep()
-                        }
-                    }, useShiftKey: true)
-                }
-            default:
-                break
-            }
-        case let state as InputState.AssociatedPhrases:
-            let candidate = state.candidates[Int(index)]
-            keyHandler.fixNodeForAssociatedPhraseWithPrefix(at: state.prefixCursorIndex, prefixReading: state.prefixReading, prefixValue: state.prefixValue, associatedPhraseReading: candidate.reading, associatedPhraseValue: candidate.value)
-            guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
-                return
-            }
-            handle(state: inputting, client: client)
-            break
-        case let state as InputState.AssociatedPhrasesPlain:
-            let selectedCandidate = state.candidates[Int(index)]
-            handle(state: .Committing(poppedText: selectedCandidate.value), client: currentClient)
-            if Preferences.associatedPhrasesEnabled,
-               let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(withReading: selectedCandidate.reading, value: selectedCandidate.value, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
-                self.handle(state: associatePhrases, client: client)
-            } else {
-                handle(state: .Empty(), client: client)
-            }
-        case let state as InputState.SelectingFeature:
-            if let nextState = state.nextState(by: Int(index)) {
-                handle(state: nextState, client: client)
-            }
-        case let state as InputState.SelectingDateMacro:
-            let candidate = state.candidate(at: Int(index))
-            if !candidate.isEmpty {
-                let committing = InputState.Committing(poppedText: candidate)
-                handle(state: committing, client: client)
-            }
-        case let state as InputState.SelectingDictionary:
-            let handled = state.lookUp(usingServiceAtIndex: Int(index), state: state) { state in
-                handle(state: state, client: client)
-            }
-            if handled {
-                let previous = state.previousState
-                let candidateIndex = state.selectedIndex
-                handle(state: previous, client: client)
-                if candidateIndex > 0 {
-                    gCurrentCandidateController?.selectedCandidateIndex = UInt(candidateIndex)
-                }
-            }
-        case let state as InputState.ShowingCharInfo:
-            let text = state.menuTitleValueMapping[Int(index)].1
-            NSPasteboard.general.declareTypes([.string], owner: nil)
-            NSPasteboard.general.setString(text, forType: .string)
-            NotifierController.notify(message:String(format:NSLocalizedString("%@ has been copied.", comment: ""), text))
-
-            let previous = state.previousState.previousState
-            let candidateIndex = state.previousState.selectedIndex
-            handle(state: previous, client: client)
-            if candidateIndex > 0 {
-                gCurrentCandidateController?.selectedCandidateIndex = UInt(candidateIndex)
-            }
-        default:
-            break
-        }
     }
 }
