@@ -240,7 +240,6 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         NSArray *lineComponents = [trimmed componentsSeparatedByString:@" "];
         if (lineComponents.count != 2) {
             continue;
-            ;
         }
         if ([lineComponents[0] isEqualToString:exactPhrase] &&
             [lineComponents[1] isEqualToString:key]) {
