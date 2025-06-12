@@ -28,7 +28,7 @@ import NotifierUI
 
 extension McBopomofoInputMethodController: CandidateControllerDelegate {
     func candidateCountForController(_ controller: CandidateController) -> UInt {
-        return if let state = state as? CandidateProvider {
+        if let state = state as? CandidateProvider {
             UInt(state.candidateCount)
         } else {
             0
@@ -36,7 +36,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
     }
 
     func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
-        return if let state = state as? CandidateProvider {
+        if let state = state as? CandidateProvider {
             state.candidate(at: Int(index))
         } else {
             ""

@@ -331,7 +331,7 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     if (result) {
         NSError *writeError;
         [mutableString writeToURL:[NSURL fileURLWithPath:path] atomically:YES encoding:NSUTF8StringEncoding error:&writeError];
-        if (error != nil) {
+        if (writeError != nil) {
             return NO;
         }
         return YES;
