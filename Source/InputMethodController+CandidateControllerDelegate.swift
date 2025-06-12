@@ -160,6 +160,9 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             if candidateIndex > 0 {
                 gCurrentCandidateController?.selectedCandidateIndex = UInt(candidateIndex)
             }
+        case let state as InputState.CustomMenu:
+            let entry = state.entries[Int(index)]
+            entry.callback()
         default:
             break
         }

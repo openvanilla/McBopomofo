@@ -1392,8 +1392,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     [strongSelf _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
                     stateCallback(inputting);
-//                    InputStateCommitting *committing = [[InputStateCommitting alloc] init];
-//                    stateCallback(committing);
                 }],
                 [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
                 @"") callback:^{
@@ -1437,8 +1435,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     [strongSelf _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
                     stateCallback(inputting);
-//                    InputStateCommitting *committing = [[InputStateCommitting alloc] init];
-//                    stateCallback(committing);
                 }],
                 [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
                 @"") callback:^{
@@ -1548,12 +1544,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return NO;
             }
         }
-        if ([state isKindOfClass:[InputStateCustomMenu class]]) {
-            InputStateCustomMenu *customMenu = (InputStateCustomMenu *)state;
-            InputStateCustomMenuEntry *entry = customMenu.entries[gCurrentCandidateController.selectedCandidateIndex];
-            entry.callback();
-            return YES;
-        }
+
 
         if (Preferences.shiftEnterEnabled && _inputMode == InputModeBopomofo && input.isShiftHold) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
