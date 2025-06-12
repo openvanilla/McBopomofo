@@ -21,16 +21,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+import CandidateUI
 import Cocoa
 import InputMethodKit
-import CandidateUI
 
 extension McBopomofoInputMethodController: KeyHandlerDelegate {
     func candidateController(for keyHandler: KeyHandler) -> Any {
         gCurrentCandidateController ?? .vertical
     }
 
-    func keyHandler(_ keyHandler: KeyHandler, didSelectCandidateAt index: Int, candidateController controller: Any) {
+    func keyHandler(
+        _ keyHandler: KeyHandler, didSelectCandidateAt index: Int,
+        candidateController controller: Any
+    ) {
         if index < 0 {
             return
         }
@@ -60,16 +63,16 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
             }
 
             #if DEBUG
-            let pipe = Pipe()
-            process.standardError = pipe
+                let pipe = Pipe()
+                process.standardError = pipe
             #endif
             process.launch()
             process.waitUntilExit()
             #if DEBUG
-            let read = pipe.fileHandleForReading
-            let data = read.readDataToEndOfFile()
-            let s = String(data: data, encoding: .utf8)
-            NSLog("result \(String(describing: s))")
+                let read = pipe.fileHandleForReading
+                let data = read.readDataToEndOfFile()
+                let s = String(data: data, encoding: .utf8)
+                NSLog("result \(String(describing: s))")
             #endif
         }
 
@@ -80,7 +83,9 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
         }
     }
 
-    func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState) -> Bool {
+    func keyHandler(_ keyHandler: KeyHandler, didRequestWriteUserPhraseWith state: InputState)
+        -> Bool
+    {
         guard let state = state as? InputState.Marking else {
             return false
         }
@@ -92,7 +97,9 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
         return true
     }
 
-    func keyHandler(_ keyHandler: KeyHandler, didRequestBoostScoreForPhrase phrase: String, reading: String) -> Bool {
+    func keyHandler(
+        _ keyHandler: KeyHandler, didRequestBoostScoreForPhrase phrase: String, reading: String
+    ) -> Bool {
         let phraseToWrite = "\(phrase) \(reading)"
         let result = LanguageModelManager.writeUserPhrase(phraseToWrite)
         if result {
@@ -101,7 +108,9 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
         return result
     }
 
-    func keyHandler(_ keyHandler: KeyHandler, didRequestExcludePhrase phrase: String, reading: String) -> Bool {
+    func keyHandler(
+        _ keyHandler: KeyHandler, didRequestExcludePhrase phrase: String, reading: String
+    ) -> Bool {
         let phraseToWrite = "\(phrase) \(reading)"
         let result = LanguageModelManager.removeUserPhrase(phraseToWrite)
         if result {

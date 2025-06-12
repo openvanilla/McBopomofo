@@ -124,3 +124,14 @@
 "Character Information" = "Character Information";
 
 "Enclosed Numbers" = "Enclosed Numbers";
+
+"Boost" = "Boost";
+
+"Cancel" = "Cancel";
+
+"Exclude" = "Exclude";
+
+"Do you want to boost the score of the phrase \"%@\"?" = "Do you want to boost the score of the phrase \"%@\"?";
+
+"Do you want to exclude the phrase \"%@\"?" = "Do you want to exclude the phrase \"%@\"?";
+

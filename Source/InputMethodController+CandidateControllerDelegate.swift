@@ -21,9 +21,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+import CandidateUI
 import Cocoa
 import InputMethodKit
-import CandidateUI
 import NotifierUI
 
 extension McBopomofoInputMethodController: CandidateControllerDelegate {
@@ -35,7 +35,9 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         }
     }
 
-    func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
+    func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt)
+        -> String
+    {
         return if let state = state as? CandidateProvider {
             state.candidate(at: Int(index))
         } else {
@@ -43,13 +45,18 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         }
     }
 
-    func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
+    func candidateController(
+        _ controller: CandidateController, didSelectCandidateAtIndex index: UInt
+    ) {
         let client = currentClient
 
         switch state {
         case let state as InputState.ChoosingCandidate:
             let selectedCandidate = state.candidates[Int(index)]
-            keyHandler.fixNode(reading: selectedCandidate.reading, value: selectedCandidate.value, originalCursorIndex: Int(state.originalCursorIndex), useMoveCursorAfterSelectionSetting: true)
+            keyHandler.fixNode(
+                reading: selectedCandidate.reading, value: selectedCandidate.value,
+                originalCursorIndex: Int(state.originalCursorIndex),
+                useMoveCursorAfterSelectionSetting: true)
 
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return
@@ -61,7 +68,11 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 let composingBuffer = inputting.composingBuffer
                 handle(state: .Committing(poppedText: composingBuffer), client: client)
                 if Preferences.associatedPhrasesEnabled,
-                   let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(withReading: selectedCandidate.reading, value: selectedCandidate.value, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
+                    let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(
+                        withReading: selectedCandidate.reading, value: selectedCandidate.value,
+                        useVerticalMode: state.useVerticalMode)
+                        as? InputState.AssociatedPhrasesPlain
+                {
                     self.handle(state: associatePhrases, client: client)
                 } else {
                     handle(state: .Empty(), client: client)
@@ -70,24 +81,32 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                 handle(state: inputting, client: client)
                 if Preferences.associatedPhrasesEnabled {
                     var textFrame = NSRect.zero
-                    let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
-                    let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+                    let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(
+                        forCharacterIndex: 0, lineHeightRectangle: &textFrame)
+                    let useVerticalMode =
+                        (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
 
                     let state = keyHandler.buildInputtingState()
-                    keyHandler.handleAssociatedPhrase(with: state, useVerticalMode: useVerticalMode, stateCallback: { newState in
-                        self.handle(state: newState, client: client)
-                    }, errorCallback: {
-                        if (Preferences.beepUponInputError) {
-                            NSSound.beep()
-                        }
-                    }, useShiftKey: true)
+                    keyHandler.handleAssociatedPhrase(
+                        with: state, useVerticalMode: useVerticalMode,
+                        stateCallback: { newState in
+                            self.handle(state: newState, client: client)
+                        },
+                        errorCallback: {
+                            if Preferences.beepUponInputError {
+                                NSSound.beep()
+                            }
+                        }, useShiftKey: true)
                 }
             default:
                 break
             }
         case let state as InputState.AssociatedPhrases:
             let candidate = state.candidates[Int(index)]
-            keyHandler.fixNodeForAssociatedPhraseWithPrefix(at: state.prefixCursorIndex, prefixReading: state.prefixReading, prefixValue: state.prefixValue, associatedPhraseReading: candidate.reading, associatedPhraseValue: candidate.value)
+            keyHandler.fixNodeForAssociatedPhraseWithPrefix(
+                at: state.prefixCursorIndex, prefixReading: state.prefixReading,
+                prefixValue: state.prefixValue, associatedPhraseReading: candidate.reading,
+                associatedPhraseValue: candidate.value)
             guard let inputting = keyHandler.buildInputtingState() as? InputState.Inputting else {
                 return
             }
@@ -97,7 +116,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             let selectedCandidate = state.candidates[Int(index)]
             handle(state: .Committing(poppedText: selectedCandidate.value), client: currentClient)
             if Preferences.associatedPhrasesEnabled,
-               let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(withReading: selectedCandidate.reading, value: selectedCandidate.value, useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain {
+                let associatePhrases = keyHandler.buildAssociatedPhrasePlainState(
+                    withReading: selectedCandidate.reading, value: selectedCandidate.value,
+                    useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain
+            {
                 self.handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)
@@ -128,7 +150,9 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             let text = state.menuTitleValueMapping[Int(index)].1
             NSPasteboard.general.declareTypes([.string], owner: nil)
             NSPasteboard.general.setString(text, forType: .string)
-            NotifierController.notify(message:String(format:NSLocalizedString("%@ has been copied.", comment: ""), text))
+            NotifierController.notify(
+                message: String(format: NSLocalizedString("%@ has been copied.", comment: ""), text)
+            )
 
             let previous = state.previousState.previousState
             let candidateIndex = state.previousState.selectedIndex
