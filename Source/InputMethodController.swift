@@ -21,15 +21,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+import CandidateUI
 import Cocoa
 import InputMethodKit
-import CandidateUI
 import NotifierUI
-import TooltipUI
 import OpenCCBridge
+import TooltipUI
 
-private extension Bool {
-    var state: NSControl.StateValue {
+extension Bool {
+    fileprivate var state: NSControl.StateValue {
         self ? .on : .off
     }
 }
@@ -38,7 +38,7 @@ private let kMinKeyLabelSize: CGFloat = 10
 
 internal var gCurrentCandidateController: CandidateController?
 
-internal extension CandidateController {
+extension CandidateController {
     static let horizontal = HorizontalCandidateController()
     static let vertical = VerticalCandidateController()
 }
@@ -64,45 +64,73 @@ class McBopomofoInputMethodController: IMKInputController {
     override func menu() -> NSMenu! {
         let menu = NSMenu(title: "Input Method Menu")
 
-        let chineseConversionItem = menu.addItem(withTitle: NSLocalizedString("Chinese Conversion", comment: ""), action: #selector(toggleChineseConverter(_:)), keyEquivalent: "g")
+        let chineseConversionItem = menu.addItem(
+            withTitle: NSLocalizedString("Chinese Conversion", comment: ""),
+            action: #selector(toggleChineseConverter(_:)), keyEquivalent: "g")
         chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
         chineseConversionItem.state = Preferences.chineseConversionEnabled.state
 
-        let halfWidthPunctuationItem = menu.addItem(withTitle: NSLocalizedString("Use Half-Width Punctuations", comment: ""), action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "h")
+        let halfWidthPunctuationItem = menu.addItem(
+            withTitle: NSLocalizedString("Use Half-Width Punctuations", comment: ""),
+            action: #selector(toggleHalfWidthPunctuation(_:)), keyEquivalent: "h")
         halfWidthPunctuationItem.keyEquivalentModifierMask = [.command, .control]
         halfWidthPunctuationItem.state = Preferences.halfWidthPunctuationEnabled.state
-        let associatedPhrasesItem = menu.addItem(withTitle: NSLocalizedString("Associated Phrases", comment: ""), action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "")
+        let associatedPhrasesItem = menu.addItem(
+            withTitle: NSLocalizedString("Associated Phrases", comment: ""),
+            action: #selector(toggleAssociatedPhrasesEnabled(_:)), keyEquivalent: "")
         associatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
 
         let inputMode = keyHandler.inputMode
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
         if inputMode == .bopomofo && optionKeyPressed {
-            let phaseReplacementItem = menu.addItem(withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""), action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
+            let phaseReplacementItem = menu.addItem(
+                withTitle: NSLocalizedString("Use Phrase Replacement", comment: ""),
+                action: #selector(togglePhraseReplacement(_:)), keyEquivalent: "")
             phaseReplacementItem.state = Preferences.phraseReplacementEnabled.state
         }
 
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil, keyEquivalent: "")
+        menu.addItem(
+            withTitle: NSLocalizedString("User Phrases", comment: ""), action: nil,
+            keyEquivalent: "")
 
         if inputMode == .plainBopomofo {
-            if (Preferences.enableUserPhrasesInPlainBopomofo) {
-                menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrasesPlainBopomofo(_:)), keyEquivalent: "")
+            if Preferences.enableUserPhrasesInPlainBopomofo {
+                menu.addItem(
+                    withTitle: NSLocalizedString("Edit User Phrases", comment: ""),
+                    action: #selector(openUserPhrasesPlainBopomofo(_:)), keyEquivalent: "")
             }
-            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesPlainBopomofo(_:)), keyEquivalent: "")
+            menu.addItem(
+                withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""),
+                action: #selector(openExcludedPhrasesPlainBopomofo(_:)), keyEquivalent: "")
         } else {
-            menu.addItem(withTitle: NSLocalizedString("Edit User Phrases", comment: ""), action: #selector(openUserPhrases(_:)), keyEquivalent: "")
-            menu.addItem(withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""), action: #selector(openExcludedPhrasesMcBopomofo(_:)), keyEquivalent: "")
+            menu.addItem(
+                withTitle: NSLocalizedString("Edit User Phrases", comment: ""),
+                action: #selector(openUserPhrases(_:)), keyEquivalent: "")
+            menu.addItem(
+                withTitle: NSLocalizedString("Edit Excluded Phrases", comment: ""),
+                action: #selector(openExcludedPhrasesMcBopomofo(_:)), keyEquivalent: "")
             if optionKeyPressed {
-                menu.addItem(withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""), action: #selector(openPhraseReplacementMcBopomofo(_:)), keyEquivalent: "")
+                menu.addItem(
+                    withTitle: NSLocalizedString("Edit Phrase Replacement Table", comment: ""),
+                    action: #selector(openPhraseReplacementMcBopomofo(_:)), keyEquivalent: "")
             }
         }
 
-        menu.addItem(withTitle: NSLocalizedString("Reload User Phrases", comment: ""), action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
+        menu.addItem(
+            withTitle: NSLocalizedString("Reload User Phrases", comment: ""),
+            action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
         menu.addItem(NSMenuItem.separator())
 
-        menu.addItem(withTitle: NSLocalizedString("McBopomofo Preferences", comment: ""), action: #selector(showPreferences(_:)), keyEquivalent: "")
-        menu.addItem(withTitle: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(checkForUpdate(_:)), keyEquivalent: "")
-        menu.addItem(withTitle: NSLocalizedString("About McBopomofo…", comment: ""), action: #selector(showAbout(_:)), keyEquivalent: "")
+        menu.addItem(
+            withTitle: NSLocalizedString("McBopomofo Preferences", comment: ""),
+            action: #selector(showPreferences(_:)), keyEquivalent: "")
+        menu.addItem(
+            withTitle: NSLocalizedString("Check for Updates…", comment: ""),
+            action: #selector(checkForUpdate(_:)), keyEquivalent: "")
+        menu.addItem(
+            withTitle: NSLocalizedString("About McBopomofo…", comment: ""),
+            action: #selector(showAbout(_:)), keyEquivalent: "")
         return menu
     }
 
@@ -112,7 +140,8 @@ class McBopomofoInputMethodController: IMKInputController {
         UserDefaults.standard.synchronize()
 
         // Override the keyboard layout. Use US if not set.
-        (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
+        (client as? IMKTextInput)?.overrideKeyboard(
+            withKeyboardNamed: Preferences.basisKeyboardLayout)
         // reset the state
         currentClient = client
 
@@ -134,7 +163,8 @@ class McBopomofoInputMethodController: IMKInputController {
         if keyHandler.inputMode != newInputMode {
             UserDefaults.standard.synchronize()
             // Remember to override the keyboard layout again -- treat this as an activate event.
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: Preferences.basisKeyboardLayout)
+            (client as? IMKTextInput)?.overrideKeyboard(
+                withKeyboardNamed: Preferences.basisKeyboardLayout)
             keyHandler.clear()
             keyHandler.inputMode = newInputMode
             self.handle(state: .Empty(), client: client)
@@ -184,9 +214,11 @@ class McBopomofoInputMethodController: IMKInputController {
 
             let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
             let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
-            if event.modifierFlags.contains(notShift) ||
-                       (event.modifierFlags.contains(.shift) && includeShift) {
-                (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: functionKeyKeyboardLayoutID)
+            if event.modifierFlags.contains(notShift)
+                || (event.modifierFlags.contains(.shift) && includeShift)
+            {
+                (client as? IMKTextInput)?.overrideKeyboard(
+                    withKeyboardNamed: functionKeyKeyboardLayoutID)
                 return false
             }
             (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: basisKeyboardLayoutID)
@@ -194,14 +226,16 @@ class McBopomofoInputMethodController: IMKInputController {
         }
 
         var textFrame = NSRect.zero
-        let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(forCharacterIndex: 0, lineHeightRectangle: &textFrame)
-        let useVerticalMode = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+        let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(
+            forCharacterIndex: 0, lineHeightRectangle: &textFrame)
+        let useVerticalMode =
+            (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
         let input = KeyHandlerInput(event: event, isVerticalMode: useVerticalMode)
 
         let result = keyHandler.handle(input: input, state: state) { newState in
             self.handle(state: newState, client: client)
         } errorCallback: {
-            if (Preferences.beepUponInputError) {
+            if Preferences.beepUponInputError {
                 NSSound.beep()
             }
         }
@@ -216,7 +250,10 @@ class McBopomofoInputMethodController: IMKInputController {
 
     @objc func toggleChineseConverter(_ sender: Any?) {
         let enabled = Preferences.toggleChineseConversionEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Chinese conversion on", comment: "") : NSLocalizedString("Chinese conversion off", comment: ""))
+        NotifierController.notify(
+            message: enabled
+                ? NSLocalizedString("Chinese conversion on", comment: "")
+                : NSLocalizedString("Chinese conversion off", comment: ""))
         if let currentClient = currentClient {
             keyHandler.clear()
             self.handle(state: InputState.Empty(), client: currentClient)
@@ -225,7 +262,10 @@ class McBopomofoInputMethodController: IMKInputController {
 
     @objc func toggleHalfWidthPunctuation(_ sender: Any?) {
         let enabled = Preferences.toggleHalfWidthPunctuationEnabled()
-        NotifierController.notify(message: enabled ? NSLocalizedString("Half-Width Punctuation On", comment: "") : NSLocalizedString("Half-Width Punctuation Off", comment: ""))
+        NotifierController.notify(
+            message: enabled
+                ? NSLocalizedString("Half-Width Punctuation On", comment: "")
+                : NSLocalizedString("Half-Width Punctuation Off", comment: ""))
         if let currentClient = currentClient {
             keyHandler.clear()
             self.handle(state: InputState.Empty(), client: currentClient)
@@ -266,7 +306,8 @@ class McBopomofoInputMethodController: IMKInputController {
     }
 
     @objc func reloadUserPhrases(_ sender: Any?) {
-        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
+        LanguageModelManager.loadUserPhrases(
+            enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
     }
 
@@ -342,7 +383,8 @@ extension McBopomofoInputMethodController {
         if buffer.isEmpty {
             return
         }
-        (client as? IMKTextInput)?.insertText(buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
+        (client as? IMKTextInput)?.insertText(
+            buffer, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
     }
 
     private func handle(state: InputState.Deactivated, previous: InputState, client: Any?) {
@@ -360,11 +402,13 @@ extension McBopomofoInputMethodController {
             commit(text: previous.composingBuffer, client: client)
         }
 
-        if let _ = previous as? InputState.Big5 {
-            client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
+        if previous as? InputState.Big5 != nil {
+            client.setMarkedText(
+                "", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
         }
-        if let _ = previous as? InputState.ChineseNumber {
-            client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
+        if previous as? InputState.ChineseNumber != nil {
+            client.setMarkedText(
+                "", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
         }
 
         // Unlike the Empty state handler, we don't call client.setMarkedText() here:
@@ -384,10 +428,14 @@ extension McBopomofoInputMethodController {
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
-    private func handle(state: InputState.EmptyIgnoringPreviousState, previous: InputState, client: Any!) {
+    private func handle(
+        state: InputState.EmptyIgnoringPreviousState, previous: InputState, client: Any!
+    ) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
 
@@ -395,7 +443,9 @@ extension McBopomofoInputMethodController {
             return
         }
 
-        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
     private func handle(state: InputState.Committing, previous: InputState, client: Any?) {
@@ -410,7 +460,9 @@ extension McBopomofoInputMethodController {
         if !poppedText.isEmpty {
             commit(text: poppedText, client: client)
         }
-        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
     private func handle(state: InputState.Inputting, previous: InputState, client: Any?) {
@@ -423,9 +475,13 @@ extension McBopomofoInputMethodController {
 
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        client.setMarkedText(state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         if !state.tooltip.isEmpty {
-            show(tooltip: state.tooltip, composingBuffer: state.composingBuffer, cursorIndex: state.cursorIndex, client: client)
+            show(
+                tooltip: state.tooltip, composingBuffer: state.composingBuffer,
+                cursorIndex: state.cursorIndex, client: client)
         }
     }
 
@@ -438,12 +494,16 @@ extension McBopomofoInputMethodController {
 
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        client.setMarkedText(state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
 
         if state.tooltip.isEmpty {
             hideTooltip()
         } else {
-            show(tooltip: state.tooltip, composingBuffer: state.composingBuffer, cursorIndex: state.markerIndex, client: client)
+            show(
+                tooltip: state.tooltip, composingBuffer: state.composingBuffer,
+                cursorIndex: state.markerIndex, client: client)
         }
     }
 
@@ -456,7 +516,9 @@ extension McBopomofoInputMethodController {
 
         // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
         // i.e. the client app needs to take care of where to put this composing buffer
-        client.setMarkedText(state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            state.attributedString, selectionRange: NSMakeRange(Int(state.cursorIndex), 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
     }
 
@@ -472,22 +534,32 @@ extension McBopomofoInputMethodController {
         // i.e. the client app needs to take care of where to put this composing buffer
         switch previousState {
         case let previousState as InputState.ChoosingCandidate:
-            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            client.setMarkedText(
+                previousState.attributedString,
+                selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0),
+                replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         case let previousState as InputState.Inputting:
-            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            client.setMarkedText(
+                previousState.attributedString,
+                selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0),
+                replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         default:
             break
         }
         show(candidateWindowWith: state, client: client)
     }
 
-    private func handle(state: InputState.AssociatedPhrasesPlain, previous: InputState, client: Any?) {
+    private func handle(
+        state: InputState.AssociatedPhrasesPlain, previous: InputState, client: Any?
+    ) {
         hideTooltip()
         guard let client = client as? IMKTextInput else {
             gCurrentCandidateController?.visible = false
             return
         }
-        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
     }
 
@@ -502,7 +574,9 @@ extension McBopomofoInputMethodController {
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
     }
 
@@ -517,7 +591,9 @@ extension McBopomofoInputMethodController {
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        client.setMarkedText("", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
     }
 
@@ -532,7 +608,9 @@ extension McBopomofoInputMethodController {
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
     private func handle(state: InputState.EnclosedNumber, previous: InputState, client: Any?) {
@@ -546,7 +624,9 @@ extension McBopomofoInputMethodController {
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
@@ -560,7 +640,9 @@ extension McBopomofoInputMethodController {
         if let previous = previous as? InputState.NotEmpty {
             commit(text: previous.composingBuffer, client: client)
         }
-        client.setMarkedText(state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        client.setMarkedText(
+            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
     private func handle(state: InputState.SelectingDictionary, previous: InputState, client: Any?) {
@@ -575,9 +657,15 @@ extension McBopomofoInputMethodController {
 
         switch previousState {
         case let previousState as InputState.ChoosingCandidate:
-            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            client.setMarkedText(
+                previousState.attributedString,
+                selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0),
+                replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         case let previousState as InputState.Marking:
-            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            client.setMarkedText(
+                previousState.attributedString,
+                selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0),
+                replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         default:
             break
         }
@@ -596,9 +684,15 @@ extension McBopomofoInputMethodController {
         // i.e. the client app needs to take care of where to put this composing buffer
         switch previousState {
         case let previousState as InputState.ChoosingCandidate:
-            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            client.setMarkedText(
+                previousState.attributedString,
+                selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0),
+                replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         case let previousState as InputState.Marking:
-            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            client.setMarkedText(
+                previousState.attributedString,
+                selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0),
+                replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         default:
             break
         }
@@ -611,19 +705,6 @@ extension McBopomofoInputMethodController {
             gCurrentCandidateController?.visible = false
             return
         }
-//        let previousState = state.previousState
-        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
-        // i.e. the client app needs to take care of where to put this composing buffer
-
-//        switch previousState {
-//        case let previousState as InputState.ChoosingCandidate:
-//            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
-//        case let previousState as InputState.Marking:
-//            client.setMarkedText(previousState.attributedString, selectionRange: NSMakeRange(Int(previousState.cursorIndex), 0), replacementRange: NSMakeRange(NSNotFound, NSNotFound))
-//        default:
-//            break
-//        }
-
         show(candidateWindowWith: state, client: client)
     }
 }
@@ -683,16 +764,17 @@ extension McBopomofoInputMethodController {
             gCurrentCandidateController = .vertical
         }
 
-        gCurrentCandidateController?.tooltip = switch state {
-        case let state as InputState.SelectingDictionary:
-            String(format:NSLocalizedString("Look up %@", comment: ""), state.selectedPhrase)
-        case let state as InputState.AssociatedPhrases:
-            String(format:NSLocalizedString("%@…", comment: ""), state.prefixValue)
-        case let state as InputState.CustomMenu:
-            state.title
-        default:
-            ""
-        }
+        gCurrentCandidateController?.tooltip =
+            switch state {
+            case let state as InputState.SelectingDictionary:
+                String(format: NSLocalizedString("Look up %@", comment: ""), state.selectedPhrase)
+            case let state as InputState.AssociatedPhrases:
+                String(format: NSLocalizedString("%@…", comment: ""), state.prefixValue)
+            case let state as InputState.CustomMenu:
+                state.title
+            default:
+                ""
+            }
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
         let textSize = Preferences.candidateListTextSize
@@ -705,11 +787,15 @@ extension McBopomofoInputMethodController {
             return NSFont.systemFont(ofSize: size)
         }
 
-        gCurrentCandidateController?.keyLabelFont = font(name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
-        gCurrentCandidateController?.candidateFont = font(name: Preferences.candidateTextFontName, size: textSize)
+        gCurrentCandidateController?.keyLabelFont = font(
+            name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
+        gCurrentCandidateController?.candidateFont = font(
+            name: Preferences.candidateTextFontName, size: textSize)
 
         let candidateKeys = Preferences.candidateKeys
-        let keyLabels = candidateKeys.count >= 4 ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
+        let keyLabels =
+            candidateKeys.count >= 4
+            ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
         let shouldUseShift = {
             if let state = state as? InputState.AssociatedPhrases {
                 return state.useShiftKey
@@ -741,14 +827,22 @@ extension McBopomofoInputMethodController {
         }
 
         while lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor >= 0 {
-            (client as? IMKTextInput)?.attributes(forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
+            (client as? IMKTextInput)?.attributes(
+                forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
             cursor -= 1
         }
 
         if useVerticalMode {
-            gCurrentCandidateController?.set(windowTopLeftPoint: NSMakePoint(lineHeightRect.origin.x + lineHeightRect.size.width + 4.0, lineHeightRect.origin.y - 4.0), bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
+            gCurrentCandidateController?.set(
+                windowTopLeftPoint: NSMakePoint(
+                    lineHeightRect.origin.x + lineHeightRect.size.width + 4.0,
+                    lineHeightRect.origin.y - 4.0),
+                bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
         } else {
-            gCurrentCandidateController?.set(windowTopLeftPoint: NSMakePoint(lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0), bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
+            gCurrentCandidateController?.set(
+                windowTopLeftPoint: NSMakePoint(
+                    lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0),
+                bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
         }
     }
 
@@ -759,10 +853,12 @@ extension McBopomofoInputMethodController {
             cursor -= 1
         }
         while lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor >= 0 {
-            (client as? IMKTextInput)?.attributes(forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
+            (client as? IMKTextInput)?.attributes(
+                forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
             cursor -= 1
         }
-        McBopomofoInputMethodController.tooltipController.show(tooltip: tooltip, at: lineHeightRect.origin)
+        McBopomofoInputMethodController.tooltipController.show(
+            tooltip: tooltip, at: lineHeightRect.origin)
     }
 
     private func hideTooltip() {
