@@ -423,7 +423,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // MARK: Handle Other States with Menu
     if ([state isKindOfClass:[InputStateSelectingDictionary class]] ||
-        [state isKindOfClass:[InputStateShowingCharInfo class]]) {
+        [state isKindOfClass:[InputStateShowingCharInfo class]] ||
+        [state isKindOfClass:[InputStateCustomMenu class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -662,8 +663,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             stateCallback(empty);
             return YES;
         }
-        if (Preferences.shiftEnterEnabled &&
-            _inputMode == InputModeBopomofo && input.isShiftHold &&
+        if (Preferences.shiftEnterEnabled && _inputMode == InputModeBopomofo && input.isShiftHold &&
             [state isKindOfClass:[InputStateInputting class]]) {
             return [self handleAssociatedPhraseWithState:(InputStateInputting *)state useVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback useShiftKey:NO];
         }
@@ -1356,6 +1356,98 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    NSArray *invalidPrefixArray = @[
+        @"_half_punctuation_",
+        @"_ctrl_punctuation_",
+        @"_letter_",
+        @"_number_",
+        @"_punctuation_",
+    ];
+
+    if (_inputMode == InputModeBopomofo && ([input.inputText isEqualToString:@"="] || [input.inputText isEqualToString:@"+"])) {
+        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
+            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+            InputStateCandidate *candidate = currentState.candidates[index];
+            NSString *reading = candidate.reading;
+            for (NSString *invalidPrefix in invalidPrefixArray) {
+                if ([reading hasPrefix:invalidPrefix]) {
+                    errorCallback();
+                    return YES;
+                }
+            }
+            if ([reading containsString:@"-"] == NO) {
+                errorCallback();
+                return YES;
+            }
+            __weak __typeof__(self) weakSelf = self;
+            NSArray *entries = @[
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"") callback:^{
+                    __strong __typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) {
+                        return;
+                    }
+                    [strongSelf.delegate keyHandler:strongSelf didRequestBoostScoreForPhrase:candidate.value reading:reading];
+                    [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
+                    [strongSelf _walk];
+                    InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
+                    stateCallback(inputting);
+                }],
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
+                @"") callback:^{
+                    stateCallback(currentState);
+                    gCurrentCandidateController.selectedCandidateIndex = index;
+                }],
+            ];
+            NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
+            InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
+            stateCallback(confirm);
+            return YES;
+        }
+    }
+
+    if (_inputMode == InputModeBopomofo && ([input.inputText isEqualToString:@"-"] || [input.inputText isEqualToString:@"_"])) {
+        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
+            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
+            InputStateCandidate *candidate = currentState.candidates[index];
+            NSString *reading = candidate.reading;
+            for (NSString *invalidPrefix in invalidPrefixArray) {
+                if ([reading hasPrefix:invalidPrefix]) {
+                    errorCallback();
+                    return YES;
+                }
+            }
+            if ([reading containsString:@"-"] == NO) {
+                errorCallback();
+                return YES;
+            }
+            __weak __typeof__(self) weakSelf = self;
+            NSArray *entries = @[
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude",
+                @"") callback:^{
+                    __strong __typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) {
+                        return;
+                    }
+                    [strongSelf.delegate keyHandler:strongSelf didRequestExcludePhrase:candidate.value reading:reading];
+                    [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
+                    [strongSelf _walk];
+                    InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
+                    stateCallback(inputting);
+                }],
+                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
+                @"") callback:^{
+                    stateCallback(currentState);
+                }],
+            ];
+            NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
+            InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
+            stateCallback(confirm);
+            return YES;
+        }
+    }
+
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateShowingCharInfo class]] ||
             [state isKindOfClass:[InputStateSelectingDictionary class]]) {
@@ -1363,7 +1455,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
-            NSString *selectedPhrase = currentState.candidates[index].displayText;
+            InputStateCandidate *candidate = currentState.candidates[index];
+            NSString *reading = candidate.reading;
+            for (NSString *invalidPrefix in invalidPrefixArray) {
+                if ([reading hasPrefix:invalidPrefix]) {
+                    errorCallback();
+                    return YES;
+                }
+            }
+
+            NSString *selectedPhrase = candidate.displayText;
             InputStateSelectingDictionary *newState = [[InputStateSelectingDictionary alloc] initWithPreviousState:currentState selectedString:selectedPhrase selectedIndex:index];
             stateCallback(newState);
             return YES;
@@ -1384,6 +1485,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
         } else if ([state isKindOfClass:[InputStateSelectingDictionary class]]) {
             InputStateSelectingDictionary *current = (InputStateSelectingDictionary *)state;
+            NSInteger selectedIndex = current.selectedIndex;
+            InputStateNotEmpty *newState = current.previousState;
+            stateCallback(newState);
+            gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+            gCurrentCandidateController.selectedCandidateIndex = selectedIndex;
+        } else if ([state isKindOfClass:[InputStateCustomMenu class]]) {
+            InputStateCustomMenu *current = (InputStateCustomMenu *)state;
             NSInteger selectedIndex = current.selectedIndex;
             InputStateNotEmpty *newState = current.previousState;
             stateCallback(newState);
@@ -1437,8 +1545,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             }
         }
 
-        if (Preferences.shiftEnterEnabled &&
-            _inputMode == InputModeBopomofo && input.isShiftHold) {
+
+        if (Preferences.shiftEnterEnabled && _inputMode == InputModeBopomofo && input.isShiftHold) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
                 InputStateChoosingCandidate *current = (InputStateChoosingCandidate *)state;
                 NSInteger selectedCandidateIndex = gCurrentCandidateController.selectedCandidateIndex;

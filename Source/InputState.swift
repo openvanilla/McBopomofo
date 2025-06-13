@@ -545,7 +545,8 @@ class InputState: NSObject {
         @objc private(set) var useShiftKey: Bool = false
 
         @objc init(
-            previousState: NotEmpty, prefixCursorIndex: Int, prefixReading: String, prefixValue: String,
+            previousState: NotEmpty, prefixCursorIndex: Int, prefixReading: String,
+            prefixValue: String,
             selectedIndex: Int, candidates: [Candidate], useVerticalMode: Bool, useShiftKey: Bool
         ) {
             self.previousState = previousState
@@ -736,6 +737,54 @@ class InputState: NSObject {
 
         func candidate(at index: Int) -> String {
             menu[index]
+        }
+
+    }
+
+    @objc(InputStateCustomMenuEntry)
+    class CustomMenuEntry: NSObject {
+        @objc var title: String
+        @objc var callback: () -> (Void)
+
+        @objc init(title: String, callback: @escaping () -> (Void)) {
+            self.title = title
+            self.callback = callback
+        }
+    }
+
+    /// Represents that the user is choosing information about selected
+    /// characters.
+    @objc(InputStateCustomMenu)
+    class CustomMenu: NotEmpty, CandidateProvider {
+        @objc private(set) var previousState: NotEmpty
+        @objc private(set) var title: String
+        @objc private(set) var entries: [CustomMenuEntry]
+        @objc private(set) var selectedIndex: Int = 0
+        
+        @objc init(
+            composingBuffer: String,
+            cursorIndex: UInt,
+            title: String,
+            entries: [CustomMenuEntry],
+            previousState: NotEmpty,
+            selectedIndex: Int
+        ) {
+            self.title = title
+            self.entries = entries
+            self.previousState = previousState
+            self.selectedIndex = selectedIndex
+            super.init(
+                composingBuffer: composingBuffer,
+                cursorIndex: cursorIndex
+            )
+        }
+
+        var candidateCount: Int {
+            entries.count
+        }
+
+        func candidate(at index: Int) -> String {
+            entries[index].title
         }
 
     }

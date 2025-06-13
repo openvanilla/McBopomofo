@@ -98,9 +98,8 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 + (void)loadUserPhrasesWithPlainBopomofoEnabled:(BOOL)userPhraseForPlainBopomofo
 {
     gLanguageModelMcBopomofo.loadUserPhrases([self userPhrasesDataPathMcBopomofo].UTF8String, [self excludedPhrasesDataPathMcBopomofo].UTF8String);
-    gLanguageModelPlainBopomofo.loadUserPhrases(userPhraseForPlainBopomofo ?
-                                                [self userPhrasesDataPathPlainBopomofo].UTF8String : NULL,
-                                                [self excludedPhrasesDataPathPlainBopomofo].UTF8String);
+    gLanguageModelPlainBopomofo.loadUserPhrases(userPhraseForPlainBopomofo ? [self userPhrasesDataPathPlainBopomofo].UTF8String : NULL,
+        [self excludedPhrasesDataPathPlainBopomofo].UTF8String);
 }
 
 + (void)loadUserPhraseReplacement
@@ -216,15 +215,43 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     return NO;
 }
 
-+ (BOOL)writeUserPhrase:(NSString *)userPhrase
++ (BOOL)_checkIfPhrase:(NSString *)phrase existAtPath:(NSString *)path
 {
-    if (![self checkIfUserLanguageModelFilesExist]) {
+    NSString *exactPhrase = nil;
+    NSString *key = nil;
+    NSArray *components = [phrase componentsSeparatedByString:@" "];
+    if (components.count != 2) {
         return NO;
     }
+    exactPhrase = components[0];
+    key = components[1];
 
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return NO;
+    }
+    NSError *error = nil;
+    NSString *content = [[NSString alloc] initWithContentsOfURL:[NSURL fileURLWithPath:path] encoding:NSUTF8StringEncoding error:&error];
+    if (error != nil) {
+        return NO;
+    }
+    NSArray *lines = [content componentsSeparatedByString:@"\n"];
+    for (NSString *line in lines) {
+        NSString *trimmed = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSArray *lineComponents = [trimmed componentsSeparatedByString:@" "];
+        if (lineComponents.count != 2) {
+            continue;
+        }
+        if ([lineComponents[0] isEqualToString:exactPhrase] &&
+            [lineComponents[1] isEqualToString:key]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (BOOL)_writePhrase:(NSString *)phrase atEndOfPath:(NSString *)path
+{
     BOOL addLineBreakAtFront = NO;
-    NSString *path = [self userPhrasesDataPathMcBopomofo];
-
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         NSError *error = nil;
         NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
@@ -242,27 +269,116 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
             }
         }
     }
-
     NSMutableString *currentMarkedPhrase = [NSMutableString string];
     if (addLineBreakAtFront) {
         [currentMarkedPhrase appendString:@"\n"];
     }
-    [currentMarkedPhrase appendString:userPhrase];
+    [currentMarkedPhrase appendString:phrase];
     [currentMarkedPhrase appendString:@"\n"];
 
     NSFileHandle *writeFile = [NSFileHandle fileHandleForUpdatingAtPath:path];
     if (!writeFile) {
         return NO;
     }
+
     [writeFile seekToEndOfFile];
     NSData *data = [currentMarkedPhrase dataUsingEncoding:NSUTF8StringEncoding];
     [writeFile writeData:data];
     [writeFile closeFile];
+    return YES;
+}
+
++ (BOOL)_removePhrase:(NSString *)phrase atPath:(NSString *)path
+{
+    NSString *exactPhrase = nil;
+    NSString *key = nil;
+    NSArray *components = [phrase componentsSeparatedByString:@" "];
+    if (components.count != 2) {
+        return NO;
+    }
+    exactPhrase = components[0];
+    key = components[1];
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return NO;
+    }
+    NSError *error = nil;
+    NSString *content = [[NSString alloc] initWithContentsOfURL:[NSURL fileURLWithPath:path] encoding:NSUTF8StringEncoding error:&error];
+    if (error != nil) {
+        return NO;
+    }
+    NSArray *lines = [content componentsSeparatedByString:@"\n"];
+
+    BOOL result = NO;
+    NSMutableString *mutableString = [NSMutableString string];
+    for (NSString *line in lines) {
+        NSString *trimmed = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSArray *lineComponents = [trimmed componentsSeparatedByString:@" "];
+        if (lineComponents.count != 2) {
+            [mutableString appendString:line];
+            [mutableString appendString:@"\n"];
+            continue;
+        }
+        if ([lineComponents[0] isEqualToString:exactPhrase] &&
+            [lineComponents[1] isEqualToString:key]) {
+            result = YES;
+            continue;
+        }
+        [mutableString appendString:line];
+        [mutableString appendString:@"\n"];
+    }
+    if (result) {
+        NSError *writeError;
+        [mutableString writeToURL:[NSURL fileURLWithPath:path] atomically:YES encoding:NSUTF8StringEncoding error:&writeError];
+        if (writeError != nil) {
+            return NO;
+        }
+        return YES;
+    }
+
+    return NO;
+}
+
++ (BOOL)writeUserPhrase:(NSString *)userPhrase
+{
+    if (![self checkIfUserLanguageModelFilesExist]) {
+        return NO;
+    }
+
+    NSString *excludePath = [self excludedPhrasesDataPathMcBopomofo];
+    [self _removePhrase:userPhrase atPath:excludePath];
+
+    NSString *includePath = [self userPhrasesDataPathMcBopomofo];
+    if ([self _checkIfPhrase:userPhrase existAtPath:includePath]) {
+        return NO;
+    }
+    BOOL result = [self _writePhrase:userPhrase atEndOfPath:includePath];
 
     //  We use FSEventStream to monitor the change of the user phrase folder,
     //  so we don't have to load data here.
     //  [self loadUserPhrases];
-    return YES;
+    return result;
+}
+
++ (BOOL)removeUserPhrase:(NSString *)userPhrase
+{
+    if (![self checkIfUserLanguageModelFilesExist]) {
+        return NO;
+    }
+
+    NSString *includePath = [self userPhrasesDataPathMcBopomofo];
+    [self _removePhrase:userPhrase atPath:includePath];
+
+    NSString *excludePath = [self excludedPhrasesDataPathMcBopomofo];
+    if ([self _checkIfPhrase:userPhrase existAtPath:excludePath]) {
+        return NO;
+    }
+    BOOL result = [self _writePhrase:userPhrase atEndOfPath:excludePath];
+
+    //  We use FSEventStream to monitor the change of the user phrase folder,
+    //  so we don't have to load data here.
+    //  [self loadUserPhrases];
+    return result;
 }
 
 + (NSString *)dataFolderPath
@@ -324,11 +440,12 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     gLanguageModelMcBopomofo.setPhraseReplacementEnabled(phraseReplacementEnabled);
 }
 
-+ (nullable NSString *)readingFor:(NSString *)phrase {
++ (nullable NSString *)readingFor:(NSString *)phrase
+{
     if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
         [self loadDataModel:InputModeBopomofo];
     }
-    
+
     std::string reading = gLanguageModelMcBopomofo.getReading(phrase.UTF8String);
     return !reading.empty() ? @(reading.c_str()) : nil;
 }

@@ -38,6 +38,9 @@ extern InputMode InputModePlainBopomofo;
 - (id)candidateControllerForKeyHandler:(KeyHandler *)keyHandler;
 - (void)keyHandler:(KeyHandler *)keyHandler didSelectCandidateAtIndex:(NSInteger)index candidateController:(id)controller;
 - (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestWriteUserPhraseWithState:(InputState *)state;
+- (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestBoostScoreForPhrase:(NSString *)phrase reading:(NSString *)reading;
+- (BOOL)keyHandler:(KeyHandler *)keyHandler didRequestExcludePhrase:(NSString *)phrase reading:(NSString *)reading;
+- (BOOL)keyHandlerDidRequestReloadLanguageModel:(KeyHandler *)keyHandler;
 @end
 
 @interface KeyHandler : NSObject

@@ -122,3 +122,13 @@
 "Character Information" = "字元資訊";
 
 "Enclosed Numbers" = "標題數字";
+
+"Boost" = "增加權重";
+
+"Cancel" = "取消";
+
+"Exclude" = "排除";
+
+"Do you want to boost the score of the phrase \"%@\"?" = "您想要提升 \"%@\" 這個詞彙的權重嗎？";
+
+"Do you want to exclude the phrase \"%@\"?" = "您想要從詞庫中排除 \"%@\" 這個詞彙嗎？";
