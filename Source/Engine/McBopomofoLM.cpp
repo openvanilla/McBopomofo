@@ -238,6 +238,7 @@ McBopomofoLM::filterAndTransformUnigrams(
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results;
 
   for (auto&& unigram : unigrams) {
+    std::vector<std::string> annotations;
     // excludedValues filters out the unigrams with the original value.
     // insertedValues filters out the ones with the converted value
     const std::string& originalValue = unigram.value();
@@ -249,12 +250,16 @@ McBopomofoLM::filterAndTransformUnigrams(
     if (phraseReplacementEnabled_) {
       std::string replacement = phraseReplacement_.valueForKey(value);
       if (!replacement.empty()) {
+        annotations.emplace_back("replacement applied");
         value = replacement;
       }
     }
     if (macroConverter_ != nullptr) {
       std::string replacement = macroConverter_(value);
-      value = replacement;
+      if (value != replacement) {
+        annotations.emplace_back("macro expanded");
+        value = replacement;
+      }
     }
 
     // Check if the string is an unsupported macro
@@ -265,10 +270,13 @@ McBopomofoLM::filterAndTransformUnigrams(
 
     if (externalConverterEnabled_ && externalConverter_ != nullptr) {
       std::string replacement = externalConverter_(value);
-      value = replacement;
+      if (value != replacement) {
+        annotations.emplace_back("external converter applied");
+        value = replacement;
+      }
     }
     if (insertedValues.find(value) == insertedValues.end()) {
-      results.emplace_back(value, unigram.score());
+      results.emplace_back(value, unigram.score(), originalValue, annotations);
       insertedValues.insert(value);
     }
   }

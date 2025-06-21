@@ -45,14 +45,25 @@ class LanguageModel {
   // usually a log probability from a language model.
   class Unigram {
    public:
-    explicit Unigram(std::string val = "", double sc = 0)
-        : value_(std::move(val)), score_(sc) {}
+    explicit Unigram(std::string val = "",
+                     double sc = 0,
+                     std::string originalValue = "",
+                     std::vector<std::string> annotations = std::vector<std::string>()
+                     )
+        : value_(std::move(val)),
+          score_(sc),
+          originalValue_(std::move(originalValue)),
+          annotations_(std::move(annotations)){}
 
     [[nodiscard]] const std::string& value() const { return value_; }
+    [[nodiscard]] const std::string& originalValue() const { return originalValue_; }
+    [[nodiscard]] const std::vector<std::string>& annotations() const { return annotations_; }
     [[nodiscard]] double score() const { return score_; }
 
    private:
     std::string value_;
+    std::string originalValue_;
+    std::vector<std::string> annotations_;
     double score_;
   };
 };

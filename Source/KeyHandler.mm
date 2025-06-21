@@ -1364,12 +1364,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         @"_punctuation_",
     ];
 
-    if (_inputMode == InputModeBopomofo && ([input.inputText isEqualToString:@"="] || [input.inputText isEqualToString:@"+"])) {
-        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
+    if (_inputMode == InputModeBopomofo && [state isKindOfClass:[InputStateChoosingCandidate class]]) {
+        BOOL isPlusKey = [input.inputText isEqualToString:@"="] || [input.inputText isEqualToString:@"+"];
+        BOOL isMinusKey = [input.inputText isEqualToString:@"-"] || [input.inputText isEqualToString:@"_"];
+        if (isPlusKey || isMinusKey) {
             InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
             NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
             InputStateCandidate *candidate = currentState.candidates[index];
             NSString *reading = candidate.reading;
+
+            if (![candidate.value isEqualToString:candidate.originalValue]) {
+                return YES;
+            }
+
             for (NSString *invalidPrefix in invalidPrefixArray) {
                 if ([reading hasPrefix:invalidPrefix]) {
                     errorCallback();
@@ -1380,9 +1387,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 errorCallback();
                 return YES;
             }
+
             __weak __typeof__(self) weakSelf = self;
-            NSArray *entries = @[
-                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"") callback:^{
+            NSMutableArray *entries = [[NSMutableArray alloc] init];
+            NSString *title = @"";
+            if (isPlusKey) {
+                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"") callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
                         return;
@@ -1392,39 +1402,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     [strongSelf _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
                     stateCallback(inputting);
-                }],
-                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
-                @"") callback:^{
-                    stateCallback(currentState);
-                    gCurrentCandidateController.selectedCandidateIndex = index;
-                }],
-            ];
-            NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
-            InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
-            stateCallback(confirm);
-            return YES;
-        }
-    }
-
-    if (_inputMode == InputModeBopomofo && ([input.inputText isEqualToString:@"-"] || [input.inputText isEqualToString:@"_"])) {
-        if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
-            InputStateChoosingCandidate *currentState = (InputStateChoosingCandidate *)state;
-            NSInteger index = gCurrentCandidateController.selectedCandidateIndex;
-            InputStateCandidate *candidate = currentState.candidates[index];
-            NSString *reading = candidate.reading;
-            for (NSString *invalidPrefix in invalidPrefixArray) {
-                if ([reading hasPrefix:invalidPrefix]) {
-                    errorCallback();
-                    return YES;
-                }
-            }
-            if ([reading containsString:@"-"] == NO) {
-                errorCallback();
-                return YES;
-            }
-            __weak __typeof__(self) weakSelf = self;
-            NSArray *entries = @[
-                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude",
+                }];
+                [entries addObject:boost];
+                title =[NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
+            } else if (isMinusKey) {
+                InputStateCustomMenuEntry *exlude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude",
                 @"") callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
@@ -1435,18 +1417,23 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     [strongSelf _walk];
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
                     stateCallback(inputting);
-                }],
-                [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
-                @"") callback:^{
-                    stateCallback(currentState);
-                }],
-            ];
-            NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
+                }];
+                [entries addObject:exlude];
+                title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
+            }
+            InputStateCustomMenuEntry *cancel = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
+            @"") callback:^{
+                stateCallback(currentState);
+                gCurrentCandidateController.selectedCandidateIndex = index;
+            }];
+            [entries addObject:cancel];
+
             InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
             stateCallback(confirm);
             return YES;
         }
     }
+
 
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateShowingCharInfo class]] ||
@@ -2240,8 +2227,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         NSString *r = @(c.reading.c_str());
         NSString *v = @(c.value.c_str());
+        NSString *ov = @(c.originalValue.c_str());
         NSString *dt = @(displayText.c_str());
-        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt];
+
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt originalValue:ov];
         [candidatesArray addObject:candidate];
     }
 
@@ -2326,7 +2315,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
             NSString *candidateReading = @(combinedReading.c_str());
             NSString *candidateValue = @(valueWithoutPrefix.c_str());
-            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:candidateValue];
+            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:candidateValue originalValue:candidateValue];
             [array addObject:candidate];
         }
         InputStateAssociatedPhrasesPlain *associatedPhrases = [[InputStateAssociatedPhrasesPlain alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
@@ -2374,7 +2363,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             displayText = [[OpenCCBridge sharedInstance] convertToSimplified:displayText];
         }
 
-        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:displayText];
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:displayText originalValue:candidateValue];
         [array addObject:candidate];
     }
     InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state prefixCursorIndex:prefixCursorIndex prefixReading:reading prefixValue:value selectedIndex:candidateIndex candidates:array useVerticalMode:useVerticalMode useShiftKey:useShiftKey];
