@@ -44,8 +44,9 @@ final class DictionaryServiceTests {
         for index in 0..<count {
             var callbackCalled = false
             let choosing = InputState.ChoosingCandidate(
-                composingBuffer: "hi", cursorIndex: 0,
-                candidates: [InputState.Candidate(reading: "", value: "", displayText: "")],
+                composingBuffer: "hi",
+                cursorIndex: 0,
+                candidates: [InputState.Candidate(reading: "", value: "", displayText: "", originalValue: "")],
                 useVerticalMode: false)
             let selecting = InputState.SelectingDictionary(
                 previousState: choosing, selectedString: "你", selectedIndex: 0)
