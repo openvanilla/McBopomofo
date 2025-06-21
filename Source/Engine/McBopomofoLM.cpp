@@ -238,7 +238,6 @@ McBopomofoLM::filterAndTransformUnigrams(
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results;
 
   for (auto&& unigram : unigrams) {
-    std::vector<std::string> annotations;
     // excludedValues filters out the unigrams with the original value.
     // insertedValues filters out the ones with the converted value
     const std::string& originalValue = unigram.value();
@@ -247,6 +246,7 @@ McBopomofoLM::filterAndTransformUnigrams(
     }
 
     std::string value = originalValue;
+    std::vector<std::string> annotations;
     if (phraseReplacementEnabled_) {
       std::string replacement = phraseReplacement_.valueForKey(value);
       if (!replacement.empty()) {

@@ -1404,9 +1404,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     stateCallback(inputting);
                 }];
                 [entries addObject:boost];
-                title =[NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
+                title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
             } else if (isMinusKey) {
-                InputStateCustomMenuEntry *exlude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude",
+                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude",
                 @"") callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
@@ -1418,7 +1418,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
                     stateCallback(inputting);
                 }];
-                [entries addObject:exlude];
+                [entries addObject:exclude];
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
             }
             InputStateCustomMenuEntry *cancel = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
