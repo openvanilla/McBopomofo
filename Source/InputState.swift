@@ -479,11 +479,18 @@ class InputState: NSObject {
         @objc private(set) var reading: String
         @objc private(set) var value: String
         @objc private(set) var displayText: String
+        /// The original value of a candidate.
+        ///
+        /// The value of a candidate may differ from its original value. For example,
+        /// if a user turns on Chinese conversion, or a candidate is a macro, the
+        /// original value would be converted to another value.
+        @objc private(set) var rawValue: String
 
-        @objc init(reading: String, value: String, displayText: String) {
+        @objc init(reading: String, value: String, displayText: String, rawValue: String) {
             self.reading = reading
             self.value = value
             self.displayText = displayText
+            self.rawValue = rawValue
         }
     }
 
@@ -760,7 +767,7 @@ class InputState: NSObject {
         @objc private(set) var title: String
         @objc private(set) var entries: [CustomMenuEntry]
         @objc private(set) var selectedIndex: Int = 0
-        
+
         @objc init(
             composingBuffer: String,
             cursorIndex: UInt,

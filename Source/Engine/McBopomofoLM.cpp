@@ -240,12 +240,13 @@ McBopomofoLM::filterAndTransformUnigrams(
   for (auto&& unigram : unigrams) {
     // excludedValues filters out the unigrams with the original value.
     // insertedValues filters out the ones with the converted value
-    const std::string& originalValue = unigram.value();
-    if (excludedValues.find(originalValue) != excludedValues.end()) {
+    const std::string& rawValue = unigram.value();
+    if (excludedValues.find(rawValue) != excludedValues.end()) {
       continue;
     }
 
-    std::string value = originalValue;
+    std::string value = rawValue;
+
     if (phraseReplacementEnabled_) {
       std::string replacement = phraseReplacement_.valueForKey(value);
       if (!replacement.empty()) {
@@ -254,7 +255,9 @@ McBopomofoLM::filterAndTransformUnigrams(
     }
     if (macroConverter_ != nullptr) {
       std::string replacement = macroConverter_(value);
-      value = replacement;
+      if (value != replacement) {
+        value = replacement;
+      }
     }
 
     // Check if the string is an unsupported macro
@@ -265,10 +268,12 @@ McBopomofoLM::filterAndTransformUnigrams(
 
     if (externalConverterEnabled_ && externalConverter_ != nullptr) {
       std::string replacement = externalConverter_(value);
-      value = replacement;
+      if (value != replacement) {
+        value = replacement;
+      }
     }
     if (insertedValues.find(value) == insertedValues.end()) {
-      results.emplace_back(value, unigram.score());
+      results.emplace_back(value, unigram.score(), rawValue);
       insertedValues.insert(value);
     }
   }
