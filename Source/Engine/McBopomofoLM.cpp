@@ -240,24 +240,22 @@ McBopomofoLM::filterAndTransformUnigrams(
   for (auto&& unigram : unigrams) {
     // excludedValues filters out the unigrams with the original value.
     // insertedValues filters out the ones with the converted value
-    const std::string& originalValue = unigram.value();
-    if (excludedValues.find(originalValue) != excludedValues.end()) {
+    const std::string& rawValue = unigram.value();
+    if (excludedValues.find(rawValue) != excludedValues.end()) {
       continue;
     }
 
-    std::string value = originalValue;
-    std::vector<std::string> annotations;
+    std::string value = rawValue;
+
     if (phraseReplacementEnabled_) {
       std::string replacement = phraseReplacement_.valueForKey(value);
       if (!replacement.empty()) {
-        annotations.emplace_back("replacement applied");
         value = replacement;
       }
     }
     if (macroConverter_ != nullptr) {
       std::string replacement = macroConverter_(value);
       if (value != replacement) {
-        annotations.emplace_back("macro expanded");
         value = replacement;
       }
     }
@@ -271,12 +269,11 @@ McBopomofoLM::filterAndTransformUnigrams(
     if (externalConverterEnabled_ && externalConverter_ != nullptr) {
       std::string replacement = externalConverter_(value);
       if (value != replacement) {
-        annotations.emplace_back("external converter applied");
         value = replacement;
       }
     }
     if (insertedValues.find(value) == insertedValues.end()) {
-      results.emplace_back(value, unigram.score(), originalValue, annotations);
+      results.emplace_back(value, unigram.score(), rawValue);
       insertedValues.insert(value);
     }
   }

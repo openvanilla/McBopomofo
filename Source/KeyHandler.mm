@@ -1373,7 +1373,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateCandidate *candidate = currentState.candidates[index];
             NSString *reading = candidate.reading;
 
-            if (![candidate.value isEqualToString:candidate.originalValue]) {
+            // The vlalue of a candidate might be an expanced input macro, and
+            // we should not let the users to boost or exclude such candidates.
+            //
+            // In other words, we should forbid the candidates whose value
+            // is not equal to the raw value.
+            if (![candidate.value isEqualToString:candidate.rawValue]) {
                 return YES;
             }
 
@@ -1392,7 +1397,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSMutableArray *entries = [[NSMutableArray alloc] init];
             NSString *title = @"";
             if (isPlusKey) {
-                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"") callback:^{
+                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"")
+                                                                                           callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
                         return;
@@ -1406,8 +1412,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 [entries addObject:boost];
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
             } else if (isMinusKey) {
-                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude",
-                @"") callback:^{
+                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude", @"") callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
                         return;
@@ -1421,8 +1426,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 [entries addObject:exclude];
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
             }
-            InputStateCustomMenuEntry *cancel = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel",
-            @"") callback:^{
+            InputStateCustomMenuEntry *cancel = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel", @"") callback:^{
                 stateCallback(currentState);
                 gCurrentCandidateController.selectedCandidateIndex = index;
             }];
@@ -1433,7 +1437,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
     }
-
 
     if (_inputMode == InputModeBopomofo && [input.inputText isEqualToString:@"?"]) {
         if ([state isKindOfClass:[InputStateShowingCharInfo class]] ||
@@ -1531,7 +1534,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 return NO;
             }
         }
-
 
         if (Preferences.shiftEnterEnabled && _inputMode == InputModeBopomofo && input.isShiftHold) {
             if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
@@ -2227,10 +2229,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         NSString *r = @(c.reading.c_str());
         NSString *v = @(c.value.c_str());
-        NSString *ov = @(c.originalValue.c_str());
+        NSString *rv = @(c.rawValue.c_str());
         NSString *dt = @(displayText.c_str());
 
-        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt originalValue:ov];
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:r value:v displayText:dt rawValue:rv];
         [candidatesArray addObject:candidate];
     }
 
@@ -2315,7 +2317,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
             NSString *candidateReading = @(combinedReading.c_str());
             NSString *candidateValue = @(valueWithoutPrefix.c_str());
-            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:candidateValue originalValue:candidateValue];
+            InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:candidateValue rawValue:candidateValue];
             [array addObject:candidate];
         }
         InputStateAssociatedPhrasesPlain *associatedPhrases = [[InputStateAssociatedPhrasesPlain alloc] initWithCandidates:array useVerticalMode:useVerticalMode];
@@ -2363,7 +2365,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             displayText = [[OpenCCBridge sharedInstance] convertToSimplified:displayText];
         }
 
-        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:displayText originalValue:candidateValue];
+        InputStateCandidate *candidate = [[InputStateCandidate alloc] initWithReading:candidateReading value:candidateValue displayText:displayText rawValue:candidateValue];
         [array addObject:candidate];
     }
     InputStateAssociatedPhrases *associatedPhrases = [[InputStateAssociatedPhrases alloc] initWithPreviousState:state prefixCursorIndex:prefixCursorIndex prefixReading:reading prefixValue:value selectedIndex:candidateIndex candidates:array useVerticalMode:useVerticalMode useShiftKey:useShiftKey];

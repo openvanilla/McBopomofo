@@ -46,11 +46,12 @@ final class DictionaryServiceTests {
             let choosing = InputState.ChoosingCandidate(
                 composingBuffer: "hi",
                 cursorIndex: 0,
-                candidates: [InputState.Candidate(reading: "", value: "", displayText: "", originalValue: "")],
-                useVerticalMode: false)
+                candidates: [InputState.Candidate(reading: "", value: "", displayText: "", rawValue: "")],
+                useVerticalMode: false
+            )
             let selecting = InputState.SelectingDictionary(
                 previousState: choosing, selectedString: "你", selectedIndex: 0)
-
+            
             if DictionaryServices.shared.shouldSkipTest(withServiceAtIndex: index) {
                 continue
             }
