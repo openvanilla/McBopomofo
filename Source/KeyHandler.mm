@@ -1329,10 +1329,35 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || input.isDelete;
 
-    BOOL isCursorMovingKey = (Preferences.allowMovingCursorWhenChoosingCandidates && ([input.inputText isEqualToString:@"j"] || [input.inputText isEqualToString:@"k"])) || (input.isShiftHold && (input.isLeft || input.isRight));
+    NSLog(@"Preferences.allowMovingCursorWhenChoosingCandidates %ld", static_cast<long>(Preferences.allowMovingCursorWhenChoosingCandidates));
+    NSLog(@"input.inputText:%@", input.inputText);
 
-    if ([state isKindOfClass:[InputStateChoosingCandidate class]] && isCursorMovingKey) {
-        if ([input.inputText isEqualToString:@"j"] || (input.isLeft && input.isShiftHold)) {
+    BOOL isCursorMovingLeft = NO;
+    BOOL isCursorMovingRight = NO;
+    if (input.isShiftHold) {
+        if (input.isLeft) {
+            isCursorMovingLeft = YES;
+        } else if (input.isRight) {
+            isCursorMovingRight = YES;
+        }
+    }
+    else if (Preferences.allowMovingCursorWhenChoosingCandidates == MovingCursorKeyUseJK) {
+        if ([input.inputText isEqualToString:@"j"]) {
+            isCursorMovingLeft = YES;
+        } else if ([input.inputText isEqualToString:@"k"]) {
+            isCursorMovingRight = YES;
+        }
+    }
+    else if (Preferences.allowMovingCursorWhenChoosingCandidates == MovingCursorKeyUseHL) {
+        if ([input.inputText isEqualToString:@"h"]) {
+            isCursorMovingLeft = YES;
+        } else if ([input.inputText isEqualToString:@"l"]) {
+            isCursorMovingRight = YES;
+        }
+    }
+
+    if ([state isKindOfClass:[InputStateChoosingCandidate class]] && (isCursorMovingLeft || isCursorMovingRight) ) {
+        if (isCursorMovingLeft) {
             size_t cursor = _grid->cursor();
             if (cursor > 0) {
                 cursor--;
@@ -1341,7 +1366,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 errorCallback();
                 return YES;
             }
-        } else if ([input.inputText isEqualToString:@"k"] || (input.isRight && input.isShiftHold)) {
+        } else if (isCursorMovingRight) {
             size_t cursor = _grid->cursor();
             if (cursor < _grid->length()) {
                 cursor++;
