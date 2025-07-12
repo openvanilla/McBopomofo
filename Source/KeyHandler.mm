@@ -1335,24 +1335,20 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     BOOL isCursorMovingLeft = NO;
     BOOL isCursorMovingRight = NO;
     if (input.isShiftHold) {
-        if (input.isLeft) {
-            isCursorMovingLeft = YES;
-        } else if (input.isRight) {
-            isCursorMovingRight = YES;
-        }
-    }
-    else if (Preferences.allowMovingCursorWhenChoosingCandidates == MovingCursorKeyUseJK) {
-        if ([input.inputText isEqualToString:@"j"]) {
-            isCursorMovingLeft = YES;
-        } else if ([input.inputText isEqualToString:@"k"]) {
-            isCursorMovingRight = YES;
-        }
-    }
-    else if (Preferences.allowMovingCursorWhenChoosingCandidates == MovingCursorKeyUseHL) {
-        if ([input.inputText isEqualToString:@"h"]) {
-            isCursorMovingLeft = YES;
-        } else if ([input.inputText isEqualToString:@"l"]) {
-            isCursorMovingRight = YES;
+        isCursorMovingLeft = input.isLeft;
+        isCursorMovingRight = input.isRight;
+    } else {
+        switch (Preferences.allowMovingCursorWhenChoosingCandidates) {
+            case MovingCursorKeyUseJK:
+                isCursorMovingLeft = [input.inputText isEqualToString:@"j"];
+                isCursorMovingRight = [input.inputText isEqualToString:@"k"];
+                break;
+            case MovingCursorKeyUseHL:
+                isCursorMovingLeft = [input.inputText isEqualToString:@"h"];
+                isCursorMovingRight = [input.inputText isEqualToString:@"l"];
+                break;
+            default:
+                break;
         }
     }
 
