@@ -340,12 +340,12 @@
                     <rect key="frame" x="229" y="302" width="212" height="25"/>
                     <popUpButtonCell key="cell" type="push" title="Moving cursor is not allowed" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="bmM-mL-c3L" id="ymc-ph-WCL">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="menu"/>
+                        <font key="font" metaFont="message"/>
                         <menu key="menu" id="FKG-wO-hnA">
                             <items>
                                 <menuItem title="Moving cursor is not allowed" state="on" id="bmM-mL-c3L"/>
-                                <menuItem title="JK keys moves the cursor" tag="1" id="K0k-rP-lGt"/>
-                                <menuItem title="HL keys moves the cursor" tag="2" id="eou-CZ-8G2"/>
+                                <menuItem title="JK keys move the cursor" tag="1" id="K0k-rP-lGt"/>
+                                <menuItem title="HL keys move the cursor" tag="2" id="eou-CZ-8G2"/>
                             </items>
                         </menu>
                     </popUpButtonCell>

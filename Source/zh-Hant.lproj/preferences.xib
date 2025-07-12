@@ -328,12 +328,12 @@
                     </textFieldCell>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YWl-mS-2Wx">
-                    <rect key="frame" x="41" y="288" width="133" height="16"/>
+                    <rect key="frame" x="41" y="288" width="130" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="PdE-3m-X9E"/>
                     </constraints>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="選字時可以移動游標：" id="pqK-7Z-ehF">
-                        <font key="font" size="13" name=".PingFangUITextTC-Regular"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -342,7 +342,7 @@
                     <rect key="frame" x="181" y="283" width="167" height="25"/>
                     <popUpButtonCell key="cell" type="push" title="不使用" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="eGy-zp-bhw" id="8kw-Sg-bV9">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="menu"/>
+                        <font key="font" metaFont="message"/>
                         <menu key="menu" id="6Dk-0j-FLJ">
                             <items>
                                 <menuItem title="不使用" state="on" id="eGy-zp-bhw"/>
