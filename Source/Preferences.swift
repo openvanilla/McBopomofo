@@ -253,6 +253,7 @@ class Preferences: NSObject {
         Preferences.addPhraseHookPath = Preferences.addPhraseHookPath
         Preferences.beepUponInputError = Preferences.beepUponInputError
         Preferences.enableUserPhrasesInPlainBopomofo = Preferences.enableUserPhrasesInPlainBopomofo
+        Preferences.allowMovingCursorWhenChoosingCandidates = Preferences.allowMovingCursorWhenChoosingCandidates
     }
 
     @EnumUserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: KeyboardLayout.standard)
@@ -378,11 +379,21 @@ class Preferences: NSObject {
             }
         }
     }
+}
 
-    /// Whether allows moving the cursor by J/K keys, when the candidate
+/// An enumeration representing keys used for moving the cursor in the
+/// application.
+@objc enum MovingCursorKey: Int {
+    case disabled = 0
+    case useJK = 1
+    case useHL = 2
+}
+
+extension Preferences {
+    /// Whether allows moving the cursor by J/K or H/L keys, when the candidate
     /// window is presented.
-    @UserDefault(key: kAllowMovingCursorWhenChoosingCandidates, defaultValue: false)
-    @objc static var allowMovingCursorWhenChoosingCandidates: Bool
+    @EnumUserDefault(key: kAllowMovingCursorWhenChoosingCandidates, defaultValue: .disabled)
+    @objc static var allowMovingCursorWhenChoosingCandidates: MovingCursorKey
 }
 
 extension Preferences {
