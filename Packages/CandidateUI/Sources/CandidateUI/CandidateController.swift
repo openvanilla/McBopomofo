@@ -57,10 +57,10 @@ public class CandidateController: NSWindowController {
             guard let window else {
                 return
             }
-            let alreadyVisiable = window.isVisible
+            let alreadyVisible = window.isVisible
             if visible {
                 window.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
-                if !alreadyVisiable {
+                if !alreadyVisible {
                     NSAccessibility.post(element: window, notification: .created)
                     NSAccessibility
                         .post(element: window, notification: .focusedWindowChanged)

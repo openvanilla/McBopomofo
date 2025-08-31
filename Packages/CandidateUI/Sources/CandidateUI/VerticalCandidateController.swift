@@ -150,10 +150,6 @@ private class VerticalCandidateTableView: NSTableView {
     var children: [CandidateAXItem] = []
 
     override func accessibilityVisibleChildren() -> [Any]? {
-        children
-    }
-
-    override func accessibilityChildren() -> [Any]? {
         var visibleChildren: [Any] = []
         for i in children.indices {
             let location = NSPoint(x: 0, y: CGFloat(i) * rowHeight)
@@ -162,6 +158,10 @@ private class VerticalCandidateTableView: NSTableView {
             }
         }
         return visibleChildren
+    }
+
+    override func accessibilityChildren() -> [Any]? {
+        children
     }
 
     func buildChildren() {

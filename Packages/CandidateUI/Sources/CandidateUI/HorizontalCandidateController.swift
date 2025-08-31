@@ -292,7 +292,7 @@ private class HorizontalCandidateView: NSView {
         select(newIndex: newIndex)
     }
 
-    // MARK: - Acccessibility
+    // MARK: - Accessibility
 
     private func select(newIndex: UInt) {
         var triggerAction = false
@@ -313,7 +313,7 @@ private class HorizontalCandidateView: NSView {
 
     fileprivate var children: [CandidateAXItem] = []
 
-    fileprivate func buildAccesibilityChildren() {
+    fileprivate func buildAccessibilityChildren() {
         func accessibilityFrameForCandidate(at index: Int) -> NSRect {
             var accuWidth: CGFloat = 0
             for i in 0 ..< index {
@@ -328,7 +328,6 @@ private class HorizontalCandidateView: NSView {
         var children: [CandidateAXItem] = []
         for (index, candidate) in displayedCandidates.enumerated() {
             let rect = accessibilityFrameForCandidate(at: index)
-            let keyLabel = keyLabels[index]
             let element = CandidateAXItem(
                 owner: self,
                 index: UInt(index),
@@ -611,11 +610,10 @@ extension HorizontalCandidateController {
         frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
         window?.setFrame(frameRect, display: false)
         candidateView.setNeedsDisplay(candidateView.bounds)
-        candidateView.buildAccesibilityChildren()
+        candidateView.buildAccessibilityChildren()
         if Int(candidateView.highlightedIndex) < candidateView.children.count {
             let element = candidateView.children[Int(candidateView.highlightedIndex)]
-            NSAccessibility
-                .post(element: element, notification: .focusedUIElementChanged)
+            NSAccessibility.post(element: element, notification: .focusedUIElementChanged)
         }
     }
 
