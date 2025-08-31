@@ -53,10 +53,19 @@ public class CandidateController: NSWindowController {
     @objc public var visible: Bool = false {
         didSet {
             NSObject.cancelPreviousPerformRequests(withTarget: self)
+            guard let window else {
+                return
+            }
+            let alreadyVisiable = window.isVisible
             if visible {
-                window?.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
+                window.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
+                if !alreadyVisiable {
+                    NSAccessibility.post(element: window, notification: .created)
+                    NSAccessibility
+                        .post(element: window, notification: .focusedWindowChanged)
+                }
             } else {
-                window?.perform(#selector(NSWindow.orderOut(_:)), with: self, afterDelay: 0.0)
+                window.perform(#selector(NSWindow.orderOut(_:)), with: self, afterDelay: 0.0)
             }
         }
     }
