@@ -150,14 +150,7 @@ private class VerticalCandidateTableView: NSTableView {
     var children: [CandidateAXItem] = []
 
     override func accessibilityVisibleChildren() -> [Any]? {
-        var visibleChildren: [Any] = []
-        for i in children.indices {
-            let location = NSPoint(x: 0, y: CGFloat(i) * rowHeight)
-            if visibleRect.contains(location) {
-                visibleChildren.append(children[i])
-            }
-        }
-        return visibleChildren
+        children.filter { visibleRect.intersects($0.rect) }
     }
 
     override func accessibilityChildren() -> [Any]? {
@@ -384,7 +377,7 @@ public class VerticalCandidateController: CandidateController {
             if selectedCandidateIndex < tableView.children.count {
                 let child = tableView.children[Int(selectedCandidateIndex)]
                 NSAccessibility.post(element: child, notification: .focusedUIElementChanged)
-                NSAccessibility.post(element: self, notification: .selectedChildrenChanged)
+                NSAccessibility.post(element: tableView, notification: .selectedChildrenChanged)
             }
         }
     }
