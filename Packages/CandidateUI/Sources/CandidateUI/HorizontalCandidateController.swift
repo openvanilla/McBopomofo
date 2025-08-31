@@ -24,28 +24,25 @@
 import Cocoa
 
 private class HorizontalCandidateView: NSView {
-
-    final fileprivate class CandidateAXItem: NSAccessibilityElement {
+    fileprivate final class CandidateAXItem: NSAccessibilityElement {
         weak var owner: HorizontalCandidateView?
         let index: UInt
-        let keyLabel: String
         let candidate: String
         let rect: NSRect
 
         init(owner: HorizontalCandidateView, index: UInt,
              candidate: String,
-             keyLabel: String,
-             rec:NSRect) {
+             rect: NSRect)
+        {
             self.owner = owner
             self.index = index
             self.candidate = candidate
-            self.keyLabel = keyLabel
-            self.rect = rec
+            self.rect = rect
         }
 
         override func accessibilityParent() -> Any? { owner }
         override func accessibilityRole() -> NSAccessibility.Role { .staticText }
-        override func accessibilityLabel() -> String? { "\(keyLabel) \(candidate)" }
+        override func accessibilityLabel() -> String? { candidate }
         override func isAccessibilityElement() -> Bool { true }
 
         func accessibilitySelected() -> Bool {
@@ -61,16 +58,12 @@ private class HorizontalCandidateView: NSView {
 
     var highlightedIndex: UInt = 0 {
         didSet {
-            setNeedsDisplay(self.bounds)
+            setNeedsDisplay(bounds)
+            // Note: When the selection changes, we need to notify accessibility.
             if highlightedIndex < children.count {
                 let child = children[Int(highlightedIndex)]
-                NSAccessibility
-                    .post(
-                        element: child,
-                        notification: .focusedUIElementChanged
-                    )
-                NSAccessibility
-                    .post(element: self, notification: .selectedChildrenChanged)
+                NSAccessibility.post(element: child, notification: .focusedUIElementChanged)
+                NSAccessibility.post(element: self, notification: .selectedChildrenChanged)
             }
         }
     }
@@ -86,22 +79,23 @@ private class HorizontalCandidateView: NSView {
     private var keyLabelAttrDict: [NSAttributedString.Key: AnyObject] = [:]
     private var candidateAttrDict: [NSAttributedString.Key: AnyObject] = [:]
     private var elementWidths: [CGFloat] = []
-    private var trackingHighlightedIndex: UInt = UInt.max
+    private var trackingHighlightedIndex: UInt = .max
 
     private let tooltipPadding: CGFloat = 2.0
-    private var tooltipSize: NSSize = NSSize.zero
+    private var tooltipSize: NSSize = .zero
 
     override var toolTip: String? {
         didSet {
             if let toolTip = toolTip, !toolTip.isEmpty {
                 let baseSize = NSSize(width: 10240.0, height: 10240.0)
                 var tooltipRect = (toolTip as NSString).boundingRect(
-                    with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
+                    with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict
+                )
                 tooltipRect.size.height += tooltipPadding * 2
                 tooltipRect.size.width += tooltipPadding * 2
-                self.tooltipSize = tooltipRect.size
+                tooltipSize = tooltipRect.size
             } else {
-                self.tooltipSize = NSSize.zero
+                tooltipSize = NSSize.zero
             }
         }
     }
@@ -126,20 +120,23 @@ private class HorizontalCandidateView: NSView {
 
     func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
         let count = min(labels.count, candidates.count)
-        keyLabels = Array(labels[0..<count])
-        displayedCandidates = Array(candidates[0..<count])
+        keyLabels = Array(labels[0 ..< count])
+        displayedCandidates = Array(candidates[0 ..< count])
 
         var newWidths = [CGFloat]()
         let baseSize = NSSize(width: 10240.0, height: 10240.0)
-        for index in 0..<count {
+        for index in 0 ..< count {
             let labelRect = (keyLabels[index] as NSString).boundingRect(
-                with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict)
+                with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict
+            )
             let candidateRect = (displayedCandidates[index] as NSString).boundingRect(
-                with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict)
+                with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict
+            )
             let cellWidth =
                 max(
                     candidateTextHeight,
-                    max(labelRect.size.width, candidateRect.size.width)) + cellPadding
+                    max(labelRect.size.width, candidateRect.size.width)
+                ) + cellPadding
             newWidths.append(cellWidth)
         }
         elementWidths = newWidths
@@ -188,7 +185,7 @@ private class HorizontalCandidateView: NSView {
         cellPadding = ceil(biggestSize / 2.0)
     }
 
-    override func draw(_ dirtyRect: NSRect) {
+    override func draw(_: NSRect) {
         var bigSurOrHigher = false
         if #available(macOS 10.16, *) {
             bigSurOrHigher = true
@@ -205,18 +202,21 @@ private class HorizontalCandidateView: NSView {
         }
         if let toolTip = toolTip {
             let tooltipFrame = NSRect(
-                x: 0, y: 0, width: tooltipSize.width, height: tooltipSize.height)
+                x: 0, y: 0, width: tooltipSize.width, height: tooltipSize.height
+            )
             (toolTip as NSString).draw(in: tooltipFrame, withAttributes: keyLabelAttrDict)
         }
 
         var accuWidth: CGFloat = 0
-        for index in 0..<elementWidths.count {
+        for index in 0 ..< elementWidths.count {
             let currentWidth = elementWidths[index]
             let labelRect = NSRect(
-                x: accuWidth, y: tooltipSize.height, width: currentWidth, height: keyLabelHeight)
+                x: accuWidth, y: tooltipSize.height, width: currentWidth, height: keyLabelHeight
+            )
             let candidateRect = NSRect(
                 x: accuWidth, y: tooltipSize.height + keyLabelHeight + 1.0, width: currentWidth,
-                height: candidateTextHeight)
+                height: candidateTextHeight
+            )
 
             var activeKeyLabelAttrDict = keyLabelAttrDict
             if bigSurOrHigher {
@@ -230,7 +230,8 @@ private class HorizontalCandidateView: NSView {
                 NSBezierPath.fill(labelRect)
             }
             (keyLabels[index] as NSString).draw(
-                in: labelRect, withAttributes: activeKeyLabelAttrDict)
+                in: labelRect, withAttributes: activeKeyLabelAttrDict
+            )
 
             var activeCandidateAttr = candidateAttrDict
             if bigSurOrHigher {
@@ -253,27 +254,27 @@ private class HorizontalCandidateView: NSView {
                 NSBezierPath.fill(candidateRect)
             }
             (displayedCandidates[index] as NSString).draw(
-                in: candidateRect, withAttributes: activeCandidateAttr)
+                in: candidateRect, withAttributes: activeCandidateAttr
+            )
             accuWidth += currentWidth + 1.0
         }
     }
 
     private func findHitIndex(event: NSEvent) -> UInt? {
         let location = convert(event.locationInWindow, to: nil)
-        if !NSPointInRect(location, self.bounds) {
+        if !NSPointInRect(location, bounds) {
             return nil
         }
         var accuWidth: CGFloat = 0.0
-        for index in 0..<elementWidths.count {
+        for index in 0 ..< elementWidths.count {
             let currentWidth = elementWidths[index]
 
-            if location.x >= accuWidth && location.x <= accuWidth + currentWidth {
+            if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
                 return UInt(index)
             }
             accuWidth += currentWidth + 1.0
         }
         return nil
-
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -302,7 +303,7 @@ private class HorizontalCandidateView: NSView {
         }
 
         trackingHighlightedIndex = 0
-        self.setNeedsDisplay(self.bounds)
+        setNeedsDisplay(bounds)
         if triggerAction {
             if let target = target as? NSObject, let action = action {
                 target.perform(action, with: self)
@@ -313,13 +314,12 @@ private class HorizontalCandidateView: NSView {
     fileprivate var children: [CandidateAXItem] = []
 
     fileprivate func buildAccesibilityChildren() {
-
         func accessibilityFrameForCandidate(at index: Int) -> NSRect {
             var accuWidth: CGFloat = 0
-            for i in 0..<index {
+            for i in 0 ..< index {
                 accuWidth += elementWidths[i] + 1.0
             }
-            let width  = elementWidths[index]
+            let width = elementWidths[index]
             let height = keyLabelHeight + candidateTextHeight + 1.0
             let rectInView = NSRect(x: accuWidth, y: tooltipSize.height, width: width, height: height)
             return rectInView
@@ -333,8 +333,7 @@ private class HorizontalCandidateView: NSView {
                 owner: self,
                 index: UInt(index),
                 candidate: candidate,
-                keyLabel: keyLabel,
-                rec: rect
+                rect: rect
             )
             children.append(element)
         }
@@ -385,7 +384,8 @@ public class HorizontalCandidateController: CandidateController {
         var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
         let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
         let panel = NSPanel(
-            contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
+            contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
+        )
         panel.level = NSWindow.Level(Int(kCGPopUpMenuWindowLevel) + 1)
         panel.hasShadow = true
 
@@ -442,17 +442,18 @@ public class HorizontalCandidateController: CandidateController {
         prevPageButton.action = #selector(pageButtonAction(_:))
     }
 
-    required init?(coder: NSCoder) {
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func reloadData() {
+    override public func reloadData() {
         candidateView.highlightedIndex = 0
         currentPage = 0
         layoutCandidateView()
     }
 
-    public override func showNextPage() -> Bool {
+    override public func showNextPage() -> Bool {
         guard delegate != nil else {
             return false
         }
@@ -467,7 +468,7 @@ public class HorizontalCandidateController: CandidateController {
         return true
     }
 
-    public override func showPreviousPage() -> Bool {
+    override public func showPreviousPage() -> Bool {
         guard delegate != nil else {
             return false
         }
@@ -482,7 +483,7 @@ public class HorizontalCandidateController: CandidateController {
         return true
     }
 
-    public override func highlightNextCandidate() -> Bool {
+    override public func highlightNextCandidate() -> Bool {
         guard let delegate = delegate else {
             return false
         }
@@ -495,7 +496,7 @@ public class HorizontalCandidateController: CandidateController {
         return true
     }
 
-    public override func highlightPreviousCandidate() -> Bool {
+    override public func highlightPreviousCandidate() -> Bool {
         guard delegate != nil else {
             return false
         }
@@ -509,7 +510,7 @@ public class HorizontalCandidateController: CandidateController {
         return true
     }
 
-    public override func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+    override public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
         guard let delegate = delegate else {
             return UInt.max
         }
@@ -518,7 +519,7 @@ public class HorizontalCandidateController: CandidateController {
         return result < delegate.candidateCountForController(self) ? result : UInt.max
     }
 
-    public override var selectedCandidateIndex: UInt {
+    override public var selectedCandidateIndex: UInt {
         get {
             currentPage * UInt(keyLabels.count) + candidateView.highlightedIndex
         }
@@ -537,7 +538,6 @@ public class HorizontalCandidateController: CandidateController {
 }
 
 extension HorizontalCandidateController {
-
     private var pageCount: UInt {
         guard let delegate = delegate else {
             return 0
@@ -558,12 +558,13 @@ extension HorizontalCandidateController {
         let keyLabelCount = UInt(keyLabels.count)
 
         let begin = currentPage * keyLabelCount
-        for index in begin..<min(begin + keyLabelCount, count) {
+        for index in begin ..< min(begin + keyLabelCount, count) {
             let candidate = delegate.candidateController(self, candidateAtIndex: index)
             candidates.append(candidate)
         }
         candidateView.set(
-            keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates)
+            keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates
+        )
         candidateView.toolTip = tooltip
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame
@@ -589,7 +590,8 @@ extension HorizontalCandidateController {
             nextPageButton.frame = buttonRect
 
             buttonRect.origin = NSPoint(
-                x: newSize.width + 8.0, y: buttonOriginY + buttonRect.size.height + spacing)
+                x: newSize.width + 8.0, y: buttonOriginY + buttonRect.size.height + spacing
+            )
             prevPageButton.frame = buttonRect
 
             newSize.width += 52.0
@@ -603,10 +605,11 @@ extension HorizontalCandidateController {
         frameRect = window?.frame ?? NSRect.zero
 
         let topLeftPoint = NSMakePoint(
-            frameRect.origin.x, frameRect.origin.y + frameRect.size.height)
+            frameRect.origin.x, frameRect.origin.y + frameRect.size.height
+        )
         frameRect.size = newSize
         frameRect.origin = NSMakePoint(topLeftPoint.x, topLeftPoint.y - frameRect.size.height)
-        self.window?.setFrame(frameRect, display: false)
+        window?.setFrame(frameRect, display: false)
         candidateView.setNeedsDisplay(candidateView.bounds)
         candidateView.buildAccesibilityChildren()
         if Int(candidateView.highlightedIndex) < candidateView.children.count {
@@ -627,10 +630,9 @@ extension HorizontalCandidateController {
         }
     }
 
-    @objc fileprivate func candidateViewMouseDidClick(_ sender: Any) {
+    @objc fileprivate func candidateViewMouseDidClick(_: Any) {
         delegate?.candidateController(self, didSelectCandidateAtIndex: selectedCandidateIndex)
     }
-
 }
 
 extension String {
