@@ -132,6 +132,7 @@ private class VerticalCandidateTableView: NSTableView {
         override func accessibilityLabel() -> String? { candidate?.string }
         override func isAccessibilityElement() -> Bool { true }
 
+        func accessibilitySelected() -> Bool {
             guard let selectedRow = owner?.selectedRow, selectedRow != NSNotFound else { return false }
             return index == UInt(selectedRow)
         }
