@@ -54,7 +54,7 @@ class McBopomofoInputMethodController: IMKInputController {
     var currentClient: Any?
     var keyHandler: KeyHandler = KeyHandler()
     var state: InputState = InputState.Empty()
-    var charInfo: SystemCharacterInfo?
+    lazy var charInfo: SystemCharacterInfo? = try? SystemCharacterInfo()
 
     // MARK: - IMKInputController methods
 

@@ -205,11 +205,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         }
 
         func checkIfSystemCharacterInfoReady() -> Bool {
-            if charInfo == nil {
-                charInfo = try? SystemCharacterInfo()
-            }
-            let ready = charInfo != nil
-            return ready
+            charInfo != nil
         }
 
         func getSystemExplanation(for chr: String) -> String? {
