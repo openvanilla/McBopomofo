@@ -213,10 +213,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                   let result = try? charInfo.read(string: chr) else {
                 return nil
             }
-            if let example = result.traditionalExample {
-                return "「\(example)」的「\(chr)」"
-            }
-            if let example = result.simplifiedExample {
+            if let example = result.traditionalExample ?? result.simplifiedExample {
                 return "「\(example)」的「\(chr)」"
             }
             if let components = result.components {
