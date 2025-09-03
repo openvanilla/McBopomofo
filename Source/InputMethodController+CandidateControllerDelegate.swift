@@ -27,6 +27,7 @@ import InputMethodKit
 import NotifierUI
 
 extension McBopomofoInputMethodController: CandidateControllerDelegate {
+
     func candidateCountForController(_ controller: CandidateController) -> UInt {
         if let state = state as? CandidateProvider {
             UInt(state.candidateCount)
@@ -166,5 +167,33 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         default:
             break
         }
+    }
+
+    func candidateController(_ controller: CandidateController, readingAtIndex index: UInt) -> String? {
+        if let state = state as? CandidateProvider {
+            state.reading(at: Int(index))
+        } else {
+            nil
+        }
+    }
+
+    func candidateController(_ controller: CandidateController, requestExplanationFor candidate: String, reading: String) -> String? {
+        if let singleExplan: String? = {
+            let state = keyHandler
+                .buildAssociatedPhrasePlainState(
+                    withReading: reading,
+                    value: candidate,
+                    useVerticalMode: false
+                )
+            if let state = state as? InputState.AssociatedPhrasesPlain {
+                let phrase = state.candidate(at: 0)
+                return "「\(candidate)\(phrase)」的「\(candidate)」"
+            }
+            return nil
+        }() {
+            return singleExplan
+        }
+//        return reading.applyingTransform(.toUnicodeName, reverse: false)
+        return nil
     }
 }

@@ -27,6 +27,7 @@ import NSStringUtils
 @objc protocol CandidateProvider: NSObjectProtocol {
     @objc var candidateCount: Int { get }
     @objc func candidate(at index: Int) -> String
+    @objc func reading(at index: Int) -> String?
 }
 
 /// Represents the states for the input method controller.
@@ -155,6 +156,10 @@ class InputState: NSObject {
         func candidate(at index: Int) -> String {
             featureList[index].0
         }
+
+        func reading(at index: Int) -> String? {
+            nil
+        }
     }
 
     @objc(InputStateSelectingDateMacro)
@@ -199,6 +204,10 @@ class InputState: NSObject {
 
         func candidate(at index: Int) -> String {
             menu[index]
+        }
+
+        func reading(at index: Int) -> String? {
+            nil
         }
     }
 
@@ -525,12 +534,16 @@ class InputState: NSObject {
             "<InputState.ChoosingCandidate, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
         }
 
-        @objc var candidateCount: Int {
+        var candidateCount: Int {
             candidates.count
         }
 
-        @objc func candidate(at index: Int) -> String {
+        func candidate(at index: Int) -> String {
             candidates[index].displayText
+        }
+
+        func reading(at index: Int) -> String? {
+            candidates[index].reading
         }
     }
 
@@ -580,6 +593,11 @@ class InputState: NSObject {
         func candidate(at index: Int) -> String {
             candidates[index].displayText
         }
+
+        func reading(at index: Int) -> String? {
+            candidates[index].reading
+        }
+
     }
 
     /// Represents that the user is choosing in a candidates list
@@ -607,6 +625,10 @@ class InputState: NSObject {
 
         func candidate(at index: Int) -> String {
             candidates[index].displayText
+        }
+
+        func reading(at index: Int) -> String? {
+            candidates[index].reading
         }
     }
 
@@ -645,14 +667,17 @@ class InputState: NSObject {
             "<InputState.SelectingDictionaryService>"
         }
 
-        @objc var candidateCount: Int {
+        var candidateCount: Int {
             menu.count
         }
 
-        @objc func candidate(at index: Int) -> String {
+        func candidate(at index: Int) -> String {
             menu[index]
         }
 
+        func reading(at index: Int) -> String? {
+            nil
+        }
     }
 
     /// Represents that the user is choosing information about selected
@@ -746,6 +771,9 @@ class InputState: NSObject {
             menu[index]
         }
 
+        func reading(at index: Int) -> String? {
+            nil
+        }
     }
 
     @objc(InputStateCustomMenuEntry)
@@ -794,5 +822,8 @@ class InputState: NSObject {
             entries[index].title
         }
 
+        func reading(at index: Int) -> String? {
+            nil
+        }
     }
 }
