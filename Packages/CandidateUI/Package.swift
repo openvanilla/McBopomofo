@@ -1,11 +1,11 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "CandidateUI",
-    platforms: [.macOS(.v10_10)],
+    platforms: [.macOS(.v10_15)],
     products: [
         .library(
             name: "CandidateUI",
