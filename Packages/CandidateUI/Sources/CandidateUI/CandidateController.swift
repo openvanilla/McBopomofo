@@ -49,17 +49,28 @@ public class CandidateController: NSWindowController {
             reloadData()
         }
     }
-    @objc public var selectedCandidateIndex: UInt = UInt.max
+
+    @objc public var selectedCandidateIndex: UInt = .max
     @objc public var visible: Bool = false {
         didSet {
             NSObject.cancelPreviousPerformRequests(withTarget: self)
+            guard let window else {
+                return
+            }
+            let alreadyVisible = window.isVisible
             if visible {
-                window?.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
+                window.perform(#selector(NSWindow.orderFront(_:)), with: self, afterDelay: 0.0)
+                if !alreadyVisible {
+                    NSAccessibility.post(element: window, notification: .created)
+                    NSAccessibility
+                        .post(element: window, notification: .focusedWindowChanged)
+                }
             } else {
-                window?.perform(#selector(NSWindow.orderOut(_:)), with: self, afterDelay: 0.0)
+                window.perform(#selector(NSWindow.orderOut(_:)), with: self, afterDelay: 0.0)
             }
         }
     }
+
     @objc public var windowTopLeftPoint: NSPoint {
         get {
             guard let frameRect = window?.frame else {
@@ -77,12 +88,12 @@ public class CandidateController: NSWindowController {
     @objc public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"].map {
         CandidateKeyLabel(key: $0, displayedText: $0)
     }
-    @objc public var keyLabelFont: NSFont = NSFont.systemFont(ofSize: 14)
-    @objc public var candidateFont: NSFont = NSFont.systemFont(ofSize: 18)
+
+    @objc public var keyLabelFont: NSFont = .systemFont(ofSize: 14)
+    @objc public var candidateFont: NSFont = .systemFont(ofSize: 18)
     @objc public var tooltip: String = ""
 
-    @objc public func reloadData() {
-    }
+    @objc public func reloadData() {}
 
     @objc public func showNextPage() -> Bool {
         false
@@ -100,7 +111,7 @@ public class CandidateController: NSWindowController {
         false
     }
 
-    @objc public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
+    @objc public func candidateIndexAtKeyLabelIndex(_: UInt) -> UInt {
         UInt.max
     }
 
@@ -128,10 +139,11 @@ public class CandidateController: NSWindowController {
         var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
         for screen in NSScreen.screens {
             let frame = screen.visibleFrame
-            if windowTopLeftPoint.x >= frame.minX &&
-                       windowTopLeftPoint.x <= frame.maxX &&
-                       windowTopLeftPoint.y >= frame.minY &&
-                       windowTopLeftPoint.y <= frame.maxY {
+            if windowTopLeftPoint.x >= frame.minX,
+               windowTopLeftPoint.x <= frame.maxX,
+               windowTopLeftPoint.y >= frame.minY,
+               windowTopLeftPoint.y <= frame.maxY
+            {
                 screenFrame = frame
                 break
             }
@@ -165,5 +177,4 @@ public class CandidateController: NSWindowController {
 
         window?.setFrameTopLeftPoint(adjustedPoint)
     }
-
 }
