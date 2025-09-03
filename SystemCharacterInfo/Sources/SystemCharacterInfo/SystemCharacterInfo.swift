@@ -28,7 +28,7 @@ import Foundation
 private let path = "/System/Library/PrivateFrameworks/CoreChineseEngine.framework/Versions/A/Resources/CharacterAccessibilityData.sqlite"
 
 public struct CharacterInfo {
-    public let cheracter: String?
+    public let character: String?
     public let components: String?
     public let simplifiedExample: String?
     public let traditionalExample: String?
@@ -67,7 +67,7 @@ public class SystemCharacterInfo {
         let ZCHARACTER = Expression<String?>("ZCHARACTER")
 
         return CharacterInfo(
-            cheracter: try? row.get(ZCHARACTER),
+            character: try? row.get(ZCHARACTER),
             components: try? row.get(ZCOMPONENTS),
             simplifiedExample: try? row.get(ZSIMPLIFIEDEXEMPLAR),
             traditionalExample: try? row.get(ZTRADITIONALEXEMPLAR)

@@ -28,6 +28,6 @@ import Testing
 @Test func example() async throws {
     let info = try SystemCharacterInfo()
     let result = try info.read(string: "燈")
-    #expect(result.cheracter == "燈")
+    #expect(result.character == "燈")
     #expect(result.components == "火登")
 }
