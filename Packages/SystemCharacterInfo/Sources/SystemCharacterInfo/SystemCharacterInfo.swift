@@ -54,23 +54,27 @@ public class SystemCharacterInfo {
 
     public func read(string: String) throws -> CharacterInfo {
         let zentry = Table("ZENTRY")
-        let zcharacter = Expression<String>("ZCHARACTER")
+        let zcharacter = Expression<String>(value: "ZCHARACTER")
         let query = zentry.filter(zcharacter == string).limit(1)
         let result = try db.prepare(query)
         let rows = Array(result)
         guard let row = rows.first else {
             throw SystemCharacterInfoError.notFound
         }
-        let ZSIMPLIFIEDEXEMPLAR = Expression<String?>("ZSIMPLIFIEDEXEMPLAR")
-        let ZTRADITIONALEXEMPLAR = Expression<String?>("ZTRADITIONALEXEMPLAR")
-        let ZCOMPONENTS = Expression<String?>("ZCOMPONENTS")
-        let ZCHARACTER = Expression<String?>("ZCHARACTER")
+        let zSimplifiedExamplar = Expression<String?>(
+            value: "ZSIMPLIFIEDEXEMPLAR"
+        )
+        let zTraditionalExamplar = Expression<String?>(
+            value: "ZTRADITIONALEXEMPLAR"
+        )
+        let zComponents = Expression<String?>(value: "ZCOMPONENTS")
+        let zCharacter = Expression<String?>(value: "ZCHARACTER")
 
         return CharacterInfo(
-            character: try? row.get(ZCHARACTER),
-            components: try? row.get(ZCOMPONENTS),
-            simplifiedExample: try? row.get(ZSIMPLIFIEDEXEMPLAR),
-            traditionalExample: try? row.get(ZTRADITIONALEXEMPLAR)
+            character: try? row.get(zCharacter),
+            components: try? row.get(zComponents),
+            simplifiedExample: try? row.get(zSimplifiedExamplar),
+            traditionalExample: try? row.get(zTraditionalExamplar)
         )
     }
 }
