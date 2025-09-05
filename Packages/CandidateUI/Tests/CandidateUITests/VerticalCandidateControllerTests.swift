@@ -21,6 +21,14 @@ final class VerticalCandidateControllerTests {
         func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
             selected = candidates[Int(index)]
         }
+
+        func candidateController(_ controller: CandidateController, readingAtIndex index: UInt) -> String? {
+            nil
+        }
+
+        func candidateController(_ controller: CandidateUI.CandidateController, requestExplanationFor candidate: String, reading: String) -> String? {
+            nil
+        }
     }
 
     @Test("Test if candidate controller can be positioned correctly when the input position is below the bottom of screen")

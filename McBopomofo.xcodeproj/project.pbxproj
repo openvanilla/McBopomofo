@@ -55,6 +55,7 @@
 		D43737C92DF9C35800D9707C /* InputMethodController+KeyHandlerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43737C82DF9C35100D9707C /* InputMethodController+KeyHandlerDelegate.swift */; };
 		D43737CB2DF9C48300D9707C /* InputMethodController+CandidateControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43737CA2DF9C48200D9707C /* InputMethodController+CandidateControllerDelegate.swift */; };
 		D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43FC40A2B23788400ED5A1C /* InputMacro.swift */; };
+		D4451AC92E688C6B00E8F5AB /* SystemCharacterInfo in Frameworks */ = {isa = PBXBuildFile; productRef = D4451AC82E688C6B00E8F5AB /* SystemCharacterInfo */; };
 		D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD5E2B393C00000C5812 /* InputMacroTests.swift */; };
 		D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D449AD602B39506D000C5812 /* ServiceProviderTests.swift */; };
 		D44FB74527915565003C80A6 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44FB74427915555003C80A6 /* Preferences.swift */; };
@@ -229,6 +230,7 @@
 		D4E33D9127A838F7006DB1CF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		D4E569DA27A34CC100AC2CEF /* KeyHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyHandler.h; sourceTree = "<group>"; };
 		D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = KeyHandler.mm; sourceTree = "<group>"; };
+		D4E5EEE22E68A9B30068BC58 /* SystemCharacterInfo */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SystemCharacterInfo; path = Packages/SystemCharacterInfo; sourceTree = "<group>"; };
 		D4E791782B52CDCF00676A68 /* ChineseNumbers */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ChineseNumbers; path = Packages/ChineseNumbers; sourceTree = "<group>"; };
 		D4EE67572B39685F00F062DE /* DictionaryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryServiceTests.swift; sourceTree = "<group>"; };
 		D4EE67592B39968900F062DE /* dictionary_service.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dictionary_service.json; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 				D427F7B4279086DC004A2160 /* InputSourceHelper in Frameworks */,
 				D427F7C127908EFC004A2160 /* OpenCCBridge in Frameworks */,
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
+				D4451AC92E688C6B00E8F5AB /* SystemCharacterInfo in Frameworks */,
 				D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */,
 				D4E7917A2B52CDE500676A68 /* ChineseNumbers in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
@@ -453,6 +456,7 @@
 		D427F766278C9CBD004A2160 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				D4E5EEE22E68A9B30068BC58 /* SystemCharacterInfo */,
 				D41B626A2B86EAD400583148 /* BopomofoBraille */,
 				D4E791782B52CDCF00676A68 /* ChineseNumbers */,
 				D427F768278C9D0D004A2160 /* CandidateUI */,
@@ -534,6 +538,7 @@
 				D4C9CAB027AAC9690058DFEA /* NSStringUtils */,
 				D4E791792B52CDE500676A68 /* ChineseNumbers */,
 				D41B626B2B86EAE900583148 /* BopomofoBraille */,
+				D4451AC82E688C6B00E8F5AB /* SystemCharacterInfo */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1453,6 +1458,10 @@
 		D427F7C027908EFC004A2160 /* OpenCCBridge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OpenCCBridge;
+		};
+		D4451AC82E688C6B00E8F5AB /* SystemCharacterInfo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SystemCharacterInfo;
 		};
 		D47D73C227A7200500255A50 /* FSEventStreamHelper */ = {
 			isa = XCSwiftPackageProductDependency;

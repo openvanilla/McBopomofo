@@ -27,6 +27,7 @@ import InputMethodKit
 import NotifierUI
 import OpenCCBridge
 import TooltipUI
+import SystemCharacterInfo
 
 extension Bool {
     fileprivate var state: NSControl.StateValue {
@@ -53,6 +54,7 @@ class McBopomofoInputMethodController: IMKInputController {
     var currentClient: Any?
     var keyHandler: KeyHandler = KeyHandler()
     var state: InputState = InputState.Empty()
+    lazy var charInfo: SystemCharacterInfo? = try? SystemCharacterInfo()
 
     // MARK: - IMKInputController methods
 

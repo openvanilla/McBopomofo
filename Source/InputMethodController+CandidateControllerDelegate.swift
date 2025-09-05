@@ -25,8 +25,10 @@ import CandidateUI
 import Cocoa
 import InputMethodKit
 import NotifierUI
+import SystemCharacterInfo
 
 extension McBopomofoInputMethodController: CandidateControllerDelegate {
+
     func candidateCountForController(_ controller: CandidateController) -> UInt {
         if let state = state as? CandidateProvider {
             UInt(state.candidateCount)
@@ -165,6 +167,79 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             entry.callback()
         default:
             break
+        }
+    }
+
+    func candidateController(_ controller: CandidateController, readingAtIndex index: UInt) -> String? {
+        if let state = state as? CandidateProvider {
+            state.reading(at: Int(index))
+        } else {
+            nil
+        }
+    }
+
+    func candidateController(_ controller: CandidateController, requestExplanationFor candidate: String, reading: String) -> String? {
+        // The method helps to provide character information for Voice Over.
+        // For example, when a user turns VoiceOver on and then select a candidate
+        // like "中", Voice Over will say "「中國地方」的「中」".
+
+        if reading == "" {
+            return nil
+        }
+        if reading.hasPrefix("_") {
+            return nil
+        }
+
+        func getMcbopomofoExplanation(for candidate: String, reading: String) -> String? {
+            let state = keyHandler
+                .buildAssociatedPhrasePlainState(
+                    withReading: reading,
+                    value: candidate,
+                    useVerticalMode: false
+                )
+            if let state = state as? InputState.AssociatedPhrasesPlain {
+                let phrase = state.candidate(at: 0)
+                return "「\(candidate)\(phrase)」的「\(candidate)」"
+            }
+            return nil
+        }
+
+        func checkIfSystemCharacterInfoReady() -> Bool {
+            charInfo != nil
+        }
+
+        func getSystemExplanation(for chr: String) -> String? {
+            guard let charInfo = charInfo,
+                  let result = try? charInfo.read(string: chr) else {
+                return nil
+            }
+            if let example = result.traditionalExample ?? result.simplifiedExample {
+                return "「\(example)」的「\(chr)」"
+            }
+            if let components = result.components {
+                return "「\(components)」組成的「\(chr)」"
+            }
+            return nil
+        }
+
+        if let singleExplan = getMcbopomofoExplanation(for: candidate, reading: reading) {
+            return singleExplan
+        }
+        if !checkIfSystemCharacterInfoReady() {
+            return nil
+        }
+        var components: [String] = []
+        for chr in candidate {
+            let result = getSystemExplanation(for: String(chr)) ?? String(chr)
+            components.append(result)
+        }
+        switch components.count {
+        case 0:
+            return nil
+        case 1:
+            return components[0]
+        default:
+            return "\(candidate) - \(components.joined(separator: ", "))"
         }
     }
 }

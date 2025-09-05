@@ -110,26 +110,49 @@ private class BackgroundView: NSView {
     }
 }
 
+private protocol VerticalCandidateTableViewDelegate: AnyObject {
+    func view(_ view: VerticalCandidateTableView, didRequestExplanationFor candidate: String, reading: String) -> String?
+    func view(_ view: VerticalCandidateTableView, readingAtIndex index: UInt) -> String?
+}
+
 private class VerticalCandidateTableView: NSTableView {
+    fileprivate weak var explanDelegate: VerticalCandidateTableViewDelegate?
+
     fileprivate final class CandidateAXItem: NSAccessibilityElement {
         weak var owner: VerticalCandidateTableView?
         let index: UInt
         let candidate: NSAttributedString?
+        let reading: String?
         let rect: NSRect
 
         init(owner: VerticalCandidateTableView, index: UInt,
              candidate: NSAttributedString?,
+             reading: String?,
              rect: NSRect)
         {
             self.owner = owner
             self.index = index
             self.candidate = candidate
+            self.reading = reading
             self.rect = rect
         }
 
         override func accessibilityParent() -> Any? { owner }
-        override func accessibilityRole() -> NSAccessibility.Role { .staticText }
-        override func accessibilityLabel() -> String? { candidate?.string }
+        override func accessibilityRole() -> NSAccessibility.Role { .unknown }
+        override func accessibilityLabel() -> String? {
+            guard let owner = owner,
+                    let delegate = owner.explanDelegate,
+                    let candate = candidate?.string,
+                    let reading else {
+                return candidate?.string
+            }
+            let explan = delegate.view(
+                owner,
+                didRequestExplanationFor: candate,
+                reading: reading
+            )
+            return explan ?? candidate?.string
+        }
         override func isAccessibilityElement() -> Bool { true }
 
         func accessibilitySelected() -> Bool {
@@ -166,14 +189,21 @@ private class VerticalCandidateTableView: NSTableView {
         }
         var children = [CandidateAXItem]()
         for i in 0 ..< Int(rows) {
-            let value = dataSource.tableView?(self, objectValueFor: nil, row: i)
+            let candidate = dataSource.tableView?(self, objectValueFor: nil, row: i)
+            let reading = explanDelegate?.view(self, readingAtIndex: UInt(i))
             let rect = NSRect(
                 x: 0,
                 y: CGFloat(i) * rowHeight,
                 width: frame.width,
                 height: rowHeight
             )
-            let child = CandidateAXItem(owner: self, index: UInt(i), candidate: value as? NSAttributedString, rect: rect)
+            let child = CandidateAXItem(
+                owner: self,
+                index: UInt(i),
+                candidate: candidate as? NSAttributedString,
+                reading: reading,
+                rect: rect
+            )
             children.append(child)
         }
         self.children = children
@@ -278,6 +308,7 @@ public class VerticalCandidateController: CandidateController {
         super.init(window: panel)
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.explanDelegate = self
         tableView.doubleAction = #selector(rowDoubleClicked(_:))
         tableView.target = self
 
@@ -625,6 +656,21 @@ extension VerticalCandidateController: NSTableViewDataSource, NSTableViewDelegat
         scrollView.frame = NSRect(x: stripWidth + 1.0, y: 0, width: windowWidth - stripWidth - 1, height: windowHeight - tooltipHeight)
         tooltipView.frame = NSRect(x: tooltipPadding, y: windowHeight - tooltipHeight + tooltipPadding, width: windowWidth, height: tooltipHeight)
         window?.setFrame(frameRect, display: false)
+    }
+}
+
+extension VerticalCandidateController: VerticalCandidateTableViewDelegate {
+    fileprivate func view(_ view: VerticalCandidateTableView, didRequestExplanationFor candidate: String, reading: String) -> String? {
+        delegate?
+            .candidateController(
+                self,
+                requestExplanationFor: candidate,
+                reading: reading
+            )
+    }
+
+    fileprivate func view(_ view: VerticalCandidateTableView, readingAtIndex index: UInt) -> String? {
+        delegate?.candidateController(self, readingAtIndex: UInt(index))
     }
 }
 

@@ -23,26 +23,40 @@
 
 import Cocoa
 
+private protocol HorizontalCandidateViewDelegate: AnyObject {
+    func view(_ view: HorizontalCandidateView, didRequestExplanationFor candidate: String, reading: String) -> String?
+}
+
 private class HorizontalCandidateView: NSView {
+
+    fileprivate weak var delegate: HorizontalCandidateViewDelegate?
+
     fileprivate final class CandidateAXItem: NSAccessibilityElement {
         weak var owner: HorizontalCandidateView?
         let index: UInt
         let candidate: String
+        let reading: String?
         let rect: NSRect
 
         init(owner: HorizontalCandidateView, index: UInt,
-             candidate: String,
-             rect: NSRect)
+             candidate: String, reading: String?, rect: NSRect)
         {
             self.owner = owner
             self.index = index
             self.candidate = candidate
+            self.reading = reading
             self.rect = rect
         }
 
         override func accessibilityParent() -> Any? { owner }
-        override func accessibilityRole() -> NSAccessibility.Role { .staticText }
-        override func accessibilityLabel() -> String? { candidate }
+        override func accessibilityRole() -> NSAccessibility.Role { .unknown }
+        override func accessibilityLabel() -> String? {
+            guard let owner = owner, let delegate = owner.delegate, let reading else {
+                return candidate
+            }
+            let explan = delegate.view(owner, didRequestExplanationFor: candidate, reading: reading)
+            return explan ?? candidate
+        }
         override func isAccessibilityElement() -> Bool { true }
 
         func accessibilitySelected() -> Bool {
@@ -72,7 +86,7 @@ private class HorizontalCandidateView: NSView {
     weak var target: AnyObject?
 
     private var keyLabels: [String] = []
-    private var displayedCandidates: [String] = []
+    private var displayedCandidates: [(candidate: String, reading: String?)] = []
     private var keyLabelHeight: CGFloat = 0
     private var candidateTextHeight: CGFloat = 0
     private var cellPadding: CGFloat = 0
@@ -118,7 +132,7 @@ private class HorizontalCandidateView: NSView {
         return result
     }
 
-    func set(keyLabels labels: [String], displayedCandidates candidates: [String]) {
+    func set(keyLabels labels: [String], displayedCandidates candidates: [(candidate:String, reading: String?)]) {
         let count = min(labels.count, candidates.count)
         keyLabels = Array(labels[0 ..< count])
         displayedCandidates = Array(candidates[0 ..< count])
@@ -129,7 +143,7 @@ private class HorizontalCandidateView: NSView {
             let labelRect = (keyLabels[index] as NSString).boundingRect(
                 with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict
             )
-            let candidateRect = (displayedCandidates[index] as NSString).boundingRect(
+            let candidateRect = (displayedCandidates[index].candidate as NSString).boundingRect(
                 with: baseSize, options: .usesLineFragmentOrigin, attributes: candidateAttrDict
             )
             let cellWidth =
@@ -253,7 +267,7 @@ private class HorizontalCandidateView: NSView {
                 }
                 NSBezierPath.fill(candidateRect)
             }
-            (displayedCandidates[index] as NSString).draw(
+            (displayedCandidates[index].candidate as NSString).draw(
                 in: candidateRect, withAttributes: activeCandidateAttr
             )
             accuWidth += currentWidth + 1.0
@@ -331,7 +345,8 @@ private class HorizontalCandidateView: NSView {
             let element = CandidateAXItem(
                 owner: self,
                 index: UInt(index),
-                candidate: candidate,
+                candidate: candidate.candidate,
+                reading: candidate.reading,
                 rect: rect
             )
             children.append(element)
@@ -439,6 +454,8 @@ public class HorizontalCandidateController: CandidateController {
 
         prevPageButton.target = self
         prevPageButton.action = #selector(pageButtonAction(_:))
+
+        candidateView.delegate = self
     }
 
     @available(*, unavailable)
@@ -536,6 +553,12 @@ public class HorizontalCandidateController: CandidateController {
     }
 }
 
+extension HorizontalCandidateController: HorizontalCandidateViewDelegate {
+    fileprivate func view(_ view: HorizontalCandidateView, didRequestExplanationFor candidate: String, reading: String) -> String? {
+        delegate?.candidateController(self, requestExplanationFor: candidate, reading: reading)
+    }
+}
+
 extension HorizontalCandidateController {
     private var pageCount: UInt {
         guard let delegate = delegate else {
@@ -552,18 +575,17 @@ extension HorizontalCandidateController {
         }
 
         candidateView.set(keyLabelFont: keyLabelFont, candidateFont: candidateFont)
-        var candidates = [String]()
+        var candidates = [(candidate: String, reading: String?)]()
         let count = delegate.candidateCountForController(self)
         let keyLabelCount = UInt(keyLabels.count)
 
         let begin = currentPage * keyLabelCount
         for index in begin ..< min(begin + keyLabelCount, count) {
             let candidate = delegate.candidateController(self, candidateAtIndex: index)
-            candidates.append(candidate)
+            let reading = delegate.candidateController(self, readingAtIndex: index)
+            candidates.append((candidate, reading))
         }
-        candidateView.set(
-            keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates
-        )
+        candidateView.set(keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates)
         candidateView.toolTip = tooltip
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame
