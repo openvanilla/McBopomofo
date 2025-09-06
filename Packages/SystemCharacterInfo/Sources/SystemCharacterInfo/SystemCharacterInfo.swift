@@ -54,21 +54,17 @@ public class SystemCharacterInfo {
 
     public func read(string: String) throws -> CharacterInfo {
         let zentry = Table("ZENTRY")
-        let zcharacter = Expression<String>(value: "ZCHARACTER")
+        let zcharacter = SQLite.Expression<String>("ZCHARACTER")
         let query = zentry.filter(zcharacter == string).limit(1)
         let result = try db.prepare(query)
         let rows = Array(result)
         guard let row = rows.first else {
             throw SystemCharacterInfoError.notFound
         }
-        let zSimplifiedExamplar = Expression<String?>(
-            value: "ZSIMPLIFIEDEXEMPLAR"
-        )
-        let zTraditionalExamplar = Expression<String?>(
-            value: "ZTRADITIONALEXEMPLAR"
-        )
-        let zComponents = Expression<String?>(value: "ZCOMPONENTS")
-        let zCharacter = Expression<String?>(value: "ZCHARACTER")
+        let zSimplifiedExamplar = SQLite.Expression<String?>("ZSIMPLIFIEDEXEMPLAR")
+        let zTraditionalExamplar = SQLite.Expression<String?>("ZTRADITIONALEXEMPLAR")
+        let zComponents = SQLite.Expression<String?>("ZCOMPONENTS")
+        let zCharacter = SQLite.Expression<String?>("ZCHARACTER")
 
         return CharacterInfo(
             character: try? row.get(zCharacter),
