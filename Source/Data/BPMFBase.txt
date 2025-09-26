@@ -12804,6 +12804,7 @@
 徿 ㄌㄨㄥˋ long4 xj/4 big5
 梇 ㄌㄨㄥˋ long4 xj/4 big5
 咔 ㄌㄨㄥˋ long4 xj/4 big5
+弄 ㄌㄨㄥˋ long4 xj/4 big5
 龍 ㄌㄨㄥˊ long2 xj/6 big5
 隆 ㄌㄨㄥˊ long2 xj/6 big5
 籠 ㄌㄨㄥˊ long2 xj/6 big5
