@@ -191,6 +191,7 @@
 灞 ㄅㄚˋ ba4 184 big5
 伯 ㄅㄚˋ ba4 184 big5
 猈 ㄅㄚˋ ba4 184 big5
+把 ㄅㄚˋ ba4 184 big5
 拔 ㄅㄚˊ ba2 186 big5
 跋 ㄅㄚˊ ba2 186 big5
 鈸 ㄅㄚˊ ba2 186 big5
