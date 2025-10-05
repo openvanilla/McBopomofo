@@ -8,11 +8,11 @@ In most cases, developers will add new Chinese characters or phrases rather than
 
 ## Adding Phrases 
 
-When adding a new phrase containing multiple characters to `BPMFMappings.txt`, ensure that `phrase.occ` is also updated with the same phrase and its frequency. The frequency should be a positive integer.
+When adding a new phrase containing multiple characters to `BPMFMappings.txt`, ensure that `phrase.occ` is also updated with the same phrase and its frequency. The frequency should be a positive integer. 0 is also acceptable, but negative values are not.
 
 ## Sorting
 
-Both `BPMFMappings.txt` and `phrase.occ` must stay sorted using the C locale. After making changes, run `LC_ALL=c sort -o BPMFMappings.txt BPMFMappings.txt` and `LC_ALL=c sort -o phrase.occ phrase.occ` before committing.
+Both `BPMFMappings.txt` and `phrase.occ` must stay sorted using the C locale. After making changes, run `LC_ALL=C sort -o BPMFMappings.txt BPMFMappings.txt` and `LC_ALL=C sort -o phrase.occ phrase.occ` before committing.
 
 ## Heterophony Characters
 
