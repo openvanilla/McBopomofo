@@ -10,11 +10,10 @@ The `Source/Data/` directory contains all dictionary data files and the build sy
 
 **GitHub Copilot users:** See `.github/instructions/Data.instructions.md` for path-specific Copilot instructions for this directory.
 
+**General guidelines** (emoji, date/time format, Conventional Commits, etc.) are defined in the root `AGENTS.md` and `.github/copilot-instructions.md`.
+
 **Key Principles:**
 - In most cases, you'll be **adding** new characters or phrases rather than deleting existing ones
-- **Never use emoji** in documentation, comments, or generated content (emoji data in dictionary files is acceptable)
-- **Date/time format:** When noting "last updated" or timestamps in documentation, always use full ISO 8601 datetime in UTC+8 timezone (e.g., `2025-10-12T14:30:00+08:00`). Use the `date` command to get the current system time and adjust to UTC+8 if needed
-- **Conventional Commits:** When making commits, use the format `type(scope): description` (e.g., `feat(data): add new phrase mappings`, `fix(dict): correct heterophony for 樂`). See: https://www.conventionalcommits.org/
 
 ## File Descriptions
 
