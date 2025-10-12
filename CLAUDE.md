@@ -17,5 +17,3 @@ These files contain detailed information about:
 - Dictionary data management
 
 Please consult AGENTS.md for all development tasks.
-
-
