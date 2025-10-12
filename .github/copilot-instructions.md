@@ -1,4 +1,20 @@
-# McBopomofo Copilot Instructions
+# GitHub Copilot Instructions
+
+## Documentation Structure
+
+This file provides GitHub Copilot-specific coding instructions. For comprehensive project documentation:
+
+- **AGENTS.md**: Master documentation for all AI coding assistants (architecture, build process, workflows)
+- **algorithm.md**: Technical algorithm documentation (Chinese)
+- **Source/Data/AGENTS.md**: Dictionary data development guide
+
+**Note:** GitHub Copilot does not automatically read AGENTS.md files. Essential guidelines are included below.
+
+---
+
+## General Guidelines
+
+- **Never use emoji** in code, comments, documentation, or any generated content (exception: when editing dictionary data files that contain emoji mappings)
 
 ## Project Context
 - Input method for macOS built with AppKit/IMKit in Swift and bridged Objective-C++, backed by the C++ language model in `Source/Engine`.
@@ -39,6 +55,15 @@
 - When dictionary data changes, regenerate artifacts via the make targets in `Source/Data` and check updated binaries into `Source/Data/bin`.
 - Keep shell scripts such as `Source/add-phrase-hook.sh` POSIX-compliant and aligned with the existing shebang and style.
 
+## Git Commit Convention
+
+- Use Conventional Commits format for all commits and pull requests.
+- Format: `type(scope): description`
+- Types: feat, fix, docs, style, refactor, test, chore
+- Example: `feat(keyboard): add support for custom layout`
+- Keep descriptions concise, present tense, lowercase.
+- Reference: https://www.conventionalcommits.org/
+
 ## Things to Avoid
 - Avoid replacing AppKit windows with SwiftUI or Combine; the runtime depends on NSWindow/XIB assets.
 - Do not bypass the bridge to talk to the engine directly from Swift; IMKit lifecycle assumptions require the Objective-C++ layer.
@@ -51,7 +76,3 @@
 - `Source/Engine/McBopomofoLM.cpp`: Core language model logic and unigram handling.
 - `McBopomofoTests/PreferencesTests.swift`: Example of the Swift `Testing` suite setup and patterns.
 - `Source/Engine/CMakeLists.txt`: Engine build configuration and test registration.
-
-
-
-Note: https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions#creating-path-specific-custom-instructions-1
