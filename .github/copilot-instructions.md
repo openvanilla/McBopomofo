@@ -14,7 +14,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## General Guidelines
 
-- **Never use emoji** in code, comments, documentation, or any generated content (exception: when editing dictionary data files that contain emoji mappings)
+- **Never use emoji** in code, comments, documentation, or generated content outside `Source/Data/`. Emoji are permitted only within dictionary data files in `Source/Data` where mappings include emoji.
 
 ## Project Context
 - Input method for macOS built with AppKit/IMKit in Swift and bridged Objective-C++, backed by the C++ language model in `Source/Engine`.
