@@ -1,1 +1,0 @@
-../../bin/derive_associated_phrases.py

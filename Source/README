@@ -1,151 +1,182 @@
 .
 ├── AppDelegate.swift
 ├── Base.lproj
-│   ├── Credits.rtf
-│   ├── InfoPlist.strings
-│   ├── Localizable.strings
-│   ├── MainMenu.xib
-│   ├── preferences.xib
-│   ├── template-data.txt
-│   ├── template-exclude-phrases-plain-bpmf.txt
-│   ├── template-exclude-phrases.txt
-│   └── template-phrases-replacement.txt
+│   ├── Credits.rtf
+│   ├── InfoPlist.strings
+│   ├── Localizable.strings
+│   ├── MainMenu.xib
+│   ├── preferences.xib
+│   ├── template-data.txt
+│   ├── template-exclude-phrases-plain-bpmf.txt
+│   ├── template-exclude-phrases.txt
+│   └── template-phrases-replacement.txt
 ├── Data
-│   ├── BPMFBase.txt
-│   ├── BPMFMappings.txt
-│   ├── BPMFPunctuations.txt
-│   ├── Makefile
-│   ├── PhraseFreq.txt
-│   ├── README
-│   ├── Symbols.txt
-│   ├── associated-phrases.txt
-│   ├── bin
-│   │   ├── C_Version
-│   │   │   ├── Makefile
-│   │   │   ├── count.bash
-│   │   │   └── count.occurrence.c
-│   │   ├── README
-│   │   ├── Sample_Prep
-│   │   │   ├── build.bash
-│   │   │   └── filter.bash
-│   │   ├── bpmfmap.py
-│   │   ├── buildFreq.py
-│   │   ├── cook-plain-bpmf.py
-│   │   ├── cook.py
-│   │   ├── cook_util.py
-│   │   ├── count.bash
-│   │   ├── count.occurrence.py
-│   │   ├── disabled
-│   │   │   ├── BIG5toUTF8.pl
-│   │   │   ├── bpmfmap_human.py
-│   │   │   ├── build4wlist.bash
-│   │   │   ├── buildFreq.bash
-│   │   │   ├── cook.rb
-│   │   │   ├── count.occurrence.pl
-│   │   │   ├── countphrase.bash
-│   │   │   ├── randomShuffle.bash
-│   │   │   ├── typocorrection.bash
-│   │   │   └── utf8length.pl
-│   │   ├── nonCJK_filter.py
-│   │   ├── self-score-test.py
-│   │   └── textpool.rc
-│   ├── data-plain-bpmf.txt
-│   ├── data.txt
-│   ├── exclusion.txt
-│   ├── heterophony1.list
-│   ├── heterophony2.list
-│   ├── heterophony3.list
-│   ├── memo
-│   │   ├── blacklist.txt
-│   │   ├── covered_by_others.txt
-│   │   ├── covered_by_singles.txt
-│   │   └── falsecount.txt
-│   └── phrase.occ
+│   ├── BPMFBase.txt
+│   ├── BPMFMappings.txt
+│   ├── BPMFPunctuations.txt
+│   ├── Makefile
+│   ├── PhraseFreq.txt
+│   ├── README
+│   ├── Symbols.txt
+│   ├── associated-phrases.txt
+│   ├── bin_legacy                 [DEPRECATED Oct 2024 - see bin_legacy/DEPRECATED.md]
+│   │   ├── C_Version
+│   │   │   ├── Makefile
+│   │   │   ├── count.bash
+│   │   │   └── count.occurrence.c
+│   │   ├── DEPRECATED.md
+│   │   ├── README
+│   │   ├── Sample_Prep
+│   │   │   ├── build.bash
+│   │   │   └── filter.bash
+│   │   ├── audit_encoding.swift
+│   │   ├── bpmfmap.py
+│   │   ├── buildFreq.py
+│   │   ├── cook-plain-bpmf.py
+│   │   ├── cook.py
+│   │   ├── cook_util.py
+│   │   ├── count.bash
+│   │   ├── count.occurrence.py
+│   │   ├── derive_associated_phrases.py
+│   │   ├── disabled
+│   │   │   ├── BIG5toUTF8.pl
+│   │   │   ├── bpmfmap_human.py
+│   │   │   ├── build4wlist.bash
+│   │   │   ├── buildFreq.bash
+│   │   │   ├── cook.rb
+│   │   │   ├── count.occurrence.pl
+│   │   │   ├── countphrase.bash
+│   │   │   ├── randomShuffle.bash
+│   │   │   ├── typocorrection.bash
+│   │   │   └── utf8length.pl
+│   │   ├── nonCJK_filter.py
+│   │   └── self-score-test.py
+│   ├── curation
+│   │   ├── README.md
+│   │   ├── __init__.py
+│   │   ├── builders
+│   │   │   ├── __init__.py
+│   │   │   ├── frequency_builder.py
+│   │   │   └── phrase_deriver.py
+│   │   ├── compilers
+│   │   │   ├── __init__.py
+│   │   │   ├── compiler_utils.py
+│   │   │   ├── main_compiler.py
+│   │   │   └── plain_bpmf_compiler.py
+│   │   ├── notebooks
+│   │   │   └── playground.ipynb
+│   │   ├── requirements.txt
+│   │   ├── utils
+│   │   │   ├── __init__.py
+│   │   │   └── text_filter.py
+│   │   └── validators
+│   │       ├── __init__.py
+│   │       └── score_validator.py
+│   ├── data-plain-bpmf.txt
+│   ├── data.txt
+│   ├── exclusion.txt
+│   ├── heterophony1.list
+│   ├── heterophony2.list
+│   ├── heterophony3.list
+│   ├── memo
+│   │   ├── blacklist.txt
+│   │   ├── covered_by_others.txt
+│   │   ├── covered_by_singles.txt
+│   │   └── falsecount.txt
+│   ├── phrase.occ
+│   ├── pyproject.toml
+│   ├── scripts
+│   │   ├── analyze_data.py
+│   │   ├── count_occurrences.py
+│   │   └── map_bpmf.py
+│   ├── tests
+│   │   └── __init__.py
+│   └── textpool.rc
 ├── Engine
-│   ├── AssociatedPhrases.cpp
-│   ├── AssociatedPhrases.h
-│   ├── CMakeLists.txt
-│   ├── Gramambular
-│   │   ├── Bigram.h
-│   │   ├── BlockReadingBuilder.h
-│   │   ├── Gramambular.h
-│   │   ├── Grid.h
-│   │   ├── KeyValuePair.h
-│   │   ├── LanguageModel.h
-│   │   ├── Node.h
-│   │   ├── NodeAnchor.h
-│   │   ├── Span.h
-│   │   ├── Unigram.h
-│   │   └── Walker.h
-│   ├── KeyValueBlobReader.cpp
-│   ├── KeyValueBlobReader.h
-│   ├── KeyValueBlobReaderTest.cpp
-│   ├── Mandarin
-│   │   ├── CMakeLists.txt
-│   │   ├── Mandarin.cpp
-│   │   ├── Mandarin.h
-│   │   └── MandarinTest.cpp
-│   ├── McBopomofoLM.cpp
-│   ├── McBopomofoLM.h
-│   ├── ParselessLM.cpp
-│   ├── ParselessLM.h
-│   ├── ParselessLMBenchmark.cpp
-│   ├── ParselessLMTest.cpp
-│   ├── ParselessPhraseDB.cpp
-│   ├── ParselessPhraseDB.h
-│   ├── ParselessPhraseDBTest.cpp
-│   ├── PhraseReplacementMap.cpp
-│   ├── PhraseReplacementMap.h
-│   ├── PhraseReplacementMapTest.cpp
-│   ├── UserOverrideModel.cpp
-│   ├── UserOverrideModel.h
-│   ├── UserPhrasesLM.cpp
-│   ├── UserPhrasesLM.h
-│   └── UserPhrasesLMTest.cpp
+│   ├── AssociatedPhrases.cpp
+│   ├── AssociatedPhrases.h
+│   ├── CMakeLists.txt
+│   ├── Gramambular
+│   │   ├── Bigram.h
+│   │   ├── BlockReadingBuilder.h
+│   │   ├── Gramambular.h
+│   │   ├── Grid.h
+│   │   ├── KeyValuePair.h
+│   │   ├── LanguageModel.h
+│   │   ├── Node.h
+│   │   ├── NodeAnchor.h
+│   │   ├── Span.h
+│   │   ├── Unigram.h
+│   │   └── Walker.h
+│   ├── KeyValueBlobReader.cpp
+│   ├── KeyValueBlobReader.h
+│   ├── KeyValueBlobReaderTest.cpp
+│   ├── Mandarin
+│   │   ├── CMakeLists.txt
+│   │   ├── Mandarin.cpp
+│   │   ├── Mandarin.h
+│   │   └── MandarinTest.cpp
+│   ├── McBopomofoLM.cpp
+│   ├── McBopomofoLM.h
+│   ├── ParselessLM.cpp
+│   ├── ParselessLM.h
+│   ├── ParselessLMBenchmark.cpp
+│   ├── ParselessLMTest.cpp
+│   ├── ParselessPhraseDB.cpp
+│   ├── ParselessPhraseDB.h
+│   ├── ParselessPhraseDBTest.cpp
+│   ├── PhraseReplacementMap.cpp
+│   ├── PhraseReplacementMap.h
+│   ├── PhraseReplacementMapTest.cpp
+│   ├── UserOverrideModel.cpp
+│   ├── UserOverrideModel.h
+│   ├── UserPhrasesLM.cpp
+│   ├── UserPhrasesLM.h
+│   └── UserPhrasesLMTest.cpp
 ├── Images
-│   ├── Bopomofo.tiff
-│   ├── Bopomofo@2x.tiff
-│   ├── Images.xcassets
-│   │   ├── AlertIcon.imageset
-│   │   │   ├── 128X128.png
-│   │   │   ├── 192x192.png
-│   │   │   ├── 64X64.png
-│   │   │   └── Contents.json
-│   │   ├── AppIcon.appiconset
-│   │   │   ├── 1024X1024.png
-│   │   │   ├── 128X128.png
-│   │   │   ├── 16X16.png
-│   │   │   ├── 256X256.png
-│   │   │   ├── 32X32.png
-│   │   │   ├── 512X512.png
-│   │   │   ├── 64X64.png
-│   │   │   └── Contents.json
-│   │   └── Contents.json
-│   ├── PlainBopomofo.tiff
-│   └── PlainBopomofo@2x.tiff
+│   ├── Bopomofo.tiff
+│   ├── Bopomofo@2x.tiff
+│   ├── Images.xcassets
+│   │   ├── AlertIcon.imageset
+│   │   │   ├── 128X128.png
+│   │   │   ├── 192x192.png
+│   │   │   ├── 64X64.png
+│   │   │   └── Contents.json
+│   │   ├── AppIcon.appiconset
+│   │   │   ├── 1024X1024.png
+│   │   │   ├── 128X128.png
+│   │   │   ├── 16X16.png
+│   │   │   ├── 256X256.png
+│   │   │   ├── 32X32.png
+│   │   │   ├── 512X512.png
+│   │   │   ├── 64X64.png
+│   │   │   └── Contents.json
+│   │   └── Contents.json
+│   ├── PlainBopomofo.tiff
+│   └── PlainBopomofo@2x.tiff
 ├── InputMethodController.swift
 ├── InputState.swift
 ├── Installer
-│   ├── AppDelegate.swift
-│   ├── ArchiveUtil.swift
-│   ├── Base.lproj
-│   │   └── MainMenu.xib
-│   ├── BundleTranslocate.h
-│   ├── BundleTranslocate.m
-│   ├── Installer-Info.plist
-│   ├── Installer-Prefix.pch
-│   ├── McBopomofoInstaller-Bridging-Header.h
-│   ├── NotarizedArchives
-│   │   └── README.md
-│   ├── en.lproj
-│   │   ├── InfoPlist.strings
-│   │   ├── License.rtf
-│   │   └── Localizable.strings
-│   └── zh-Hant.lproj
-│       ├── InfoPlist.strings
-│       ├── License.rtf
-│       ├── Localizable.strings
-│       └── MainMenu.xib
+│   ├── AppDelegate.swift
+│   ├── ArchiveUtil.swift
+│   ├── Base.lproj
+│   │   └── MainMenu.xib
+│   ├── BundleTranslocate.h
+│   ├── BundleTranslocate.m
+│   ├── Installer-Info.plist
+│   ├── Installer-Prefix.pch
+│   ├── McBopomofoInstaller-Bridging-Header.h
+│   ├── NotarizedArchives
+│   │   └── README.md
+│   ├── en.lproj
+│   │   ├── InfoPlist.strings
+│   │   ├── License.rtf
+│   │   └── Localizable.strings
+│   └── zh-Hant.lproj
+│       ├── InfoPlist.strings
+│       ├── License.rtf
+│       ├── Localizable.strings
+│       └── MainMenu.xib
 ├── KeyHandler.h
 ├── KeyHandler.mm
 ├── KeyHandlerInput.swift
@@ -161,12 +192,12 @@
 ├── PreferencesWindowController.swift
 ├── README
 ├── Tools
-│   ├── genRTF.py
-│   └── tistool.m
+│   ├── genRTF.py
+│   └── tistool.m
 ├── en.lproj
-│   ├── Credits.rtf
-│   ├── InfoPlist.strings
-│   └── Localizable.strings
+│   ├── Credits.rtf
+│   ├── InfoPlist.strings
+│   └── Localizable.strings
 ├── main.swift
 └── zh-Hant.lproj
     ├── Credits.rtf
@@ -179,4 +210,4 @@
     ├── template-exclude-phrases.txt
     └── template-phrases-replacement.txt
 
-22 directories, 157 files
+26 directories, 173 files
