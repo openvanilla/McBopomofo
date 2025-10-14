@@ -1,1 +1,4 @@
-../term_score_verification/requirements.txt
+ipywidgets
+jupyterlab
+pandas
+tqdm
