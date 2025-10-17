@@ -292,8 +292,7 @@
                     </buttonCell>
                     <cells>
                         <column>
-                            <buttonCell type="radio" title="直接輸入大
-                            字母" imagePosition="left" alignment="left" state="on" inset="2" id="Udo-22-eqG">
+                            <buttonCell type="radio" title="直接輸入大寫字母" imagePosition="left" alignment="left" state="on" inset="2" id="Udo-22-eqG">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
