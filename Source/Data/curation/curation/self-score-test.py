@@ -1,1 +1,0 @@
-../../bin/self-score-test.py
