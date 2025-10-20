@@ -1590,7 +1590,24 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    if (charCode == 32 || input.isPageDown || input.emacsKey == McBopomofoEmacsKeyNextPage) {
+    BOOL isPageDown = NO;
+    BOOL isPageUp = NO;
+    isPageDown = charCode == 32 || input.isPageDown || input.emacsKey == McBopomofoEmacsKeyNextPage;
+    isPageUp = input.isPageUp;
+    switch (Preferences.allowMovingCursorWhenChoosingCandidates) {
+        case MovingCursorKeyUseJK:
+            isPageDown = [input.inputText isEqualToString:@"l"];
+            isPageUp = [input.inputText isEqualToString:@"h"];
+            break;
+        case MovingCursorKeyUseHL:
+            isCursorMovingLeft = [input.inputText isEqualToString:@"k"];
+            isCursorMovingRight = [input.inputText isEqualToString:@"j"];
+            break;
+        default:
+            break;
+    }
+
+    if (isPageDown) {
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             errorCallback();
@@ -1598,7 +1615,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    if (input.isPageUp) {
+    if (isPageUp) {
         BOOL updated = [gCurrentCandidateController showPreviousPage];
         if (!updated) {
             errorCallback();
