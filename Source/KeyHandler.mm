@@ -1596,12 +1596,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     isPageUp = input.isPageUp;
     switch (Preferences.allowMovingCursorWhenChoosingCandidates) {
         case MovingCursorKeyUseJK:
-            isPageDown = [input.inputText isEqualToString:@"l"];
-            isPageUp = [input.inputText isEqualToString:@"h"];
+            isPageDown = isPageDown || [input.inputText isEqualToString:@"l"];
+            isPageUp = isPageUp || [input.inputText isEqualToString:@"h"];
             break;
         case MovingCursorKeyUseHL:
-            isCursorMovingLeft = [input.inputText isEqualToString:@"k"];
-            isCursorMovingRight = [input.inputText isEqualToString:@"j"];
+            isPageDown = isPageDown || [input.inputText isEqualToString:@"k"];
+            isPageUp = isPageUp || [input.inputText isEqualToString:@"j"];
             break;
         default:
             break;
