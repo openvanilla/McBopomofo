@@ -1,0 +1,28 @@
+name: Python Data Tools
+
+on:
+  push:
+    paths:
+      - 'Source/Data/**/*.py'
+      - 'Source/Data/curation/**'
+      - 'Source/Data/scripts/**'
+      - 'Source/Data/pyproject.toml'
+      - 'Source/Data/Makefile'
+      - '.github/workflows/python-data-check.yml'
+  pull_request:
+    paths:
+      - 'Source/Data/**/*.py'
+      - 'Source/Data/curation/**'
+      - 'Source/Data/scripts/**'
+      - 'Source/Data/pyproject.toml'
+      - 'Source/Data/Makefile'
+      - '.github/workflows/python-data-check.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test data files
+        run: make check
+        working-directory: Source/Data
