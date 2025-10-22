@@ -161,20 +161,252 @@ Emojis/symbols are allowed but **MUST NOT be the default candidate**. Add to `Sy
 - Frequencies must be non-negative integers (0 acceptable, negatives NOT allowed)
 - All files must be C locale sorted for binary search compatibility
 
-## Python Tools in bin/
+## Python Package Structure
+
+The `curation/` package contains library modules organized into submodules:
+
+| Submodule | Purpose |
+|-----------|---------|
+| `curation.builders` | Data building and processing tools (frequency_builder, phrase_deriver) |
+| `curation.compilers` | Data compilation tools (main_compiler, plain_bpmf_compiler) |
+| `curation.validators` | Validation and analysis tools (score_validator) |
+| `curation.utils` | General utilities (text_filter) |
+
+Scripts with side effects are located in `scripts/`:
 
 | Script | Purpose |
 |--------|---------|
-| `cook.py` | Main build script: combines all source files into `data.txt` |
-| `cook-plain-bpmf.py` | Builds `data-plain-bpmf.txt` for traditional Bopomofo mode |
-| `buildFreq.py` | Generates `PhraseFreq.txt` from `phrase.occ` and `exclusion.txt` |
-| `derive_associated_phrases.py` | Generates associated phrase suggestions from `data.txt` |
-| `bpmfmap.py` | Helper for automatic Bopomofo mapping |
-| `count.occurrence.py` | Counts phrase occurrences in text corpus |
-| `self-score-test.py` | Validates and scores dictionary data quality |
-| `nonCJK_filter.py` | Filters out non-CJK characters |
-| `audit_encoding.swift` | Checks file encoding issues |
+| `count_occurrences.py` | Counts phrase occurrences in text corpus |
+| `analyze_data.py` | Analyzes dictionary data and generates reports |
+| `map_bpmf.py` | Helper for automatic Bopomofo mapping |
 
+### Python Development Guidelines
+
+**CRITICAL RULES for AI coding assistants:**
+
+#### 1. Module Organization Rules
+
+**Library modules** (in `curation/` package) **MUST NOT** have side effects at module level:
+- **PROHIBITED**: Opening files, reading/writing data, printing output at module level
+- **PROHIBITED**: Executing code immediately when module is imported
+- **REQUIRED**: All initialization must be in functions
+- **REQUIRED**: Module must be importable without executing code
+
+**Example of BAD module (violates rules):**
+```python
+# BAD: Has side effects at import time
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')  # WRONG: Reads file at import!
+corpus = open('corpus.txt').read()  # WRONG: Opens file at import!
+```
+
+**Example of GOOD module:**
+```python
+# GOOD: No side effects, importable as library
+import configparser
+
+def load_config(config_path='config.ini'):
+    """Load configuration from file."""
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    return config
+
+def main():
+    """Main entry point for CLI usage."""
+    config = load_config()
+    # ... rest of logic
+
+if __name__ == '__main__':
+    main()
+```
+
+#### 2. Import Guidelines
+
+- **REQUIRED**: All imports at top of file
+- **NEVER** use inline imports (unless explicitly necessary for specific technical reasons)
+- Use relative imports within package (e.g., `from .compiler_utils import HEADER`)
+- Use absolute imports for external packages (e.g., `import argparse`)
+
+**Example of BAD imports:**
+```python
+# BAD: Inline import
+def process_data():
+    import pandas as pd  # WRONG: NEVER do this!
+    return pd.DataFrame(data)
+```
+
+**Example of GOOD imports:**
+```python
+# GOOD: All imports at top
+import argparse
+import sys
+from typing import List, Dict
+from .compiler_utils import HEADER
+
+def process_data(input_data):
+    result = []
+    for item in input_data:
+        result.append(item.upper())
+    return result
+```
+
+#### 3. Side Effect Management
+
+**Scripts with side effects belong in `scripts/` directory, NOT in `curation/` package.**
+
+Scripts that do any of the following must be in `scripts/`:
+- Read configuration files at module level
+- Open and process data files at module level
+- Print output or generate reports at module level
+- Execute analysis immediately when imported
+
+**When to use `scripts/` vs `curation/`:**
+
+| Location | Purpose | Characteristics |
+|----------|---------|-----------------|
+| `scripts/` | Pure CLI tools | Has side effects; not importable as library; immediate execution |
+| `curation/` | Library modules | No side effects; importable; reusable functions |
+
+#### 4. Script vs Library Separation
+
+**Library modules** in `curation/` should:
+- Provide reusable functions and classes
+- Have a `main()` function for CLI usage
+- Be declared in `pyproject.toml` `[project.scripts]`
+- Follow pattern: `mcbpmf-tool-name = "curation.module:main"`
+
+**Scripts** in `scripts/` should:
+- Be standalone executables
+- Have all logic in `if __name__ == '__main__':` block
+- Be called directly: `python3 scripts/script_name.py`
+- NOT be imported by other modules
+
+#### 5. PEP-8 Naming Conventions
+
+- Module names: `lowercase_with_underscores.py`
+- Function names: `lowercase_with_underscores()`
+- Class names: `CapitalizedWords`
+- Constants: `UPPERCASE_WITH_UNDERSCORES`
+
+**Examples:**
+- GOOD: `frequency_builder.py`, `main_compiler.py`, `text_filter.py`
+- BAD: `buildFreq.py`, `nonCJK_filter.py`, `cook-plain-bpmf.py`
+
+#### 6. Package Installation
+
+Install as editable package for development:
+```bash
+pip install -e .              # Install package
+pip install -e ".[dev]"       # Install with dev dependencies
+pip install -e ".[notebook]"  # Install with notebook dependencies
+```
+
+After installation, use console scripts:
+```bash
+mcbpmf-build-freq              # Instead of: python3 -m curation.builders.frequency_builder
+mcbpmf-compile                 # Instead of: python3 -m curation.compilers.main_compiler
+mcbpmf-validate-scores         # Instead of: python3 -m curation.validators.score_validator
+```
+
+## Project Path Configuration
+
+All scripts and modules use centralized path constants from the `curation` package:
+
+```python
+from curation import PROJECT_ROOT, CONFIG_FILE
+
+# PROJECT_ROOT = Source/Data/ directory (where pyproject.toml lives)
+# CONFIG_FILE = Source/Data/textpool.rc
+
+# Example usage in scripts
+config = configparser.ConfigParser()
+config.read(CONFIG_FILE)
+corpus_path = Path(config.get('data', 'corpus_path')).expanduser()
+```
+
+**Do NOT** compute paths relatively in individual scripts:
+- BAD: `Path(__file__).parent.parent`
+- BAD: `os.path.abspath(sys.argv[0]).split('/')`
+- GOOD: `from curation import PROJECT_ROOT`
+
+This ensures:
+- Single source of truth for project structure
+- Easy refactoring if directory structure changes
+- Consistent behavior across all tools
+
+## Historical Context: Tool Evolution (2012-2025)
+
+### Migration from bin/ to curation/ (October 2024)
+
+Prior to October 2024, all Python tools were located in the `bin/` directory (now renamed to `bin_legacy/`). This directory accumulated tools over 13+ years with contributions from multiple developers.
+
+#### Tool Creation Timeline
+
+- **2012-08-06**: `cook.py` created by Mengjuei Hsieh, replacing Ruby implementation
+- **2012-09-16**: `buildFreq.py` created, replacing bash version
+- **2013-01-02**: `self-score-test.py` added for quality validation
+- **2013-01-21**: C version moved to `C_Version/` subdirectory ("phasing out")
+- **2024-03-15**: `derive_associated_phrases.py` added by Lukhnos Liu (v2 system)
+- **2024-08-25**: `audit_encoding.swift` added by zonble
+- **2025-03-08**: `cook.py` modernized with Black formatting and argparse
+
+#### Why Migration Was Needed
+
+The bin/ structure had accumulated issues:
+1. Flat organization (~30 files, no logical grouping)
+2. Mixed concerns (library code, CLI scripts, config files, legacy tools)
+3. Inconsistent naming conventions
+4. Some modules had side effects at import time
+5. Not installable as proper Python package
+6. Each script calculated paths differently
+
+#### What Was Migrated vs Preserved
+
+**Migrated to `curation/` package** (actively used):
+- All compilation and build tools
+- Frequency calculation
+- Data validation
+- Text processing utilities
+
+**Moved to `scripts/`** (CLI-only, with side effects):
+- Corpus occurrence counting
+- Data analysis reports
+- BPMF mapping helpers
+
+**Preserved in `bin_legacy/`** (historical reference):
+- `audit_encoding.swift` - Still usable standalone tool (2024)
+- `C_Version/` - Fast C implementation, phased out in 2013
+- `Sample_Prep/` - Corpus preparation methodology
+- `disabled/` - Legacy Perl/Ruby/Bash implementations
+
+#### Path Configuration Changed
+
+- **Before**: Each script calculated paths relatively
+- **After**: Import from `curation` package: `from curation import PROJECT_ROOT, CONFIG_FILE`
+
+#### Using Legacy Tools
+
+The `audit_encoding.swift` tool is still functional:
+```bash
+cd bin_legacy
+swift audit_encoding.swift  # Validates BPMFBase.txt encoding categories
+```
+
+C version (for performance comparison):
+```bash
+cd bin_legacy/C_Version
+export TEXTPOOL=/path/to/corpus
+./count.bash 測試詞彙
+```
+
+For complete migration history and tool details, see `bin_legacy/DEPRECATED.md`.
+
+#### Key Contributors
+
+- **Mengjuei Hsieh**: Original Python implementation (2012-2013)
+- **Lukhnos Liu**: Modernization and associated phrases v2 (2024-2025)
+- **zonble**: Encoding audit tool (2024)
 
 ## Data Generation Pipeline
 

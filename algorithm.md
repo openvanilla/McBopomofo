@@ -690,9 +690,19 @@ flowchart TD
 - **方形節點**：外部實體（External Entity）— McBopomofo.app
 - **標籤箭頭**：資料流（Data Flow）
 
+> **📝 工具路徑更新 (2024年10月)**
+>
+> Python 工具已從 `bin/` 遷移至 `curation/` 套件結構。
+> 所有模組使用集中式路徑配置（從 `curation` 套件匯入 `PROJECT_ROOT`）。
+> 舊的 `bin/` 目錄已重新命名為 `bin_legacy/` 以保留歷史參考。
+>
+> - `bin/buildFreq.py` → `curation/builders/frequency_builder.py`
+> - `bin/cook.py` → `curation/compilers/main_compiler.py`
+> - `bin/derive_associated_phrases.py` → `curation/builders/phrase_deriver.py`
+
 ### 頻率計算
 
-`buildFreq.py` 將詞彙出現次數轉換為對數機率（`Source/Data/bin/buildFreq.py`）：
+`frequency_builder.py` 將詞彙出現次數轉換為對數機率（`Source/Data/curation/builders/frequency_builder.py`）：
 
 #### 步驟 1：載入資料
 
@@ -775,7 +785,7 @@ $$
 
 ### 破音字處理
 
-`cook.py` 根據破音字清單調整單字的詞頻（`Source/Data/bin/cook.py:158`）：
+`main_compiler.py` 根據破音字清單調整單字的詞頻（`Source/Data/curation/compilers/main_compiler.py:158`）：
 
 ```python
 # 載入破音字清單
@@ -888,10 +898,10 @@ LC_ALL=C sort -o phrase.occ phrase.occ
 | 功能 | 檔案路徑 | 說明 |
 |------|----------|------|
 | 編譯流程 | `Source/Data/Makefile` | 定義所有編譯目標與依賴 |
-| 頻率計算 | `Source/Data/bin/buildFreq.py` | 將出現次數轉為對數機率 |
-| 詞庫合併 | `Source/Data/bin/cook.py` | 合併所有資料源生成 data.txt |
-| 破音字處理 | `Source/Data/bin/cook.py:158` | 根據清單調整破音字頻率 |
-| 聯想詞生成 | `Source/Data/bin/derive_associated_phrases.py` | 從詞庫生成聯想詞 |
+| 頻率計算 | `Source/Data/curation/builders/frequency_builder.py` | 將出現次數轉為對數機率 |
+| 詞庫合併 | `Source/Data/curation/compilers/main_compiler.py` | 合併所有資料源生成 data.txt |
+| 破音字處理 | `Source/Data/curation/compilers/main_compiler.py:158` | 根據清單調整破音字頻率 |
+| 聯想詞生成 | `Source/Data/curation/builders/phrase_deriver.py` | 從詞庫生成聯想詞 |
 
 ### Swift & Objective-C++ 層
 
