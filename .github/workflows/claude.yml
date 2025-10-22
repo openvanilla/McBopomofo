@@ -54,5 +54,10 @@ jobs:
 
           # Enable GitHub MCP server tools for inline review comments
           # See: https://github.com/anthropics/claude-code-action/issues/60
-          claude_args: "--allowedTools mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review"
+          claude_args: >-
+            --allowedTools
+            mcp__github__create_pending_pull_request_review,
+            mcp__github__get_pull_request_diff,
+            mcp__github__add_comment_to_pending_review,
+            mcp__github__submit_pending_pull_request_review
 
