@@ -19,15 +19,12 @@ pip install -e ".[notebook]"
 
 After installation, the following command-line tools are available:
 
-- `mcbpmf-cook` - Main build script: combines all source files into data.txt
-- `mcbpmf-cook-plain-bpmf` - Builds data-plain-bpmf.txt for traditional Bopomofo mode
+- `mcbpmf-compile` - Main build script: combines all source files into data.txt
+- `mcbpmf-compile-plain` - Builds data-plain-bpmf.txt for traditional Bopomofo mode
 - `mcbpmf-build-freq` - Generates PhraseFreq.txt from phrase.occ and exclusion.txt
-- `mcbpmf-derive-associated` - Generates associated phrase suggestions
-- `mcbpmf-bpmf-mapper` - Helper for automatic Bopomofo mapping
-- `mcbpmf-count-occurrence` - Counts phrase occurrences in text corpus
+- `mcbpmf-derive-phrases` - Generates associated phrase suggestions
 - `mcbpmf-validate-scores` - Validates and scores dictionary data quality
 - `mcbpmf-filter-non-cjk` - Filters out non-CJK characters
-- `mcbpmf-analyze-data` - Analyzes dictionary data and generates reports
 
 ## Development
 
