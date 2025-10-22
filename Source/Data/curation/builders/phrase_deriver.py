@@ -70,7 +70,17 @@ class Entry:
         return cls(reading, value, float(score))
 
 
-def main(source_file, target_file, punctuation_file):
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("source", help="source file")
+    parser.add_argument("target", help="target file")
+    parser.add_argument("punctuation", help="punctuation file")
+    args = parser.parse_args()
+
+    source_file = args.source
+    target_file = args.target
+    punctuation_file = args.punctuation
+
     with open(source_file, "r") as f:
         if f.readline().strip() != PRAGMA:
             raise ValueError("Invalid source file")
@@ -109,10 +119,4 @@ def main(source_file, target_file, punctuation_file):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("source", help="source file")
-    parser.add_argument("target", help="target file")
-    parser.add_argument("punctuation", help="punctuation file")
-    args = parser.parse_args()
-
-    main(args.source, args.target, args.punctuation)
+    main()
