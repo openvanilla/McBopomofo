@@ -17,7 +17,6 @@ Submodules:
 -----------
 builders : Data building and processing tools
     - frequency_builder: Generates frequency data from occurrence counts
-    - occurrence_counter: Counts phrase occurrences in text corpus
     - phrase_deriver: Derives associated phrases from dictionary data
 
 compilers : Data compilation tools
@@ -27,10 +26,8 @@ compilers : Data compilation tools
 
 validators : Validation and analysis tools
     - score_validator: Validates and tests dictionary data quality
-    - data_analyzer: Analyzes dictionary data and generates reports
 
 utils : General utilities
-    - bpmf_mapper: Bopomofo phonetic mapping helper
     - text_filter: Text filtering utilities for CJK characters
 
 Usage:
