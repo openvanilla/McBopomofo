@@ -244,8 +244,11 @@ import sys
 from typing import List, Dict
 from .compiler_utils import HEADER
 
-def process_data():
-    return DataFrame(data)
+def process_data(input_data):
+    result = []
+    for item in input_data:
+        result.append(item.upper())
+    return result
 ```
 
 #### 3. Side Effect Management
