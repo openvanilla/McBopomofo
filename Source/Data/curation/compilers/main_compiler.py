@@ -223,7 +223,7 @@ def cook(
                 fout.write("%s %s %s\n" % row)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="cook phrases database")
     parser.add_argument("--heterophony1", required=True)
     parser.add_argument("--heterophony2", required=True)
@@ -249,3 +249,7 @@ if __name__ == "__main__":
         macros_path=args.macros,
         output_path=args.output,
     )
+
+
+if __name__ == "__main__":
+    main()
