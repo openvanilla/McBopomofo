@@ -34,26 +34,26 @@ All active Python tools have been migrated to the new `curation/` package struct
 
 ## Tools Preserved in bin_legacy/
 
-### 🔧 Encoding Audit Tool (Active)
+### Encoding Audit Tool (Active)
 - **File**: `audit_encoding.swift`
 - **Purpose**: Validates Big5/CNS/UTF-8 character encoding categories in BPMFBase.txt
 - **Usage**: `swift audit_encoding.swift` (from bin_legacy/ directory)
-- **Status**: ✅ **Still usable** - Standalone utility, not yet migrated
+- **Status**: **Still usable** - Standalone utility, not yet migrated
 
-### 🚀 C Implementation (`C_Version/`)
+### C Implementation (`C_Version/`)
 - **Purpose**: Fast single-phrase occurrence counting in text corpus
 - **Usage**: `C_Version/count.bash <phrase>`
-- **Status**: ⚠️ **Phased out** - Superseded by Python implementation
+- **Status**: **Phased out** - Superseded by Python implementation
 - **Note**: Kept for performance comparison and historical reference
 
-### 📦 Sample Preparation (`Sample_Prep/`)
+### Sample Preparation (`Sample_Prep/`)
 - **Purpose**: Training corpus preparation and filtering
-- **Status**: 📚 **Historical reference** - Documents corpus processing methodology
+- **Status**: **Historical reference** - Documents corpus processing methodology
 
-### 🗄️ Disabled Scripts (`disabled/`)
+### Disabled Scripts (`disabled/`)
 Legacy implementations in multiple languages (Perl, Ruby, Bash).
 - **Purpose**: Historical record of implementation evolution
-- **Status**: 🔒 **Archived** - Preserved for reference only
+- **Status**: **Archived** - Preserved for reference only
 
 ## Tool Evolution History
 

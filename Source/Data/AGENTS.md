@@ -187,18 +187,18 @@ Scripts with side effects are located in `scripts/`:
 #### 1. Module Organization Rules
 
 **Library modules** (in `curation/` package) **MUST NOT** have side effects at module level:
-- ❌ **PROHIBITED**: Opening files, reading/writing data, printing output at module level
-- ❌ **PROHIBITED**: Executing code immediately when module is imported
-- ✅ **REQUIRED**: All initialization must be in functions
-- ✅ **REQUIRED**: Module must be importable without executing code
+- **PROHIBITED**: Opening files, reading/writing data, printing output at module level
+- **PROHIBITED**: Executing code immediately when module is imported
+- **REQUIRED**: All initialization must be in functions
+- **REQUIRED**: Module must be importable without executing code
 
 **Example of BAD module (violates rules):**
 ```python
 # BAD: Has side effects at import time
 import configparser
 config = configparser.ConfigParser()
-config.read('config.ini')  # ❌ Reads file at import!
-corpus = open('corpus.txt').read()  # ❌ Opens file at import!
+config.read('config.ini')  # WRONG: Reads file at import!
+corpus = open('corpus.txt').read()  # WRONG: Opens file at import!
 ```
 
 **Example of GOOD module:**
@@ -223,16 +223,16 @@ if __name__ == '__main__':
 
 #### 2. Import Guidelines
 
-- ✅ **REQUIRED**: All imports at top of file
-- ❌ **NEVER** use inline imports (unless explicitly necessary for specific technical reasons)
-- ✅ Use relative imports within package (e.g., `from .compiler_utils import HEADER`)
-- ✅ Use absolute imports for external packages (e.g., `import argparse`)
+- **REQUIRED**: All imports at top of file
+- **NEVER** use inline imports (unless explicitly necessary for specific technical reasons)
+- Use relative imports within package (e.g., `from .compiler_utils import HEADER`)
+- Use absolute imports for external packages (e.g., `import argparse`)
 
 **Example of BAD imports:**
 ```python
 # BAD: Inline import
 def process_data():
-    import pandas as pd  # ❌ NEVER do this!
+    import pandas as pd  # WRONG: NEVER do this!
     return pd.DataFrame(data)
 ```
 
@@ -290,8 +290,8 @@ Scripts that do any of the following must be in `scripts/`:
 - Constants: `UPPERCASE_WITH_UNDERSCORES`
 
 **Examples:**
-- ✅ `frequency_builder.py`, `main_compiler.py`, `text_filter.py`
-- ❌ `buildFreq.py`, `nonCJK_filter.py`, `cook-plain-bpmf.py`
+- GOOD: `frequency_builder.py`, `main_compiler.py`, `text_filter.py`
+- BAD: `buildFreq.py`, `nonCJK_filter.py`, `cook-plain-bpmf.py`
 
 #### 6. Package Installation
 
@@ -326,9 +326,9 @@ corpus_path = Path(config.get('data', 'corpus_path')).expanduser()
 ```
 
 **Do NOT** compute paths relatively in individual scripts:
-- ❌ BAD: `Path(__file__).parent.parent`
-- ❌ BAD: `os.path.abspath(sys.argv[0]).split('/')`
-- ✅ GOOD: `from curation import PROJECT_ROOT`
+- BAD: `Path(__file__).parent.parent`
+- BAD: `os.path.abspath(sys.argv[0]).split('/')`
+- GOOD: `from curation import PROJECT_ROOT`
 
 This ensures:
 - Single source of truth for project structure
