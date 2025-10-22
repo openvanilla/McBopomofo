@@ -1,5 +1,37 @@
 name: Build
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'Source/**'
+      - 'Packages/**'
+      - 'McBopomofo*/**'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - '.github/workflows/continuous-integration-workflow-xcode-latest.yml'
+    paths-ignore:
+      - 'Source/Data/**/*.py'
+      - 'Source/Data/curation/**'
+      - 'Source/Data/scripts/**'
+      - 'Source/Data/bin_legacy/**'
+      - 'Source/Data/**/*.md'
+      - '**/*.md'
+      - 'docs/**'
+  pull_request:
+    paths:
+      - 'Source/**'
+      - 'Packages/**'
+      - 'McBopomofo*/**'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - '.github/workflows/continuous-integration-workflow-xcode-latest.yml'
+    paths-ignore:
+      - 'Source/Data/**/*.py'
+      - 'Source/Data/curation/**'
+      - 'Source/Data/scripts/**'
+      - 'Source/Data/bin_legacy/**'
+      - 'Source/Data/**/*.md'
+      - '**/*.md'
+      - 'docs/**'
 
 jobs:
   build:
