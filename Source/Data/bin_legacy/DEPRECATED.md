@@ -11,23 +11,23 @@ All active Python tools have been migrated to the new `curation/` package struct
 
 ### Active Python Tools → `curation/` Package
 
-| Legacy Tool | Created | Last Updated | New Location | Notes |
-|------------|---------|--------------|--------------|-------|
-| `cook.py` | 2012-08 | 2025-03 | `curation/compilers/main_compiler.py` | Replaced Ruby; recently modernized with argparse |
-| `cook_util.py` | - | - | `curation/compilers/compiler_utils.py` | Utility functions |
-| `cook-plain-bpmf.py` | - | - | `curation/compilers/plain_bpmf_compiler.py` | Plain BPMF mode compiler |
-| `buildFreq.py` | 2012-09 | 2022-01 | `curation/builders/frequency_builder.py` | Replaced bash; stable since 2022 |
-| `derive_associated_phrases.py` | 2024-03 | 2024-10 | `curation/builders/phrase_deriver.py` | Associated phrases v2; actively maintained |
-| `self-score-test.py` | 2013-01 | 2022-01 | `curation/validators/score_validator.py` | Quality validation; stable since 2022 |
-| `nonCJK_filter.py` | - | - | `curation/utils/text_filter.py` | Text filtering utility |
+| Legacy Tool | New Location | Notes |
+|------------|--------------|-------|
+| `cook.py` | `curation/compilers/main_compiler.py` | Main compiler |
+| `cook_util.py` | `curation/compilers/compiler_utils.py` | Utility functions |
+| `cook-plain-bpmf.py` | `curation/compilers/plain_bpmf_compiler.py` | Plain BPMF mode compiler |
+| `buildFreq.py` | `curation/builders/frequency_builder.py` | Frequency builder |
+| `derive_associated_phrases.py` | `curation/builders/phrase_deriver.py` | Associated phrases v2 |
+| `self-score-test.py` | `curation/validators/score_validator.py` | Quality validation |
+| `nonCJK_filter.py` | `curation/utils/text_filter.py` | Text filtering utility |
 
 ### CLI Scripts → `scripts/` Directory
 
-| Legacy Tool | Created | Last Updated | New Location | Notes |
-|------------|---------|--------------|--------------|-------|
-| `count.occurrence.py` | ~2013 | 2022-12 | `scripts/count_occurrences.py` | Phrase occurrence counter; has side effects at module level |
-| `bpmfmap.py` | - | - | `scripts/map_bpmf.py` | Primitive BPMF mapping helper |
-| Analysis tools | - | - | `scripts/analyze_data.py` | Data quality analysis |
+| Legacy Tool | New Location | Notes |
+|------------|--------------|-------|
+| `count.occurrence.py` | `scripts/count_occurrences.py` | Phrase occurrence counter |
+| `bpmfmap.py` | `scripts/map_bpmf.py` | BPMF mapping helper |
+| Analysis tools | `scripts/analyze_data.py` | Data quality analysis |
 
 ### Configuration
 - `textpool.rc` → `textpool.rc` (moved to Data/ root)
@@ -36,40 +36,24 @@ All active Python tools have been migrated to the new `curation/` package struct
 
 ### 🔧 Encoding Audit Tool (Active)
 - **File**: `audit_encoding.swift`
-- **Created**: 2024-08-25 by zonble
-- **Last Updated**: 2024-10-30 (comments update)
 - **Purpose**: Validates Big5/CNS/UTF-8 character encoding categories in BPMFBase.txt
 - **Usage**: `swift audit_encoding.swift` (from bin_legacy/ directory)
 - **Status**: ✅ **Still usable** - Standalone utility, not yet migrated
-- **Note**: May be migrated to `scripts/` in future if needed
 
 ### 🚀 C Implementation (`C_Version/`)
-- **Created**: Original tools ~2010-2012
-- **Moved to subdirectory**: 2013-01-21 (commit 765dbd8 "phasing out C version")
 - **Purpose**: Fast single-phrase occurrence counting in text corpus
-- **Files**:
-  - `count.occurrence.c` - C implementation of phrase counter
-  - `count.bash` - Wrapper script (requires TEXTPOOL environment variable)
-  - `Makefile` - Builds C_count.occ.exe
 - **Usage**: `C_Version/count.bash <phrase>`
-- **Status**: ⚠️ **Phased out since 2013** - Superseded by Python `count.occurrence.py`
+- **Status**: ⚠️ **Phased out** - Superseded by Python implementation
 - **Note**: Kept for performance comparison and historical reference
 
 ### 📦 Sample Preparation (`Sample_Prep/`)
 - **Purpose**: Training corpus preparation and filtering
-- **Files**:
-  - `build.bash` - Main build script
-  - `filter.bash` - Text filtering pipeline
 - **Status**: 📚 **Historical reference** - Documents corpus processing methodology
-- **Note**: Shows original workflow for preparing training data from raw text sources
 
 ### 🗄️ Disabled Scripts (`disabled/`)
-Legacy implementations in multiple languages:
-- **Perl**: `BIG5toUTF8.pl`, `count.occurrence.pl`, `utf8length.pl`
-- **Ruby**: `cook.rb` (original implementation before Python)
-- **Bash**: `buildFreq.bash`, `build4wlist.bash`, `countphrase.bash`, etc.
+Legacy implementations in multiple languages (Perl, Ruby, Bash).
 - **Purpose**: Historical record of implementation evolution
-- **Status**: 🔒 **Archived** - Not functional, preserved for reference only
+- **Status**: 🔒 **Archived** - Preserved for reference only
 
 ## Tool Evolution History
 
