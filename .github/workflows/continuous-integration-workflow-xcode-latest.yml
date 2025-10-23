@@ -12,6 +12,13 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "^16.1.0"
+      - name: Get commit SHA
+        run: echo "SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Update CFBundleVersion with commit SHA
+        run: |
+          echo "Updating CFBundleVersion to ${SHA}"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${SHA}" "Source/Installer/Installer-Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${SHA}" "Source/McBopomofo-Info.plist"
       - name: Build McBopomofoLMLibTest
         run: cmake -DENABLE_TEST=1 -S . -B build
         working-directory: Source/Engine
@@ -56,7 +63,7 @@ jobs:
       - name: Build McBopomofo
         run: xcodebuild -scheme McBopomofo -configuration Release build
       - name: Build McBopomofoInstaller
-        run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
+        run: xcodebuild -scheme McBopomofoInstaller -configuration Release -derivedDataPath build
       - name: Test data files
         run: make check
         working-directory: Source/Data
@@ -67,4 +74,16 @@ jobs:
         if: github.event_name == 'push'
         uses: peter-evans/commit-comment@v3
         with:
-          body-path: 'codecov_comment.md' 
+          body-path: 'codecov_comment.md'
+      - name: Package McBopomofoInstaller
+        run: |
+          mkdir -p artifact
+          cp -R build/Build/Products/Release/McBopomofoInstaller.app artifact/
+          cd artifact
+          zip -r McBopomofo-Installer-${SHA}.zip McBopomofoInstaller.app
+          ls -lh
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: McBopomofo-Installer-${{ env.SHA }}
+          path: artifact/McBopomofo-Installer-${{ env.SHA }}.zip
