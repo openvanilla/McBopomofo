@@ -274,9 +274,9 @@ class InputState: NSObject {
                 case .alphabets:
                     "羅馬數字 (字母)"
                 case .fullWidthUpper:
-                    "羅馬數字 (大寫全型)"
+                    "羅馬數字 (大寫全形)"
                 case .fullWidthLower:
-                    "羅馬數字 (小寫全型)"
+                    "羅馬數字 (小寫全形)"
                 }
             }
         }
