@@ -42,6 +42,7 @@
 @import NSStringUtils;
 @import OpenCCBridge;
 @import ChineseNumbers;
+@import RomanNumbers;
 @import BopomofoBraille;
 
 InputMode InputModeBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Bopomofo";
@@ -338,6 +339,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // MARK: Handle Chinese Number Input
     if ([state isKindOfClass:[InputStateChineseNumber class]]) {
         return [self _handleNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+    }
+
+    if ([state isKindOfClass:[InputStateRomanNumber class]]) {
+        return [self _handleRomanNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     if ([state isKindOfClass:[InputStateEnclosedNumber class]]) {
@@ -1911,6 +1916,82 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
         InputStateChineseNumber *newState = [[InputStateChineseNumber alloc] initWithStyle:numberState.style number:appended];
+        stateCallback(newState);
+    } else {
+        errorCallback();
+    }
+    return YES;
+}
+
+- (BOOL)_handleRomanNumberState:(InputState *)state
+                     input:(KeyHandlerInput *)input
+             stateCallback:(void (^)(InputState *))stateCallback
+             errorCallback:(void (^)(void))errorCallback;
+{
+    InputStateRomanNumber *numberState = (InputStateRomanNumber *)state;
+    UniChar charCode = input.charCode;
+    BOOL cancelKey = (charCode == 27);
+    if (cancelKey) {
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+    if ((charCode == 8) || input.isDelete) {
+        NSString *number = numberState.number;
+        if (number.length > 0) {
+            number = [number substringToIndex:number.length - 1];
+        } else {
+            errorCallback();
+            return YES;
+        }
+        InputStateRomanNumber *newState = [[InputStateRomanNumber alloc] initWithStyle:numberState.style number:number];
+        stateCallback(newState);
+        return YES;
+    }
+
+    if (charCode == 13) {
+        if (!numberState.number.count) {
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
+            return YES;
+        }
+        NSString *number = numberState.number;
+        RomanNumbersStyle style = RomanNumbersStyleAlphabets;
+
+        switch (numberState.style) {
+            case InputStateRomanNumberStyleAlphabet:
+                style = RomanNumbersStyleAlphabets;
+                break;
+            case InputStateRomanNumberStyleFullWidthUpper:
+                style = RomanNumbersStyleFullWidthUpper;
+                break;
+            case InputStateRomanNumberStyleFullWidthLower:
+                style = RomanNumbersStyleFullWidthLower;
+                break;
+            default:
+                break;
+        }
+
+        NSError *error = nil;
+        NSString *string = [RomanNumbers convertWithString:number style:style error:&error];
+        if (error != nil) {
+            errorCallback();
+            return YES;
+        }
+        InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
+        stateCallback(committing);
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+
+    if (charCode >= '0' && charCode <= '9') {
+        if (numberState.number.length > 3) {
+            errorCallback();
+            return YES;
+        }
+        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
+        InputStateRomanNumber *newState = [[InputStateRomanNumber alloc] initWithStyle:numberState.style number:appended];
         stateCallback(newState);
     } else {
         errorCallback();

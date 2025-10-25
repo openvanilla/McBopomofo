@@ -354,6 +354,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.ChineseNumber:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.RomanNumber:
+            handle(state: newState, previous: previous, client: client)
         case let newState as InputState.EnclosedNumber:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
@@ -600,6 +602,22 @@ extension McBopomofoInputMethodController {
     }
 
     private func handle(state: InputState.ChineseNumber, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText(
+            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+    }
+
+    private func handle(state: InputState.RomanNumber, previous: InputState, client: Any?) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
 

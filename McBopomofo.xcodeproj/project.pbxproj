@@ -73,6 +73,7 @@
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
 		D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3B82796A8A000657FF3 /* PreferencesTests.swift */; };
 		D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */; };
+		D48F853E2EACDB6C00C2FDAB /* RomanNumbers in Frameworks */ = {isa = PBXBuildFile; productRef = D48F853D2EACDB6C00C2FDAB /* RomanNumbers */; };
 		D4A13D5A27A59F0B003BE359 /* InputMethodController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A13D5927A59D5C003BE359 /* InputMethodController.swift */; };
 		D4A8E43627A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */; };
 		D4C2A9872B4309D700113711 /* UTF8HelperTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = D4C2A9862B4309D700113711 /* UTF8HelperTest.mm */; };
@@ -215,6 +216,7 @@
 		D485D3B62796A8A000657FF3 /* McBopomofoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = McBopomofoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D485D3B82796A8A000657FF3 /* PreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTests.swift; sourceTree = "<group>"; };
 		D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionUpdateTests.swift; sourceTree = "<group>"; };
+		D48F853C2EACCDE900C2FDAB /* RomanNumbers */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RomanNumbers; path = Packages/RomanNumbers; sourceTree = "<group>"; };
 		D495583A27A5C6C4006ADE1C /* LanguageModelManager+Privates.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LanguageModelManager+Privates.h"; sourceTree = "<group>"; };
 		D4A13D5927A59D5C003BE359 /* InputMethodController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMethodController.swift; sourceTree = "<group>"; };
 		D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyHandlerPlainBopomofoTests.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				D427F7A927905E90004A2160 /* TooltipUI in Frameworks */,
 				D4451AC92E688C6B00E8F5AB /* SystemCharacterInfo in Frameworks */,
 				D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */,
+				D48F853E2EACDB6C00C2FDAB /* RomanNumbers in Frameworks */,
 				D4E7917A2B52CDE500676A68 /* ChineseNumbers in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
 				D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */,
@@ -459,6 +462,7 @@
 				D4E5EEE22E68A9B30068BC58 /* SystemCharacterInfo */,
 				D41B626A2B86EAD400583148 /* BopomofoBraille */,
 				D4E791782B52CDCF00676A68 /* ChineseNumbers */,
+				D48F853C2EACCDE900C2FDAB /* RomanNumbers */,
 				D427F768278C9D0D004A2160 /* CandidateUI */,
 				D427F7A727905E43004A2160 /* TooltipUI */,
 				D427F7AC27907B7E004A2160 /* NotifierUI */,
@@ -539,6 +543,7 @@
 				D4E791792B52CDE500676A68 /* ChineseNumbers */,
 				D41B626B2B86EAE900583148 /* BopomofoBraille */,
 				D4451AC82E688C6B00E8F5AB /* SystemCharacterInfo */,
+				D48F853D2EACDB6C00C2FDAB /* RomanNumbers */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1466,6 +1471,10 @@
 		D47D73C227A7200500255A50 /* FSEventStreamHelper */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FSEventStreamHelper;
+		};
+		D48F853D2EACDB6C00C2FDAB /* RomanNumbers */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RomanNumbers;
 		};
 		D4C9CAB027AAC9690058DFEA /* NSStringUtils */ = {
 			isa = XCSwiftPackageProductDependency;
