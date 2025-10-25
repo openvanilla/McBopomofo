@@ -65,6 +65,9 @@ jobs:
       - name: Test ChineseNumbers
         run: swift test --enable-code-coverage
         working-directory: Packages/ChineseNumbers
+      - name: Test RomanNumbers
+        run: swift test --enable-code-coverage
+        working-directory: Packages/RomanNumbers
       - name: Clean McBopomofo for testing
         run: xcodebuild -scheme McBopomofo -configuration Debug clean
       - name: Test McBopomofo

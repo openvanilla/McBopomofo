@@ -132,3 +132,9 @@
 "Do you want to boost the score of the phrase \"%@\"?" = "您想要提升 \"%@\" 這個詞彙的權重嗎？";
 
 "Do you want to exclude the phrase \"%@\"?" = "您想要從詞庫中排除 \"%@\" 這個詞彙嗎？";
+
+"Roman Numbers (Alphabets)" = "羅馬數字 (字母)";
+
+"Roman Numbers (Full-width Upper Case)" = "羅馬數字 (大寫全形)";
+
+"Roman Numbers (Full-width Lower Case)" = "羅馬數字 (小寫全形)";

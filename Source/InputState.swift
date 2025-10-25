@@ -135,6 +135,18 @@ class InputState: NSObject {
                 NSLocalizedString("Suzhou Numbers", comment: ""),
                 { .ChineseNumber(style: .suzhou, number: "") }
             ),
+            (
+                NSLocalizedString("Roman Numbers (Alphabets)", comment: ""),
+                { .RomanNumber(style: .alphabets , number: "") }
+            ),
+            (
+                NSLocalizedString("Roman Numbers (Full-width Upper Case)", comment: ""),
+                { .RomanNumber(style: .fullWidthUpper, number: "") }
+            ),
+            (
+                NSLocalizedString("Roman Numbers (Full-width Lower Case)", comment: ""),
+                { .RomanNumber(style: .fullWidthLower, number: "") }
+            ),
         ]
 
         override var description: String {
@@ -248,6 +260,44 @@ class InputState: NSObject {
             return "[\(style.label)] \(number)"
         }
     }
+
+    @objc(InputStateRomanNumber)
+    class RomanNumber: InputState {
+        @objc(InputStateRomanNumberStyle)
+        enum Style: Int {
+            case alphabets = 0
+            case fullWidthUpper = 1
+            case fullWidthLower = 2
+
+            var label: String {
+                switch self {
+                case .alphabets:
+                    "羅馬數字 (字母)"
+                case .fullWidthUpper:
+                    "羅馬數字 (大寫全形)"
+                case .fullWidthLower:
+                    "羅馬數字 (小寫全形)"
+                }
+            }
+        }
+
+        @objc private(set) var number: String
+        @objc private(set) var style: Style
+
+        @objc init(style: Style, number: String) {
+            self.style = style
+            self.number = number
+        }
+
+        override var description: String {
+            "<InputState.RomanNumber, style:\(style), number:\(number)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[\(style.label)] \(number)"
+        }
+    }
+
 
     @objc(InputStateBig5)
     class Big5: InputState {
