@@ -1987,8 +1987,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    const int MAX_ROMAN_NUMBER_LENGTH = 4;
     if (charCode >= '0' && charCode <= '9') {
-        if (numberState.number.length > 3) {
+        if (numberState.number.length >= MAX_ROMAN_NUMBER_LENGTH) {
             errorCallback();
             return YES;
         }
