@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "mcbopomofo-data"
 version = "0.1.0"
 description = "McBopomofo dictionary data tools and build system"
-readme = "curation/README.md"
+readme = "README.md"
 requires-python = ">=3.9"
 authors = [
     {name = "OpenVanilla Project", email = "info@openvanilla.org"}
@@ -28,7 +28,7 @@ dependencies = []
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
-    "pycodestyle>=2.11.0",
+    "ruff>=0.1.0",
 ]
 notebook = [
     "ipywidgets",
@@ -45,6 +45,7 @@ mcbpmf-compile-plain = "curation.compilers.plain_bpmf_compiler:main"
 mcbpmf-derive-phrases = "curation.builders.phrase_deriver:main"
 mcbpmf-validate-scores = "curation.validators.score_validator:main"
 mcbpmf-filter-non-cjk = "curation.utils.text_filter:main"
+mcbpmf-audit-encoding = "scripts.audit_encoding:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -69,3 +70,14 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"

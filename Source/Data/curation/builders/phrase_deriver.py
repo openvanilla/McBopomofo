@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+import unicodedata
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import List, Tuple
-import unicodedata
 
 PRAGMA = "# format org.openvanilla.mcbopomofo.sorted"
 MAX_ENTRIES_PER_PREFIX = 60
@@ -17,7 +16,7 @@ class Entry:
     score: float
 
     _zipped_readings_and_values_computed: bool = False
-    _cached_zipped_readings_and_values: List[Tuple[str, str]] = None
+    _cached_zipped_readings_and_values: list[tuple[str, str]] = None
 
     def associated_phrase_line(self) -> str:
         """Return a new Entry in the associated pharse format.
@@ -34,9 +33,9 @@ class Entry:
 
         parts = [f"{v}-{r}" for r, v in rvs]
 
-        return "%s %.4f" % ("-".join(parts), self.score)
+        return "{} {:.4f}".format("-".join(parts), self.score)
 
-    def zipped_readings_and_values(self) -> List[Tuple[str, str]]:
+    def zipped_readings_and_values(self) -> list[tuple[str, str]]:
         """Returns the readings and values zipped together.
 
         This only considers the values that entirely consist of Unicode
@@ -81,12 +80,12 @@ def main():
     target_file = args.target
     punctuation_file = args.punctuation
 
-    with open(source_file, "r") as f:
+    with open(source_file) as f:
         if f.readline().strip() != PRAGMA:
             raise ValueError("Invalid source file")
         lines = [line.strip() for line in f]
 
-    with open(punctuation_file, "r") as f:
+    with open(punctuation_file) as f:
         punctuation_lines = [line.strip() for line in f]
 
     entries = [Entry.from_line(line) for line in lines[1:]]
@@ -105,9 +104,7 @@ def main():
     keys = sorted(prefix_entry_map.keys(), key=lambda k: k.encode("utf-8"))
     for k in keys:
         entries = sorted(prefix_entry_map[k], key=lambda e: e.score, reverse=True)
-        output_lines.extend(
-            [e.associated_phrase_line() for e in entries[:MAX_ENTRIES_PER_PREFIX]]
-        )
+        output_lines.extend([e.associated_phrase_line() for e in entries[:MAX_ENTRIES_PER_PREFIX]])
 
     output_lines += punctuation_lines
     byte_sorted_output_lines = sorted(output_lines, key=lambda x: x.encode("utf-8"))
