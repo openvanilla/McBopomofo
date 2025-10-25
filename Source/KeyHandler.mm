@@ -1992,7 +1992,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             errorCallback();
             return YES;
         }
-        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
+        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, charCode];
         InputStateRomanNumber *newState = [[InputStateRomanNumber alloc] initWithStyle:numberState.style number:appended];
         stateCallback(newState);
     } else {
