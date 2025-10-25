@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+"""Compile dictionary source files into final data.txt for language model."""
+
 import argparse
 import sys
 
@@ -11,219 +12,170 @@ __license__ = "MIT"
 UNK_LOG_FREQ = -99.0
 H_DEFLT_FREQ = -6.8
 
-bpmf_chars = {}
-bpmf_phrases = {}
-phrases = {}
-bpmf_phon1 = {}
-bpmf_phon2 = {}
-bpmf_phon3 = {}
-bpmf_hetero = {}
+bpmf_chars: dict[str, list[str]] = {}
+bpmf_phrases: dict[str, list[str]] = {}
+phrases: dict[str, float | str] = {}
+bpmf_phon1: dict[str, str] = {}
+bpmf_phon2: dict[str, str] = {}
+bpmf_phon3: dict[str, str] = {}
+bpmf_hetero: dict[str, str] = {}
+
+
+def load_heterophony_file(file_path: str, target_dict: dict[str, str]) -> None:
+    """Load heterophony pronunciation mappings into target_dict."""
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            for line in f:
+                if not line or line[0] == "#":
+                    continue
+                elements = line.rstrip().split()
+                if len(elements) >= 2:
+                    target_dict[elements[0]] = elements[1]
+    except OSError as e:
+        print(f"Error reading {file_path}: {e}")
+
+
+def load_bpmf_base(file_path: str) -> None:
+    """Load base BPMF character mappings into bpmf_chars and bpmf_phrases."""
+    with open(file_path, encoding="utf-8") as f:
+        for line in f:
+            if not line or line[0] == "#":
+                continue
+            elements = line.rstrip().split()
+            if len(elements) < 5:
+                continue
+            mykey, myvalue = elements[0], elements[1]
+            if mykey in bpmf_chars:
+                bpmf_chars[mykey].append(myvalue)
+            else:
+                bpmf_chars[mykey] = [myvalue]
+            if mykey in bpmf_phrases:
+                bpmf_phrases[mykey].append(myvalue)
+            else:
+                bpmf_phrases[mykey] = [myvalue]
+
+
+def load_bpmf_mappings(file_path: str) -> None:
+    """Load multi-character phrase BPMF mappings into bpmf_phrases."""
+    with open(file_path, encoding="utf-8") as f:
+        for line in f:
+            if not line or line[0] == "#":
+                continue
+            elements = line.rstrip().split()
+            if not elements:
+                continue
+            mykey = elements.pop(0)
+            myvalue = "-".join(elements)
+            if mykey in bpmf_phrases:
+                bpmf_phrases[mykey].append(myvalue)
+            else:
+                bpmf_phrases[mykey] = [myvalue]
+
+
+def load_phrase_frequencies(file_path: str) -> None:
+    """Load phrase frequency scores into phrases dict."""
+    for key in bpmf_chars:
+        phrases[key] = UNK_LOG_FREQ
+    with open(file_path, encoding="utf-8") as f:
+        for line in f:
+            if not line or line[0] == "#":
+                continue
+            elements = line.rstrip().split()
+            if len(elements) < 2:
+                continue
+            mykey = elements.pop(0)
+            myvalue = elements.pop(0)
+            if mykey not in bpmf_phrases:
+                sys.exit(f"[ERROR] {mykey} key mismatches.")
+            phrases[mykey] = myvalue
+
+
+def generate_output_entries() -> list[tuple[str, str, float | str]]:
+    """Generate output entries with heterophony frequency adjustments."""
+    output: list[tuple[str, str, float | str]] = []
+    for mykey, myvalue in phrases.items():
+        readings = bpmf_phrases.get(mykey)
+        if not readings:
+            continue
+        if len(mykey) > 3:
+            for r in readings:
+                output.append((mykey, r, myvalue))
+            continue
+        for r in readings:
+            if mykey not in bpmf_phon1 or str(bpmf_phon1[mykey]) == r:
+                output.append((mykey, r, myvalue))
+                continue
+            if mykey not in bpmf_phon2:
+                output.append((mykey, r, H_DEFLT_FREQ))
+                continue
+            elif str(bpmf_phon2[mykey]) == r:
+                if float(myvalue) - 0.69314718055994 > H_DEFLT_FREQ:
+                    output.append((mykey, r, float(myvalue) - 0.69314718055994))
+                    continue
+                else:
+                    output.append((mykey, r, H_DEFLT_FREQ))
+                    continue
+            elif mykey not in bpmf_phon3:
+                output.append((mykey, r, H_DEFLT_FREQ))
+                continue
+            elif str(bpmf_phon3[mykey]) == r:
+                if float(myvalue) - 0.69314718055994 * 2 > H_DEFLT_FREQ:
+                    output.append((mykey, r, float(myvalue) - 0.69314718055994 * 2))
+                    continue
+                else:
+                    output.append((mykey, r, H_DEFLT_FREQ))
+                    continue
+            output.append((mykey, r, H_DEFLT_FREQ))
+    return output
 
 
 def cook(
-    heterophony1_path,
-    heterophony2_path,
-    heterophony3_path,
-    phrase_freq_path,
-    bpmf_mappings_path,
-    bpmf_base_path,
-    punctuations_path,
-    symbols_path,
-    macros_path,
-    output_path,
-):
-    try:
-        handle = open(heterophony1_path, "r")
-    except IOError as e:
-        print("({})".format(e))
-    while True:
-        line = handle.readline()
-        if not line:
-            break
-        if line[0] == "#":
-            continue
-        elements = line.rstrip().split()
-        # if elements[0] in bpmf_hetero: break
-        bpmf_phon1[elements[0]] = elements[1]
-    handle.close()
-    try:
-        handle = open(heterophony2_path, "r")
-    except IOError as e:
-        print("({})".format(e))
-    while True:
-        line = handle.readline()
-        if not line:
-            break
-        if line[0] == "#":
-            continue
-        elements = line.rstrip().split()
-        # if elements[0] in bpmf_hetero: break
-        bpmf_phon2[elements[0]] = elements[1]
-    handle.close()
-    try:
-        handle = open(heterophony3_path, "r")
-    except IOError as e:
-        print("({})".format(e))
-    while True:
-        line = handle.readline()
-        if not line:
-            break
-        if line[0] == "#":
-            continue
-        elements = line.rstrip().split()
-        # if elements[0] in bpmf_hetero: break
-        bpmf_phon3[elements[0]] = elements[1]
-    handle.close()
-    # bpmfbase
-    handle = open(bpmf_base_path, "r")
-    while True:
-        line = handle.readline()
-        if not line:
-            break
-        if line[0] == "#":
-            continue
-        elements = line.rstrip().split()
-        mytype = elements[4]
-        mykey = elements[0]
-        myvalue = elements[1]
-        # print mykey
-        if mykey in bpmf_chars:
-            bpmf_chars[mykey].append(myvalue)
-        else:
-            bpmf_chars[mykey] = []
-            bpmf_chars[mykey].append(myvalue)
-        if mykey in bpmf_phrases:
-            bpmf_phrases[mykey].append(myvalue)
-        else:
-            bpmf_phrases[mykey] = []
-            bpmf_phrases[mykey].append(myvalue)
-    handle.close()
-    # bpmf-mappings
-    handle = open(bpmf_mappings_path, "r")
-    while True:
-        line = handle.readline()
-        if not line:
-            break
-        if line[0] == "#":
-            continue
-        elements = line.rstrip().split()
-        mykey = elements.pop(0)
-        myvalue = "-".join(elements)
-        # print mykey
-        # print myvalue
-        if mykey in bpmf_phrases:
-            bpmf_phrases[mykey].append(myvalue)
-        else:
-            bpmf_phrases[mykey] = []
-            bpmf_phrases[mykey].append(myvalue)
-    handle.close()
-    # phrase-freqs
-    handle = open(phrase_freq_path, "r")
-
-    output = []
-
-    # Populate phrases dict with entries from BPMFBase.txt first: this is so
-    # that the resulting phrases dict will maintain the order from
-    # BPMFBase.txt; this is important for rarely used characters.
-    for key in bpmf_chars:
-        phrases[key] = UNK_LOG_FREQ
-
-    while True:
-        line = handle.readline()
-        if not line:
-            break
-        if line[0] == "#":
-            continue
-        elements = line.rstrip().split()
-        mykey = elements.pop(0)
-        myvalue = elements.pop(0)
-        try:
-            readings = bpmf_phrases[mykey]
-        except:
-            sys.exit("[ERROR] %s key mismatches." % mykey)
-        phrases[mykey] = myvalue
-
-    for mykey, myvalue in phrases.items():
-        readings = bpmf_phrases.get(mykey)
-
-        if readings:
-            # 剛好一個中文字字的長度目前還是 3 (標點、聲調好像都是2)
-            if len(mykey) > 3:
-                for r in readings:
-                    output.append((mykey, r, myvalue))
-                    pass
-                continue
-            else:
-                # lookup the table from canonical list
-                for r in readings:
-                    if mykey not in bpmf_phon1:
-                        output.append((mykey, r, myvalue))
-                        continue
-                    elif str(bpmf_phon1[mykey]) == r:
-                        output.append((mykey, r, myvalue))
-                        continue
-                    elif mykey not in bpmf_phon2:
-                        output.append((mykey, r, H_DEFLT_FREQ))
-                        continue
-                    elif str(bpmf_phon2[mykey]) == r:
-                        # l(3/4) = -0.28768207245178 / 頻率打七五折之意
-                        # l(1/2) = -0.69314718055994 / 頻率打五折之意
-                        if float(myvalue) - 0.69314718055994 > H_DEFLT_FREQ:
-                            output.append((mykey, r, float(myvalue) - 0.69314718055994))
-                            continue
-                        else:
-                            output.append((mykey, r, H_DEFLT_FREQ))
-                            continue
-                    elif mykey not in bpmf_phon3:
-                        output.append((mykey, r, H_DEFLT_FREQ))
-                        continue
-                    elif str(bpmf_phon3[mykey]) == r:
-                        # l(3/4*3/4) = -0.28768207245178*2
-                        # l(1/2*1/2) = -0.69314718055994*2
-                        if float(myvalue) - 0.69314718055994 * 2 > H_DEFLT_FREQ:
-                            output.append(
-                                (mykey, r, float(myvalue) - 0.69314718055994 * 2)
-                            )
-                            continue
-                        else:
-                            output.append((mykey, r, H_DEFLT_FREQ))
-                            continue
-                    output.append((mykey, r, H_DEFLT_FREQ))
-                    # 如果是破音字, set it to default.
-                    # 很罕用的注音建議不要列入 heterophony?.list，這樣的話
-                    # 就可以直接進來這個 condition
-    handle.close()
-
-    with open(punctuations_path) as punctuations_file:
+    heterophony1_path: str,
+    heterophony2_path: str,
+    heterophony3_path: str,
+    phrase_freq_path: str,
+    bpmf_mappings_path: str,
+    bpmf_base_path: str,
+    punctuations_path: str,
+    symbols_path: str,
+    macros_path: str,
+    output_path: str,
+) -> None:
+    """Compile all dictionary source files into final data.txt."""
+    load_heterophony_file(heterophony1_path, bpmf_phon1)
+    load_heterophony_file(heterophony2_path, bpmf_phon2)
+    load_heterophony_file(heterophony3_path, bpmf_phon3)
+    load_bpmf_base(bpmf_base_path)
+    load_bpmf_mappings(bpmf_mappings_path)
+    load_phrase_frequencies(phrase_freq_path)
+    output = generate_output_entries()
+    with open(punctuations_path, encoding="utf-8") as punctuations_file:
         for line in punctuations_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3
             output.append(tuple(row))
-
-    with open(symbols_path) as symbols_file:
+    with open(symbols_path, encoding="utf-8") as symbols_file:
         for line in symbols_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3, row
             output.append(tuple(row))
-
-    with open(macros_path) as macro_file:
+    with open(macros_path, encoding="utf-8") as macro_file:
         for line in macro_file:
             row = line.rstrip().split(" ")
             assert len(row) == 3, row
             output.append(tuple(row))
-
     output = convert_vks_rows_to_sorted_kvs_rows(output)
-    with open(output_path, "w") as fout:
+    with open(output_path, "w", encoding="utf-8") as fout:
         fout.write(HEADER)
-
         for row in output:
-            if type(row[-1]) is float:
-                fout.write("%s %s %f\n" % row)
+            if isinstance(row[-1], float):
+                fout.write(f"{row[0]} {row[1]} {row[2]:f}\n")
             else:
-                fout.write("%s %s %s\n" % row)
+                fout.write(f"{row[0]} {row[1]} {row[2]}\n")
 
 
-def main():
+def main() -> None:
+    """Main entry point for data compiler."""
     parser = argparse.ArgumentParser(description="cook phrases database")
     parser.add_argument("--heterophony1", required=True)
     parser.add_argument("--heterophony2", required=True)
@@ -235,7 +187,6 @@ def main():
     parser.add_argument("--symbols", required=True)
     parser.add_argument("--macros", required=True)
     parser.add_argument("--output", required=True)
-
     args = parser.parse_args()
     cook(
         heterophony1_path=args.heterophony1,

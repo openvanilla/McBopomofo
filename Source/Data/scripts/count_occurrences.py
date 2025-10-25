@@ -1,90 +1,94 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import sys
-import codecs
+"""Count phrase occurrences in corpus with parallel processing support."""
+
+import argparse
 import configparser
 import multiprocessing
 from pathlib import Path
 
-# Import centralized project paths
-from curation import PROJECT_ROOT, CONFIG_FILE
+from curation import CONFIG_FILE
 
 __author__ = "Mengjuei Hsieh and The McBopomofo Authors"
 __copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
 __license__ = "MIT"
 
-__doc__ = """
-   A facility to print a list of counts for substrings / phrases
-   in a text pool file, given a list of phrases."""
-
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE)
-corpus_path = Path(config.get('data', 'corpus_path')).expanduser()
+corpus_path = Path(config.get("data", "corpus_path")).expanduser()
 
-# store the content of a text pool file in a global variable
-# not ideal, but should be sufficient.
-bigstring = ''
+bigstring = ""
 try:
-    with codecs.open(corpus_path, encoding='utf-8', mode='r') as handle:
+    with open(corpus_path, encoding="utf-8") as handle:
         bigstring = handle.read()
-except IOError as e:
-    print(f"({e})")
-    raise e
+except OSError as e:
+    print(f"Error reading corpus: {e}")
+    raise
 
 
-# return a tuple of (substring, count, status)
-def count_string(substring):
+def count_string(substring: str) -> tuple[str, int, bool]:
+    """Count occurrences of substring in corpus, return (substring, count, success)."""
     if bigstring and substring:
         return substring, bigstring.count(substring), True
-    return '', 0, False
+    return "", 0, False
 
 
-if __name__ == '__main__':
-    """
-    bin/count.occurrence.py phrase.list > phrase.occ
-    """
-    import argparse
-    max_cores = multiprocessing.cpu_count()
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-j", metavar='<nproc>', type=int, help="specify number of simutaneous search thread")
-    parser.add_argument("phraselist", help="file with one phrase per line, use - for standard input")
-    args = parser.parse_args()
-
-    allstrings = []
-
-    if not args.j:
-        pass
-    elif max_cores >= args.j:
-        max_cores = args.j
-    else:
-        pass
-    ncores = max_cores
-    if args.phraselist == '-':
-        while True:
-            try:
-                line = input()
-                if not line: break
-                if line[0] == '#': continue
+def load_phrases_from_file(file_path: Path) -> list[str]:
+    """Load phrases from file (first word on each line)."""
+    phrases = []
+    try:
+        with open(file_path, encoding="utf-8") as handle:
+            for line in handle:
+                if not line or line[0] == "#":
+                    continue
                 elements = line.rstrip().split()
-                allstrings.append(elements[0])
-            except (EOFError): break
-    else:
-        try:
-            handle = codecs.open(args.phraselist, encoding='utf-8', mode='r')
-        except IOError as e:
-            print("({})".format(e))
+                if elements:
+                    phrases.append(elements[0])
+    except OSError as e:
+        print(f"Error reading {file_path}: {e}")
+    return phrases
+
+
+def load_phrases_from_stdin() -> list[str]:
+    """Load phrases from standard input (first word on each line)."""
+    phrases = []
+    try:
         while True:
-            line = handle.readline()
-            if not line: break
-            if line[0] == '#': continue
+            line = input()
+            if not line or line[0] == "#":
+                continue
             elements = line.rstrip().split()
-            allstrings.append(elements[0])
-        handle.close()
-    pool = multiprocessing.Pool(ncores)
-    results = pool.map_async(count_string, allstrings).get(9999999)
-    outputs = [(phrase, count) for phrase, count, state in results if state is True]
+            if elements:
+                phrases.append(elements[0])
+    except EOFError:
+        pass
+    return phrases
+
+
+def main() -> None:
+    """Main entry point for phrase occurrence counting."""
+    max_cores = multiprocessing.cpu_count()
+    parser = argparse.ArgumentParser(description="Count phrase occurrences in corpus")
+    parser.add_argument(
+        "-j",
+        metavar="<nproc>",
+        type=int,
+        help="specify number of simultaneous search threads",
+    )
+    parser.add_argument(
+        "phraselist",
+        help="file with one phrase per line, use - for standard input",
+    )
+    args = parser.parse_args()
+    ncores = args.j if args.j and args.j <= max_cores else max_cores
+    if args.phraselist == "-":
+        allstrings = load_phrases_from_stdin()
+    else:
+        allstrings = load_phrases_from_file(Path(args.phraselist))
+    with multiprocessing.Pool(ncores) as pool:
+        results = pool.map_async(count_string, allstrings).get(9999999)
+    outputs = [(phrase, count) for phrase, count, state in results if state]
     for phrase, count in outputs:
-        outstring = u'%s	%d' % (phrase, count)
-        print(outstring)
-# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
+        print(f"{phrase}\t{count}")
+
+
+if __name__ == "__main__":
+    main()

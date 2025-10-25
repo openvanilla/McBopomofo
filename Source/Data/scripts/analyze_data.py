@@ -1,128 +1,200 @@
-with open('data.txt') as f:
-    lines = f.readlines()
+"""Analyze dictionary data for score consistency and unigram completeness."""
 
-data = [ln.strip().split(' ') for ln in lines[1:] if not ln.startswith('_')]
+from pathlib import Path
 
-data = [(d[0].split('-'), d[1], float(d[2])) for d in data]
+from curation import PROJECT_ROOT
 
-unigram_1char = {}
-value_to_score = {}
+__author__ = "The McBopomofo Authors"
+__copyright__ = "Copyright 2024 and onwards The McBopomofo Authors"
+__license__ = "MIT"
 
-unigram_1char_count = 0
-unigram_multichar_count = 0
+Reading = list[str]
+Value = str
+Score = float
+UnigramData = tuple[Reading, Value, Score]
+UnigramChar = tuple[Value, Score]
+CompetingUnigram = tuple[Value, Score, Value, Score]
+InsufficientEntry = tuple[Reading, Value, Score, list[UnigramChar], Score]
 
-for (r, v, s) in data:
-    # Skip emojis.
-    if s == -8:
-        continue
+EMOJI_SCORE = -8.0
+SEPARATOR = "-" * 72
 
-    if v in value_to_score:
-        if s > value_to_score[v]:
-            value_to_score[v] = s
-    else:
-        value_to_score[v] = s
 
-    if len(r) > 1:
-        unigram_multichar_count += 1
-        continue
-    unigram_1char_count += 1
+def load_data_file(file_path: Path) -> list[UnigramData]:
+    """Load and parse data.txt into (reading, value, score) tuples."""
+    with open(file_path, encoding="utf-8") as f:
+        lines = f.readlines()
+    data = [ln.strip().split(" ") for ln in lines[1:] if not ln.startswith("_")]
+    return [(d[0].split("-"), d[1], float(d[2])) for d in data]
 
-    k = r[0]
-    if k in unigram_1char:
-        if s > unigram_1char[k][1]:
-            unigram_1char[k] = (v, s)
-    else:
-        unigram_1char[k] = (v, s)
 
-faulty = []
-indifferents = []
-insufficients = []
-competing_unigrams = []
+def build_unigram_maps(
+    data: list[UnigramData],
+) -> tuple[dict[str, UnigramChar], dict[Value, Score], int, int]:
+    """Build lookup maps for unigrams, return (1char_map, value_scores, 1char_count, multichar_count)."""
+    unigram_1char = {}
+    value_to_score = {}
+    unigram_1char_count = 0
+    unigram_multichar_count = 0
 
-for (r, v, s) in data:
-    if len(r) < 2:
-        continue
+    for reading, value, score in data:
+        if score == EMOJI_SCORE:
+            continue
 
-    # Skip all emojis.
-    if s == -8:
-        continue
-
-    comp = []
-    ts = 0
-    bad = False
-    for x in r:
-        if x not in unigram_1char:
-            bad = True
-            break
-
-        uv, us = unigram_1char[x]
-        ts += us
-        comp.append((uv, us))
-
-    if bad:
-        faulty.append((r, v))
-        continue
-
-    if ts >= s:
-        i = (r, v, s, comp, (s - ts))
-
-        k = ''.join([x[0] for x in comp])
-
-        if v == k:
-            indifferents.append(i)
+        if value in value_to_score:
+            value_to_score[value] = max(score, value_to_score[value])
         else:
-            if k in value_to_score and v != k:
-                if s < value_to_score[k]:
-                    competing_unigrams.append((v, s, k, value_to_score[k]))
-            insufficients.append(i)
+            value_to_score[value] = score
 
-insufficients = sorted(insufficients, key=lambda i: i[2], reverse=True)
-competing_unigrams = sorted(
-    competing_unigrams, key=lambda i: i[1] - i[3], reverse=True)
+        if len(reading) > 1:
+            unigram_multichar_count += 1
+            continue
 
-separator = '-' * 72
-print(separator)
-print('%6d unigrams with one character' % unigram_1char_count)
-print('%6d unigrams with multiple characters' % unigram_multichar_count)
+        unigram_1char_count += 1
+        key = reading[0]
 
-print(separator)
-print('summary for unigrams with scores lower than their competing characters:')
-print('%6d unigrams that are indifferent since the characters are the same' %
-      len(indifferents))
-print('%6d unigrams that are not the top candidate (%.1f%% of unigrams)' %
-      (len(insufficients),
-       len(insufficients) / float(unigram_multichar_count) * 100.0))
-print('\nof which:')
+        if key in unigram_1char:
+            if score > unigram_1char[key][1]:
+                unigram_1char[key] = (value, score)
+        else:
+            unigram_1char[key] = (value, score)
 
-insufficients_map = {}
-for x in range(2, 7):
-    insufficients_map[x] = [i for i in insufficients if len(i[0]) == x]
+    return unigram_1char, value_to_score, unigram_1char_count, unigram_multichar_count
 
-print('  %6d 2-character unigrams' % len(insufficients_map[2]))
-print('  %6d 3-character unigrams' % len(insufficients_map[3]))
-print('  %6d 4-character unigrams' % len(insufficients_map[4]))
-print('  %6d 5-character unigrams' % len(insufficients_map[5]))
-print('  %6d 6-character unigrams' % len(insufficients_map[6]))
 
-print(separator)
-print('top insufficient 2-character unigrams')
-for i in insufficients_map[2][:25]:
-    print(i)
+def analyze_multi_char_unigrams(
+    data: list[UnigramData],
+    unigram_1char: dict[str, UnigramChar],
+    value_to_score: dict[Value, Score],
+) -> tuple[
+    list[tuple[Reading, Value]],
+    list[InsufficientEntry],
+    list[InsufficientEntry],
+    list[CompetingUnigram],
+]:
+    """Analyze multi-char unigrams for score consistency, return (faulty, indifferents, insufficients, competing)."""
+    faulty = []
+    indifferents = []
+    insufficients = []
+    competing_unigrams = []
+    for reading, value, score in data:
+        if len(reading) < 2:
+            continue
+        if score == EMOJI_SCORE:
+            continue
+        comp = []
+        total_score = 0.0
+        bad = False
+        for char_reading in reading:
+            if char_reading not in unigram_1char:
+                bad = True
+                break
+            char_value, char_score = unigram_1char[char_reading]
+            total_score += char_score
+            comp.append((char_value, char_score))
+        if bad:
+            faulty.append((reading, value))
+            continue
+        if total_score >= score:
+            entry = (reading, value, score, comp, score - total_score)
+            composed_value = "".join(x[0] for x in comp)
+            if value == composed_value:
+                indifferents.append(entry)
+            else:
+                if (
+                    composed_value in value_to_score
+                    and value != composed_value
+                    and score < value_to_score[composed_value]
+                ):
+                    competing_unigrams.append(
+                        (value, score, composed_value, value_to_score[composed_value])
+                    )
+                insufficients.append(entry)
+    insufficients.sort(key=lambda i: i[2], reverse=True)
+    competing_unigrams.sort(key=lambda i: i[1] - i[3], reverse=True)
+    return faulty, indifferents, insufficients, competing_unigrams
 
-print(separator)
-print('all insufficient 3-character unigrams')
-for i in insufficients_map[3]:
-    print(i)
 
-print(separator)
-print('%d unigrams also compete with unigrams from top composing characters' %
-      len(competing_unigrams))
-print('some samples:')
-for i in competing_unigrams[:25]:
-    print(i)
+def print_analysis_results(
+    unigram_1char_count: int,
+    unigram_multichar_count: int,
+    indifferents: list[InsufficientEntry],
+    insufficients: list[InsufficientEntry],
+    competing_unigrams: list[CompetingUnigram],
+    faulty: list[tuple[Reading, Value]],
+) -> None:
+    """Print formatted analysis results."""
+    print(SEPARATOR)
+    print(f"{unigram_1char_count:6d} unigrams with one character")
+    print(f"{unigram_multichar_count:6d} unigrams with multiple characters")
 
-if faulty:
-    print(separator)
-    print('The following unigrams cannot be typed:')
-    for f in faulty:
-        print(f)
+    print(SEPARATOR)
+    print("summary for unigrams with scores lower than their competing characters:")
+    print(f"{len(indifferents):6d} unigrams that are indifferent since the characters are the same")
+
+    insufficient_pct = len(insufficients) / float(unigram_multichar_count) * 100.0
+    print(
+        f"{len(insufficients):6d} unigrams that are not the top candidate "
+        f"({insufficient_pct:.1f}% of unigrams)"
+    )
+    print("\nof which:")
+
+    insufficients_map = {}
+    for length in range(2, 7):
+        insufficients_map[length] = [i for i in insufficients if len(i[0]) == length]
+
+    for length in range(2, 7):
+        count = len(insufficients_map[length])
+        print(f"  {count:6d} {length}-character unigrams")
+
+    print(SEPARATOR)
+    print("top insufficient 2-character unigrams")
+    for entry in insufficients_map[2][:25]:
+        print(entry)
+
+    print(SEPARATOR)
+    print("all insufficient 3-character unigrams")
+    for entry in insufficients_map[3]:
+        print(entry)
+
+    print(SEPARATOR)
+    print(
+        f"{len(competing_unigrams)} unigrams also compete with unigrams "
+        f"from top composing characters"
+    )
+    print("some samples:")
+    for entry in competing_unigrams[:25]:
+        print(entry)
+
+    if faulty:
+        print(SEPARATOR)
+        print("The following unigrams cannot be typed:")
+        for f in faulty:
+            print(f)
+
+
+def main() -> None:
+    """Main entry point for the analysis script."""
+    data_file = PROJECT_ROOT / "data.txt"
+    if not data_file.exists():
+        print(f"Error: {data_file} not found. Run 'make all' first to generate data files.")
+        return
+    data = load_data_file(data_file)
+    unigram_1char, value_to_score, unigram_1char_count, unigram_multichar_count = (
+        build_unigram_maps(data)
+    )
+    faulty, indifferents, insufficients, competing_unigrams = analyze_multi_char_unigrams(
+        data, unigram_1char, value_to_score
+    )
+    print_analysis_results(
+        unigram_1char_count,
+        unigram_multichar_count,
+        indifferents,
+        insufficients,
+        competing_unigrams,
+        faulty,
+    )
+
+
+if __name__ == "__main__":
+    main()
