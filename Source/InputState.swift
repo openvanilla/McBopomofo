@@ -137,7 +137,7 @@ class InputState: NSObject {
             ),
             (
                 NSLocalizedString("Roman Numbers (Alphabets)", comment: ""),
-                { .RomanNumber(style: .alphabet , number: "") }
+                { .RomanNumber(style: .alphabets , number: "") }
             ),
             (
                 NSLocalizedString("Roman Numbers (Full-width Upper Case)", comment: ""),
@@ -265,13 +265,13 @@ class InputState: NSObject {
     class RomanNumber: InputState {
         @objc(InputStateRomanNumberStyle)
         enum Style: Int {
-            case alphabet = 0
+            case alphabets = 0
             case fullWidthUpper = 1
             case fullWidthLower = 2
 
             var label: String {
                 switch self {
-                case .alphabet:
+                case .alphabets:
                     "羅馬數字 (字母)"
                 case .fullWidthUpper:
                     "羅馬數字 (大寫全型)"

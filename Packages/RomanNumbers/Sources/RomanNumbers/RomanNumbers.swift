@@ -9,9 +9,9 @@ public enum RomanNumbersErrors: Int, Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .tooLarge:
-            "Cannot be larger then 3999"
+            "Cannot be larger than 3999"
         case .tooSmall:
-            "Cannot be less then 0"
+            "Cannot be less than 0"
         case .invalidInput:
             "Input is not a valid integer"
         }
