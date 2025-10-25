@@ -1,0 +1,64 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - '**/*.swift'
+      - '**/*.cpp'
+      - '**/*.mm'
+      - '**/*.m'
+      - '**/*.h'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - '.github/workflows/codeql.yml'
+
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - '**/*.swift'
+      - '**/*.cpp'
+      - '**/*.mm'
+      - '**/*.m'
+      - '**/*.h'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - '.github/workflows/codeql.yml'
+
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: macos-latest
+    timeout-minutes: 360
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'swift', 'cpp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: manual
+
+    - name: Build project
+      run: |
+        xcodebuild -scheme McBopomofoInstaller -configuration Debug build ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:${{ matrix.language }}"

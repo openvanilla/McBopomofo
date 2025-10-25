@@ -1,5 +1,25 @@
 name: Build
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - '**/*.swift'
+      - '**/*.cpp'
+      - '**/*.mm'
+      - '**/*.m'
+      - '**/*.h'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - '.github/workflows/continuous-integration-workflow-xcode-latest.yml'
+  pull_request:
+    paths:
+      - '**/*.swift'
+      - '**/*.cpp'
+      - '**/*.mm'
+      - '**/*.m'
+      - '**/*.h'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - '.github/workflows/continuous-integration-workflow-xcode-latest.yml'
 
 jobs:
   build:
