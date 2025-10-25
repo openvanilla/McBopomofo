@@ -1,19 +1,49 @@
-# AGENTS.md
+# McBopomofo Dictionary Data
 
-This file provides guidance to AI coding assistants when working with dictionary data in this directory.
+This directory contains all dictionary data files and the build system for generating McBopomofo's language model data. These files define the mapping between Bopomofo phonetic input and Traditional Chinese characters/phrases, along with frequency data and special features like macros and symbols.
 
-## Overview
+**For comprehensive dictionary development workflows**, see [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明).
 
-The `Source/Data/` directory contains all dictionary data files and the build system for generating McBopomofo's language model data. These files define the mapping between Bopomofo phonetic input and Traditional Chinese characters/phrases, along with frequency data and special features like macros and symbols.
+**Key Principle:** In most cases, you'll be **adding** new characters or phrases rather than deleting existing ones.
 
-**For comprehensive dictionary development workflows**, see [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明). This document provides technical reference for AI assistants.
+## Directory Structure
 
-**GitHub Copilot users:** See `.github/instructions/Data.instructions.md` for path-specific Copilot instructions for this directory.
-
-**General guidelines** (emoji, date/time format, Conventional Commits, etc.) are defined in the root `AGENTS.md` and `.github/copilot-instructions.md`.
-
-**Key Principles:**
-- In most cases, you'll be **adding** new characters or phrases rather than deleting existing ones
+```
+├── BPMFBase.txt          Single character Bopomofo mappings
+├── BPMFMappings.txt      Multi-character phrases (2-6 chars)
+│                         Originally simplified from tsi.src of libtabe
+│                         (BSD Licensed) with modifications
+├── BPMFPunctuations.txt  Punctuation marks
+├── heterophony1.list     Heterophony reading priorities (1st order)
+├── heterophony2.list     Heterophony reading priorities (2nd order)
+├── heterophony3.list     Heterophony reading priorities (3rd order)
+├── phrase.occ            Phrase frequency/occurrence data
+├── exclusion.txt         Phrase frequency exclusions
+├── Symbols.txt           Special symbols (era names, etc.)
+├── Macros.txt            Text macros (date/time)
+├── Makefile              Build automation
+├── pyproject.toml        Python package configuration
+├── textpool.rc           Corpus counting configuration
+│
+├── curation/             Python package for data processing
+│   │                     (exports PROJECT_ROOT, CONFIG_FILE for path resolution)
+│   ├── builders/         frequency_builder, phrase_deriver
+│   ├── compilers/        main_compiler, plain_bpmf_compiler, compiler_utils
+│   ├── utils/            text_filter
+│   ├── validators/       score_validator, encoding auditor
+│   ├── notebooks/        Jupyter analysis notebooks
+│   └── requirements.txt  Package dependencies
+│
+├── scripts/              Standalone CLI tools (with side effects)
+│   │                     (imports paths from curation package)
+│   ├── count_occurrences.py  Count phrase occurrences in corpus
+│   ├── analyze_data.py       Analyze dictionary data quality
+│   ├── map_bpmf.py           Primitive BPMF mapping helper
+│   └── audit_encoding.py     Validate BPMFBase.txt encoding categories
+│
+├── tests/                Unit tests for curation package
+└── memo/                 Reference data and notes
+```
 
 ## File Descriptions
 
@@ -44,10 +74,11 @@ The `Source/Data/` directory contains all dictionary data files and the build sy
 
 **Important:** Generated output files are built locally and NOT committed to git (listed in `.gitignore`).
 
-## Common Commands
+## Build System & Commands
+
+### Essential Make Targets
 
 ```bash
-# Essential Make Targets
 make all           # Generate all output files
 make sort          # Sort all data files with correct C locale
 make check         # Validate data integrity
@@ -179,12 +210,13 @@ Scripts with side effects are located in `scripts/`:
 | `count_occurrences.py` | Counts phrase occurrences in text corpus |
 | `analyze_data.py` | Analyzes dictionary data and generates reports |
 | `map_bpmf.py` | Helper for automatic Bopomofo mapping |
+| `audit_encoding.py` | Validates BPMFBase.txt encoding categories (Big5/CNS/UTF-8) |
 
-### Python Development Guidelines
+## Python Development Guidelines
 
 **CRITICAL RULES for AI coding assistants:**
 
-#### 1. Module Organization Rules
+### 1. Module Organization Rules
 
 **Library modules** (in `curation/` package) **MUST NOT** have side effects at module level:
 - **PROHIBITED**: Opening files, reading/writing data, printing output at module level
@@ -221,7 +253,7 @@ if __name__ == '__main__':
     main()
 ```
 
-#### 2. Import Guidelines
+### 2. Import Guidelines
 
 - **REQUIRED**: All imports at top of file
 - **NEVER** use inline imports (unless explicitly necessary for specific technical reasons)
@@ -251,7 +283,7 @@ def process_data(input_data):
     return result
 ```
 
-#### 3. Side Effect Management
+### 3. Side Effect Management
 
 **Scripts with side effects belong in `scripts/` directory, NOT in `curation/` package.**
 
@@ -268,7 +300,7 @@ Scripts that do any of the following must be in `scripts/`:
 | `scripts/` | Pure CLI tools | Has side effects; not importable as library; immediate execution |
 | `curation/` | Library modules | No side effects; importable; reusable functions |
 
-#### 4. Script vs Library Separation
+### 4. Script vs Library Separation
 
 **Library modules** in `curation/` should:
 - Provide reusable functions and classes
@@ -282,7 +314,7 @@ Scripts that do any of the following must be in `scripts/`:
 - Be called directly: `python3 scripts/script_name.py`
 - NOT be imported by other modules
 
-#### 5. PEP-8 Naming Conventions
+### 5. PEP-8 Naming Conventions
 
 - Module names: `lowercase_with_underscores.py`
 - Function names: `lowercase_with_underscores()`
@@ -293,7 +325,7 @@ Scripts that do any of the following must be in `scripts/`:
 - GOOD: `frequency_builder.py`, `main_compiler.py`, `text_filter.py`
 - BAD: `buildFreq.py`, `nonCJK_filter.py`, `cook-plain-bpmf.py`
 
-#### 6. Package Installation
+### 6. Package Installation
 
 Install as editable package for development:
 ```bash
@@ -307,6 +339,97 @@ After installation, use console scripts:
 mcbpmf-build-freq              # Instead of: python3 -m curation.builders.frequency_builder
 mcbpmf-compile                 # Instead of: python3 -m curation.compilers.main_compiler
 mcbpmf-validate-scores         # Instead of: python3 -m curation.validators.score_validator
+mcbpmf_audit_encoding          # Encoding validation tool
+```
+
+### Console Scripts Reference
+
+Complete list of available CLI tools after `pip install -e .`:
+
+| Command | Module | Purpose |
+|---------|--------|---------|
+| `mcbpmf-compile` | `curation.compilers.main_compiler` | Build data.txt from all sources |
+| `mcbpmf-compile-plain` | `curation.compilers.plain_bpmf_compiler` | Build data-plain-bpmf.txt |
+| `mcbpmf-build-freq` | `curation.builders.frequency_builder` | Generate PhraseFreq.txt |
+| `mcbpmf-derive-phrases` | `curation.builders.phrase_deriver` | Generate associated phrases |
+| `mcbpmf-validate-scores` | `curation.validators.score_validator` | Validate dictionary quality |
+| `mcbpmf-filter-non-cjk` | `curation.utils.text_filter` | Filter non-CJK characters |
+| `mcbpmf-audit-encoding` | `scripts.audit_encoding` | Validate encoding categories |
+
+### Running Tests
+
+For Python package development:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=curation
+
+# Run specific test file
+pytest tests/test_specific.py
+```
+
+### Code Quality Tools
+
+This project uses Ruff for linting and formatting Python code. Ruff is an extremely fast Python linter and formatter written in Rust.
+
+```bash
+# Check code quality (linting)
+ruff check .
+
+# Auto-fix issues where possible
+ruff check --fix .
+
+# Format code
+ruff format .
+
+# Run both linting and formatting
+ruff check --fix . && ruff format .
+```
+
+**Configuration** is in `pyproject.toml`:
+- Line length: 100 characters
+- Target: Python 3.9+
+- Selected rules: Error detection (E), PEP 8 (F), import sorting (I), naming (N), Python upgrades (UP), bugbear (B)
+
+### Jupyter Notebooks
+
+The `curation/notebooks/` directory contains analysis tools:
+
+- `playground.ipynb` - Term score verification and data analysis
+
+To use notebooks:
+```bash
+pip install -e ".[notebook]"
+jupyter notebook curation/notebooks/
+```
+
+### Example Module Pattern
+
+When creating new modules in the `curation/` package, follow this pattern:
+
+```python
+#!/usr/bin/env python3
+import argparse
+from pathlib import Path
+from curation import PROJECT_ROOT
+
+def process_data(input_file: Path) -> None:
+    """Process dictionary data."""
+    # Implementation here
+    pass
+
+def main():
+    """CLI entry point."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', type=Path)
+    args = parser.parse_args()
+    process_data(args.input)
+
+if __name__ == '__main__':
+    main()
 ```
 
 ## Project Path Configuration
@@ -335,84 +458,11 @@ This ensures:
 - Easy refactoring if directory structure changes
 - Consistent behavior across all tools
 
-## Historical Context: Tool Evolution (2012-2025)
-
-### Migration from bin/ to curation/ (October 2024)
-
-Prior to October 2024, all Python tools were located in the `bin/` directory (now renamed to `bin_legacy/`). This directory accumulated tools over 13+ years with contributions from multiple developers.
-
-#### Tool Creation Timeline
-
-- **2012-08-06**: `cook.py` created by Mengjuei Hsieh, replacing Ruby implementation
-- **2012-09-16**: `buildFreq.py` created, replacing bash version
-- **2013-01-02**: `self-score-test.py` added for quality validation
-- **2013-01-21**: C version moved to `C_Version/` subdirectory ("phasing out")
-- **2024-03-15**: `derive_associated_phrases.py` added by Lukhnos Liu (v2 system)
-- **2024-08-25**: `audit_encoding.swift` added by zonble
-- **2025-03-08**: `cook.py` modernized with Black formatting and argparse
-
-#### Why Migration Was Needed
-
-The bin/ structure had accumulated issues:
-1. Flat organization (~30 files, no logical grouping)
-2. Mixed concerns (library code, CLI scripts, config files, legacy tools)
-3. Inconsistent naming conventions
-4. Some modules had side effects at import time
-5. Not installable as proper Python package
-6. Each script calculated paths differently
-
-#### What Was Migrated vs Preserved
-
-**Migrated to `curation/` package** (actively used):
-- All compilation and build tools
-- Frequency calculation
-- Data validation
-- Text processing utilities
-
-**Moved to `scripts/`** (CLI-only, with side effects):
-- Corpus occurrence counting
-- Data analysis reports
-- BPMF mapping helpers
-
-**Preserved in `bin_legacy/`** (historical reference):
-- `audit_encoding.swift` - Still usable standalone tool (2024)
-- `C_Version/` - Fast C implementation, phased out in 2013
-- `Sample_Prep/` - Corpus preparation methodology
-- `disabled/` - Legacy Perl/Ruby/Bash implementations
-
-#### Path Configuration Changed
-
-- **Before**: Each script calculated paths relatively
-- **After**: Import from `curation` package: `from curation import PROJECT_ROOT, CONFIG_FILE`
-
-#### Using Legacy Tools
-
-The `audit_encoding.swift` tool is still functional:
-```bash
-cd bin_legacy
-swift audit_encoding.swift  # Validates BPMFBase.txt encoding categories
-```
-
-C version (for performance comparison):
-```bash
-cd bin_legacy/C_Version
-export TEXTPOOL=/path/to/corpus
-./count.bash 測試詞彙
-```
-
-For complete migration history and tool details, see `bin_legacy/DEPRECATED.md`.
-
-#### Key Contributors
-
-- **Mengjuei Hsieh**: Original Python implementation (2012-2013)
-- **Lukhnos Liu**: Modernization and associated phrases v2 (2024-2025)
-- **zonble**: Encoding audit tool (2024)
-
 ## Data Generation Pipeline
 
 The build process flows: `phrase.occ` + `exclusion.txt` → `buildFreq.py` → `PhraseFreq.txt` → `cook.py` (+ other inputs) → `data.txt` → `derive_associated_phrases.py` → `associated-phrases-v2.txt`.
 
-For detailed pipeline diagram, frequency calculation algorithms, and heterophony processing logic, see `algorithm.md` section "字典資料的生成與使用".
+For detailed pipeline diagram, frequency calculation algorithms, and heterophony processing logic, see `../algorithm.md` section "字典資料的生成與使用".
 
 ## Editorial Guidelines
 
@@ -420,7 +470,21 @@ For editorial policies, see [Wiki: 詞庫開發說明](https://github.com/openva
 
 ### Phrase Quality Control
 
+When in doubt, use Google/Yahoo search to confirm the rarity of phrases:
+
+```
+Example search: "一瞻丰采" site:.tw
+```
+
 Check phrase rarity: `site:.tw "phrase"` (under 1,000 results → likely safe to remove)
+
+**Removal criteria:**
+- If results are under 1,000, it's likely safe to remove the phrase
+- If tsi.src variants show up on first page (SEO sites), remove the phrase
+- For idioms, first hit may be idiom database - use editorial judgment
+- If candidate is part of a longer phrase with incorrect segmentation, replace with complete phrase (if ≤6 characters)
+
+**Remember:** IME is not an idiom database.
 
 ### Data Integrity Checks
 
@@ -453,10 +517,69 @@ pkill -HUP McBopomofo  # Restart
 | Heterophony shows wrong default | Place common reading in `heterophony1.list`, less common in `heterophony2.list` |
 | Emoji appears as first candidate | Add to `Symbols.txt` with negative score (e.g., -8) |
 
-## Reference Files for Context
+## Tool Evolution History (2012-2025)
 
-- Root `AGENTS.md`: Overall project architecture and build system
-- `algorithm.md`: Detailed algorithm explanation (Chinese)
-- [Wiki: 程式架構](https://github.com/openvanilla/McBopomofo/wiki/程式架構): Program architecture
-- [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明): Dictionary development guide
-- [Wiki: 使用手冊](https://github.com/openvanilla/McBopomofo/wiki/使用手冊): User manual
+### Phase 1: Multi-Language Era (2005-2012)
+- Original tools in Perl, Ruby, Bash
+- Multiple implementations for different purposes
+
+### Phase 2: Python Migration (2012-2013)
+- **2012-08-06**: `cook.py` replaced Ruby implementation (Mengjuei Hsieh)
+- **2012-09-16**: `buildFreq.py` replaced bash version (Mengjuei Hsieh)
+- **2013-01-02**: `self-score-test.py` added for quality validation (Mengjuei Hsieh)
+- **2013-01-21**: C version moved to subdirectory, Python became primary
+
+### Phase 3: Maturation (2014-2023)
+- Tools stable and functional
+- Minor updates for Python 3 compatibility
+- **2022-01-18**: Copyright header updates (Lukhnos Liu)
+- **2022-12-30**: count.occurrence.py updates (Mengjuei Hsieh)
+
+### Phase 4: Modern Features (2024)
+- **2024-03-15**: Associated phrases v2 system (Lukhnos Liu)
+- **2024-08-25**: Swift encoding audit tool (zonble)
+- **2024-10-30**: Enhanced associated phrases with punctuation (zonble)
+
+### Phase 5: Package Reorganization (2024-2025)
+- **October 2024**: Migration to `curation/` package structure
+- **2025-03-08**: Final modernization - Black formatting (Lukhnos Liu)
+- **2025-03-08**: argparse refactor (Lukhnos Liu)
+- **January 2025**: Complete Python 3 migration, legacy cleanup
+
+**Benefits achieved:**
+- Proper Python package with PEP-8 compliance
+- Organized submodules (builders, compilers, validators, utils)
+- Importable modules without side effects
+- Package installation via pyproject.toml
+- Console script entry points
+- Centralized path configuration
+
+### Migration Summary
+
+**What was migrated:**
+- All compilation and build tools → `curation/` package
+- Frequency calculation → `curation.builders`
+- Data validation → `curation.validators`
+- Text processing utilities → `curation.utils`
+- Corpus occurrence counting → `scripts/`
+- Data analysis reports → `scripts/`
+- BPMF mapping helpers → `scripts/`
+
+**Path configuration changed:**
+- **Before**: Each script calculated paths relatively
+- **After**: Import from `curation` package: `from curation import PROJECT_ROOT, CONFIG_FILE`
+
+## Key Contributors
+
+- **Mengjuei Hsieh**: Original Python implementation (2012-2013), corpus processing tools
+- **Lukhnos Liu**: Modernization, associated phrases v2, package reorganization (2024-2025)
+- **zonble**: Encoding audit tools, enhanced features (2024)
+
+## References
+
+- **Project Overview**: `../../AGENTS.md` - McBopomofo project architecture and build system
+- **Algorithm Details**: `../algorithm.md` - Data generation pipeline and methodology
+- **Main Documentation**: `../../README.markdown` - Main project documentation
+- **Wiki: 程式架構**: Program architecture (https://github.com/openvanilla/McBopomofo/wiki/程式架構)
+- **Wiki: 詞庫開發說明**: Dictionary development guide (https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明)
+- **Wiki: 使用手冊**: User manual (https://github.com/openvanilla/McBopomofo/wiki/使用手冊)

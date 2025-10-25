@@ -88,7 +88,7 @@ LC_ALL=C sort -o BPMFMappings.txt BPMFMappings.txt
 LC_ALL=C sort -o phrase.occ phrase.occ
 ```
 
-**For detailed dictionary data documentation**, see `Source/Data/AGENTS.md` which covers file formats, editing workflows, Python tools, and troubleshooting.
+**For detailed dictionary data documentation**, see `Source/Data/README.md` which covers file formats, editing workflows, Python tools, and troubleshooting.
 
 ## GitHub Copilot Configuration
 
@@ -117,7 +117,7 @@ McBopomofo uses a three-layer architecture (Swift/Objective-C++/C++). For detail
 | `Source/Engine/Mandarin/Mandarin.cpp` | Bopomofo syllable processing and keyboard layouts |
 | `Source/Engine/gramambular2/` | Text segmentation algorithms (HMM-based) |
 | `Source/Data/Makefile` | Dictionary data build system |
-| `Source/Data/AGENTS.md` | Comprehensive dictionary data documentation |
+| `Source/Data/README.md` | Comprehensive dictionary data documentation |
 | `algorithm.md` | Detailed algorithm explanation (Chinese) |
 | `McBopomofoTests/PreferencesTests.swift` | Example Swift Testing suite patterns |
 
@@ -181,7 +181,7 @@ McBopomofo uses a three-layer architecture (Swift/Objective-C++/C++). For detail
 
 ### Dictionary Data Modifications
 
-For dictionary data modifications, see [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明) or `Source/Data/AGENTS.md` for detailed workflows.
+For dictionary data modifications, see [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明) or `Source/Data/README.md` for detailed workflows.
 
 ## Things to Avoid
 
