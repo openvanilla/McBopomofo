@@ -10,6 +10,7 @@ on:
       - '*.xcodeproj/**'
       - '*.xcworkspace/**'
       - '.github/workflows/continuous-integration-workflow-xcode-latest.yml'
+      - '!Source/Data/**'
   pull_request:
     paths:
       - '**/*.swift'
@@ -20,6 +21,7 @@ on:
       - '*.xcodeproj/**'
       - '*.xcworkspace/**'
       - '.github/workflows/continuous-integration-workflow-xcode-latest.yml'
+      - '!Source/Data/**'
 
 jobs:
   build:
@@ -28,7 +30,10 @@ jobs:
     # env:
     #   DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "^16.1.0"
@@ -88,6 +93,6 @@ jobs:
         run: bash .github/collect_swift_coverage.sh
       - name: Create commit comment
         if: github.event_name == 'push'
-        uses: peter-evans/commit-comment@v3
+        uses: peter-evans/commit-comment@v4
         with:
-          body-path: 'codecov_comment.md' 
+          body-path: 'codecov_comment.md'

@@ -9,6 +9,7 @@ on:
       - '**/*.mm'
       - '**/*.m'
       - '**/*.h'
+      - '**/*.py'
       - '*.xcodeproj/**'
       - '*.xcworkspace/**'
       - '.github/workflows/codeql.yml'
@@ -21,6 +22,7 @@ on:
       - '**/*.mm'
       - '**/*.m'
       - '**/*.h'
+      - '**/*.py'
       - '*.xcodeproj/**'
       - '*.xcworkspace/**'
       - '.github/workflows/codeql.yml'
@@ -42,19 +44,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'swift', 'cpp' ]
+        language: [ 'swift', 'cpp', 'python' ]
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
-        build-mode: manual
+        build-mode: ${{ matrix.language == 'python' && 'none' || 'manual' }}
 
     - name: Build project
+      if: matrix.language == 'swift' || matrix.language == 'cpp'
       run: |
         xcodebuild -scheme McBopomofoInstaller -configuration Debug build ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
 
