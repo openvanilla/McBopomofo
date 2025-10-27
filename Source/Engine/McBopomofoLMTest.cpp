@@ -22,7 +22,9 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #include <cmath>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "McBopomofoLM.h"
 #include "gtest/gtest.h"

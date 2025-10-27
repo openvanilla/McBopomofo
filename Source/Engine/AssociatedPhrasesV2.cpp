@@ -26,9 +26,12 @@
 #include <algorithm>
 #include <cstdlib>
 #include <limits>
+#include <memory>
 #include <sstream>
+#include <string>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "UTF8Helper.h"
 

@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <string>
+#include <vector>
 
 #include "UserPhrasesLM.h"
 #include "gtest/gtest.h"
@@ -38,12 +39,23 @@ TEST(UserPhrasesLMTest, LenientReading) {
   EXPECT_TRUE(lm.hasUnigrams("reading1"));
   EXPECT_FALSE(lm.hasUnigrams("value2"));
 
-  // Anything after the error won't be parsed, so reading2 won't be found.
-  EXPECT_FALSE(lm.hasUnigrams("reading2"));
-
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results =
       lm.getUnigrams("reading1");
   EXPECT_EQ(results[0].value(), "value1");
+  EXPECT_EQ(results[0].score(), UserPhrasesLM::kUserUnigramScore);
+}
+
+TEST(UserPhrasesLMTest, ValuesContainingSpaces) {
+  constexpr char kTestData[] = "v a l u e 1 reading1\nvalue2 \nval 3 reading2";
+
+  UserPhrasesLM lm;
+  ASSERT_TRUE(lm.load(kTestData, sizeof(kTestData)));
+  EXPECT_TRUE(lm.hasUnigrams("reading2"));
+  EXPECT_FALSE(lm.hasUnigrams("value2"));
+
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> results =
+      lm.getUnigrams("reading1");
+  EXPECT_EQ(results[0].value(), "v a l u e 1");
   EXPECT_EQ(results[0].score(), UserPhrasesLM::kUserUnigramScore);
 }
 

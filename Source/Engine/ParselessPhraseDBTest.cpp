@@ -24,7 +24,9 @@
 #include <cstdio>
 #include <filesystem>
 #include <map>
+#include <memory>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "ParselessPhraseDB.h"

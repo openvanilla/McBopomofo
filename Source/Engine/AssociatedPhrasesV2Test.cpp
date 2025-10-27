@@ -21,7 +21,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "AssociatedPhrasesV2.h"
 #include "gtest/gtest.h"

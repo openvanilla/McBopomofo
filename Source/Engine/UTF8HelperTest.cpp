@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #include <string>
+#include <vector>
 
 #include "UTF8Helper.h"
 #include "gtest/gtest.h"

@@ -24,12 +24,11 @@
 #ifndef SRC_ENGINE_USERPHRASESLM_H_
 #define SRC_ENGINE_USERPHRASESLM_H_
 
-#include <iostream>
 #include <map>
 #include <string>
-#include <utility>
 #include <vector>
 
+#include "ByteBlockBackedDictionary.h"
 #include "MemoryMappedFile.h"
 #include "gramambular2/language_model.h"
 
@@ -54,11 +53,13 @@ class UserPhrasesLM : public Formosa::Gramambular2::LanguageModel {
       const std::string& key) override;
   bool hasUnigrams(const std::string& key) override;
 
+  std::vector<ByteBlockBackedDictionary::Issue> getParsingIssues() const;
+
   static constexpr double kUserUnigramScore = 0;
 
  protected:
   MemoryMappedFile mmapedFile_;
-  std::map<std::string_view, std::vector<std::string_view>> keyRowMap;
+  ByteBlockBackedDictionary dictionary_;
 };
 
 }  // namespace McBopomofo
