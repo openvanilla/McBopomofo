@@ -21,10 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <random>
 #include <string>
+#include <utility>
 
 #include "MemoryMappedFile.h"
 #include "gtest/gtest.h"

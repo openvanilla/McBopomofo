@@ -24,8 +24,10 @@
 #ifndef SRC_ENGINE_MCBOPOMOFOLM_H_
 #define SRC_ENGINE_MCBOPOMOFOLM_H_
 
+#include <filesystem>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -106,7 +108,7 @@ class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
 
   void setMacroConverter(
       std::function<std::string(const std::string&)> macroConverter);
-  std::string convertMacro(const std::string& input);
+  std::string convertMacro(const std::string& input) const;
 
   // Methods to allow loading in-memory data for testing purposes.
   void loadLanguageModel(std::unique_ptr<ParselessPhraseDB> db);
@@ -115,21 +117,52 @@ class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
   void loadExcludedPhrases(const char* data, size_t length);
   void loadPhraseReplacementMap(const char* data, size_t length);
 
+  enum class UserFileType {
+    USER_PHRASES,
+    EXCLUDED_PHRASES,
+    PHRASE_REPLACEMENT_MAP,
+  };
+
+  enum class IssueType {
+    NO_ISSUE,
+    MISSING_SECOND_COLUMN,
+    NULL_CHARACTER_IN_TEXT,
+  };
+
+  struct UserFileIssue {
+    const UserFileType fileType;
+    const std::filesystem::path path;
+    const IssueType issueType;
+    const size_t lineNumber;
+    UserFileIssue(UserFileType ft, std::filesystem::path p, IssueType it,
+                  size_t ln)
+        : fileType(ft), path(std::move(p)), issueType(it), lineNumber(ln) {}
+  };
+
+  // Returns the issues encountered while parsing the user files (user phrases,
+  // excluded phrases, or phrase replacements), if any.
+  std::vector<UserFileIssue> getUserFileIssues() const;
+
  protected:
   // Filters and converts the input unigrams and returns a new list of unigrams.
   // Unigrams whose values are found in `excludedValues` are removed, and the
   // kept values will be inserted to the `insertedValues` set.
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
   filterAndTransformUnigrams(
-      const std::vector<Formosa::Gramambular2::LanguageModel::Unigram> unigrams,
+      const std::vector<Formosa::Gramambular2::LanguageModel::Unigram>&
+          unigrams,
       const std::unordered_set<std::string>& excludedValues,
-      std::unordered_set<std::string>& insertedValues);
+      std::unordered_set<std::string>& insertedValues) const;
 
   ParselessLM languageModel_;
   UserPhrasesLM userPhrases_;
   UserPhrasesLM excludedPhrases_;
   PhraseReplacementMap phraseReplacement_;
   AssociatedPhrasesV2 associatedPhrasesV2_;
+
+  std::optional<std::filesystem::path> userPhrasesDataPath_;
+  std::optional<std::filesystem::path> excludedPhrasesDataPath_;
+  std::optional<std::filesystem::path> phraseReplacementPath_;
 
   bool phraseReplacementEnabled_ = false;
 

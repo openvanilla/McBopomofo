@@ -38,8 +38,9 @@ TEST(PhraseReplacementMapTest, LenientReading) {
   ASSERT_EQ(map.valueForKey("key"), "value");
   ASSERT_TRUE(map.valueForKey("key2").empty());
 
-  // key2 causes parsing error, and the line that has key3 won't be parsed.
-  ASSERT_TRUE(map.valueForKey("key3").empty());
+  // even if key2 caused an error, key3 is still parsed.
+  ASSERT_FALSE(map.valueForKey("key3").empty());
+  ASSERT_EQ(map.valueForKey("key3"), "value3");
 }
 
 }  // namespace McBopomofo

@@ -25,6 +25,8 @@
 
 #include <cassert>
 #include <cstring>
+#include <string>
+#include <vector>
 
 namespace McBopomofo {
 
@@ -97,7 +99,7 @@ const char* ParselessPhraseDB::findFirstMatchingLine(
   const char* bottom = end_;
 
   while (top < bottom) {
-    const char* mid = top + (bottom - top) / 2;
+    const char* mid = top + ((bottom - top) / 2);
     const char* ptr = mid;
 
     if (ptr != begin_) {

@@ -23,6 +23,9 @@
 
 #include "UTF8Helper.h"
 
+#include <string>
+#include <vector>
+
 namespace McBopomofo {
 // NOLINTBEGIN(readability-magic-numbers)
 

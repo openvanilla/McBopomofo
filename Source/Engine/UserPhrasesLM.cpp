@@ -29,9 +29,8 @@
 #include <unistd.h>
 
 #include <fstream>
+#include <string>
 #include <vector>
-
-#include "KeyValueBlobReader.h"
 
 namespace McBopomofo {
 
@@ -45,7 +44,7 @@ bool UserPhrasesLM::open(const char* path) {
 }
 
 void UserPhrasesLM::close() {
-  keyRowMap.clear();
+  dictionary_.clear();
   mmapedFile_.close();
 }
 
@@ -54,36 +53,28 @@ bool UserPhrasesLM::load(const char* data, size_t length) {
     return false;
   }
 
-  keyRowMap.clear();
-
-  KeyValueBlobReader reader(data, length);
-  KeyValueBlobReader::KeyValue keyValue;
-  while (reader.Next(&keyValue) == KeyValueBlobReader::State::HAS_PAIR) {
-    // The format of the user phrases files is a bit different. The first column
-    // is the phrase (value) and the second column is the Bopofomo reading. The
-    // KeyValueBlobReader::KeyValue's value is the second column, that's why
-    // it's used as the key of the keyRowMap here.
-    keyRowMap[keyValue.value].emplace_back(keyValue.key);
-  }
-  return true;
+  return dictionary_.parse(
+      data, length, ByteBlockBackedDictionary::ColumnOrder::VALUE_THEN_KEY);
 }
-
 std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
 UserPhrasesLM::getUnigrams(const std::string& key) {
   std::vector<Formosa::Gramambular2::LanguageModel::Unigram> v;
-  auto iter = keyRowMap.find(key);
-  if (iter != keyRowMap.end()) {
-    const std::vector<std::string_view>& values = iter->second;
-    for (const auto& value : values) {
-      v.emplace_back(std::string(value), kUserUnigramScore);
-    }
+
+  std::vector<std::string_view> values = dictionary_.getValues(key);
+  for (const auto& value : values) {
+    v.emplace_back(std::string(value), kUserUnigramScore);
   }
 
   return v;
 }
 
 bool UserPhrasesLM::hasUnigrams(const std::string& key) {
-  return keyRowMap.find(key) != keyRowMap.end();
+  return dictionary_.hasKey(key);
+}
+
+std::vector<ByteBlockBackedDictionary::Issue> UserPhrasesLM::getParsingIssues()
+    const {
+  return dictionary_.issues();
 }
 
 }  // namespace McBopomofo

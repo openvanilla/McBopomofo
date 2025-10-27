@@ -23,6 +23,9 @@
 
 #include <filesystem>
 #include <iostream>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "ParselessLM.h"
 #include "gtest/gtest.h"
