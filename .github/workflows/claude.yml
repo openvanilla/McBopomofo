@@ -45,17 +45,21 @@ jobs:
           prompt: |
             Please review this PR and provide inline feedback using the GitHub review system. Follow these steps:
 
-            1. **Start a review**: Use `mcp__github__create_pending_pull_request_review` to begin a pending review
-            2. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes and line numbers
-            3. **Add inline comments**: Use `mcp__github__add_comment_to_pending_review` for each specific piece of feedback on particular lines
-            4. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" (not "REQUEST_CHANGES") to publish all comments as a non-blocking review
+            1. **Get PR context** (optional): Use `mcp__github__get_pull_request` to understand the PR's purpose, title, and description
+            2. **Start a review**: Use `mcp__github__create_pending_pull_request_review` to begin a pending review
+            3. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes and line numbers
+            4. **Add inline comments**: Use `mcp__github__add_comment_to_pending_review` for each specific piece of feedback on particular lines
+            5. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" (not "REQUEST_CHANGES") to publish all comments as a non-blocking review
 
             When suggesting code changes, use GitHub's suggestion format with ```suggestion blocks so authors can apply changes directly.
 
           # Enable GitHub MCP server tools for inline review comments
           # See: https://github.com/anthropics/claude-code-action/issues/60
+          # Added mcp__github__get_pull_request for consistency with claude-code-review.yml
+          # and to prevent permission denials when Claude needs PR context
           claude_args: >-
             --allowedTools
+            mcp__github__get_pull_request,
             mcp__github__create_pending_pull_request_review,
             mcp__github__get_pull_request_diff,
             mcp__github__add_comment_to_pending_review,
