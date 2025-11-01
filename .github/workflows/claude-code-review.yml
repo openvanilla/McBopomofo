@@ -64,22 +64,29 @@ jobs:
             - Violations of repository coding standards
 
             Keep your response concise:
-            - Maximum 10 bullet points in summary
+            - Focus on critical/high-priority issues only
             - Use inline comments with code suggestions for specific fixes
             - Group similar issues together to avoid repetition
             - Skip style/formatting nitpicks unless they impact security or performance
             - No general observations, praise, or minor suggestions
 
-            Format:
-            - Start with 1-2 sentence overview
-            - List only critical/high-priority issues as bullet points
-            - For each issue: what, where, why it matters, suggested fix
-            - End with sign-off: APPROVED or ISSUES FOUND
+            Use the GitHub review system to post your feedback:
+            1. Use `mcp__github__get_pull_request` to understand the PR context if needed
+            2. Use `mcp__github__create_pending_pull_request_review` to start a pending review
+            3. Use `mcp__github__get_pull_request_diff` to see the code changes and line numbers
+            4. Use `mcp__github__add_comment_to_pending_review` for inline comments on specific lines
+            5. Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish
 
-            Use `gh pr comment` with your Bash tool to leave your concise review as a comment on the PR.
+            When suggesting code changes, use GitHub's ```suggestion blocks so authors can apply changes directly.
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
-          # Increased max-turns to 10 to ensure Claude has enough iterations to complete review and post comment
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)" --max-turns 10'
+          # Use MCP GitHub tools for posting PR reviews (more reliable than gh CLI)
+          # Includes mcp__github__get_pull_request which was missing and caused permission denials
+          claude_args: >-
+            --allowedTools
+            mcp__github__get_pull_request,
+            mcp__github__create_pending_pull_request_review,
+            mcp__github__get_pull_request_diff,
+            mcp__github__add_comment_to_pending_review,
+            mcp__github__submit_pending_pull_request_review
 
