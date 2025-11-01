@@ -3,7 +3,14 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    # Note: Removed paths-ignore to allow testing workflow changes
+    paths-ignore:
+      - '.github/workflows/claude-code-review.yml'
+    # Note: This workflow skips when modifying itself to avoid OIDC token validation errors.
+    # GitHub's security model requires workflow files using id-token: write to be identical
+    # to the version on the master branch. PRs that modify workflows cannot pass OIDC
+    # validation until merged. This is intentional security and cannot be bypassed.
+    # Workflow changes should be manually reviewed and will apply to future PRs after merge.
+    #
     # Optional: Only run on specific file changes
     # paths:
     #   - "src/**/*.ts"
