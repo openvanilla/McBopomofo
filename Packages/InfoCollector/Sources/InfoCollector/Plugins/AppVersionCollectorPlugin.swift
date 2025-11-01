@@ -21,21 +21,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import Carbon
+import Foundation
 
-func osStatusToString(_ status: OSStatus) -> String {
-    let bigEndianValue = status.bigEndian
-    let data = withUnsafeBytes(of: bigEndianValue) { Data($0) }
+public struct AppVersionCollectorPlugin: InfoCollectorPlugin, Sendable {
+    var name: String { "App version collector" }
 
-    if let fourCharString = String(data: data, encoding: .ascii) {
-        return fourCharString
-    } else {
-        return "(\(String(format: "%08X", status)))"
+    func collect(callback: @escaping (Result<String, Error>) -> Void) {
+        let bundle = Bundle.main
+        let version =
+            bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"
+        let build =
+            bundle.object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String ?? "N/A"
+
+        var result: [String] = []
+        result.append("- App Version: \(version)")
+        result.append("- App Build: \(build)")
+        let string = result.joined(separator: "\n")
+        callback(.success(string))
     }
-}
 
-func numberToHex<T: FixedWidthInteger>(_ number: T, withPrefix prefix: Bool = true) -> String {
-    let width = MemoryLayout<T>.size * 2
-    let formatString = prefix ? "%#0\(width + 2)X" : "%0\(width)X"
-    return String(format: formatString, number.littleEndian as! CVarArg)
 }

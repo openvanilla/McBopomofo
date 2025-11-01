@@ -52,7 +52,8 @@ private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
 private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
-private let kRepeatedPunctuationToSelectCandidateEnabledKey = "RepeatedPunctuationToSelectCandidateEnabled"
+private let kRepeatedPunctuationToSelectCandidateEnabledKey =
+    "RepeatedPunctuationToSelectCandidateEnabled"
 private let kUseCustomUserPhraseLocation = "UseCustomUserPhraseLocation"
 private let kCustomUserPhraseLocation = "CustomUserPhraseLocation"
 
@@ -235,8 +236,10 @@ class Preferences: NSObject {
         Preferences.basisKeyboardLayout = Preferences.basisKeyboardLayout
         Preferences.functionKeyboardLayout = Preferences.functionKeyboardLayout
         Preferences.candidateKeys = Preferences.candidateKeys
-        Preferences.selectPhraseAfterCursorAsCandidate = Preferences.selectPhraseAfterCursorAsCandidate
-        Preferences.moveCursorAfterSelectingCandidate = Preferences.moveCursorAfterSelectingCandidate
+        Preferences.selectPhraseAfterCursorAsCandidate =
+            Preferences.selectPhraseAfterCursorAsCandidate
+        Preferences.moveCursorAfterSelectingCandidate =
+            Preferences.moveCursorAfterSelectingCandidate
         Preferences.useHorizontalCandidateList = Preferences.useHorizontalCandidateList
         Preferences.chineseConversionEnabled = Preferences.chineseConversionEnabled
         Preferences.halfWidthPunctuationEnabled = Preferences.halfWidthPunctuationEnabled
@@ -248,12 +251,14 @@ class Preferences: NSObject {
         Preferences.letterBehavior = Preferences.letterBehavior
         Preferences.controlEnterOutput = Preferences.controlEnterOutput
         Preferences.shiftEnterEnabled = Preferences.shiftEnterEnabled
-        Preferences.repeatedPunctuationToSelectCandidateEnabled = Preferences.repeatedPunctuationToSelectCandidateEnabled
+        Preferences.repeatedPunctuationToSelectCandidateEnabled =
+            Preferences.repeatedPunctuationToSelectCandidateEnabled
         Preferences.addPhraseHookEnabled = Preferences.addPhraseHookEnabled
         Preferences.addPhraseHookPath = Preferences.addPhraseHookPath
         Preferences.beepUponInputError = Preferences.beepUponInputError
         Preferences.enableUserPhrasesInPlainBopomofo = Preferences.enableUserPhrasesInPlainBopomofo
-        Preferences.allowMovingCursorWhenChoosingCandidates = Preferences.allowMovingCursorWhenChoosingCandidates
+        Preferences.allowMovingCursorWhenChoosingCandidates =
+            Preferences.allowMovingCursorWhenChoosingCandidates
     }
 
     @EnumUserDefault(key: kKeyboardLayoutPreferenceKey, defaultValue: KeyboardLayout.standard)
@@ -389,6 +394,16 @@ class Preferences: NSObject {
     case useHL = 2
 }
 
+extension MovingCursorKey {
+    var name: String {
+        switch self {
+        case .disabled: "Disabled"
+        case .useJK: "J/K"
+        case .useHL: "H/L"
+        }
+    }
+}
+
 extension Preferences {
     /// Whether allows moving the cursor by J/K or H/L keys, when the candidate
     /// window is presented.
@@ -440,6 +455,18 @@ extension Preferences {
     case htmlRuby = 2
     case braille = 3
     case hanyuPinyin = 4
+}
+
+extension ControlEnterOutput {
+    var name: String {
+        switch self {
+        case .off: "Off"
+        case .bpmfReading: "Bopomofo Reading"
+        case .htmlRuby: "HTML Ruby Text"
+        case .braille: "Taiwan Braille"
+        case .hanyuPinyin: "Hanyu Pinyin"
+        }
+    }
 }
 
 extension Preferences {
@@ -541,4 +568,67 @@ extension Preferences {
 extension Preferences {
     @UserDefault(key: kEnableUserPhrasesInPlainBopomofo, defaultValue: false)
     @objc static var enableUserPhrasesInPlainBopomofo: Bool
+}
+
+extension Preferences {
+    static func createReport() -> String {
+        var lines: [String] = []
+        lines.append("- McBopomofo Settings")
+        lines.append("  - Keyboard Layout: \(Preferences.keyboardLayout.name)")
+        lines.append("  - Basis Keyboard Layout: \(Preferences.basisKeyboardLayout)")
+        lines.append("  - Function Keyboard Layout: \(Preferences.functionKeyboardLayout)")
+        lines.append("  - Candidate Keys: \(Preferences.candidateKeys)")
+        lines.append(
+            "  - Selection Mode: \(Preferences.selectPhraseAfterCursorAsCandidate ? "After Cursor" : "Before Cusor")"
+        )
+        lines.append(
+            "  - Move Cursor After Selecting Candidate: \(Preferences.moveCursorAfterSelectingCandidate ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Canddidate Window: \(Preferences.useHorizontalCandidateList ? "Horizontal" : "Vertical")"
+        )
+        lines.append(
+            "  - Chinese Conversion: \(Preferences.chineseConversionEnabled ? "Enabled" : "Disabled")"
+        )
+        lines
+            .append(
+                "  - Chinese Conversion Style: \(Preferences.chineseConversionStyle.name)"
+            )
+        lines.append(
+            "  - Punctuations: \(Preferences.halfWidthPunctuationEnabled ? "Half-width" : "Full-width")"
+        )
+        lines.append(
+            "  - Select Canidate With Numbric Keyboard: \(Preferences.selectCandidateWithNumericKeypad ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Allow Ctrl + ` For Big5 Input: \(Preferences.big5InputEnabled ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Phrase Repalcement: \(Preferences.phraseReplacementEnabled ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Associated Phrases (McBopomofo): \(Preferences.associatedPhrasesEnabled ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Associated Phrases (Plain Bopomofo): \(Preferences.enableUserPhrasesInPlainBopomofo ? "Enabled" : "Disabled")"
+        )
+
+        lines.append("  - Letter Keys: \(Preferences.letterBehavior)")
+        lines.append("  - Ctrl + Enter Key: \(Preferences.controlEnterOutput.name)")
+        lines.append(
+            "  - Shift + Enter Key For Associated Phrases: \(Preferences.shiftEnterEnabled ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Repeated Keys For Next Candidate: \(Preferences.repeatedPunctuationToSelectCandidateEnabled ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Add Phrase Hook: \(Preferences.addPhraseHookEnabled ? "Enabled" : "Disabled")")
+        lines.append("  - Add Phrase Hook Path: \(Preferences.addPhraseHookPath)")
+        lines.append(
+            "  - Beep Upon Errors: \(Preferences.beepUponInputError ? "Enabled" : "Disabled")")
+        lines.append(
+            "  - Moving Cursor When Choosing Candidates: \(Preferences.allowMovingCursorWhenChoosingCandidates)"
+        )
+        return lines.joined(separator: "\n")
+    }
 }

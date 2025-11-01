@@ -1,12 +1,12 @@
 protocol InfoCollectorPlugin {
     var name: String { get }
     func collect(callback: @escaping (Result<String, Error>) -> Void)
-    @available(iOS 13.0.0, *)
+    @available(iOS 13.0.0, macOS 10.15, *)
     func collect() async throws -> String
 }
 
 extension InfoCollectorPlugin {
-    @available(iOS 13.0.0, *)
+    @available(iOS 13.0.0, macOS 10.15, *)
     func collect() async throws -> String {
         try await withCheckedThrowingContinuation {
             (continuation: CheckedContinuation<String, Error>) in

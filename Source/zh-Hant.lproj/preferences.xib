@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23727" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24128" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23727"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24128"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -28,7 +28,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="489" y="334" width="433" height="575"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1049"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="433" height="575"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -41,7 +41,7 @@
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BSi-pH-F8f">
-                    <rect key="frame" x="183" y="482" width="219" height="25"/>
+                    <rect key="frame" x="186" y="482" width="212" height="24"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="iXH-DJ-dBb">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -71,7 +71,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6eT-rC-gVz">
-                    <rect key="frame" x="183" y="452" width="219" height="25"/>
+                    <rect key="frame" x="186" y="452" width="212" height="24"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="M0n-R9-S5B">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -153,7 +153,7 @@
                     </connections>
                 </popUpButton>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="2Nx-PK-HCb">
-                    <rect key="frame" x="184" y="386" width="117" height="18"/>
+                    <rect key="frame" x="186" y="387" width="113" height="16"/>
                     <buttonCell key="cell" type="check" title="使用空白鍵選字" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="viN-E3-CpO">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -163,7 +163,7 @@
                     </connections>
                 </button>
                 <comboBox focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gtY-jT-2F6">
-                    <rect key="frame" x="185" y="409" width="216" height="23"/>
+                    <rect key="frame" x="186" y="407" width="212" height="24"/>
                     <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="SQ9-Pr-yQD">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -187,7 +187,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KOq-SU-0dw">
-                    <rect key="frame" x="182" y="92" width="214" height="18"/>
+                    <rect key="frame" x="184" y="93" width="210" height="16"/>
                     <buttonCell key="cell" type="check" title="按下 ESC 會清除整個輸入緩衝區" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="lGd-Af-8ly">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -211,7 +211,7 @@
                     <rect key="frame" x="20" y="445" width="256" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qLt-o2-oPl">
-                    <rect key="frame" x="187" y="316" width="181" height="18"/>
+                    <rect key="frame" x="191" y="317" width="177" height="16"/>
                     <buttonCell key="cell" type="check" title="選字之後自動移動游標位置" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jlf-jk-hJY">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -262,7 +262,7 @@
                     </connections>
                 </matrix>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="oya-hD-nIE">
-                    <rect key="frame" x="182" y="55" width="155" height="18"/>
+                    <rect key="frame" x="184" y="56" width="151" height="16"/>
                     <buttonCell key="cell" type="check" title="輸入錯誤時發出警示聲" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="N4o-lx-RYS">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -272,7 +272,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="hvF-32-Zw1">
-                    <rect key="frame" x="182" y="33" width="143" height="18"/>
+                    <rect key="frame" x="184" y="34" width="139" height="16"/>
                     <buttonCell key="cell" type="check" title="定期檢查是否有新版" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="k9r-ii-fdD">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -307,7 +307,7 @@
                     </connections>
                 </matrix>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tDv-b3-Mrm">
-                    <rect key="frame" x="182" y="120" width="117" height="18"/>
+                    <rect key="frame" x="186" y="121" width="113" height="16"/>
                     <buttonCell key="cell" type="check" title="使用聯想詞功能" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jXH-Sv-SCM">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -339,7 +339,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IHs-uV-EyH">
-                    <rect key="frame" x="181" y="283" width="167" height="25"/>
+                    <rect key="frame" x="184" y="283" width="173" height="24"/>
                     <popUpButtonCell key="cell" type="push" title="不使用" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="eGy-zp-bhw" id="8kw-Sg-bV9">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -443,11 +443,11 @@
             <point key="canvasLocation" x="168" y="-350"/>
         </view>
         <view id="L2Q-IX-SXc">
-            <rect key="frame" x="0.0" y="0.0" width="436" height="208"/>
+            <rect key="frame" x="0.0" y="0.0" width="436" height="297"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cks-CZ-m7g">
-                    <rect key="frame" x="60" y="172" width="118" height="16"/>
+                    <rect key="frame" x="60" y="261" width="118" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="中文簡繁轉換模式：" id="bX9-g7-U8G">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -455,7 +455,7 @@
                     </textFieldCell>
                 </textField>
                 <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PuO-lM-5fF">
-                    <rect key="frame" x="184" y="150" width="206" height="38"/>
+                    <rect key="frame" x="184" y="239" width="206" height="38"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="206" height="18"/>
                     <size key="intercellSpacing" width="4" height="2"/>
@@ -480,7 +480,7 @@
                     </connections>
                 </matrix>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YR5-r0-KVo">
-                    <rect key="frame" x="65" y="125" width="113" height="16"/>
+                    <rect key="frame" x="65" y="214" width="113" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + Enter 按鍵：" id="euS-8m-1LM">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -488,7 +488,7 @@
                     </textFieldCell>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QYl-R0-PIq">
-                    <rect key="frame" x="91" y="98" width="87" height="16"/>
+                    <rect key="frame" x="91" y="187" width="87" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + ` 按鍵：" id="ezl-df-SwH">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -496,7 +496,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Toh-FQ-MTf">
-                    <rect key="frame" x="181" y="118" width="219" height="25"/>
+                    <rect key="frame" x="181" y="207" width="219" height="25"/>
                     <popUpButtonCell key="cell" type="push" title="關閉" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4VD-Kh-SxN" id="Gcx-5r-kDK">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -515,7 +515,7 @@
                     </connections>
                 </popUpButton>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bAc-Eh-8y4">
-                    <rect key="frame" x="182" y="97" width="189" height="18"/>
+                    <rect key="frame" x="184" y="187" width="185" height="16"/>
                     <buttonCell key="cell" type="check" title="使用 Ctrl + ` 輸入 Big5 內碼" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="29h-4W-Qux">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -525,7 +525,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92X-g9-wsi">
-                    <rect key="frame" x="182" y="70" width="168" height="18"/>
+                    <rect key="frame" x="184" y="160" width="166" height="16"/>
                     <buttonCell key="cell" type="check" title="連續輸入標點切換候選字" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uza-2x-Yem">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -538,7 +538,7 @@
                     </connections>
                 </button>
                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="i1G-1y-ihS">
-                    <rect key="frame" x="182" y="17" width="236" height="48"/>
+                    <rect key="frame" x="182" y="106" width="236" height="48"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="232" id="W9j-gd-BG6"/>
                     </constraints>
@@ -549,7 +549,7 @@
                     </textFieldCell>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mgj-mT-xZ6">
-                    <rect key="frame" x="113" y="70" width="69" height="16"/>
+                    <rect key="frame" x="113" y="159" width="69" height="16"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="65" id="fFl-lX-SN3"/>
                     </constraints>
@@ -559,11 +559,33 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="BKA-Sp-uuc">
+                    <rect key="frame" x="20" y="96" width="396" height="5"/>
+                </box>
+                <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k5j-ZT-zUm">
+                    <rect key="frame" x="181" y="64" width="128" height="24"/>
+                    <buttonCell key="cell" type="push" title="產生系統資訊報告" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Z6Q-r5-E9H">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" size="13" name=".PingFangUITextTC-Regular"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="openSystemInfoReport:" target="-2" id="AZK-NZ-01I"/>
+                    </connections>
+                </button>
+                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2rb-rs-r3j">
+                    <rect key="frame" x="182" y="28" width="236" height="28"/>
+                    <textFieldCell key="cell" selectable="YES" title="當您在回報問題的時候，可以用這個按鈕，產生一份系統資訊，方便開發團隊了解您的問題。" id="vN2-uZ-LGN">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="cks-CZ-m7g" secondAttribute="trailing" constant="20" symbolic="YES" id="2vN-7H-kMX"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="i1G-1y-ihS" secondAttribute="trailing" constant="20" symbolic="YES" id="55u-1x-Gza"/>
                 <constraint firstItem="QYl-R0-PIq" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="93" id="654-qr-PVz"/>
+                <constraint firstItem="BKA-Sp-uuc" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="198" id="8Kb-ij-Hfa"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="8RB-nU-gsQ"/>
                 <constraint firstAttribute="trailing" secondItem="mgj-mT-xZ6" secondAttribute="trailing" constant="256" id="Ag7-HU-Mrb"/>
                 <constraint firstItem="mgj-mT-xZ6" firstAttribute="top" secondItem="QYl-R0-PIq" secondAttribute="bottom" constant="12" id="Aip-Mp-4m8"/>
@@ -577,24 +599,31 @@
                 <constraint firstItem="bAc-Eh-8y4" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="MaU-YK-uu3"/>
                 <constraint firstItem="YR5-r0-KVo" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="67" id="OIV-aX-QE9"/>
                 <constraint firstItem="QYl-R0-PIq" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="94" id="Uxa-bX-L63"/>
+                <constraint firstItem="BKA-Sp-uuc" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="20" symbolic="YES" id="WKn-db-N8d"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Toh-FQ-MTf" secondAttribute="trailing" constant="20" symbolic="YES" id="bHq-Ek-dwH"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bAc-Eh-8y4" secondAttribute="trailing" constant="20" symbolic="YES" id="blE-3q-IHj"/>
                 <constraint firstItem="92X-g9-wsi" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="121" id="cWS-6m-SvY"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QYl-R0-PIq" secondAttribute="trailing" constant="20" symbolic="YES" id="clc-vZ-J9H"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="d9p-FP-caF"/>
+                <constraint firstItem="k5j-ZT-zUm" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="219" id="dQb-5B-fcp"/>
                 <constraint firstItem="cks-CZ-m7g" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="20" symbolic="YES" id="ePS-tF-QAw"/>
+                <constraint firstItem="2rb-rs-r3j" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="fJJ-XY-bJG"/>
                 <constraint firstItem="i1G-1y-ihS" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="g9S-38-Fym"/>
+                <constraint firstAttribute="trailing" secondItem="BKA-Sp-uuc" secondAttribute="trailing" constant="20" symbolic="YES" id="gCy-AV-8xL"/>
+                <constraint firstItem="2rb-rs-r3j" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="241" id="gsh-jH-yeF"/>
                 <constraint firstItem="i1G-1y-ihS" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="143" id="jMJ-rU-Z9P"/>
                 <constraint firstItem="YR5-r0-KVo" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="67" id="lPb-qK-5c7"/>
+                <constraint firstItem="k5j-ZT-zUm" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="llW-dV-YCu"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2rb-rs-r3j" secondAttribute="trailing" constant="20" symbolic="YES" id="mrL-Q3-sES"/>
             </constraints>
-            <point key="canvasLocation" x="651" y="-121.5"/>
+            <point key="canvasLocation" x="651" y="-103.5"/>
         </view>
         <customView id="M7i-Af-lNp">
             <rect key="frame" x="0.0" y="0.0" width="436" height="334"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="107" translatesAutoresizingMaskIntoConstraints="NO" id="uPv-37-dOi">
-                    <rect key="frame" x="22" y="298" width="105" height="16"/>
+                    <rect key="frame" x="9" y="298" width="105" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="使用者詞彙位置：" id="ulY-l0-tqg">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -602,7 +631,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b15-I3-wDL">
-                    <rect key="frame" x="21" y="257" width="65" height="25"/>
+                    <rect key="frame" x="11" y="258" width="71" height="24"/>
                     <popUpButtonCell key="cell" type="push" title="標準" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="WPo-X9-YuK" id="zEZ-0A-2Df">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -620,7 +649,7 @@
                     </popUpButtonCell>
                 </popUpButton>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aAf-VY-6CO">
-                    <rect key="frame" x="90" y="261" width="291" height="21"/>
+                    <rect key="frame" x="90" y="258" width="291" height="24"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Ooe-Ve-njT">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -632,7 +661,7 @@
                     </connections>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="749" preferredMaxLayoutWidth="405" translatesAutoresizingMaskIntoConstraints="NO" id="pb0-gR-J2p">
-                    <rect key="frame" x="18" y="177" width="403" height="28"/>
+                    <rect key="frame" x="18" y="174" width="403" height="28"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="8wn-XD-VFx"/>
                     </constraints>
@@ -643,7 +672,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ibr-mk-lwr">
-                    <rect key="frame" x="90" y="232" width="39" height="21"/>
+                    <rect key="frame" x="90" y="229" width="39" height="21"/>
                     <buttonCell key="cell" type="bevel" title="Button" bezelStyle="rounded" imagePosition="overlaps" alignment="left" controlSize="small" imageScaling="proportionallyDown" inset="2" id="QMk-FM-cgo">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -653,7 +682,7 @@
                     </connections>
                 </button>
                 <textField focusRingType="none" horizontalHuggingPriority="249" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="bHQ-bR-nHc">
-                    <rect key="frame" x="18" y="120" width="396" height="16"/>
+                    <rect key="frame" x="18" y="117" width="396" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="在手動加入使用者詞彙之後:" id="Yhg-pv-SyV">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -661,7 +690,7 @@
                     </textFieldCell>
                 </textField>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="u6i-rg-gq3">
-                    <rect key="frame" x="18" y="86" width="398" height="18"/>
+                    <rect key="frame" x="20" y="84" width="396" height="16"/>
                     <buttonCell key="cell" type="check" title="執行特定的 Shell Script" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="bkX-1g-jGL">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -671,7 +700,7 @@
                     </connections>
                 </button>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VKE-yo-TdG">
-                    <rect key="frame" x="71" y="58" width="346" height="21"/>
+                    <rect key="frame" x="71" y="52" width="346" height="24"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="346" id="62p-rx-Sp1"/>
                     </constraints>
@@ -685,7 +714,7 @@
                     </connections>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="8ku-Pt-FIH">
-                    <rect key="frame" x="21" y="60" width="44" height="16"/>
+                    <rect key="frame" x="21" y="56" width="44" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="路徑：" id="2Ox-BG-OqC">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -693,10 +722,10 @@
                     </textFieldCell>
                 </textField>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="LVR-3l-T11">
-                    <rect key="frame" x="20" y="154" width="396" height="5"/>
+                    <rect key="frame" x="20" y="151" width="396" height="5"/>
                 </box>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Nf4-gN-42Y">
-                    <rect key="frame" x="384" y="262" width="32" height="20"/>
+                    <rect key="frame" x="384" y="259" width="32" height="24"/>
                     <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="NSFolder" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="nfb-rv-kdU">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
