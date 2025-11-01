@@ -64,7 +64,7 @@ jobs:
     - name: Build project
       if: matrix.language == 'swift' || matrix.language == 'cpp'
       run: |
-        xcodebuild -scheme McBopomofoInstaller -configuration Debug build ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
+        PYTHON=$(which python3) xcodebuild -scheme McBopomofoInstaller -configuration Debug build ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
