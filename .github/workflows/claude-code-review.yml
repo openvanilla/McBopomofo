@@ -14,16 +14,21 @@ on:
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Note: For pull requests from forks, this workflow requires manual approval
+    # by a repository maintainer before it will run. This is a security measure
+    # to prevent malicious actors from accessing repository secrets.
+    #
+    # To enable fork PR reviews:
+    # 1. Go to Settings → Actions → General
+    # 2. Under "Fork pull request workflows from outside collaborators"
+    # 3. Select "Require approval for all outside collaborators"
+    #
+    # Maintainers: Review the PR code first, then approve the workflow run if safe.
 
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write  # Changed from read to write - needed to post PR comments
       issues: read
       id-token: write
 
@@ -68,5 +73,6 @@ jobs:
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)" --max-turns 5'
+          # Increased max-turns to 10 to ensure Claude has enough iterations to complete review and post comment
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)" --max-turns 10'
 
