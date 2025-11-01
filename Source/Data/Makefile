@@ -25,7 +25,7 @@ data.txt: curation/compilers/main_compiler.py BPMFBase.txt BPMFMappings.txt BPMF
 		--output data.txt
 
 associated-phrases-v2.txt: data.txt curation/builders/phrase_deriver.py associated-punctuation.txt
-		$(PYTHON) -m curation.builders.phrase_deriver $< $@ associated-punctuation.txt
+	$(PYTHON) -m curation.builders.phrase_deriver $< $@ associated-punctuation.txt
 
 PhraseFreq.txt: curation/builders/frequency_builder.py phrase.occ exclusion.txt
 	$(PYTHON) -m curation.builders.frequency_builder
