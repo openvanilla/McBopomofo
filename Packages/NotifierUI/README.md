@@ -46,4 +46,5 @@ queues if needed.
 
 ## License
 
-NotifierUI ships under the MIT license. Refer to the repository root `LICENSE` file for full terms.
+This package is released under the MIT license. See the header comments in the
+source files for the full text.
