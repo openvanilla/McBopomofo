@@ -37,35 +37,37 @@ struct ActiveInputSourceListCollectorPlugin: InfoCollectorPlugin {
             return nil
         }
 
-        // Use HIToolbox TIS APIs to get current and enabled input sources
-        // Build a query for enabled input sources
-        let keys: [CFString: Any] = [
-            kTISPropertyInputSourceIsEnabled: kCFBooleanTrue as CFBoolean,
-            kTISPropertyInputSourceIsSelectCapable: kCFBooleanTrue as CFBoolean,
-            kTISPropertyInputSourceCategory: kTISCategoryKeyboardInputSource as CFString,
-        ]
-        let dict = keys as CFDictionary
-        var lines: [String] = []
-        // Enabled input sources
-        if let list = TISCreateInputSourceList(dict, false)?.takeRetainedValue()
-            as? [TISInputSource]
-        {
-            lines.append("- Enabled Input Sources:")
-            for src in list {
-                let name = getStringValue(src, kTISPropertyLocalizedName) ?? "<unknown>"
-                let sid = getStringValue(src, kTISPropertyInputSourceID) ?? ""
-                let category =
+        DispatchQueue.main.async {
+            // Use HIToolbox TIS APIs to get current and enabled input sources
+            // Build a query for enabled input sources
+            let keys: [CFString: Any] = [
+                kTISPropertyInputSourceIsEnabled: kCFBooleanTrue as CFBoolean,
+                kTISPropertyInputSourceIsSelectCapable: kCFBooleanTrue as CFBoolean,
+                kTISPropertyInputSourceCategory: kTISCategoryKeyboardInputSource as CFString,
+            ]
+            let dict = keys as CFDictionary
+            var lines: [String] = []
+            // Enabled input sources
+            if let list = TISCreateInputSourceList(dict, false)?.takeRetainedValue()
+                as? [TISInputSource]
+            {
+                lines.append("- Enabled Input Sources:")
+                for src in list {
+                    let name = getStringValue(src, kTISPropertyLocalizedName) ?? "<unknown>"
+                    let sid = getStringValue(src, kTISPropertyInputSourceID) ?? ""
+                    let category =
                     getStringValue(
                         src,
                         kTISPropertyInputSourceCategory
                     ) ?? ""
-                lines.append("  - \(name) (\(sid)) [\(category)]")
+                    lines.append("  - \(name) (\(sid)) [\(category)]")
+                }
             }
-        }
 
-        if lines.isEmpty {
-            lines.append("No input sources found")
+            if lines.isEmpty {
+                lines.append("    No input sources found")
+            }
+            callback(.success(lines.joined(separator: "\n")))
         }
-        callback(.success(lines.joined(separator: "\n")))
     }
 }

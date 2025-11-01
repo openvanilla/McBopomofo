@@ -23,7 +23,7 @@
 
 import AppKit
 
-struct SafaruVersionCollectorPlugin: InfoCollectorPlugin {
+struct SafariVersionCollectorPlugin: InfoCollectorPlugin {
     var name: String { "Safari version collector" }
 
     func collect(callback: @escaping (Result<String, Error>) -> Void) {

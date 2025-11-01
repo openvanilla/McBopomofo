@@ -25,7 +25,6 @@ import Foundation
 
 @objc
 public class InfoCollector: NSObject {
-    @MainActor
     @available(iOS 13.0.0, macOS 10.15, *)
     public static func generate() async -> String {
         await withCheckedContinuation { (continuation: CheckedContinuation<String, Never>) in
@@ -35,7 +34,6 @@ public class InfoCollector: NSObject {
         }
     }
 
-    @MainActor
     public static func generate(callback: @escaping (String) -> Void) {
         let plugins: [InfoCollectorPlugin] = [
             MachineModelCollectorPlugin(),
@@ -44,7 +42,7 @@ public class InfoCollector: NSObject {
             KeyboardTypeCollectorPlugin(),
             ActiveInputSourceListCollectorPlugin(),
             DefaultWebBrowserCollectorPlugin(),
-            SafaruVersionCollectorPlugin(),
+            SafariVersionCollectorPlugin(),
             AppVersionCollectorPlugin(),
         ]
 
