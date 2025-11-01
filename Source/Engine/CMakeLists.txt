@@ -10,8 +10,8 @@ add_subdirectory(Mandarin)
 add_library(McBopomofoLMLib
         AssociatedPhrasesV2.h
         AssociatedPhrasesV2.cpp
-        KeyValueBlobReader.h
-        KeyValueBlobReader.cpp
+        ByteBlockBackedDictionary.h
+        ByteBlockBackedDictionary.cpp
         McBopomofoLM.h
         McBopomofoLM.cpp
         MemoryMappedFile.h
@@ -59,7 +59,7 @@ if (ENABLE_TEST)
         # Test target declarations.
         add_executable(McBopomofoLMLibTest
                 AssociatedPhrasesV2Test.cpp
-                KeyValueBlobReaderTest.cpp
+                ByteBlockBackedDictionaryTest.cpp
                 McBopomofoLMTest.cpp
                 MemoryMappedFileTest.cpp
                 ParselessLMTest.cpp
