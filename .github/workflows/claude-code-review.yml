@@ -3,8 +3,7 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignore:
-      - '.github/workflows/claude-code-review.yml'
+    # Note: Removed paths-ignore to allow testing workflow changes
     # Optional: Only run on specific file changes
     # paths:
     #   - "src/**/*.ts"
@@ -14,17 +13,18 @@ on:
 
 jobs:
   claude-review:
-    # Note: For pull requests from forks, this workflow requires manual approval
-    # by a repository maintainer before it will run. This is a security measure
-    # to prevent malicious actors from accessing repository secrets.
+    # Note: Fork PRs are automatically skipped because they cannot access repository
+    # secrets (CLAUDE_CODE_OAUTH_TOKEN) or generate OIDC tokens. This is GitHub's
+    # security model and cannot be overridden.
     #
-    # To enable fork PR reviews:
-    # 1. Go to Settings → Actions → General
-    # 2. Under "Fork pull request workflows from outside collaborators"
-    # 3. Select "Require approval for all outside collaborators"
+    # For fork PRs, maintainers can:
+    # 1. Merge the PR first, then Claude will review on the next PR
+    # 2. Use the on-demand claude.yml workflow by commenting @claude on the PR
+    # 3. Manually review the code
     #
-    # Maintainers: Review the PR code first, then approve the workflow run if safe.
+    # This workflow only runs on PRs from branches within this repository.
 
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
