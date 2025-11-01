@@ -1,3 +1,5 @@
+PYTHON ?= python3
+
 .PHONY: sort clean
 
 all: data.txt data-plain-bpmf.txt associated-phrases-v2.txt
@@ -5,12 +7,12 @@ all: data.txt data-plain-bpmf.txt associated-phrases-v2.txt
 install: all
 
 data-plain-bpmf.txt: curation/compilers/plain_bpmf_compiler.py BPMFBase.txt BPMFPunctuations.txt
-	python3 -m curation.compilers.plain_bpmf_compiler BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
+	$(PYTHON) -m curation.compilers.plain_bpmf_compiler BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
 
 data.txt: curation/compilers/main_compiler.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
           PhraseFreq.txt phrase.occ Symbols.txt Macros.txt\
           heterophony1.list heterophony2.list heterophony3.list
-	python3 -m curation.compilers.main_compiler \
+	$(PYTHON) -m curation.compilers.main_compiler \
 		--heterophony1 heterophony1.list \
 		--heterophony2 heterophony2.list \
 		--heterophony3 heterophony3.list \
@@ -23,10 +25,10 @@ data.txt: curation/compilers/main_compiler.py BPMFBase.txt BPMFMappings.txt BPMF
 		--output data.txt
 
 associated-phrases-v2.txt: data.txt curation/builders/phrase_deriver.py associated-punctuation.txt
-		python3 -m curation.builders.phrase_deriver $< $@ associated-punctuation.txt
+		$(PYTHON) -m curation.builders.phrase_deriver $< $@ associated-punctuation.txt
 
 PhraseFreq.txt: curation/builders/frequency_builder.py phrase.occ exclusion.txt
-	python3 -m curation.builders.frequency_builder
+	$(PYTHON) -m curation.builders.frequency_builder
 
 clean:
 	rm -f data.txt data-plain-bpmf.txt phrase.list
@@ -68,7 +70,7 @@ tidy:
 	@sed -i '' -e 's/1/˙/g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g' BPMFMappings.txt
 
 _phrase.occ: phrase.list
-	@python3 scripts/count_occurrences.py phrase.list > tmp && mv tmp phrase.occ
+	@$(PYTHON) scripts/count_occurrences.py phrase.list > tmp && mv tmp phrase.occ
 
 phrase.list: BPMFBase.txt BPMFMappings.txt
 	awk 'length($$1)<4{print $$1}' BPMFBase.txt > tmp
