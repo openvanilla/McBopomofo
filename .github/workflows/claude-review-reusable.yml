@@ -50,13 +50,16 @@ jobs:
           # Tools included:
           # - mcp__github__get_me: Get authenticated user context (prevents permission denials)
           # - mcp__github__get_pull_request: Get PR metadata, title, description (context understanding)
+          # - mcp__github__list_pull_requests: List/search PRs in the repository (context discovery)
           # - mcp__github__create_pending_pull_request_review: Start a pending review
           # - mcp__github__get_pull_request_diff: Get code changes and line numbers for inline comments
           # - mcp__github__add_comment_to_pending_review: Add inline review comments
           # - mcp__github__submit_pending_pull_request_review: Publish the review
           claude_args: >-
-            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || '--allowedTools mcp__github__get_me,
+            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || '--allowedTools
+              mcp__github__get_me,
               mcp__github__get_pull_request,
+              mcp__github__list_pull_requests,
               mcp__github__create_pending_pull_request_review,
               mcp__github__get_pull_request_diff,
               mcp__github__add_comment_to_pending_review,
