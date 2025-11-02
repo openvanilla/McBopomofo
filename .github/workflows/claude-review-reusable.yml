@@ -55,11 +55,9 @@ jobs:
           # - mcp__github__add_comment_to_pending_review: Add inline review comments
           # - mcp__github__submit_pending_pull_request_review: Publish the review
           claude_args: >-
-            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || format(
-              '--allowedTools mcp__github__get_me,
+            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || '--allowedTools mcp__github__get_me,
               mcp__github__get_pull_request,
               mcp__github__create_pending_pull_request_review,
               mcp__github__get_pull_request_diff,
               mcp__github__add_comment_to_pending_review,
-              mcp__github__submit_pending_pull_request_review'
-            ) }}
+              mcp__github__submit_pending_pull_request_review' }}
