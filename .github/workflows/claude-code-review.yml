@@ -37,9 +37,13 @@ jobs:
     #
     # This workflow only runs on PRs from branches within this repository.
     # Skip for fork PRs and automated bots to avoid manual approval requirements
+    # Note: If manual approvals still occur, check repository Settings → Actions → General
+    # and set "Fork pull request workflows from outside collaborators" to
+    # "Require approval for first-time contributors" instead of "all outside collaborators"
     if: |
       github.event.pull_request.head.repo.full_name == github.repository &&
-      !contains(fromJSON('["dependabot[bot]", "renovate[bot]", "github-actions[bot]", "copilot-pull-request-reviewer[bot]", "github-copilot[bot]", "copilot-autofix[bot]"]'), github.actor)
+      github.event.pull_request.head.repo.owner.login == github.repository_owner &&
+      !contains(fromJSON('["dependabot[bot]", "renovate[bot]", "github-actions[bot]", "copilot-pull-request-reviewer[bot]", "github-copilot[bot]", "copilot-autofix[bot]", "app/dependabot", "app/renovate", "app/github-copilot"]'), github.actor)
 
     # Explicitly declare permissions required by the reusable workflow
     permissions:
