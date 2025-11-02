@@ -25,11 +25,11 @@ jobs:
   review:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read        # Required for repository checkout
+      issues: read          # Required for reading issue context
       pull-requests: write  # Required for posting PR reviews
-      issues: read
-      id-token: write       # Required for OIDC token exchange
       actions: read         # Required for Claude to read CI results
+      id-token: write       # Required for OIDC token exchange
 
     steps:
       - name: Checkout repository

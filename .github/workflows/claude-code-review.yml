@@ -5,7 +5,8 @@ on:
     types: [opened, synchronize, reopened]
     paths-ignore:
       - '.github/workflows/claude-code-review.yml'
-    # Note: This workflow skips when modifying itself to avoid OIDC token validation errors.
+      - '.github/workflows/claude-review-reusable.yml'
+    # Note: This workflow skips when modifying Claude workflow files to avoid OIDC token validation errors.
     # GitHub's security model requires workflow files using id-token: write to be identical
     # to the version on the master branch. PRs that modify workflows cannot pass OIDC
     # validation until merged. This is intentional security and cannot be bypassed.
@@ -34,11 +35,11 @@ jobs:
 
     # Explicitly declare permissions required by the reusable workflow
     permissions:
-      id-token: write
-      pull-requests: write
-      contents: read
-      issues: read
-      actions: read
+      contents: read        # Required for repository checkout
+      issues: read          # Required for reading issue context
+      pull-requests: write  # Required for posting PR reviews
+      actions: read         # Required for Claude to read CI results
+      id-token: write       # Required for OIDC token exchange
     # Use the reusable workflow which contains the standardized MCP tool configuration
     # This eliminates duplication and ensures consistency across all Claude workflows
     uses: ./.github/workflows/claude-review-reusable.yml

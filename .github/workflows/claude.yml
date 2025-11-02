@@ -20,11 +20,11 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
 
     permissions:
-      id-token: write
-      pull-requests: write
-      contents: read
-      issues: read
-      actions: read
+      contents: read        # Required for repository checkout
+      issues: read          # Required for reading issue context
+      pull-requests: write  # Required for posting PR reviews
+      actions: read         # Required for Claude to read CI results
+      id-token: write       # Required for OIDC token exchange
     # Use the reusable workflow which contains the standardized MCP tool configuration
     # This eliminates duplication and ensures consistency across all Claude workflows
     uses: ./.github/workflows/claude-review-reusable.yml
