@@ -63,7 +63,7 @@ jobs:
 
         Keep your response concise:
         - Focus on critical/high-priority issues only
-        - Use inline comments with code suggestions for specific fixes
+        - Use inline comments with code suggestions in GitHub's ```suggestion blocks for specific fixes
         - Group similar issues together to avoid repetition
         - Skip style/formatting nitpicks unless they impact security or performance
         - No general observations, praise, or minor suggestions
