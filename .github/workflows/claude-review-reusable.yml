@@ -1,0 +1,57 @@
+name: Claude PR Review (Reusable)
+
+# Reusable workflow for Claude Code PR reviews
+# Used by both claude.yml and claude-code-review.yml to maintain consistency
+# and eliminate duplication of MCP tool configuration.
+
+on:
+  workflow_call:
+    inputs:
+      prompt:
+        description: 'The prompt to send to Claude for PR review'
+        required: true
+        type: string
+      claude_args_override:
+        description: 'Optional override for claude_args (defaults to standard MCP tools)'
+        required: false
+        type: string
+        default: ''
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN:
+        description: 'OAuth token for Claude Code authentication'
+        required: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # Required for posting PR reviews
+      issues: read
+      id-token: write       # Required for OIDC token exchange
+      actions: read         # Required for Claude to read CI results
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ inputs.prompt }}
+
+          # Standard MCP tool list for GitHub PR reviews
+          # This is the single source of truth for allowed tools across all Claude workflows
+          #
+          # Tools included:
+          # - mcp__github__get_me: Get authenticated user context (prevents permission denials)
+          # - mcp__github__get_pull_request: Get PR metadata, title, description (context understanding)
+          # - mcp__github__create_pending_pull_request_review: Start a pending review
+          # - mcp__github__get_pull_request_diff: Get code changes and line numbers for inline comments
+          # - mcp__github__add_comment_to_pending_review: Add inline review comments
+          # - mcp__github__submit_pending_pull_request_review: Publish the review
+          claude_args: ${{ inputs.claude_args_override != '' && inputs.claude_args_override || format('--allowedTools mcp__github__get_me,mcp__github__get_pull_request,mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review') }}

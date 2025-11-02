@@ -30,63 +30,41 @@ jobs:
     # 3. Manually review the code
     #
     # This workflow only runs on PRs from branches within this repository.
-
     if: github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write  # Changed from read to write - needed to post PR comments
-      issues: read
-      id-token: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+    # Use the reusable workflow which contains the standardized MCP tool configuration
+    # This eliminates duplication and ensures consistency across all Claude workflows
+    uses: ./.github/workflows/claude-review-reusable.yml
+    with:
+      prompt: |
+        REPO: ${{ github.repository }}
+        PR NUMBER: ${{ github.event.pull_request.number }}
 
-      - name: Run Claude Code Review
-        id: claude-review
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+        Please review this PR focusing ONLY on critical issues. Use the repository's CLAUDE.md for conventions.
 
-            Please review this PR focusing ONLY on critical issues. Use the repository's CLAUDE.md for conventions.
+        Review for:
+        - Potential bugs or logic errors
+        - Security vulnerabilities
+        - Performance problems
+        - Correctness issues
+        - Violations of repository coding standards
 
-            Review for:
-            - Potential bugs or logic errors
-            - Security vulnerabilities
-            - Performance problems
-            - Correctness issues
-            - Violations of repository coding standards
+        Keep your response concise:
+        - Focus on critical/high-priority issues only
+        - Use inline comments with code suggestions for specific fixes
+        - Group similar issues together to avoid repetition
+        - Skip style/formatting nitpicks unless they impact security or performance
+        - No general observations, praise, or minor suggestions
 
-            Keep your response concise:
-            - Focus on critical/high-priority issues only
-            - Use inline comments with code suggestions for specific fixes
-            - Group similar issues together to avoid repetition
-            - Skip style/formatting nitpicks unless they impact security or performance
-            - No general observations, praise, or minor suggestions
+        Use the GitHub review system to post your feedback:
+        1. Use `mcp__github__get_pull_request` to understand the PR context if needed
+        2. Use `mcp__github__get_me` to get authenticated user context if needed
+        3. Use `mcp__github__create_pending_pull_request_review` to start a pending review
+        4. Use `mcp__github__get_pull_request_diff` to see the code changes and line numbers
+        5. Use `mcp__github__add_comment_to_pending_review` for inline comments on specific lines
+        6. Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish
 
-            Use the GitHub review system to post your feedback:
-            1. Use `mcp__github__get_pull_request` to understand the PR context if needed
-            2. Use `mcp__github__create_pending_pull_request_review` to start a pending review
-            3. Use `mcp__github__get_pull_request_diff` to see the code changes and line numbers
-            4. Use `mcp__github__add_comment_to_pending_review` for inline comments on specific lines
-            5. Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish
-
-            When suggesting code changes, use GitHub's ```suggestion blocks so authors can apply changes directly.
-
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # Use MCP GitHub tools for posting PR reviews (more reliable than gh CLI)
-          # Includes mcp__github__get_pull_request which was missing and caused permission denials
-          claude_args: >-
-            --allowedTools
-            mcp__github__get_pull_request,
-            mcp__github__create_pending_pull_request_review,
-            mcp__github__get_pull_request_diff,
-            mcp__github__add_comment_to_pending_review,
-            mcp__github__submit_pending_pull_request_review
+        When suggesting code changes, use GitHub's ```suggestion blocks so authors can apply changes directly.
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
