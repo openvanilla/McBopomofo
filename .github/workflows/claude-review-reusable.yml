@@ -24,12 +24,8 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read        # Required for repository checkout
-      issues: read          # Required for reading issue context
-      pull-requests: write  # Required for posting PR reviews
-      actions: read         # Required for Claude to read CI results
-      id-token: write       # Required for OIDC token exchange
+    # Note: Permissions are inherited from calling workflows (claude.yml, claude-code-review.yml)
+    # Caller permissions take precedence over reusable workflow permissions
 
     steps:
       - name: Checkout repository
