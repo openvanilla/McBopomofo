@@ -69,3 +69,14 @@ jobs:
               mcp__github__get_pull_request_diff,
               mcp__github__add_comment_to_pending_review,
               mcp__github__submit_pending_pull_request_review' }}
+
+      - name: Log Claude Review Results
+        if: always()
+        run: |
+          echo "Claude review completed with status: ${{ steps.claude-review.outcome }}"
+          echo "Claude review conclusion: ${{ steps.claude-review.conclusion }}"
+          if [ "${{ steps.claude-review.outcome }}" = "failure" ]; then
+            echo "Claude review failed - check logs above for details"
+          elif [ "${{ steps.claude-review.outcome }}" = "success" ]; then
+            echo "Claude review completed successfully"
+          fi
