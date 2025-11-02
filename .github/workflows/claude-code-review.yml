@@ -10,18 +10,19 @@ on:
 concurrency:
   group: claude-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
-    # Note: This workflow skips when modifying Claude workflow files to avoid OIDC token validation errors.
-    # GitHub's security model requires workflow files using id-token: write to be identical
-    # to the version on the master branch. PRs that modify workflows cannot pass OIDC
-    # validation until merged. This is intentional security and cannot be bypassed.
-    # Workflow changes should be manually reviewed and will apply to future PRs after merge.
-    #
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+
+# Note: This workflow skips when modifying Claude workflow files to avoid OIDC token validation errors.
+# GitHub's security model requires workflow files using id-token: write to be identical
+# to the version on the master branch. PRs that modify workflows cannot pass OIDC
+# validation until merged. This is intentional security and cannot be bypassed.
+# Workflow changes should be manually reviewed and will apply to future PRs after merge.
+#
+# Optional: Only run on specific file changes
+# paths:
+#   - "src/**/*.ts"
+#   - "src/**/*.tsx"
+#   - "src/**/*.js"
+#   - "src/**/*.jsx"
 
 jobs:
   claude-review:
