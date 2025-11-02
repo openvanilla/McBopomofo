@@ -81,11 +81,22 @@ jobs:
       - name: Report Claude Review Failure
         if: failure()
         uses: actions/github-script@v7
+        env:
+          FAILURE_MESSAGE: |
+            **Claude Code Review Failed**
+
+            The automated Claude review encountered an error and could not complete. You can:
+
+            - Check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details
+            - Trigger a manual review by commenting `@claude` on this PR
+            - The review will be retried automatically on the next push
+
+            This does not affect the PR approval process.
         with:
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '**Claude Code Review Failed**\n\nThe automated Claude review encountered an error and could not complete. You can:\n\n- Check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details\n- Trigger a manual review by commenting `@claude` on this PR\n- The review will be retried automatically on the next push\n\nThis does not affect the PR approval process.'
+              body: process.env.FAILURE_MESSAGE
             })
