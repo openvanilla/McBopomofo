@@ -36,7 +36,11 @@ jobs:
     # 3. Manually review the code
     #
     # This workflow only runs on PRs from branches within this repository.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Skip for fork PRs to avoid manual approval requirements
+    if: |
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]' &&
+      !contains(fromJSON('["renovate[bot]", "dependabot[bot]"]'), github.actor)
 
     # Explicitly declare permissions required by the reusable workflow
     permissions:
