@@ -22,6 +22,9 @@ jobs:
     permissions:
       id-token: write
       pull-requests: write
+      contents: read
+      issues: read
+      actions: read
     # Use the reusable workflow which contains the standardized MCP tool configuration
     # This eliminates duplication and ensures consistency across all Claude workflows
     uses: ./.github/workflows/claude-review-reusable.yml
@@ -39,4 +42,3 @@ jobs:
         When suggesting code changes, use GitHub's suggestion format with ```suggestion blocks so authors can apply changes directly.
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
