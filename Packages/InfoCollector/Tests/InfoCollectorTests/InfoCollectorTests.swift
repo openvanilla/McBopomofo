@@ -10,6 +10,5 @@ import Testing
             }
         }
     }
-    print(result)
-    #expect(!result.isEmpty, "G enerated string should not be empty")
+    #expect(!result.isEmpty, "Generated string should not be empty")
 }
