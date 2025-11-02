@@ -32,6 +32,10 @@ jobs:
     # This workflow only runs on PRs from branches within this repository.
     if: github.event.pull_request.head.repo.full_name == github.repository
 
+    # Explicitly declare permissions required by the reusable workflow
+    permissions:
+      id-token: write
+      pull-requests: write
     # Use the reusable workflow which contains the standardized MCP tool configuration
     # This eliminates duplication and ensures consistency across all Claude workflows
     uses: ./.github/workflows/claude-review-reusable.yml
