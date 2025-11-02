@@ -37,5 +37,5 @@ func osStatusToString(_ status: OSStatus) -> String {
 func numberToHex<T: FixedWidthInteger>(_ number: T, withPrefix prefix: Bool = true) -> String {
     let width = MemoryLayout<T>.size * 2
     let formatString = prefix ? "%#0\(width + 2)X" : "%0\(width)X"
-    return String(format: formatString, number.littleEndian as! CVarArg)
+    return String(format: formatString, number as! CVarArg)
 }

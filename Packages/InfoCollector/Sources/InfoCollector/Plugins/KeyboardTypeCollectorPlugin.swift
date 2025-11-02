@@ -112,9 +112,6 @@ struct KeyboardTypeCollectorPlugin: InfoCollectorPlugin {
             entry = IOIteratorNext(iter)
         }
 
-        if idx == 0 {
-            print("No keyboards found in IORegistry.")
-        }
         if lines.isEmpty {
             callback(.success(""))
         } else {
