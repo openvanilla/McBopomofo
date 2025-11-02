@@ -44,8 +44,11 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: ${{ inputs.prompt }}
 
-          # Standard MCP tool list for GitHub PR reviews
-          # This is the single source of truth for allowed tools across all Claude workflows
+          # Standard configuration for GitHub PR reviews
+          # This is the single source of truth for Claude arguments across all workflows
+          #
+          # Parameters:
+          # - --max-turns 10: Increase turn limit to prevent exhaustion during complex reviews
           #
           # Tools included:
           # - mcp__github__get_me: Get authenticated user context (prevents permission denials)
@@ -56,7 +59,7 @@ jobs:
           # - mcp__github__add_comment_to_pending_review: Add inline review comments
           # - mcp__github__submit_pending_pull_request_review: Publish the review
           claude_args: >-
-            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || '--allowedTools
+            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || '--max-turns 10 --allowedTools
               mcp__github__get_me,
               mcp__github__get_pull_request,
               mcp__github__list_pull_requests,
