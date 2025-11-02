@@ -39,7 +39,7 @@ jobs:
     # Skip for fork PRs and automated bots to avoid manual approval requirements
     if: |
       github.event.pull_request.head.repo.full_name == github.repository &&
-      !contains(fromJSON('["dependabot[bot]", "renovate[bot]", "github-actions[bot]", "app/copilot-autofix", "github-copilot[bot]", "copilot-for-business[bot]"]'), github.actor)
+      !contains(fromJSON('["dependabot[bot]", "renovate[bot]", "github-actions[bot]", "copilot-pull-request-reviewer[bot]", "github-copilot[bot]", "copilot-autofix[bot]"]'), github.actor)
 
     # Explicitly declare permissions required by the reusable workflow
     permissions:
