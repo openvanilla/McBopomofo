@@ -19,6 +19,9 @@ jobs:
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
 
+    permissions:
+      id-token: write
+      pull-requests: write
     # Use the reusable workflow which contains the standardized MCP tool configuration
     # This eliminates duplication and ensures consistency across all Claude workflows
     uses: ./.github/workflows/claude-review-reusable.yml
