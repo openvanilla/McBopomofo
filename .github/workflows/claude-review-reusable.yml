@@ -11,8 +11,13 @@ on:
         description: 'The prompt to send to Claude for PR review'
         required: true
         type: string
+      claude_args:
+        description: 'Claude arguments for the review'
+        required: false
+        type: string
+        default: '--max-turns 10 --allowedTools mcp__github__get_me,mcp__github__get_pull_request,mcp__github__list_pull_requests,mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review'
       claude_args_override:
-        description: 'Optional override for claude_args (defaults to standard MCP tools)'
+        description: 'Optional override for claude_args (deprecated, use claude_args instead)'
         required: false
         type: string
         default: ''
@@ -60,15 +65,7 @@ jobs:
           # - mcp__github__get_pull_request_diff: Get code changes and line numbers for inline comments
           # - mcp__github__add_comment_to_pending_review: Add inline review comments
           # - mcp__github__submit_pending_pull_request_review: Publish the review
-          claude_args: >-
-            ${{ inputs.claude_args_override != '' && inputs.claude_args_override || '--max-turns 10 --allowedTools
-              mcp__github__get_me,
-              mcp__github__get_pull_request,
-              mcp__github__list_pull_requests,
-              mcp__github__create_pending_pull_request_review,
-              mcp__github__get_pull_request_diff,
-              mcp__github__add_comment_to_pending_review,
-              mcp__github__submit_pending_pull_request_review' }}
+          claude_args: ${{ inputs.claude_args_override != '' && inputs.claude_args_override || inputs.claude_args }}
 
       - name: Log Claude Review Results
         if: always()
