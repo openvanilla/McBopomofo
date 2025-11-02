@@ -10,6 +10,10 @@ on:
   pull_request_review:
     types: [submitted]
 
+concurrency:
+  group: claude-manual-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   claude:
     # Only trigger when @claude is mentioned in comments/reviews
