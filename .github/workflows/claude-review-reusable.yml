@@ -82,7 +82,7 @@ jobs:
           fi
 
       - name: Report Claude Review Failure
-        if: failure() && github.event_name == 'pull_request'
+        if: failure()
         uses: actions/github-script@v7
         with:
           script: |
