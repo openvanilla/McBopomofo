@@ -39,6 +39,7 @@
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */; };
 		B0781B352ACA2655003D9F75 /* ServicesMenu.strings in Resources */ = {isa = PBXBuildFile; fileRef = B0781B372ACA2655003D9F75 /* ServicesMenu.strings */; };
+		D40EFFA22EB669F900C1728A /* InfoCollector in Frameworks */ = {isa = PBXBuildFile; productRef = D40EFFA12EB669F900C1728A /* InfoCollector */; };
 		D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* LanguageModelManager.mm */; };
 		D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */; };
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
@@ -177,6 +178,7 @@
 		B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
 		B0781B362ACA2655003D9F75 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ServicesMenu.strings; sourceTree = "<group>"; };
 		B0781B382ACA2659003D9F75 /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/ServicesMenu.strings"; sourceTree = "<group>"; };
+		D40EFFA02EB669BB00C1728A /* InfoCollector */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InfoCollector; path = Packages/InfoCollector; sourceTree = "<group>"; };
 		D41355D6278D7409005E5CBD /* LanguageModelManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LanguageModelManager.h; sourceTree = "<group>"; };
 		D41355D7278D7409005E5CBD /* LanguageModelManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LanguageModelManager.mm; sourceTree = "<group>"; };
 		D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = McBopomofoLM.cpp; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 				D48F853E2EACDB6C00C2FDAB /* RomanNumbers in Frameworks */,
 				D4E7917A2B52CDE500676A68 /* ChineseNumbers in Frameworks */,
 				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
+				D40EFFA22EB669F900C1728A /* InfoCollector in Frameworks */,
 				D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */,
 				D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */,
 				D41B626C2B86EAE900583148 /* BopomofoBraille in Frameworks */,
@@ -459,6 +462,7 @@
 		D427F766278C9CBD004A2160 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				D40EFFA02EB669BB00C1728A /* InfoCollector */,
 				D4E5EEE22E68A9B30068BC58 /* SystemCharacterInfo */,
 				D41B626A2B86EAD400583148 /* BopomofoBraille */,
 				D4E791782B52CDCF00676A68 /* ChineseNumbers */,
@@ -544,6 +548,7 @@
 				D41B626B2B86EAE900583148 /* BopomofoBraille */,
 				D4451AC82E688C6B00E8F5AB /* SystemCharacterInfo */,
 				D48F853D2EACDB6C00C2FDAB /* RomanNumbers */,
+				D40EFFA12EB669F900C1728A /* InfoCollector */,
 			);
 			productName = McBopomofo;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */;
@@ -1436,6 +1441,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D40EFFA12EB669F900C1728A /* InfoCollector */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = InfoCollector;
+		};
 		D41B626B2B86EAE900583148 /* BopomofoBraille */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BopomofoBraille;

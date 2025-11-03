@@ -1,81 +1,63 @@
 # RomanNumbers
 
-RomanNumbers is a Swift package that converts decimal numbers into Roman
-numerals. It powers parts of the McBopomofo input method project where formatted
-Roman numerals are needed in Swift and Objective-C contexts.
+Copyright (c) 2022 and onwards The McBopomofo Authors.
+
+RomanNumbers converts decimal integers into Roman numerals and exposes the API
+to both Swift and Objective-C callers. It powers McBopomofo features that
+present formatted numerals inside the candidate window and user preferences.
+
+## Requirements
+
+- macOS 10.15 or later
+- Swift 5.9 or later
+- No external dependencies (Foundation only)
 
 ## Features
 
-- Supports integer values from 0 through 3999
-- Offers three output styles via `RomanNumbersStyle`: `alphabets`,
-  `fullWidthUpper` (Unicode U+2160–U+216F), and `fullWidthLower` (Unicode
-  U+2170–U+217F)
-- Accepts either `Int` input or decimal text strings
-- Throws descriptive errors (`RomanNumbersErrors`) when the source value is out of range or invalid
-- Marked with `@objc` so the conversion APIs are reachable from Objective-C code
-
-## Installation
-
-Add RomanNumbers to the `dependencies` section of your `Package.swift`:
-
-```swift
-.dependencies([
-    .package(path: "Packages/RomanNumbers")
-])
-```
-
-Then link the library from a target:
-
-```swift
-.target(
-    name: "YourTarget",
-    dependencies: [
-        .product(name: "RomanNumbers", package: "RomanNumbers")
-    ]
-)
-```
-
-If you vend the package from another repository, replace the `.package` path
-with the appropriate `.package(url: "...", from: "...")` declaration.
+- Accepts `Int` and decimal `String` inputs via convenience overloads.
+- Supports three presentation styles through `RomanNumbersStyle`: `alphabets`,
+  `fullWidthUpper` (U+2160 block), and `fullWidthLower` (U+2170 block).
+- Handles canonical ligatures for 11 and 12 in the full-width styles (`Ⅺ`, `Ⅻ`, `ⅺ`, `ⅻ`).
+- Throws typed `RomanNumbersErrors` (`tooLarge`, `tooSmall`, `invalidInput`) with localized descriptions suitable for UI.
+- Annotated with `@objc` so the converter is callable from Objective-C or Swift/Objective-C mixed targets.
 
 ## Usage
 
 ```swift
 import RomanNumbers
 
-let number = 2025
-let standard = try RomanNumbers.convert(input: number)
-let upperFullWidth = try RomanNumbers.convert(input: number, style: .fullWidthUpper)
-let lowerFromText = try RomanNumbers.convert(string: "3999", style: .fullWidthLower)
+let value = 2025
+let classic = try RomanNumbers.convert(input: value)            // "MMXXV"
+let fullUpper = try RomanNumbers.convert(input: value, style: .fullWidthUpper)
+let fromText = try RomanNumbers.convert(string: "3999", style: .fullWidthLower)
+```
 
-print(standard)        // "MMXXV"
-print(upperFullWidth)  // Unicode Roman numeral letters in the U+2160 block
-print(lowerFromText)   // Unicode Roman numeral letters in the U+2170 block
+Objective-C callers can interact with the same API:
+
+```objectivec
+@import RomanNumbers;
+
+NSError *error = nil;
+NSString *roman = [RomanNumbers convertWithInt:2025 style:RomanNumbersStyleAlphabets error:&error];
 ```
 
 ## Error Handling
 
-`RomanNumbers.convert` throws values of `RomanNumbersErrors`:
-
-- `tooLarge`: the input exceeds 3999
-- `tooSmall`: the input is negative
-- `invalidInput`: the string argument cannot be parsed as an integer
-
-These errors conform to `LocalizedError`, providing human-readable descriptions
-suitable for UI presentation.
+Wrap conversions in `do { try ... } catch` (Swift) or check the `NSError`
+pointer (Objective-C). The helper enforces the inclusive range 0…3999 and
+validates that string input is numeric.
 
 ## Testing
 
-Run the package tests with:
+Run the package tests locally with:
 
 ```bash
-swift test
+swift test --package-path Packages/RomanNumbers
 ```
 
-The suite exercises every conversion style and covers edge cases for the
-supported numeric range.
+The suite covers every style, the special-case ligatures, and boundary values.
 
 ## License
 
-RomanNumbers ships as part of McBopomofo. Refer to the repository's root
-`LICENSE` file for licensing terms.
+This package is released under the MIT license. See the header comments in the
+source files for the full text.

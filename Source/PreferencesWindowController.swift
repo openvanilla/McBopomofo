@@ -21,17 +21,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import Cocoa
 import Carbon
+import Cocoa
+import InfoCollector
 
-fileprivate extension NSToolbarItem.Identifier {
-    static let basic = NSToolbarItem.Identifier(rawValue: "basic")
-    static let userPhrases = NSToolbarItem.Identifier(rawValue: "user_phrases")
-    static let advanced = NSToolbarItem.Identifier(rawValue: "advanced")
+extension NSToolbarItem.Identifier {
+    fileprivate static let basic = NSToolbarItem.Identifier(rawValue: "basic")
+    fileprivate static let userPhrases = NSToolbarItem.Identifier(rawValue: "user_phrases")
+    fileprivate static let advanced = NSToolbarItem.Identifier(rawValue: "advanced")
 }
 
-fileprivate let kWindowTitleHeight: CGFloat = 78
-
+private let kWindowTitleHeight: CGFloat = 78
 
 // Please note that the class should be exposed as "PreferencesWindowController"
 // in Objective-C in order to let IMK to see the same class name as
@@ -135,7 +135,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
 
             func getBool(_ key: CFString) -> Bool? {
                 if let ptr = TISGetInputSourceProperty(source, key) {
-                    return Unmanaged<CFBoolean>.fromOpaque(ptr).takeUnretainedValue() == kCFBooleanTrue
+                    return Unmanaged<CFBoolean>.fromOpaque(ptr).takeUnretainedValue()
+                        == kCFBooleanTrue
                 }
                 return nil
             }
@@ -165,7 +166,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
             }
 
             guard let sourceID = getString(kTISPropertyInputSourceID),
-                  let localizedName = getString(kTISPropertyLocalizedName) else {
+                let localizedName = getString(kTISPropertyLocalizedName)
+            else {
                 continue
             }
 
@@ -194,7 +196,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         selectionKeyComboBox.stringValue = candidateSelectionKeys
 
         if #available(macOS 11.0, *) {
-            chooseUserPhrasesFolderButton.image = NSImage(systemSymbolName: "folder", accessibilityDescription: "Folder")
+            chooseUserPhrasesFolderButton.image = NSImage(
+                systemSymbolName: "folder", accessibilityDescription: "Folder")
         }
         let index = Preferences.useCustomUserPhraseLocation ? 1 : 0
         customUserPhraseLocationEnabledButton.selectItem(at: index)
@@ -209,9 +212,11 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
     }
 
     @IBAction func changeSelectionKeyAction(_ sender: Any) {
-        guard let keys = (sender as AnyObject).stringValue?
+        guard
+            let keys = (sender as AnyObject).stringValue?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-                .lowercased() else {
+                .lowercased()
+        else {
             return
         }
         do {
@@ -247,7 +252,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         Preferences.useCustomUserPhraseLocation = enabled
         if enabled {
             if Preferences.customUserPhraseLocation.isEmpty {
-                Preferences.customUserPhraseLocation = UserPhraseLocationHelper.defaultUserPhraseLocation
+                Preferences.customUserPhraseLocation =
+                    UserPhraseLocationHelper.defaultUserPhraseLocation
             }
         }
         updateUserPhraseLocation()
@@ -259,7 +265,8 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
         }
         let path = control.stringValue.trimmingCharacters(in: .whitespaces)
         if FileManager.default.fileExists(atPath: path) == false {
-            try? FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+            try? FileManager.default.createDirectory(
+                atPath: path, withIntermediateDirectories: true)
         }
         Preferences.customUserPhraseLocation = path
         updateUserPhraseLocation()
@@ -267,9 +274,9 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
 
     @IBAction func openUserPhrasedFolderAction(_ sender: Any) {
         let path =
-         Preferences.useCustomUserPhraseLocation ?
-            Preferences.customUserPhraseLocation :
-            UserPhraseLocationHelper.defaultUserPhraseLocation
+            Preferences.useCustomUserPhraseLocation
+            ? Preferences.customUserPhraseLocation
+            : UserPhraseLocationHelper.defaultUserPhraseLocation
         let url = URL(fileURLWithPath: path)
         NSWorkspace.shared.open(url)
     }
@@ -287,8 +294,32 @@ fileprivate let kWindowTitleHeight: CGFloat = 78
             updateUserPhraseLocation()
         }
     }
+
+    @IBAction func openSystemInfoReport(_ sender: Any) {
+        Task { @MainActor in
+            await openSystemInfoReportAsync()
+        }
+    }
 }
 
+extension PreferencesWindowController {
+    func openSystemInfoReportAsync() async {
+        var report = ""
+        report += await InfoCollector.generate()
+        report += Preferences.createReport()
+        // Write report to a temporary file
+        let tempDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        let randomName = "SystemInfoReport-\(UUID().uuidString).txt"
+        let fileURL = tempDir.appendingPathComponent(randomName)
+        do {
+            try report.write(to: fileURL, atomically: true, encoding: .utf8)
+            NSWorkspace.shared.open(fileURL)
+        } catch {
+            NSLog("Failed to write report to temporary file: \(error)")
+            return
+        }
+    }
+}
 
 extension PreferencesWindowController: NSToolbarDelegate {
     func use(view: NSView) {
@@ -336,7 +367,10 @@ extension PreferencesWindowController: NSToolbarDelegate {
         [.basic, .userPhrases, .advanced]
     }
 
-    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+    func toolbar(
+        _ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
+        willBeInsertedIntoToolbar flag: Bool
+    ) -> NSToolbarItem? {
         let item = NSToolbarItem(itemIdentifier: itemIdentifier)
         item.target = self
         switch itemIdentifier {
