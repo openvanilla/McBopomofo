@@ -5,68 +5,85 @@ on:
     types: [opened, synchronize, reopened]
     paths-ignore:
       - '.github/workflows/claude-code-review.yml'
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+      - '.github/workflows/claude-review-reusable.yml'
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# Note: This workflow skips when modifying Claude workflow files to avoid OIDC token validation errors.
+# GitHub's security model requires workflow files using id-token: write to be identical
+# to the version on the master branch. PRs that modify workflows cannot pass OIDC
+# validation until merged. This is intentional security and cannot be bypassed.
+# Workflow changes should be manually reviewed and will apply to future PRs after merge.
+#
+# Optional: Only run on specific file changes
+# paths:
+#   - "src/**/*.ts"
+#   - "src/**/*.tsx"
+#   - "src/**/*.js"
+#   - "src/**/*.jsx"
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Note: Fork PRs are automatically skipped because they cannot access repository
+    # secrets (CLAUDE_CODE_OAUTH_TOKEN) or generate OIDC tokens. This is GitHub's
+    # security model and cannot be overridden.
+    #
+    # For fork PRs, maintainers can:
+    # 1. Merge the PR first, then Claude will review on the next PR
+    # 2. Use the on-demand claude.yml workflow by commenting @claude on the PR
+    # 3. Manually review the code
+    #
+    # This workflow only runs on PRs from branches within this repository.
+    # Skip for fork PRs and automated bots to avoid manual approval requirements
+    # Note: If manual approvals still occur, check repository Settings → Actions → General
+    # and set "Fork pull request workflows from outside collaborators" to
+    # "Require approval for first-time contributors" instead of "all outside collaborators"
+    if: |
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.repo.owner.login == github.repository_owner &&
+      !contains(fromJSON('["dependabot[bot]", "renovate[bot]", "github-actions[bot]", "copilot-pull-request-reviewer[bot]", "github-copilot[bot]", "copilot-autofix[bot]", "app/dependabot", "app/renovate", "app/github-copilot"]'), github.actor)
 
-    runs-on: ubuntu-latest
+    # Explicitly declare permissions required by the reusable workflow
     permissions:
-      contents: read
-      pull-requests: read
-      issues: read
-      id-token: write
+      contents: read        # Required for repository checkout
+      issues: read          # Required for reading issue context
+      pull-requests: write  # Required for posting PR reviews
+      actions: read         # Required for Claude to read CI results
+      id-token: write       # Required for OIDC token exchange
+    # Use the reusable workflow which contains the standardized MCP tool configuration
+    # This eliminates duplication and ensures consistency across all Claude workflows
+    uses: ./.github/workflows/claude-review-reusable.yml
+    with:
+      prompt: |
+        REPO: ${{ github.repository }}
+        PR NUMBER: ${{ github.event.pull_request.number }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+        Please review this PR focusing ONLY on critical issues. Use the repository's CLAUDE.md for conventions.
 
-      - name: Run Claude Code Review
-        id: claude-review
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+        Review for:
+        - Potential bugs or logic errors
+        - Security vulnerabilities
+        - Performance problems
+        - Correctness issues
+        - Violations of repository coding standards
 
-            Please review this PR focusing ONLY on critical issues. Use the repository's CLAUDE.md for conventions.
+        Keep your response concise:
+        - Focus on critical/high-priority issues only
+        - Use inline comments with code suggestions in GitHub's ```suggestion blocks for specific fixes
+        - Group similar issues together to avoid repetition
+        - Skip style/formatting nitpicks unless they impact security or performance
+        - No general observations, praise, or minor suggestions
 
-            Review for:
-            - Potential bugs or logic errors
-            - Security vulnerabilities
-            - Performance problems
-            - Correctness issues
-            - Violations of repository coding standards
+        Use the GitHub review system to post your feedback:
+        1. Use `mcp__github__get_pull_request` to understand the PR context if needed
+        2. Use `mcp__github__get_me` to get authenticated user context if needed
+        3. Use `mcp__github__create_pending_pull_request_review` to start a pending review
+        4. Use `mcp__github__get_pull_request_diff` to see the code changes and line numbers
+        5. Use `mcp__github__add_comment_to_pending_review` for inline comments on specific lines
+        6. Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" to publish
 
-            Keep your response concise:
-            - Maximum 10 bullet points in summary
-            - Use inline comments with code suggestions for specific fixes
-            - Group similar issues together to avoid repetition
-            - Skip style/formatting nitpicks unless they impact security or performance
-            - No general observations, praise, or minor suggestions
-
-            Format:
-            - Start with 1-2 sentence overview
-            - List only critical/high-priority issues as bullet points
-            - For each issue: what, where, why it matters, suggested fix
-            - End with sign-off: APPROVED or ISSUES FOUND
-
-            Use `gh pr comment` with your Bash tool to leave your concise review as a comment on the PR.
-
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)" --max-turns 5'
-
+        When suggesting code changes, use GitHub's ```suggestion blocks so authors can apply changes directly.
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

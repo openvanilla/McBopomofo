@@ -1,0 +1,93 @@
+name: Claude PR Review (Reusable)
+
+# Reusable workflow for Claude Code PR reviews
+# Used by both claude.yml and claude-code-review.yml to maintain consistency
+# and eliminate duplication of MCP tool configuration.
+
+on:
+  workflow_call:
+    inputs:
+      prompt:
+        description: 'The prompt to send to Claude for PR review'
+        required: true
+        type: string
+      claude_args:
+        description: 'Claude arguments for the review'
+        required: false
+        type: string
+        default: '--max-turns 10 --allowedTools mcp__github__get_me,mcp__github__get_pull_request,mcp__github__list_pull_requests,mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_diff,mcp__github__add_comment_to_pending_review,mcp__github__submit_pending_pull_request_review'
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN:
+        description: 'OAuth token for Claude Code authentication'
+        required: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Note: Permissions are inherited from calling workflows (claude.yml, claude-code-review.yml)
+    # Caller permissions take precedence over reusable workflow permissions
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        timeout-minutes: 15
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ inputs.prompt }}
+
+          # Standard configuration for GitHub PR reviews
+          # This is the single source of truth for Claude arguments across all workflows
+          #
+          # Parameters:
+          # - --max-turns 10: Increase turn limit to prevent exhaustion during complex reviews
+          #
+          # Tools included:
+          # - mcp__github__get_me: Get authenticated user context (prevents permission denials)
+          # - mcp__github__get_pull_request: Get PR metadata, title, description (context understanding)
+          # - mcp__github__list_pull_requests: List/search PRs in the repository (context discovery)
+          # - mcp__github__create_pending_pull_request_review: Start a pending review
+          # - mcp__github__get_pull_request_diff: Get code changes and line numbers for inline comments
+          # - mcp__github__add_comment_to_pending_review: Add inline review comments
+          # - mcp__github__submit_pending_pull_request_review: Publish the review
+          claude_args: ${{ inputs.claude_args }}
+
+      - name: Log Claude Review Results
+        if: always()
+        run: |
+          echo "Claude review completed with status: ${{ steps.claude-review.outcome }}"
+          echo "Claude review conclusion: ${{ steps.claude-review.conclusion }}"
+          if [ "${{ steps.claude-review.outcome }}" = "failure" ]; then
+            echo "Claude review failed - check logs above for details"
+          elif [ "${{ steps.claude-review.outcome }}" = "success" ]; then
+            echo "Claude review completed successfully"
+          fi
+
+      - name: Report Claude Review Failure
+        if: steps.claude-review.outcome == 'failure'
+        uses: actions/github-script@v7
+        env:
+          FAILURE_MESSAGE: |
+            **Claude Code Review Failed**
+
+            The automated Claude review encountered an error and could not complete. You can:
+
+            - Check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details
+            - Trigger a manual review by commenting `@claude` on this PR
+            - The review will be retried automatically on the next push
+
+            This does not affect the PR approval process.
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.FAILURE_MESSAGE
+            })
