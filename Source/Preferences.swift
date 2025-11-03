@@ -579,13 +579,13 @@ extension Preferences {
         lines.append("  - Function Keyboard Layout: \(Preferences.functionKeyboardLayout)")
         lines.append("  - Candidate Keys: \(Preferences.candidateKeys)")
         lines.append(
-            "  - Selection Mode: \(Preferences.selectPhraseAfterCursorAsCandidate ? "After Cursor" : "Before Cusor")"
+            "  - Selection Mode: \(Preferences.selectPhraseAfterCursorAsCandidate ? "After Cursor" : "Before Cursor")"
         )
         lines.append(
             "  - Move Cursor After Selecting Candidate: \(Preferences.moveCursorAfterSelectingCandidate ? "Enabled" : "Disabled")"
         )
         lines.append(
-            "  - Canddidate Window: \(Preferences.useHorizontalCandidateList ? "Horizontal" : "Vertical")"
+            "  - Candidate Window: \(Preferences.useHorizontalCandidateList ? "Horizontal" : "Vertical")"
         )
         lines.append(
             "  - Chinese Conversion: \(Preferences.chineseConversionEnabled ? "Enabled" : "Disabled")"
@@ -598,13 +598,13 @@ extension Preferences {
             "  - Punctuations: \(Preferences.halfWidthPunctuationEnabled ? "Half-width" : "Full-width")"
         )
         lines.append(
-            "  - Select Canidate With Numbric Keyboard: \(Preferences.selectCandidateWithNumericKeypad ? "Enabled" : "Disabled")"
+            "  - Select Candidate With Numeric Keyboard: \(Preferences.selectCandidateWithNumericKeypad ? "Enabled" : "Disabled")"
         )
         lines.append(
             "  - Allow Ctrl + ` For Big5 Input: \(Preferences.big5InputEnabled ? "Enabled" : "Disabled")"
         )
         lines.append(
-            "  - Phrase Repalcement: \(Preferences.phraseReplacementEnabled ? "Enabled" : "Disabled")"
+            "  - Phrase Replacement: \(Preferences.phraseReplacementEnabled ? "Enabled" : "Disabled")"
         )
         lines.append(
             "  - Associated Phrases (McBopomofo): \(Preferences.associatedPhrasesEnabled ? "Enabled" : "Disabled")"
