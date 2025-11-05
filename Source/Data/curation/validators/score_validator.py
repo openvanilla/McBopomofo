@@ -152,7 +152,7 @@ def four_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:2])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[2:4])
         (a, b) = two_char_walk(phrases, thisbpmf)
         segcand += a
@@ -163,16 +163,16 @@ def four_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:3])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         mybpmf = bpmfinput[3]
-        (segcand, segscore) = seg_pick(mybpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, mybpmf, segcand, segscore)
         candidate.append((segcand, segscore))
     # 1234
     thisbpmf = "-".join(bpmfinput[0:4])
     if thisbpmf in phrases:
         segcand = ""
         segscore = 0
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
@@ -195,7 +195,7 @@ def five_char_walk(
         segcand = ""
         segscore = 0
         mybpmf = bpmfinput[0]
-        (segcand, segscore) = seg_pick(mybpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, mybpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[1:5])
         (a, b) = four_char_walk(phrases, thisbpmf)
         segcand += a
@@ -211,9 +211,9 @@ def five_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:2])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[2:5])
-        (a, b) = three_char_walk(thisbpmf)
+        (a, b) = three_char_walk(phrases, thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -226,7 +226,7 @@ def five_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:3])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[3:5])
         (a, b) = two_char_walk(phrases, thisbpmf)
         segcand += a
@@ -237,16 +237,16 @@ def five_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:4])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         mybpmf = bpmfinput[4]
-        (segcand, segscore) = seg_pick(mybpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, mybpmf, segcand, segscore)
         candidate.append((segcand, segscore))
     # 12345
     if "-".join(bpmfinput[0:5]) in phrases:
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:5])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
@@ -270,9 +270,9 @@ def six_char_walk(
         segcand = ""
         segscore = 0
         mybpmf = bpmfinput[0]
-        (segcand, segscore) = seg_pick(mybpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, mybpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[1:6])
-        (a, b) = four_char_walk(phrases, thisbpmf)
+        (a, b) = five_char_walk(phrases, thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -287,9 +287,9 @@ def six_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:2])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[2:6])
-        (a, b) = three_char_walk(thisbpmf)
+        (a, b) = four_char_walk(phrases, thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -303,9 +303,9 @@ def six_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:3])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[3:6])
-        (a, b) = three_char_walk(thisbpmf)
+        (a, b) = three_char_walk(phrases, thisbpmf)
         segcand += a
         segscore += b
         candidate.append((segcand, segscore))
@@ -318,7 +318,7 @@ def six_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:4])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         thisbpmf = "-".join(bpmfinput[4:6])
         (a, b) = two_char_walk(phrases, thisbpmf)
         segcand += a
@@ -329,16 +329,16 @@ def six_char_walk(
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:5])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         mybpmf = bpmfinput[5]
-        (segcand, segscore) = seg_pick(mybpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, mybpmf, segcand, segscore)
         candidate.append((segcand, segscore))
     # 123456
     if "-".join(bpmfinput[0:6]) in phrases:
         segcand = ""
         segscore = 0
         thisbpmf = "-".join(bpmfinput[0:6])
-        (segcand, segscore) = seg_pick(thisbpmf, segcand, segscore)
+        (segcand, segscore) = seg_pick(phrases, thisbpmf, segcand, segscore)
         candidate.append((segcand, segscore))
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
@@ -346,27 +346,28 @@ def six_char_walk(
 
 
 def check_bpmf_output(phrases: dict[str, list[tuple[str, float]]], bpmf2chk: str) -> None:
-    if len(bpmf2chk.split("-")) == 2:
+    length = len(bpmf2chk.split("-"))
+    if length == 2:
         (a, b) = two_char_walk(phrases, bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
             print(f"{c} {d:f} {a} {b:f}")
-    if len(bpmf2chk.split("-")) == 3:
+    elif length == 3:
         (a, b) = three_char_walk(phrases, bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
             print(f"{c} {d:f} {a} {b:f}")
-    if len(bpmf2chk.split("-")) == 4:
+    elif length == 4:
         (a, b) = four_char_walk(phrases, bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
             print(f"{c} {d:f} {a} {b:f}")
-    if len(bpmf2chk.split("-")) == 5:
+    elif length == 5:
         (a, b) = five_char_walk(phrases, bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
             print(f"{c} {d:f} {a} {b:f}")
-    if len(bpmf2chk.split("-")) == 6:
+    elif length == 6:
         (a, b) = six_char_walk(phrases, bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):

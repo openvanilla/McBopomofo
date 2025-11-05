@@ -50,7 +50,8 @@ class Entry:
         if len(reading_parts) != len(self.value):
             return None
 
-        self._cached_zipped_readings_and_values = list(zip(reading_parts, self.value, strict=True))
+        # Manual length validation for Python 3.9+ compatibility (strict=True requires 3.10+)
+        self._cached_zipped_readings_and_values = list(zip(reading_parts, self.value))
         return self._cached_zipped_readings_and_values
 
     @classmethod
