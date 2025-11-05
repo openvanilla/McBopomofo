@@ -16,10 +16,14 @@ jobs:
   claude:
     # Only trigger when @claude is mentioned in PR-related events
     # Note: This workflow requires PR context and will not run on plain issues
+    # Skip automated bots to avoid manual approval requirements (GitHub security policy for bot-triggered workflows)
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.issue.pull_request) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+      (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.issue.pull_request) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+      ) &&
+      !contains(fromJSON('["dependabot[bot]", "renovate[bot]", "github-actions[bot]", "copilot-pull-request-reviewer[bot]", "github-copilot[bot]", "copilot-autofix[bot]", "Copilot", "copilot[bot]", "app/dependabot", "app/renovate", "app/github-copilot"]'), github.actor)
 
     permissions:
       contents: read        # Required for repository checkout
