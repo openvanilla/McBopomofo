@@ -402,17 +402,17 @@ extension McBopomofoInputMethodController {
             return
         }
 
-        if let previous = previous as? InputState.NotEmpty {
+        switch previous {
+        case let previous as InputState.NotEmpty:
             commit(text: previous.composingBuffer, client: client)
-        }
-
-        if previous as? InputState.Big5 != nil {
+        case is InputState.Big5,
+            is InputState.ChineseNumber,
+            is InputState.EnclosedNumber,
+            is InputState.RomanNumber:
             client.setMarkedText(
                 "", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
-        }
-        if previous as? InputState.ChineseNumber != nil {
-            client.setMarkedText(
-                "", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
+        default:
+            break
         }
 
         // Unlike the Empty state handler, we don't call client.setMarkedText() here:
@@ -568,101 +568,27 @@ extension McBopomofoInputMethodController {
     }
 
     private func handle(state: InputState.SelectingFeature, previous: InputState, client: Any?) {
-        gCurrentCandidateController?.visible = false
-        hideTooltip()
-
-        guard let client = client as? IMKTextInput else {
-            return
-        }
-
-        if let previous = previous as? InputState.NotEmpty {
-            commit(text: previous.composingBuffer, client: client)
-        }
-        client.setMarkedText(
-            "", selectionRange: NSMakeRange(0, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
-        show(candidateWindowWith: state, client: client)
+        handleStateWithSimpleCadidateWindow(state: state, previous: previous, client: client)
     }
 
     private func handle(state: InputState.SelectingDateMacro, previous: InputState, client: Any?) {
-        gCurrentCandidateController?.visible = false
-        hideTooltip()
-
-        guard let client = client as? IMKTextInput else {
-            return
-        }
-
-        if let previous = previous as? InputState.NotEmpty {
-            commit(text: previous.composingBuffer, client: client)
-        }
-        client.setMarkedText(
-            "", selectionRange: NSMakeRange(0, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
-        show(candidateWindowWith: state, client: client)
+        handleStateWithSimpleCadidateWindow(state: state, previous: previous, client: client)
     }
 
     private func handle(state: InputState.ChineseNumber, previous: InputState, client: Any?) {
-        gCurrentCandidateController?.visible = false
-        hideTooltip()
-
-        guard let client = client as? IMKTextInput else {
-            return
-        }
-
-        if let previous = previous as? InputState.NotEmpty {
-            commit(text: previous.composingBuffer, client: client)
-        }
-        client.setMarkedText(
-            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.RomanNumber, previous: InputState, client: Any?) {
-        gCurrentCandidateController?.visible = false
-        hideTooltip()
-
-        guard let client = client as? IMKTextInput else {
-            return
-        }
-
-        if let previous = previous as? InputState.NotEmpty {
-            commit(text: previous.composingBuffer, client: client)
-        }
-        client.setMarkedText(
-            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.EnclosedNumber, previous: InputState, client: Any?) {
-        gCurrentCandidateController?.visible = false
-        hideTooltip()
-
-        guard let client = client as? IMKTextInput else {
-            return
-        }
-
-        if let previous = previous as? InputState.NotEmpty {
-            commit(text: previous.composingBuffer, client: client)
-        }
-        client.setMarkedText(
-            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
-        gCurrentCandidateController?.visible = false
-        hideTooltip()
-
-        guard let client = client as? IMKTextInput else {
-            return
-        }
-
-        if let previous = previous as? InputState.NotEmpty {
-            commit(text: previous.composingBuffer, client: client)
-        }
-        client.setMarkedText(
-            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.SelectingDictionary, previous: InputState, client: Any?) {
@@ -732,6 +658,41 @@ extension McBopomofoInputMethodController {
 // MARK: -
 
 extension McBopomofoInputMethodController {
+    private func handleStateForCustomInput(composingBuffer: String,  previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        client.setMarkedText(
+            composingBuffer, selectionRange: NSMakeRange(composingBuffer.count, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+    }
+
+    private func handleStateWithSimpleCadidateWindow(state: InputState, previous: InputState, client: Any?) {
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
+
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        if let previous = previous as? InputState.NotEmpty {
+            commit(text: previous.composingBuffer, client: client)
+        }
+        // the selection range is where the cursor is, with the length being 0 and replacement range NSNotFound,
+        // i.e. the client app needs to take care of where to put this composing buffer
+        client.setMarkedText(
+            "", selectionRange: NSMakeRange(0, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        show(candidateWindowWith: state, client: client)
+    }
+
 
     private func show(candidateWindowWith state: InputState, client: Any!) {
         let useVerticalMode: Bool = {
@@ -747,13 +708,10 @@ extension McBopomofoInputMethodController {
             case let state as InputState.AssociatedPhrases:
                 useVerticalMode = state.useVerticalMode
                 candidates = state.candidates
-            case _ as InputState.SelectingFeature:
-                return true
-            case _ as InputState.SelectingDateMacro:
-                return true
-            case _ as InputState.SelectingDictionary:
-                return true
-            case _ as InputState.ShowingCharInfo:
+            case is InputState.SelectingFeature,
+                is InputState.SelectingDateMacro,
+                is InputState.SelectingDictionary,
+                is InputState.ShowingCharInfo:
                 return true
             default:
                 break
