@@ -26,8 +26,8 @@ import Cocoa
 import InputMethodKit
 import NotifierUI
 import OpenCCBridge
-import TooltipUI
 import SystemCharacterInfo
+import TooltipUI
 
 extension Bool {
     fileprivate var state: NSControl.StateValue {
@@ -576,19 +576,23 @@ extension McBopomofoInputMethodController {
     }
 
     private func handle(state: InputState.ChineseNumber, previous: InputState, client: Any?) {
-        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
+        handleStateForCustomInput(
+            composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.RomanNumber, previous: InputState, client: Any?) {
-        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
+        handleStateForCustomInput(
+            composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.EnclosedNumber, previous: InputState, client: Any?) {
-        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
+        handleStateForCustomInput(
+            composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
-        handleStateForCustomInput(composingBuffer: state.composingBuffer, previous: previous, client: client)
+        handleStateForCustomInput(
+            composingBuffer: state.composingBuffer, previous: previous, client: client)
     }
 
     private func handle(state: InputState.SelectingDictionary, previous: InputState, client: Any?) {
@@ -658,7 +662,9 @@ extension McBopomofoInputMethodController {
 // MARK: -
 
 extension McBopomofoInputMethodController {
-    private func handleStateForCustomInput(composingBuffer: String,  previous: InputState, client: Any?) {
+    private func handleStateForCustomInput(
+        composingBuffer: String, previous: InputState, client: Any?
+    ) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
 
@@ -674,7 +680,9 @@ extension McBopomofoInputMethodController {
             replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
-    private func handleStateWithSimpleCadidateWindow(state: InputState, previous: InputState, client: Any?) {
+    private func handleStateWithSimpleCadidateWindow(
+        state: InputState, previous: InputState, client: Any?
+    ) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
 
@@ -692,7 +700,6 @@ extension McBopomofoInputMethodController {
             replacementRange: NSMakeRange(NSNotFound, NSNotFound))
         show(candidateWindowWith: state, client: client)
     }
-
 
     private func show(candidateWindowWith state: InputState, client: Any!) {
         let useVerticalMode: Bool = {

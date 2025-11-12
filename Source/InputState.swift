@@ -137,7 +137,7 @@ class InputState: NSObject {
             ),
             (
                 NSLocalizedString("Roman Numbers (Alphabets)", comment: ""),
-                { .RomanNumber(style: .alphabets , number: "") }
+                { .RomanNumber(style: .alphabets, number: "") }
             ),
             (
                 NSLocalizedString("Roman Numbers (Full-width Upper Case)", comment: ""),
@@ -297,7 +297,6 @@ class InputState: NSObject {
             return "[\(style.label)] \(number)"
         }
     }
-
 
     @objc(InputStateBig5)
     class Big5: InputState {
