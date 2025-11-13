@@ -1,16 +1,18 @@
-name: Build
+name: Build phrase database
 on:
   push:
     paths:
       - 'Source/Data/**'
+      - '.github/workflows/continuous-build-data.yml'
   pull_request:
     paths:
       - 'Source/Data/**'
+      - '.github/workflows/continuous-build-data.yml'
 
 jobs:
   build:
     name: Build phrase database
-    runs-on: macOS-15
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
