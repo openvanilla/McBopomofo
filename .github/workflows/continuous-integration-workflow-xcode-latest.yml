@@ -26,7 +26,10 @@ on:
 jobs:
   build:
     name: Build and Test with Latest Xcode
-    runs-on: macOS-15
+    strategy:
+      matrix:
+        os: [macos-15, macos-26]
+    runs-on: ${{ matrix.os }}
     # env:
     #   DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
