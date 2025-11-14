@@ -25,7 +25,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test with Latest Xcode
+    name: Build and Test with Xcode
     strategy:
       matrix:
         os: [macos-15, macos-26]
