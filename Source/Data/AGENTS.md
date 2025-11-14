@@ -128,9 +128,9 @@ Format: `character bopomofo pinyin tone tag`
 
 Do NOT suggest any changes to `heterophony1.list`, `heterophony2.list` or `heterophony3.list`. If a PR contains any changes to those files, highlight them and ask human reviewers to pay attention to them.
 
-For Mandarin heteronyms, an entry in `heterophony1.list` will cause other heterophonic readings of the same character to be demoted in terms of their frequency score. For very common characters, this can sometimes cause problems, because their heterophonic readings also occur in the language model with high frequency. To compensate this, `heterophony2.list` and `heterophony3.list` are designed to give those readings another chance to be "promoted back" with a discount (so that they still won't score higher than the one listed in `heterophony1.list`).
+For Mandarin heteronyms, an entry in `heterophony1.list` sets the primary reading and causes other readings of the same character to be demoted. This can be problematic for high-frequency characters whose other readings are also common. To compensate, `heterophony2.list` and `heterophony3.list` "promote" those readings back, but with a frequency discount to ensure they don't outrank the primary one.
 
-All this is to say that this is a complex mechanism designed to tweak the language model, and so agents should NOT suggest any changes by itself.
+This is a complex language model tuning mechanism, so agents must NOT suggest changes on their own.
 
 ### Adding Emojis and Symbols
 
