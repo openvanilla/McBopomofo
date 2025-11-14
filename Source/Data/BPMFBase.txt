@@ -2043,6 +2043,7 @@
 螫 ㄓㄜ zhe 5k big5
 晢 ㄓㄜ zhe 5k big5
 嫬 ㄓㄜ zhe 5k big5
+折 ㄓㄜ zhe 5k big5
 者 ㄓㄜˇ zhe3 5k3 big5
 赭 ㄓㄜˇ zhe3 5k3 big5
 鍺 ㄓㄜˇ zhe3 5k3 big5
@@ -8065,6 +8066,7 @@
 藣 ㄆㄧˊ pi2 qu6 big5
 蠯 ㄆㄧˊ pi2 qu6 big5
 蚍 ㄆㄧˊ pi2 qu6 big5
+比 ㄆㄧˊ pi2 qu6 big5
 飄 ㄆㄧㄠ piao qul big5
 漂 ㄆㄧㄠ piao qul big5
 慓 ㄆㄧㄠ piao qul big5

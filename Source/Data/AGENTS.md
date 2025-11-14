@@ -126,19 +126,11 @@ Format: `character bopomofo pinyin tone tag`
 
 ### Handling Heterophony Characters (破音字)
 
-For characters with multiple pronunciations (e.g., 行: ㄏㄤˊ vs ㄒㄧㄥˊ):
+Do NOT suggest any changes to `heterophony1.list`, `heterophony2.list` or `heterophony3.list`. If a PR contains any changes to those files, highlight them and ask human reviewers to pay attention to them.
 
-1. Place most common reading in `heterophony1.list`, less common in `heterophony2.list`, rare in `heterophony3.list`
-2. Add both readings to `BPMFMappings.txt`
+For Mandarin heteronyms, an entry in `heterophony1.list` sets the primary reading and causes other readings of the same character to be demoted. This can be problematic for high-frequency characters whose other readings are also common. To compensate, `heterophony2.list` and `heterophony3.list` "promote" those readings back, but with a frequency discount to ensure they don't outrank the primary one.
 
-Example:
-```bash
-# heterophony1.list
-行 ㄏㄤˊ
-
-# heterophony2.list
-行 ㄒㄧㄥˊ
-```
+This is a complex language model tuning mechanism, so agents must NOT suggest changes on their own.
 
 ### Adding Emojis and Symbols
 
