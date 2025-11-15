@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24412" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24412"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -87,24 +87,23 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="640" height="360"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1049"/>
             <view key="contentView" id="372">
                 <rect key="frame" x="0.0" y="0.0" width="640" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="536">
-                        <rect key="frame" x="20" y="60" width="600" height="251"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="536">
+                        <rect key="frame" x="20" y="55" width="600" height="269"/>
                         <clipView key="contentView" drawsBackground="NO" id="c84-Fy-j39">
-                            <rect key="frame" x="1" y="1" width="583" height="249"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <rect key="frame" x="1" y="1" width="581" height="267"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" spellingCorrection="YES" smartInsertDelete="YES" id="537">
-                                    <rect key="frame" x="0.0" y="0.0" width="583" height="249"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="581" height="267"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="583" height="249"/>
+                                    <size key="minSize" width="581" height="267"/>
                                     <size key="maxSize" width="600" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
@@ -115,13 +114,12 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="539">
-                            <rect key="frame" x="584" y="1" width="15" height="249"/>
+                            <rect key="frame" x="582" y="1" width="17" height="267"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button imageHugsTitle="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="575">
-                        <rect key="frame" x="460" y="12" width="166" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="575">
+                        <rect key="frame" x="544" y="16" width="76" height="24"/>
                         <buttonCell key="cell" type="push" title="同意安裝" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="576">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -130,9 +128,8 @@
                             <action selector="agreeAndInstallAction:" target="494" id="708"/>
                         </connections>
                     </button>
-                    <button imageHugsTitle="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="592">
-                        <rect key="frame" x="330" y="12" width="130" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="592">
+                        <rect key="frame" x="482" y="19" width="50" height="16"/>
                         <buttonCell key="cell" type="push" title="取消" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="593">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -140,33 +137,51 @@
 Gw
 </string>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="wz6-NH-04O"/>
+                        </constraints>
                         <connections>
                             <action selector="cancelAction:" target="494" id="707"/>
                         </connections>
                     </button>
-                    <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="623">
-                        <rect key="frame" x="17" y="323" width="559" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="歡迎您安裝「小麥注音輸入法」！在安裝之前，請您閱讀本軟體的使用授權：" id="624">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="688">
-                        <rect key="frame" x="17" y="19" width="337" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="688">
+                        <rect key="frame" x="18" y="20" width="246" height="14"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="點選「同意安裝」，表示您同意本軟體的使用授權。" id="689">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="623">
+                        <rect key="frame" x="18" y="332" width="604" height="16"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="歡迎您安裝「小麥注音輸入法」！在安裝之前，請您閱讀本軟體的使用授權：" id="624">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="536" firstAttribute="trailing" secondItem="575" secondAttribute="trailing" id="Dcf-SD-1gC"/>
+                    <constraint firstItem="623" firstAttribute="leading" secondItem="372" secondAttribute="leading" constant="20" symbolic="YES" id="IFd-V6-Xgc"/>
+                    <constraint firstItem="536" firstAttribute="top" secondItem="623" secondAttribute="bottom" constant="8" symbolic="YES" id="KwO-Ej-iWs"/>
+                    <constraint firstItem="536" firstAttribute="top" secondItem="372" secondAttribute="top" constant="36" id="NAT-hX-Udt"/>
+                    <constraint firstItem="688" firstAttribute="leading" secondItem="372" secondAttribute="leading" constant="20" symbolic="YES" id="Nbb-my-MXV"/>
+                    <constraint firstItem="575" firstAttribute="baseline" secondItem="688" secondAttribute="baseline" id="Q4V-Pt-1QX"/>
+                    <constraint firstItem="592" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="688" secondAttribute="trailing" constant="8" symbolic="YES" id="WVo-OG-yVj"/>
+                    <constraint firstItem="536" firstAttribute="trailing" secondItem="623" secondAttribute="trailing" id="bfW-hB-ogd"/>
+                    <constraint firstItem="592" firstAttribute="top" secondItem="536" secondAttribute="bottom" constant="20" symbolic="YES" id="h5D-l5-O3z"/>
+                    <constraint firstAttribute="bottom" secondItem="575" secondAttribute="bottom" constant="16" id="lL7-Wb-XCn"/>
+                    <constraint firstItem="536" firstAttribute="leading" secondItem="623" secondAttribute="leading" id="nQF-Zv-bIy"/>
+                    <constraint firstItem="592" firstAttribute="centerY" secondItem="688" secondAttribute="centerY" id="sCu-wm-p5V"/>
+                    <constraint firstAttribute="trailing" secondItem="623" secondAttribute="trailing" constant="20" symbolic="YES" id="wyC-Xa-RKz"/>
+                    <constraint firstItem="575" firstAttribute="leading" secondItem="592" secondAttribute="trailing" constant="12" symbolic="YES" id="yuD-ZO-BvU"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="706"/>
             </connections>
+            <point key="canvasLocation" x="10" y="-179"/>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
@@ -184,7 +199,7 @@ Gw
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="Pxv-O2-I1W">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="480" height="180"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1049"/>
             <view key="contentView" id="Qab-7x-ryB">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="180"/>
                 <autoresizingMask key="autoresizingMask"/>
