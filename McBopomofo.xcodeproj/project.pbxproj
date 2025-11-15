@@ -18,6 +18,7 @@
 		6A38BC1515FC117A00A8A51F /* data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A38BBF615FC117A00A8A51F /* data.txt */; };
 		6A4F5F982879E838008C4307 /* reading_grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A4F5F932879E838008C4307 /* reading_grid.cpp */; };
 		6A660A702EAF371000D53D7B /* ByteBlockBackedDictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A660A6F2EAF371000D53D7B /* ByteBlockBackedDictionary.cpp */; };
+		6A68C1C32EC7F2C0005284A0 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 6A68C1C12EC7F2C0005284A0 /* Localizable.stringsdict */; };
 		6A6ED16B2797650A0012872E /* template-phrases-replacement.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1632797650A0012872E /* template-phrases-replacement.txt */; };
 		6A6ED16C2797650A0012872E /* template-data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1652797650A0012872E /* template-data.txt */; };
 		6A6ED16D2797650A0012872E /* template-exclude-phrases-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1672797650A0012872E /* template-exclude-phrases-plain-bpmf.txt */; };
@@ -140,6 +141,8 @@
 		6A4F5F932879E838008C4307 /* reading_grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reading_grid.cpp; sourceTree = "<group>"; };
 		6A660A6E2EAF371000D53D7B /* ByteBlockBackedDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ByteBlockBackedDictionary.h; sourceTree = "<group>"; };
 		6A660A6F2EAF371000D53D7B /* ByteBlockBackedDictionary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ByteBlockBackedDictionary.cpp; sourceTree = "<group>"; };
+		6A68C1C22EC7F2C0005284A0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		6A68C1C42EC7F6B7005284A0 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		6A6ED1642797650A0012872E /* Base */ = {isa = PBXFileReference; lastKnownFileType = text; name = Base; path = "Base.lproj/template-phrases-replacement.txt"; sourceTree = "<group>"; };
 		6A6ED1662797650A0012872E /* Base */ = {isa = PBXFileReference; lastKnownFileType = text; name = Base; path = "Base.lproj/template-data.txt"; sourceTree = "<group>"; };
 		6A6ED1682797650A0012872E /* Base */ = {isa = PBXFileReference; lastKnownFileType = text; name = Base; path = "Base.lproj/template-exclude-phrases-plain-bpmf.txt"; sourceTree = "<group>"; };
@@ -455,6 +458,7 @@
 				6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */,
 				D4F0BBE2279B08900071253C /* BundleTranslocate.h */,
 				D4F0BBE3279B08900071253C /* BundleTranslocate.m */,
+				6A68C1C12EC7F2C0005284A0 /* Localizable.stringsdict */,
 			);
 			path = Installer;
 			sourceTree = "<group>";
@@ -680,6 +684,7 @@
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
 				6A225A1F23679F2600F685C6 /* NotarizedArchives in Resources */,
 				6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */,
+				6A68C1C32EC7F2C0005284A0 /* Localizable.stringsdict in Resources */,
 				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
 				6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */,
 			);
@@ -819,6 +824,15 @@
 				6A15B32521A51F2300B92CD3 /* Base */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		6A68C1C12EC7F2C0005284A0 /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A68C1C22EC7F2C0005284A0 /* en */,
+				6A68C1C42EC7F6B7005284A0 /* zh-Hant */,
+			);
+			name = Localizable.stringsdict;
 			sourceTree = "<group>";
 		};
 		6A6ED1632797650A0012872E /* template-phrases-replacement.txt */ = {
