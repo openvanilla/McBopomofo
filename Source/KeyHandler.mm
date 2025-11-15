@@ -95,7 +95,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         _languageModel = newLanguageModel;
 
         if (_grid == nullptr) {
-            NSLog(@"used after release????");
+            NSLog(@"warning: _grid used after release");
         }
 
         if (_grid != nullptr) {
@@ -1333,9 +1333,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || input.isDelete;
-
-    NSLog(@"Preferences.allowMovingCursorWhenChoosingCandidates %ld", static_cast<long>(Preferences.allowMovingCursorWhenChoosingCandidates));
-    NSLog(@"input.inputText:%@", input.inputText);
 
     BOOL isCursorMovingLeft = NO;
     BOOL isCursorMovingRight = NO;
