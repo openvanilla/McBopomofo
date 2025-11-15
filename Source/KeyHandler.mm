@@ -2502,4 +2502,51 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return [self buildAssociatedPhraseStateWithPreviousState:state prefixCursorAt:[self computeActualCursorIndex:candidtaeStateOriginalCursorIndex] reading:prefixReading value:prefixValue selectedCandidateIndex:candidateIndex useVerticalMode:useVerticalMode useShiftKey:useShiftKey];
 }
 
+- (NSArray<NSString *> *)collectUserFileIssues
+{
+    NSMutableArray<NSString *> *array = [NSMutableArray array];
+
+    std::vector<McBopomofo::McBopomofoLM::UserFileIssue> issues = _languageModel->getUserFileIssues();
+    for (const auto& issue : issues) {
+        NSMutableString *msg = [NSMutableString string];
+
+        switch (issue.fileType) {
+        case McBopomofo::McBopomofoLM::UserFileType::USER_PHRASES:
+            [msg appendString:NSLocalizedString(@"User phrase file", "")];
+            break;
+        case McBopomofo::McBopomofoLM::UserFileType::EXCLUDED_PHRASES:
+            [msg appendString:NSLocalizedString(@"Excluded phrase file", "")];
+            break;
+        case McBopomofo::McBopomofoLM::UserFileType::PHRASE_REPLACEMENT_MAP:
+            [msg appendString:NSLocalizedString(@"Phrase replacement file", "")];
+            break;
+        default:
+            // Shouldn't happen, and so the string is not localized.
+            [msg appendString:@"Unknown user file"];
+            break;
+        }
+
+        [msg appendFormat:@" (%@) ", [NSString stringWithUTF8String:issue.path.filename().c_str()]];
+        [msg appendFormat:NSLocalizedString(@"line %lu: ", ""), issue.lineNumber];
+
+        switch (issue.issueType) {
+        case McBopomofo::McBopomofoLM::IssueType::MISSING_SECOND_COLUMN:
+            [msg appendString:NSLocalizedString(@"Only one column was found.", "")];
+            break;
+        case McBopomofo::McBopomofoLM::IssueType::NULL_CHARACTER_IN_TEXT:
+            [msg appendString:NSLocalizedString(@"Illegal NULL character was found.", "")];
+            break;
+        case McBopomofo::McBopomofoLM::IssueType::NO_ISSUE:
+        default:
+            // Shouldn't happen, and so the string is not localized.
+            [msg appendString:@"Unknown issue."];
+            break;
+        }
+
+        [array addObject:msg];
+    }
+
+    return array;
+}
+
 @end

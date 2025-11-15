@@ -92,6 +92,8 @@ extern InputMode InputModePlainBopomofo;
 
 - (size_t)computeActualCursorIndex:(size_t)cursor;
 
+- (NSArray<NSString *> *)collectUserFileIssues;
+
 @property (strong, nonatomic) InputMode inputMode;
 @property (weak, nonatomic) id<KeyHandlerDelegate> delegate;
 @property (assign, nonatomic, readonly) NSInteger actualCandidateCursorIndex;
