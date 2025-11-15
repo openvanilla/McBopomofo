@@ -67,7 +67,7 @@ class McBopomofoInputMethodController: IMKInputController {
         let menu = NSMenu(title: "Input Method Menu")
 
         let chineseConversionItem = menu.addItem(
-            withTitle: NSLocalizedString("Chinese Conversion", comment: ""),
+            withTitle: NSLocalizedString("Convert to Simplified Chinese", comment: ""),
             action: #selector(toggleChineseConverter(_:)), keyEquivalent: "g")
         chineseConversionItem.keyEquivalentModifierMask = [.command, .control]
         chineseConversionItem.state = Preferences.chineseConversionEnabled.state
@@ -254,8 +254,8 @@ class McBopomofoInputMethodController: IMKInputController {
         let enabled = Preferences.toggleChineseConversionEnabled()
         NotifierController.notify(
             message: enabled
-                ? NSLocalizedString("Chinese conversion on", comment: "")
-                : NSLocalizedString("Chinese conversion off", comment: ""))
+                ? NSLocalizedString("Chinese Conversion On", comment: "")
+                : NSLocalizedString("Chinese Conversion Off", comment: ""))
         if let currentClient = currentClient {
             keyHandler.clear()
             self.handle(state: InputState.Empty(), client: currentClient)
