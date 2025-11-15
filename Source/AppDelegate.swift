@@ -154,7 +154,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var serviceProviderHelper = ServiceProviderInputHelper()
 
     func updateUserPhrases() {
-        NSLog("updateUserPhrases called \(LanguageModelManager.dataFolderPath)")
         LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
 
