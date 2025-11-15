@@ -31,7 +31,7 @@
 /* No comment provided by engineer. */
 "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@";
 
-"Chinese Conversion" = "Convert to Simplified Chinese";
+"Convert to Simplified Chinese" = "Convert to Simplified Chinese";
 
 "User Phrases" = "User Phrases";
 
@@ -39,7 +39,7 @@
 
 "Reload User Phrases" = "Reload User Phrases";
 
-"Unable to create the user phrase file." = "Unable to create the user phrase file.";
+"Failed to Create the User Phrase File" = "Failed to Create the User Phrase File";
 
 "Please check the permission of the path at \"%@\"." = "Please check the permission of the path at \"%@\".";
 
@@ -53,9 +53,9 @@
 
 "The phrase being marked \"%@\" is longer than the allowed %d characters." = "The phrase being marked \"%@\" is longer than the allowed %d characters.";
 
-"Chinese conversion on" = "Chinese conversion on";
+"Chinese Conversion On" = "Chinese Conversion On";
 
-"Chinese conversion off" = "Chinese conversion off";
+"Chinese Conversion Off" = "Chinese Conversion Off";
 
 "Edit Phrase Replacement Table" = "Edit Phrase Replacement Table";
 
@@ -135,6 +135,6 @@
 
 "Roman Numbers (Alphabets)" = "Roman Numbers (Alphabets)";
 
-"Roman Numbers (Full-width Upper Case)" = "Roman Numbers (Full-width Upper Case)";
+"Roman Numbers (Full-Width Upper Case)" = "Roman Numbers (Full-Width Upper Case)";
 
-"Roman Numbers (Full-width Lower Case)" = "Roman Numbers (Full-width Lower Case)";
+"Roman Numbers (Full-Width Lower Case)" = "Roman Numbers (Full-Width Lower Case)";
