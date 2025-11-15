@@ -138,3 +138,21 @@
 "Roman Numbers (Full-Width Upper Case)" = "Roman Numbers (Full-Width Upper Case)";
 
 "Roman Numbers (Full-Width Lower Case)" = "Roman Numbers (Full-Width Lower Case)";
+
+"Show Issues in User Files ⚠️" = "Show Issues in User Files ⚠️";
+
+"Issues were found in the following user phrase files:" = "Issues were found in the following user phrase files:";
+
+"Check McBopomofo menu for user file issues" = "Check McBopomofo menu for user file issues";
+
+"User phrase file" = "User phrase file";
+
+"Excluded phrase file" = "Excluded phrase file";
+
+"Phrase replacement file" = "Phrase replacement file";
+
+"line %lu: " = "line %lu: ";
+
+"Only one column was found." = "Only one column was found.";
+
+"Illegal NULL character was found." = "Illegal NULL character was found.";

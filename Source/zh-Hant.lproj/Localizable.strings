@@ -138,3 +138,21 @@
 "Roman Numbers (Full-Width Upper Case)" = "羅馬數字 (大寫全形)";
 
 "Roman Numbers (Full-Width Lower Case)" = "羅馬數字 (小寫全形)";
+
+"Show Issues in User Files ⚠️" = "列出自訂詞庫中的問題 ⚠️";
+
+"Issues were found in the following user phrase files:" = "以下是用戶自訂詞庫檔案中發現的問題：";
+
+"Check McBopomofo menu for user file issues" = "自訂詞庫有誤，請從小麥注音選單點選「列出自訂詞庫中的問題」";
+
+"User phrase file" = "使用者自訂詞彙檔";
+
+"Excluded phrase file" = "排除詞彙檔";
+
+"Phrase replacement file" = "詞彙替換表格檔";
+
+"line %lu: " = "第 %lu 行：";
+
+"Only one column was found." = "一行應該有兩欄文字，這行只有一欄。";
+
+"Illegal NULL character was found." = "這一行包含了不合規則的 NULL 字元 (0x00)。";
