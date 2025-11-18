@@ -56,6 +56,9 @@ class McBopomofoInputMethodController: IMKInputController {
     var state: InputState = InputState.Empty()
     lazy var charInfo: SystemCharacterInfo? = try? SystemCharacterInfo()
 
+    // Share the stored issues, so a set of issues is shown as notification only once.
+    static var latestUserFileIssues: [String] = []
+
     // MARK: - IMKInputController methods
 
     override init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
@@ -122,6 +125,16 @@ class McBopomofoInputMethodController: IMKInputController {
         menu.addItem(
             withTitle: NSLocalizedString("Reload User Phrases", comment: ""),
             action: #selector(reloadUserPhrases(_:)), keyEquivalent: "")
+
+        if !McBopomofoInputMethodController.latestUserFileIssues.isEmpty {
+            // Setting menuItem.image does not work in input method menus even on macOS 26,
+            // so we just use the alert emoji in the menu item title.
+            let menuItem = NSMenuItem(
+                title: NSLocalizedString("Show Issues in User Files ⚠️", comment: ""),
+                action: #selector(showUserFileIssues(_:)), keyEquivalent: "")
+            menu.addItem(menuItem)
+        }
+
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(
@@ -171,6 +184,9 @@ class McBopomofoInputMethodController: IMKInputController {
             keyHandler.inputMode = newInputMode
             self.handle(state: .Empty(), client: client)
         }
+
+        // Since setValue is called after activateServer, show user file issues here, if any.
+        checkUserFileIssues()
     }
 
     // MARK: - IMKServerInput protocol methods
@@ -311,6 +327,34 @@ class McBopomofoInputMethodController: IMKInputController {
         LanguageModelManager.loadUserPhrases(
             enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
+
+        // Empty the issues so that if there are still the same issues, a
+        // notification will be shown.
+        McBopomofoInputMethodController.latestUserFileIssues = []
+        checkUserFileIssues()
+    }
+
+    @objc func showUserFileIssues(_ sender: Any?) {
+        let header = NSLocalizedString(
+            "Issues were found in the following user phrase files:", comment: "")
+        let report =
+            header + "\n\n"
+            + McBopomofoInputMethodController.latestUserFileIssues.joined(separator: "\n")
+        let tempDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        let now = Date()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyyMMdd-HHmmss.SSS"
+        let dateString = formatter.string(from: now)
+        let fileName = "UserFileIssues-\(dateString).txt"
+        let fileURL = tempDir.appendingPathComponent(fileName)
+        do {
+            try report.write(to: fileURL, atomically: true, encoding: .utf8)
+            NSWorkspace.shared.open(fileURL)
+        } catch {
+            NSLog("Failed to write report to temporary file: \(error)")
+            return
+        }
     }
 
     @objc func showAbout(_ sender: Any?) {
@@ -848,5 +892,21 @@ extension McBopomofoInputMethodController {
 
     private func hideTooltip() {
         McBopomofoInputMethodController.tooltipController.hide()
+    }
+
+    private func checkUserFileIssues() {
+        let issues: [String] = keyHandler.collectUserFileIssues()
+
+        // McBopomofoLM caps the maximum number of issues collected, and so
+        // we'll just do this O(n) comparison since n is small.
+        if McBopomofoInputMethodController.latestUserFileIssues != issues {
+            McBopomofoInputMethodController.latestUserFileIssues = issues
+
+            if !McBopomofoInputMethodController.latestUserFileIssues.isEmpty {
+                NotifierController.notify(
+                    message: NSLocalizedString(
+                        "Check McBopomofo menu for user file issues", comment: ""), stay: true)
+            }
+        }
     }
 }
