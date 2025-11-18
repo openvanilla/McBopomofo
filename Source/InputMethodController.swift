@@ -799,8 +799,6 @@ extension McBopomofoInputMethodController {
         gCurrentCandidateController?.reloadData()
         currentClient = client
 
-        gCurrentCandidateController?.visible = true
-
         var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
         var cursor: Int = 0
 
@@ -829,6 +827,8 @@ extension McBopomofoInputMethodController {
                     lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0),
                 bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
         }
+
+        gCurrentCandidateController?.visible = true
     }
 
     private func show(tooltip: String, composingBuffer: String, cursorIndex: UInt, client: Any!) {
