@@ -30,7 +30,8 @@ import Cocoa
 
 class NonModalAlertWindowController: NSWindowController {
     @objc(sharedInstance)
-    static let shared = NonModalAlertWindowController(windowNibName: "NonModalAlertWindowController")
+    static let shared = NonModalAlertWindowController(
+        windowNibName: "NonModalAlertWindowController")
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var contentTextField: NSTextField!
@@ -38,29 +39,18 @@ class NonModalAlertWindowController: NSWindowController {
     @IBOutlet weak var cancelButton: NSButton!
     weak var delegate: NonModalAlertWindowControllerDelegate?
 
-    @objc func show(title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?, cancelAsDefault: Bool, delegate: NonModalAlertWindowControllerDelegate?) {
+    @objc func show(
+        title: String, content: String, confirmButtonTitle: String, cancelButtonTitle: String?,
+        cancelAsDefault: Bool, delegate: NonModalAlertWindowControllerDelegate?
+    ) {
         if window?.isVisible == true {
             self.delegate?.nonModalAlertWindowControllerDidCancel(self)
         }
 
         self.delegate = delegate
-
-        var oldFrame = confirmButton.frame
         confirmButton.title = confirmButtonTitle
-        confirmButton.sizeToFit()
-
-        var newFrame = confirmButton.frame
-        newFrame.size.width = max(90, newFrame.size.width + 10)
-        newFrame.origin.x += oldFrame.size.width - newFrame.size.width
-        confirmButton.frame = newFrame
-
         if let cancelButtonTitle = cancelButtonTitle {
             cancelButton.title = cancelButtonTitle
-            cancelButton.sizeToFit()
-            var adjustFrame = cancelButton.frame
-            adjustFrame.size.width = max(90, adjustFrame.size.width + 10)
-            adjustFrame.origin.x = newFrame.origin.x - adjustFrame.size.width
-            cancelButton.frame = adjustFrame
             cancelButton.isHidden = false
         } else {
             cancelButton.isHidden = true
@@ -68,7 +58,6 @@ class NonModalAlertWindowController: NSWindowController {
 
         cancelButton.nextKeyView = confirmButton
         confirmButton.nextKeyView = cancelButton
-
         if cancelButtonTitle != nil {
             if cancelAsDefault {
                 window?.defaultButtonCell = cancelButton.cell as? NSButtonCell
@@ -82,21 +71,18 @@ class NonModalAlertWindowController: NSWindowController {
 
         titleTextField.stringValue = title
 
-        oldFrame = contentTextField.frame
+        let oldContentFrame = contentTextField.frame
         contentTextField.stringValue = content
 
-        var infiniteHeightFrame = oldFrame
-        infiniteHeightFrame.size.width -= 4.0
-        infiniteHeightFrame.size.height = 10240
-        newFrame = (content as NSString).boundingRect(with: infiniteHeightFrame.size, options: [.usesLineFragmentOrigin], attributes: [.font: contentTextField.font!])
-        newFrame.size.width = max(newFrame.size.width, oldFrame.size.width)
-        newFrame.size.height += 4.0
-        newFrame.origin = oldFrame.origin
-        newFrame.origin.y -= (newFrame.size.height - oldFrame.size.height)
-        contentTextField.frame = newFrame
+        let infiniteHeightFrame = NSRect(
+            origin: CGPoint.zero, size: CGSize(width: oldContentFrame.width, height: 10240))
+        let newContentFrame = (content as NSString).boundingRect(
+            with: infiniteHeightFrame.size, options: [.usesLineFragmentOrigin],
+            attributes: [.font: contentTextField.font!])
+        let heightDelta = (newContentFrame.size.height - oldContentFrame.size.height)
 
         var windowFrame = window?.frame ?? NSRect.zero
-        windowFrame.size.height += (newFrame.size.height - oldFrame.size.height)
+        windowFrame.size.height += heightDelta
         window?.level = NSWindow.Level(Int(CGShieldingWindowLevel()) + 1)
         window?.setFrame(windowFrame, display: true)
         window?.center()

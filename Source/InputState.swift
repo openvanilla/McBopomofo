@@ -140,11 +140,11 @@ class InputState: NSObject {
                 { .RomanNumber(style: .alphabets, number: "") }
             ),
             (
-                NSLocalizedString("Roman Numbers (Full-width Upper Case)", comment: ""),
+                NSLocalizedString("Roman Numbers (Full-Width Upper Case)", comment: ""),
                 { .RomanNumber(style: .fullWidthUpper, number: "") }
             ),
             (
-                NSLocalizedString("Roman Numbers (Full-width Lower Case)", comment: ""),
+                NSLocalizedString("Roman Numbers (Full-Width Lower Case)", comment: ""),
                 { .RomanNumber(style: .fullWidthLower, number: "") }
             ),
         ]

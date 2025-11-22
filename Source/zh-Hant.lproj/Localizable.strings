@@ -31,7 +31,7 @@
 /* No comment provided by engineer. */
 "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@" = "目前使用的小麥注音版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往小麥注音網站下載新版來安裝？%5$@";
 
-"Chinese Conversion" = "輸出簡體中文";
+"Convert to Simplified Chinese" = "輸出簡體中文";
 
 "User Phrases" = "使用者詞彙";
 
@@ -39,7 +39,7 @@
 
 "Reload User Phrases" = "重新載入使用者詞彙";
 
-"Unable to create the user phrase file." = "無法建立使用者詞彙檔案";
+"Failed to Create the User Phrase File" = "無法建立使用者詞彙檔案";
 
 "Please check the permission of the path at \"%@\"." = "請檢查以下路徑的寫入權限 \"%@\"。";
 
@@ -53,9 +53,9 @@
 
 "The phrase being marked \"%@\" is longer than the allowed %d characters." = "您目前選擇了「%@」。自訂詞彙不能超過 %d 個字元。";
 
-"Chinese conversion on" = "已經切換到簡體中文模式";
+"Chinese Conversion On" = "已經切換到簡體中文模式";
 
-"Chinese conversion off" = "已經切換到繁體中文模式";
+"Chinese Conversion Off" = "已經切換到繁體中文模式";
 
 "Edit Phrase Replacement Table" = "編輯詞彙替換表格";
 
@@ -135,6 +135,24 @@
 
 "Roman Numbers (Alphabets)" = "羅馬數字 (字母)";
 
-"Roman Numbers (Full-width Upper Case)" = "羅馬數字 (大寫全形)";
+"Roman Numbers (Full-Width Upper Case)" = "羅馬數字 (大寫全形)";
 
-"Roman Numbers (Full-width Lower Case)" = "羅馬數字 (小寫全形)";
+"Roman Numbers (Full-Width Lower Case)" = "羅馬數字 (小寫全形)";
+
+"Show Issues in User Files ⚠️" = "列出自訂詞庫中的問題 ⚠️";
+
+"Issues were found in the following user phrase files:" = "以下是用戶自訂詞庫檔案中發現的問題：";
+
+"Check McBopomofo menu for user file issues" = "自訂詞庫有誤，請從小麥注音選單點選「列出自訂詞庫中的問題」";
+
+"User phrase file" = "使用者自訂詞彙檔";
+
+"Excluded phrase file" = "排除詞彙檔";
+
+"Phrase replacement file" = "詞彙替換表格檔";
+
+"line %lu: " = "第 %lu 行：";
+
+"Only one column was found." = "一行應該有兩欄文字，這行只有一欄。";
+
+"Illegal NULL character was found." = "這一行包含了不合規則的 NULL 字元 (0x00)。";

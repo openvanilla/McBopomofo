@@ -284,7 +284,7 @@ extension AppDelegate {
         func checkIfUserFilesExist() -> Bool {
             if !LanguageModelManager.checkIfUserLanguageModelFilesExist() {
                 let content = String(format: NSLocalizedString("Please check the permission of the path at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
-                NonModalAlertWindowController.shared.show(title: NSLocalizedString("Unable to create the user phrase file.", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                NonModalAlertWindowController.shared.show(title: NSLocalizedString("Failed to Create the User Phrase File", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 return false
             }
             return true
