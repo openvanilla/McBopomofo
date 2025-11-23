@@ -396,11 +396,7 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.SelectingDateMacro:
             handle(state: newState, previous: previous, client: client)
-        case let newState as InputState.ChineseNumber:
-            handle(state: newState, previous: previous, client: client)
-        case let newState as InputState.RomanNumber:
-            handle(state: newState, previous: previous, client: client)
-        case let newState as InputState.EnclosedNumber:
+        case let newState as InputState.Number:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
@@ -450,9 +446,7 @@ extension McBopomofoInputMethodController {
         case let previous as InputState.NotEmpty:
             commit(text: previous.composingBuffer, client: client)
         case is InputState.Big5,
-            is InputState.ChineseNumber,
-            is InputState.EnclosedNumber,
-            is InputState.RomanNumber:
+            is InputState.Number:
             client.setMarkedText(
                 "", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
         default:
@@ -612,26 +606,28 @@ extension McBopomofoInputMethodController {
     }
 
     private func handle(state: InputState.SelectingFeature, previous: InputState, client: Any?) {
-        handleStateWithSimpleCadidateWindow(state: state, previous: previous, client: client)
+        handleStateWithSimpleCandidateWindow(state: state, previous: previous, client: client)
     }
 
     private func handle(state: InputState.SelectingDateMacro, previous: InputState, client: Any?) {
-        handleStateWithSimpleCadidateWindow(state: state, previous: previous, client: client)
+        handleStateWithSimpleCandidateWindow(state: state, previous: previous, client: client)
     }
 
-    private func handle(state: InputState.ChineseNumber, previous: InputState, client: Any?) {
-        handleStateForCustomInput(
-            composingBuffer: state.composingBuffer, previous: previous, client: client)
-    }
+    private func handle(state: InputState.Number, previous: InputState, client: Any?) {
 
-    private func handle(state: InputState.RomanNumber, previous: InputState, client: Any?) {
-        handleStateForCustomInput(
-            composingBuffer: state.composingBuffer, previous: previous, client: client)
-    }
+        gCurrentCandidateController?.visible = false
+        hideTooltip()
 
-    private func handle(state: InputState.EnclosedNumber, previous: InputState, client: Any?) {
-        handleStateForCustomInput(
-            composingBuffer: state.composingBuffer, previous: previous, client: client)
+        guard let client = client as? IMKTextInput else {
+            return
+        }
+
+        client.setMarkedText(
+            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+        if state.candidateCount > 0 {
+            show(candidateWindowWith: state, client: client)
+        }
     }
 
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
@@ -724,7 +720,7 @@ extension McBopomofoInputMethodController {
             replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
-    private func handleStateWithSimpleCadidateWindow(
+    private func handleStateWithSimpleCandidateWindow(
         state: InputState, previous: InputState, client: Any?
     ) {
         gCurrentCandidateController?.visible = false
@@ -762,7 +758,8 @@ extension McBopomofoInputMethodController {
             case is InputState.SelectingFeature,
                 is InputState.SelectingDateMacro,
                 is InputState.SelectingDictionary,
-                is InputState.ShowingCharInfo:
+                is InputState.ShowingCharInfo,
+                is InputState.Number:
                 return true
             default:
                 break
@@ -825,15 +822,16 @@ extension McBopomofoInputMethodController {
         let keyLabels =
             candidateKeys.count >= 4
             ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
-        let shouldUseShift = {
-            if let state = state as? InputState.AssociatedPhrases {
-                return state.useShiftKey
+        let shouldUseShift =
+            switch state {
+            case let state as InputState.AssociatedPhrases:
+                state.useShiftKey
+            case is InputState.AssociatedPhrasesPlain,
+                is InputState.Number:
+                true
+            default:
+                false
             }
-            if state is InputState.AssociatedPhrasesPlain {
-                return true
-            }
-            return false
-        }()
         let keyLabelPrefix = shouldUseShift ? "⇧ " : ""
         gCurrentCandidateController?.keyLabels = keyLabels.map {
             CandidateKeyLabel(key: String($0), displayedText: keyLabelPrefix + String($0))

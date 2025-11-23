@@ -122,7 +122,7 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
                     withReading: selectedCandidate.reading, value: selectedCandidate.value,
                     useVerticalMode: state.useVerticalMode) as? InputState.AssociatedPhrasesPlain
             {
-                self.handle(state: associatePhrases, client: client)
+                handle(state: associatePhrases, client: client)
             } else {
                 handle(state: .Empty(), client: client)
             }
@@ -165,6 +165,10 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         case let state as InputState.CustomMenu:
             let entry = state.entries[Int(index)]
             entry.callback()
+        case let state as InputState.Number:
+            let candidate = state.candidate(at: Int(index))
+            let committing = InputState.Committing(poppedText: candidate)
+            handle(state: committing, client: client)
         default:
             break
         }
