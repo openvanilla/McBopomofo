@@ -8,7 +8,7 @@ __author__ = "Lukhnos Liu and The McBopomofo Authors"
 __copyright__ = "Copyright 2012 and onwards The McBopomofo Authors"
 __license__ = "MIT"
 
-skip = re.compile("．\s+_punctuation.*_>")
+skip = re.compile(r"．\s+_punctuation.*_>")
 
 insert = ["．", "_punctuation_\"", "0.0"]
 
