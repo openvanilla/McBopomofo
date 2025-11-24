@@ -24,7 +24,7 @@ class NumberInputHelper: NSObject {
         ]
 
         if let intNumber = Int(intPart),
-            intNumber > 0 && intNumber <= 3999
+           intNumber > 0 && intNumber <= 3999 && decPart.isEmpty
         {
             do {
                 try result.append(RomanNumbers.convert(input: intNumber, style: .alphabets))
