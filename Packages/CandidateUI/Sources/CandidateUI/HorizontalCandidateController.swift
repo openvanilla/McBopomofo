@@ -24,7 +24,9 @@
 import Cocoa
 
 private protocol HorizontalCandidateViewDelegate: AnyObject {
-    func view(_ view: HorizontalCandidateView, didRequestExplanationFor candidate: String, reading: String) -> String?
+    func view(
+        _ view: HorizontalCandidateView, didRequestExplanationFor candidate: String, reading: String
+    ) -> String?
 }
 
 private class HorizontalCandidateView: NSView {
@@ -38,9 +40,10 @@ private class HorizontalCandidateView: NSView {
         let reading: String?
         let rect: NSRect
 
-        init(owner: HorizontalCandidateView, index: UInt,
-             candidate: String, reading: String?, rect: NSRect)
-        {
+        init(
+            owner: HorizontalCandidateView, index: UInt,
+            candidate: String, reading: String?, rect: NSRect
+        ) {
             self.owner = owner
             self.index = index
             self.candidate = candidate
@@ -132,14 +135,17 @@ private class HorizontalCandidateView: NSView {
         return result
     }
 
-    func set(keyLabels labels: [String], displayedCandidates candidates: [(candidate:String, reading: String?)]) {
+    func set(
+        keyLabels labels: [String],
+        displayedCandidates candidates: [(candidate: String, reading: String?)]
+    ) {
         let count = min(labels.count, candidates.count)
-        keyLabels = Array(labels[0 ..< count])
-        displayedCandidates = Array(candidates[0 ..< count])
+        keyLabels = Array(labels[0..<count])
+        displayedCandidates = Array(candidates[0..<count])
 
         var newWidths = [CGFloat]()
         let baseSize = NSSize(width: 10240.0, height: 10240.0)
-        for index in 0 ..< count {
+        for index in 0..<count {
             let labelRect = (keyLabels[index] as NSString).boundingRect(
                 with: baseSize, options: .usesLineFragmentOrigin, attributes: keyLabelAttrDict
             )
@@ -222,7 +228,7 @@ private class HorizontalCandidateView: NSView {
         }
 
         var accuWidth: CGFloat = 0
-        for index in 0 ..< elementWidths.count {
+        for index in 0..<elementWidths.count {
             let currentWidth = elementWidths[index]
             let labelRect = NSRect(
                 x: accuWidth, y: tooltipSize.height, width: currentWidth, height: keyLabelHeight
@@ -280,7 +286,7 @@ private class HorizontalCandidateView: NSView {
             return nil
         }
         var accuWidth: CGFloat = 0.0
-        for index in 0 ..< elementWidths.count {
+        for index in 0..<elementWidths.count {
             let currentWidth = elementWidths[index]
 
             if location.x >= accuWidth, location.x <= accuWidth + currentWidth {
@@ -330,12 +336,13 @@ private class HorizontalCandidateView: NSView {
     fileprivate func buildAccessibilityChildren() {
         func accessibilityFrameForCandidate(at index: Int) -> NSRect {
             var accuWidth: CGFloat = 0
-            for i in 0 ..< index {
+            for i in 0..<index {
                 accuWidth += elementWidths[i] + 1.0
             }
             let width = elementWidths[index]
             let height = keyLabelHeight + candidateTextHeight + 1.0
-            let rectInView = NSRect(x: accuWidth, y: tooltipSize.height, width: width, height: height)
+            let rectInView = NSRect(
+                x: accuWidth, y: tooltipSize.height, width: width, height: height)
             return rectInView
         }
 
@@ -554,7 +561,9 @@ public class HorizontalCandidateController: CandidateController {
 }
 
 extension HorizontalCandidateController: HorizontalCandidateViewDelegate {
-    fileprivate func view(_ view: HorizontalCandidateView, didRequestExplanationFor candidate: String, reading: String) -> String? {
+    fileprivate func view(
+        _ view: HorizontalCandidateView, didRequestExplanationFor candidate: String, reading: String
+    ) -> String? {
         delegate?.candidateController(self, requestExplanationFor: candidate, reading: reading)
     }
 }
@@ -580,12 +589,13 @@ extension HorizontalCandidateController {
         let keyLabelCount = UInt(keyLabels.count)
 
         let begin = currentPage * keyLabelCount
-        for index in begin ..< min(begin + keyLabelCount, count) {
+        for index in begin..<min(begin + keyLabelCount, count) {
             let candidate = delegate.candidateController(self, candidateAtIndex: index)
             let reading = delegate.candidateController(self, readingAtIndex: index)
             candidates.append((candidate, reading))
         }
-        candidateView.set(keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates)
+        candidateView.set(
+            keyLabels: keyLabels.map { $0.displayedText }, displayedCandidates: candidates)
         candidateView.toolTip = tooltip
         var newSize = candidateView.sizeForView
         var frameRect = candidateView.frame

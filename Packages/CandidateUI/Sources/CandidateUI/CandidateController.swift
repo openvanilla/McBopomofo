@@ -38,10 +38,15 @@ public class CandidateKeyLabel: NSObject {
 @objc(VTCandidateControllerDelegate)
 public protocol CandidateControllerDelegate: AnyObject {
     func candidateCountForController(_ controller: CandidateController) -> UInt
-    func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String
-    func candidateController(_ controller: CandidateController, readingAtIndex index: UInt) -> String?
-    func candidateController(_ controller: CandidateController, requestExplanationFor candidate: String, reading: String) -> String?
-    func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt)
+    func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt)
+        -> String
+    func candidateController(_ controller: CandidateController, readingAtIndex index: UInt)
+        -> String?
+    func candidateController(
+        _ controller: CandidateController, requestExplanationFor candidate: String, reading: String
+    ) -> String?
+    func candidateController(
+        _ controller: CandidateController, didSelectCandidateAtIndex index: UInt)
 }
 
 @objc(VTCandidateController)
@@ -90,9 +95,10 @@ public class CandidateController: NSWindowController {
         }
     }
 
-    @objc public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"].map {
-        CandidateKeyLabel(key: $0, displayedText: $0)
-    }
+    @objc public var keyLabels: [CandidateKeyLabel] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        .map {
+            CandidateKeyLabel(key: $0, displayedText: $0)
+        }
 
     @objc public var keyLabelFont: NSFont = .systemFont(ofSize: 14)
     @objc public var candidateFont: NSFont = .systemFont(ofSize: 18)
@@ -131,9 +137,11 @@ public class CandidateController: NSWindowController {
     ///   - height: The height that helps the window not to be out of the bottom
     ///     of a screen.
     @objc(setWindowTopLeftPoint:bottomOutOfScreenAdjustmentHeight:)
-    public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat) {
+    public func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: CGFloat)
+    {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
-            self.doSet(windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
+            self.doSet(
+                windowTopLeftPoint: windowTopLeftPoint, bottomOutOfScreenAdjustmentHeight: height)
         }
     }
 
@@ -145,9 +153,9 @@ public class CandidateController: NSWindowController {
         for screen in NSScreen.screens {
             let frame = screen.visibleFrame
             if windowTopLeftPoint.x >= frame.minX,
-               windowTopLeftPoint.x <= frame.maxX,
-               windowTopLeftPoint.y >= frame.minY,
-               windowTopLeftPoint.y <= frame.maxY
+                windowTopLeftPoint.x <= frame.maxX,
+                windowTopLeftPoint.y >= frame.minY,
+                windowTopLeftPoint.y <= frame.maxY
             {
                 screenFrame = frame
                 break

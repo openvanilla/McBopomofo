@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "CandidateUI",
-            targets: ["CandidateUI"]),
+            targets: ["CandidateUI"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
