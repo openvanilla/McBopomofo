@@ -1902,7 +1902,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
 
-        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
+        NSString *appended = [NSString stringWithFormat:@"%@%c",
+                              numberState.number,
+                              charCode];
         NSArray *candidates = [self _candidatesForNumberString:appended];
         InputStateNumber *newState = [[InputStateNumber alloc] initWithNumber:appended candidates:candidates];
         stateCallback(newState);
@@ -1917,7 +1919,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
 
-        NSString *appended = [NSString stringWithFormat:@"%@%c", numberState.number, toupper(charCode)];
+        NSString *appended = [NSString stringWithFormat:@"%@%c",
+                              numberState.number,
+                              charCode];
         NSArray *candidates = [self _candidatesForNumberString:appended];
         InputStateNumber *newState = [[InputStateNumber alloc] initWithNumber:appended candidates:candidates];
         stateCallback(newState);
