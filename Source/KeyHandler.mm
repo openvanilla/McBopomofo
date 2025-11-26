@@ -1846,7 +1846,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return @[];
     }
     NSMutableArray *array = [[NSMutableArray alloc] init];
-    NSArray *composedCandidateArray = [NumberInputHelper cadiddatesForNumberString:number];
+    NSArray *composedCandidateArray = [NumberInputHelper candidateForNumberString:number];
     [array addObjectsFromArray:composedCandidateArray];
     std::string key = std::string("_number_") + std::string([number UTF8String]);
     if (_languageModel->hasUnigrams(key)) {

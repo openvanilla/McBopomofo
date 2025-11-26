@@ -5,7 +5,7 @@ import RomanNumbers
 @objc
 class NumberInputHelper: NSObject {
     @objc
-    static func cadiddatesFor(numberString: String) -> [String] {
+    static func candidateFor(numberString: String) -> [String] {
         if numberString.isEmpty {
             return []
         }
@@ -24,7 +24,7 @@ class NumberInputHelper: NSObject {
         ]
 
         if let intNumber = Int(intPart),
-           intNumber > 0 && intNumber <= 3999 && decPart.isEmpty
+            intNumber > 0 && intNumber <= 3999 && decPart.isEmpty
         {
             do {
                 try result.append(RomanNumbers.convert(input: intNumber, style: .alphabets))
