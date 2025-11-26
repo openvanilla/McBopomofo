@@ -623,8 +623,13 @@ extension McBopomofoInputMethodController {
         }
 
         client.setMarkedText(
-            state.composingBuffer, selectionRange: NSMakeRange(state.composingBuffer.count, 0),
-            replacementRange: NSMakeRange(NSNotFound, NSNotFound))
+            state.composingBuffer,
+            selectionRange: NSMakeRange(
+                (state.composingBuffer as NSString).length,
+                0
+            ),
+            replacementRange: NSMakeRange(NSNotFound, NSNotFound)
+        )
         if state.candidateCount > 0 {
             show(candidateWindowWith: state, client: client)
         }
