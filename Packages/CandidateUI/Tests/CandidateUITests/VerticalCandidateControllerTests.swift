@@ -1,5 +1,6 @@
 import Cocoa
 import Testing
+
 @testable import CandidateUI
 
 @MainActor
@@ -14,24 +15,35 @@ final class VerticalCandidateControllerTests {
             UInt(candidates.count)
         }
 
-        func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt) -> String {
+        func candidateController(_ controller: CandidateController, candidateAtIndex index: UInt)
+            -> String
+        {
             candidates[Int(index)]
         }
 
-        func candidateController(_ controller: CandidateController, didSelectCandidateAtIndex index: UInt) {
+        func candidateController(
+            _ controller: CandidateController, didSelectCandidateAtIndex index: UInt
+        ) {
             selected = candidates[Int(index)]
         }
 
-        func candidateController(_ controller: CandidateController, readingAtIndex index: UInt) -> String? {
+        func candidateController(_ controller: CandidateController, readingAtIndex index: UInt)
+            -> String?
+        {
             nil
         }
 
-        func candidateController(_ controller: CandidateUI.CandidateController, requestExplanationFor candidate: String, reading: String) -> String? {
+        func candidateController(
+            _ controller: CandidateUI.CandidateController, requestExplanationFor candidate: String,
+            reading: String
+        ) -> String? {
             nil
         }
     }
 
-    @Test("Test if candidate controller can be positioned correctly when the input position is below the bottom of screen")
+    @Test(
+        "Test if candidate controller can be positioned correctly when the input position is below the bottom of screen"
+    )
     func testPositioning1() {
         let controller = HorizontalCandidateController()
         let mock = Mock()
@@ -41,12 +53,15 @@ final class VerticalCandidateControllerTests {
         }
         controller.reloadData()
         controller.visible = true
-        controller.set(windowTopLeftPoint: NSPoint(x: -100, y: 0), bottomOutOfScreenAdjustmentHeight: 10)
+        controller.set(
+            windowTopLeftPoint: NSPoint(x: -100, y: 0), bottomOutOfScreenAdjustmentHeight: 10)
         Thread.sleep(forTimeInterval: 0.2)
         #expect(controller.window?.frame.minX ?? -1 >= 0)
     }
 
-    @Test("Test if candidate controller can be positioned correctly when the input position is over the top of screen")
+    @Test(
+        "Test if candidate controller can be positioned correctly when the input position is over the top of screen"
+    )
     func testPositioning2() {
         let controller = HorizontalCandidateController()
         let mock = Mock()
@@ -57,7 +72,9 @@ final class VerticalCandidateControllerTests {
         controller.reloadData()
         controller.visible = true
         let screenRect = NSScreen.main?.frame ?? NSRect.zero
-        controller.set(windowTopLeftPoint: NSPoint(x: screenRect.maxX + 100, y: screenRect.maxY + 100), bottomOutOfScreenAdjustmentHeight: 10)
+        controller.set(
+            windowTopLeftPoint: NSPoint(x: screenRect.maxX + 100, y: screenRect.maxY + 100),
+            bottomOutOfScreenAdjustmentHeight: 10)
         Thread.sleep(forTimeInterval: 0.2)
         #expect(controller.window?.frame.maxX ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxX)
         #expect(controller.window?.frame.maxY ?? CGFloat.greatestFiniteMagnitude <= screenRect.maxY)

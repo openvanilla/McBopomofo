@@ -5,11 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "CandidateUI",
-    platforms: [.macOS(.v10_15)],
     products: [
         .library(
             name: "CandidateUI",
-            targets: ["CandidateUI"]),
+            targets: ["CandidateUI"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
