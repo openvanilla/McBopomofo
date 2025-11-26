@@ -5,10 +5,7 @@ import RomanNumbers
 @objc
 class NumberInputHelper: NSObject {
     @objc
-    static func candidateFor(numberString: String) -> [String] {
-        if numberString.isEmpty {
-            return []
-        }
+    static func split(numberString: String) -> [String] {
         var intPart = ""
         var decPart = ""
         let components = numberString.split(separator: ".")
@@ -18,6 +15,17 @@ class NumberInputHelper: NSObject {
         if components.count > 1 {
             decPart = String(components[1])
         }
+        return [intPart, decPart]
+    }
+
+    @objc
+    static func candidateFor(numberString: String) -> [String] {
+        if numberString.isEmpty {
+            return []
+        }
+        let components = NumberInputHelper.split(numberString: numberString)
+        let intPart = components[0]
+        let decPart = components[1]
         var result = [
             ChineseNumbers.generate(intPart: intPart, decPart: decPart, digitCase: .lowercase),
             ChineseNumbers.generate(intPart: intPart, decPart: decPart, digitCase: .uppercase),

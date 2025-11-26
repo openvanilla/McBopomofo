@@ -1859,15 +1859,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             }
         }
     }
-    NSString *intPart = @"";
-    NSString *decPart = @"";
-    NSArray *components = [number componentsSeparatedByString:@"."];
-    if (components.count > 0) {
-        intPart = components[0];
-    }
-    if (components.count > 1) {
-        decPart = components[1];
-    }
+    NSArray *components = [NumberInputHelper splitWithNumberString:number];
+    NSString *intPart = components[0];
+    NSString *decPart = components[1];
     NSString *suzhouNumber = [SuzhouNumbers generateWithIntPart:intPart decPart:decPart unit:@"[單位]" preferInitialVertical:YES];
     [array addObject:suzhouNumber];
     return array;
