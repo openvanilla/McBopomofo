@@ -2394,231 +2394,6 @@ extension KeyHandlerBopomofoTests {
     }
 }
 
-extension KeyHandlerBopomofoTests {
-
-    func testChineseNumberCancel() {
-        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
-        let keys = Array("1234.5").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-            } errorCallback: {
-            }
-        }
-        let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
-        handler.handle(input: input, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-
-        XCTAssertTrue(state is InputState.Empty)
-    }
-
-    func testChineseNumberDelete() {
-        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
-        let keys = Array("1234.5").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-            } errorCallback: {
-            }
-        }
-        let input = KeyHandlerInput(
-            inputText: " ", keyCode: KeyCode.delete.rawValue, charCode: 0, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: input, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-
-        XCTAssertTrue(state is InputState.ChineseNumber)
-
-        if let state = state as? InputState.ChineseNumber {
-            XCTAssertTrue(state.number == "1234.")
-        }
-    }
-
-    func testChineseNumber1() {
-        var state: InputState = InputState.ChineseNumber(style: .lower, number: "")
-        var commitState: InputState?
-        let keys = Array("1234.5").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-                if newState is InputState.Committing {
-                    commitState = newState
-                }
-            } errorCallback: {
-            }
-        }
-        let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: input, state: state) { newState in
-            state = newState
-            if newState is InputState.Committing {
-                commitState = newState
-            }
-        } errorCallback: {
-        }
-
-        XCTAssert(state is InputState.Empty)
-        XCTAssert(commitState is InputState.Committing)
-        if let commitState = commitState as? InputState.Committing {
-            XCTAssertTrue(commitState.poppedText == "一千二百三十四點五")
-        }
-
-    }
-
-    func testChineseNumber2() {
-        var state: InputState = InputState.ChineseNumber(style: .upper, number: "")
-        var commitState: InputState?
-        let keys = Array("1234.5").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-                if newState is InputState.Committing {
-                    commitState = newState
-                }
-            } errorCallback: {
-            }
-        }
-        let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: input, state: state) { newState in
-            state = newState
-            if newState is InputState.Committing {
-                commitState = newState
-            }
-        } errorCallback: {
-        }
-
-        XCTAssert(state is InputState.Empty)
-        XCTAssert(commitState is InputState.Committing)
-        if let commitState = commitState as? InputState.Committing {
-            XCTAssertTrue(commitState.poppedText == "壹仟貳佰參拾肆點伍")
-        }
-
-    }
-
-    func testChineseNumber3() {
-        var state: InputState = InputState.ChineseNumber(style: .suzhou, number: "")
-        var commitState: InputState?
-        let keys = Array("1234.5").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-                if newState is InputState.Committing {
-                    commitState = newState
-                }
-            } errorCallback: {
-            }
-        }
-        let input = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: input, state: state) { newState in
-            state = newState
-            if newState is InputState.Committing {
-                commitState = newState
-            }
-        } errorCallback: {
-        }
-
-        XCTAssert(state is InputState.Empty)
-        XCTAssert(commitState is InputState.Committing)
-        if let commitState = commitState as? InputState.Committing {
-            XCTAssertTrue(commitState.poppedText == "〡二〣〤〥\n千[單位]")
-        }
-
-    }
-}
-
-extension KeyHandlerBopomofoTests {
-    func testEnclosingNumbers() {
-        var state: InputState = InputState.EnclosedNumber(number: "1")
-        let enter = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
-            isVerticalMode: false)
-        handler.handle(input: enter, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-
-        XCTAssert(state is InputState.ChoosingCandidate)
-        let input = KeyHandlerInput(
-            inputText: "1", keyCode: 0, charCode: charCode("1"), flags: [.shift],
-            isVerticalMode: false)
-        handler.handle(input: input, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-
-        XCTAssertTrue(state is InputState.ChoosingCandidate)
-        if let candidateState = state as? InputState.ChoosingCandidate {
-            XCTAssert(candidateState.composingBuffer == "１")
-            let selected = candidateState.candidates[5]
-            handler.fixNode(
-                reading: selected.reading, value: selected.value,
-                originalCursorIndex: Int(candidateState.cursorIndex),
-                useMoveCursorAfterSelectionSetting: true)
-            state = handler.buildInputtingState()
-        }
-        XCTAssertTrue(state is InputState.Inputting)
-        if let state = state as? InputState.Inputting {
-            XCTAssertTrue(state.composingBuffer == "①")
-            XCTAssertTrue(state.cursorIndex == 1)
-        }
-    }
-
-    func testEnclosingNumbers30() {
-        var state: InputState = InputState.EnclosedNumber(number: "30")
-        var commitingState: InputState.Committing?
-        let enter = KeyHandlerInput(
-            inputText: " ", keyCode: 0, charCode: 13, flags: [.shift],
-            isVerticalMode: false)
-        handler.handle(input: enter, state: state) { newState in
-            state = newState
-            if let newState = newState as? InputState.Committing {
-                commitingState = newState
-            }
-        } errorCallback: {
-        }
-
-        XCTAssert(state is InputState.Empty)
-        XCTAssertNotNil(commitingState)
-        if let commitingState = commitingState {
-            XCTAssert(commitingState.poppedText == "㉚")
-        }
-    }
-}
 
 extension KeyHandlerBopomofoTests {
     func testEnterAssocatedPhrases() {
@@ -2797,6 +2572,137 @@ extension KeyHandlerBopomofoTests {
         XCTAssertTrue(state is InputState.Committing)
         if let state = state as? InputState.Committing {
             XCTAssertTrue(state.poppedText == "中華")
+        }
+    }
+}
+
+extension KeyHandlerBopomofoTests {
+    func testNumberTypingAndCommitWithEnter() {
+        var state: InputState = InputState.Number(number: "", candidates: [])
+        for ch in Array("12345") {
+            let s = String(ch)
+            let input = KeyHandlerInput(
+                inputText: s, keyCode: 0, charCode: charCode(s), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {}
+        }
+        XCTAssertTrue(state is InputState.Number, "\(state)")
+        if let numberState = state as? InputState.Number {
+            XCTAssertEqual(numberState.number, "12345")
+            XCTAssertTrue(numberState.composingBuffer.hasSuffix("12345"))
+        }
+
+        var committing: InputState?
+        var empty: InputState?
+        var count = 0
+        let enter = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 13, flags: [], isVerticalMode: false)
+        handler.handle(input: enter, state: state) { newState in
+            switch count {
+            case 0: committing = newState
+            case 1: empty = newState
+            default: break
+            }
+            count += 1
+        } errorCallback: {}
+
+        XCTAssertEqual(count, 2)
+        XCTAssertTrue(committing is InputState.Committing, "\(String(describing: committing))")
+        if let committing = committing as? InputState.Committing {
+            XCTAssertEqual(committing.poppedText, "一萬二千三百四十五")
+        }
+        XCTAssertTrue(empty is InputState.Empty, "\(String(describing: empty))")
+    }
+
+    func testNumberBackspaceAndEsc() {
+        var state: InputState = InputState.Number(number: "123", candidates: [])
+        let backspace = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        XCTAssertTrue(state is InputState.Number, "\(state)")
+        if let numberState = state as? InputState.Number {
+            XCTAssertEqual(numberState.number, "12")
+        }
+
+        let esc = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: esc, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState || state is InputState.Empty, "\(state)")
+    }
+
+    func testNumberIgnoresNonDigit() {
+        var state: InputState = InputState.Number(number: "9", candidates: [])
+        let letter = KeyHandlerInput(
+            inputText: "a", keyCode: 0, charCode: charCode("a"), flags: [], isVerticalMode: false)
+        let _ = handler.handle(input: letter, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        // Expect still Number with unchanged buffer
+        XCTAssertTrue(state is InputState.Number, "\(state)")
+        if let numberState = state as? InputState.Number {
+            XCTAssertEqual(numberState.number, "9")
+        }
+    }
+
+    func testNumberChineseCandidates() {
+        var state: InputState = InputState.Number(number: "", candidates: [])
+        let keys = Array("123").map { String($0) }
+        for ch in keys {
+            let input = KeyHandlerInput(
+                inputText: ch, keyCode: 0, charCode: charCode(ch), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {}
+        }
+        XCTAssertTrue(state is InputState.Number, "\(state)")
+        if let numberState = state as? InputState.Number {
+            XCTAssertEqual(numberState.number, "123")
+            XCTAssertTrue(numberState.candidates.contains("一百二十三"))
+            XCTAssertTrue(numberState.candidates.contains("壹佰貳拾參"))
+            XCTAssertTrue(numberState.candidates.contains("CXXIII")) // Roman numeral for 123
+        }
+    }
+
+    func testNumberDecimalPointAndChineseCandidates() {
+        var state: InputState = InputState.Number(number: "", candidates: [])
+        let keys = Array("12.34").map { String($0) }
+        for ch in keys {
+            let input = KeyHandlerInput(
+                inputText: ch, keyCode: 0, charCode: charCode(ch), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {}
+        }
+        XCTAssertTrue(state is InputState.Number, "\(state)")
+        if let numberState = state as? InputState.Number {
+            XCTAssertEqual(numberState.number, "12.34")
+            XCTAssertTrue(numberState.candidates.contains("一十二點三四"))
+            XCTAssertTrue(numberState.candidates.contains("壹拾貳點參肆"))
+            XCTAssertFalse(numberState.candidates.contains("XII.XXXIV")) // Roman numerals should not be present for decimals
+        }
+    }
+
+    func testNumberRomanCandidatesOutOfRange() {
+        var state: InputState = InputState.Number(number: "", candidates: [])
+        let keys = Array("4000").map { String($0) } // Max Roman is 3999
+        for ch in keys {
+            let input = KeyHandlerInput(
+                inputText: ch, keyCode: 0, charCode: charCode(ch), flags: [], isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {}
+        }
+        XCTAssertTrue(state is InputState.Number, "\(state)")
+        if let numberState = state as? InputState.Number {
+            XCTAssertEqual(numberState.number, "4000")
+            XCTAssertTrue(numberState.candidates.contains("四千"))
+            XCTAssertTrue(numberState.candidates.contains("肆仟"))
+            XCTAssertFalse(numberState.candidates.contains("MMMM")) // Should not contain Roman numeral
         }
     }
 }

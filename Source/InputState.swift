@@ -122,30 +122,11 @@ class InputState: NSObject {
         var featureList: [(String, () -> InputState)] = [
             (NSLocalizedString("Big5 Code", comment: ""), { .Big5(code: "") }),
             (NSLocalizedString("Date and Time", comment: ""), { .SelectingDateMacro() }),
-            (NSLocalizedString("Enclosed Numbers", comment: ""), { .EnclosedNumber(number: "") }),
             (
-                NSLocalizedString("Lowercase Chinese Numbers", comment: ""),
-                { .ChineseNumber(style: .lower, number: "") }
-            ),
-            (
-                NSLocalizedString("Uppercase Chinese Numbers", comment: ""),
-                { .ChineseNumber(style: .upper, number: "") }
-            ),
-            (
-                NSLocalizedString("Suzhou Numbers", comment: ""),
-                { .ChineseNumber(style: .suzhou, number: "") }
-            ),
-            (
-                NSLocalizedString("Roman Numbers (Alphabets)", comment: ""),
-                { .RomanNumber(style: .alphabets, number: "") }
-            ),
-            (
-                NSLocalizedString("Roman Numbers (Full-Width Upper Case)", comment: ""),
-                { .RomanNumber(style: .fullWidthUpper, number: "") }
-            ),
-            (
-                NSLocalizedString("Roman Numbers (Full-Width Lower Case)", comment: ""),
-                { .RomanNumber(style: .fullWidthLower, number: "") }
+                NSLocalizedString("Numbers", comment: ""),
+                {
+                    .Number(number: "", candidates: [])
+                }
             ),
         ]
 
@@ -223,79 +204,35 @@ class InputState: NSObject {
         }
     }
 
-    @objc(InputStateChineseNumber)
-    class ChineseNumber: InputState {
+    @objc(InputStateNumber)
+    class Number: InputState, CandidateProvider {
+        var candidateCount: Int {
+            candidates.count
+        }
+        func candidate(at index: Int) -> String {
+            candidates[index]
+        }
 
-        @objc(InputStateChineseNumberStyle)
-        enum Style: Int {
-            case lower = 0
-            case upper = 1
-            case suzhou = 2
-
-            var label: String {
-                switch self {
-                case .lower:
-                    "中文數字"
-                case .upper:
-                    "大寫數字"
-                case .suzhou:
-                    "蘇州碼"
-                }
-            }
+        func reading(at index: Int) -> String? {
+            candidates[index]
         }
 
         @objc private(set) var number: String
-        @objc private(set) var style: Style
+        @objc private(set) var candidates: [String]
 
-        @objc init(style: Style, number: String) {
-            self.style = style
+        @objc init(number: String, candidates: [String]) {
             self.number = number
+            self.candidates = candidates
         }
 
         override var description: String {
-            "<InputState.ChineseNumber, style:\(style), number:\(number)>"
+            "<InputState.Number, number:\(number)>"
         }
 
         @objc public var composingBuffer: String {
-            return "[\(style.label)] \(number)"
-        }
-    }
-
-    @objc(InputStateRomanNumber)
-    class RomanNumber: InputState {
-        @objc(InputStateRomanNumberStyle)
-        enum Style: Int {
-            case alphabets = 0
-            case fullWidthUpper = 1
-            case fullWidthLower = 2
-
-            var label: String {
-                switch self {
-                case .alphabets:
-                    "羅馬數字 (字母)"
-                case .fullWidthUpper:
-                    "羅馬數字 (大寫全形)"
-                case .fullWidthLower:
-                    "羅馬數字 (小寫全形)"
-                }
-            }
+            return "[數字] \(number)"
         }
 
-        @objc private(set) var number: String
-        @objc private(set) var style: Style
-
-        @objc init(style: Style, number: String) {
-            self.style = style
-            self.number = number
-        }
-
-        override var description: String {
-            "<InputState.RomanNumber, style:\(style), number:\(number)>"
-        }
-
-        @objc public var composingBuffer: String {
-            return "[\(style.label)] \(number)"
-        }
     }
 
     @objc(InputStateBig5)
@@ -312,23 +249,6 @@ class InputState: NSObject {
 
         @objc public var composingBuffer: String {
             return "[內碼] \(code)"
-        }
-    }
-
-    @objc(InputStateEnclosedNumber)
-    class EnclosedNumber: InputState {
-        @objc private(set) var number: String
-
-        @objc init(number: String) {
-            self.number = number
-        }
-
-        override var description: String {
-            "<InputState.EnclosedNumber, code:\(number)>"
-        }
-
-        @objc public var composingBuffer: String {
-            return "[標題數字] \(number)"
         }
     }
 
