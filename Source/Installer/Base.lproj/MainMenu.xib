@@ -93,17 +93,20 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="575">
-                        <rect key="frame" x="495" y="16" width="125" height="24"/>
+                        <rect key="frame" x="488" y="16" width="132" height="24"/>
                         <buttonCell key="cell" type="push" title="Agree and Install" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="576">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="132" id="6in-bW-FvA"/>
+                        </constraints>
                         <connections>
                             <action selector="agreeAndInstallAction:" target="494" id="708"/>
                         </connections>
                     </button>
                     <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="592">
-                        <rect key="frame" x="417" y="16" width="66" height="24"/>
+                        <rect key="frame" x="380" y="16" width="96" height="24"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="593">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -111,11 +114,14 @@
 Gw
 </string>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="96" id="Zs7-a3-cix"/>
+                        </constraints>
                         <connections>
                             <action selector="cancelAction:" target="494" id="707"/>
                         </connections>
                     </button>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="623">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="623">
                         <rect key="frame" x="18" y="324" width="506" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Welcome to the McBopomofo Installer! Please read the following Software Licence:" id="624">
                             <font key="font" metaFont="system"/>
@@ -123,7 +129,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="688">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="688">
                         <rect key="frame" x="18" y="20" width="281" height="14"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="By installing the software I agree to the terms above." id="689">
                             <font key="font" metaFont="smallSystem"/>
@@ -201,13 +207,14 @@ Gw
                 <rect key="frame" x="0.0" y="0.0" width="480" height="180"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <progressIndicator wantsLayer="YES" fixedFrame="YES" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="deb-uT-yNv">
+                    <progressIndicator wantsLayer="YES" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="deb-uT-yNv">
                         <rect key="frame" x="20" y="67" width="440" height="20"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VDL-Yq-heb">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VDL-Yq-heb">
                         <rect key="frame" x="18" y="94" width="444" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="17" id="kHi-qQ-SL5"/>
+                        </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Stopping the old version. This may take up to one minute…" id="nTo-dx-qfZ">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -215,6 +222,14 @@ Gw
                         </textFieldCell>
                     </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="VDL-Yq-heb" secondAttribute="trailing" constant="20" symbolic="YES" id="5vd-Nm-6J4"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="leading" secondItem="deb-uT-yNv" secondAttribute="leading" id="LS0-Oi-jId"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="top" secondItem="wAe-c8-Vh9" secondAttribute="top" constant="69" id="ZFU-wR-o5h"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="trailing" secondItem="deb-uT-yNv" secondAttribute="trailing" id="gbh-71-gQH"/>
+                    <constraint firstItem="deb-uT-yNv" firstAttribute="top" secondItem="VDL-Yq-heb" secondAttribute="bottom" constant="7" id="p4M-1d-lKa"/>
+                    <constraint firstItem="VDL-Yq-heb" firstAttribute="leading" secondItem="wAe-c8-Vh9" secondAttribute="leading" constant="20" symbolic="YES" id="q2R-Q8-ajF"/>
+                </constraints>
             </view>
             <point key="canvasLocation" x="4" y="123.5"/>
         </window>
