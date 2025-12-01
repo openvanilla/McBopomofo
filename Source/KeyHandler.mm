@@ -450,7 +450,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // MARK: Handle BPMF Keys
 
     // see if it's valid BPMF reading
-    if (!skipBpmfHandling && _bpmfReadingBuffer->isValidKey((char)charCode)) {
+    bool isValidKey = _bpmfReadingBuffer->isValidKey((char)charCode);
+    if (!skipBpmfHandling && isValidKey) {
         _bpmfReadingBuffer->combineKey((char)charCode);
         keyConsumedByReading = YES;
 
@@ -463,7 +464,34 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    BOOL composeReading = _bpmfReadingBuffer->isValidKey((char)charCode) && _bpmfReadingBuffer->hasToneMarker() && !_bpmfReadingBuffer->hasToneMarkerOnly();
+    // Issue 753
+    //
+    // This allows users to use tone key to change an existing reading before
+    // the current cursor.
+    if (_bpmfReadingBuffer->hasToneMarkerOnly() && _grid->readings().size() > 0 && _grid->cursor() > 0) {
+        size_t cursor = _grid->cursor() - 1;
+        std::string reading = _grid->readings()[cursor];
+        if (reading.rfind(std::string("_"), 0) != 0) {
+            Formosa::Mandarin::BopomofoReadingBuffer *tmpBuffer = new Formosa::Mandarin::BopomofoReadingBuffer(_bpmfReadingBuffer->keyboardLayout());
+            Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
+            tmpBuffer->setsSyllable(syllable);
+            tmpBuffer->combineKey((char)charCode);
+            std::string newReading = tmpBuffer->syllable().composedString();
+            delete tmpBuffer;
+            if (_languageModel->hasUnigrams(newReading)) {
+                _bpmfReadingBuffer->clear();
+                _grid->deleteReadingBeforeCursor();
+                _grid->insertReading(newReading);
+                [self _walk];
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                stateCallback(inputting);
+                return YES;
+            }
+        }
+    }
+
+
+    BOOL composeReading = isValidKey && _bpmfReadingBuffer->hasToneMarker() && !_bpmfReadingBuffer->hasToneMarkerOnly();
 
     // see if we have composition if Enter/Space is hit and buffer is not empty
     // this is bit-OR'ed so that the tone marker key is also taken into account
