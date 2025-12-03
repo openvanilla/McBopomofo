@@ -470,10 +470,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // the current cursor.
     if (_bpmfReadingBuffer->hasToneMarkerOnly() && _grid->readings().size() > 0 && _grid->cursor() > 0) {
         size_t cursor = _grid->cursor() - 1;
-        std::string reading = _grid->readings()[cursor];
+        const std::string reading = _grid->readings()[cursor];
         if (!reading.empty() && reading[0] != '_') {
             Formosa::Mandarin::BopomofoReadingBuffer tmpBuffer(_bpmfReadingBuffer->keyboardLayout());
-            Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
+            Formosa::Mandarin::BopomofoSyllable syllable =      Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
             tmpBuffer.setSyllableRemovingTone(syllable);
             tmpBuffer.combineKey((char)charCode);
             std::string newReading = tmpBuffer.syllable().composedString();
