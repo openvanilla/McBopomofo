@@ -2706,3 +2706,87 @@ extension KeyHandlerBopomofoTests {
         }
     }
 }
+
+extension KeyHandlerBopomofoTests {
+
+    func testChnagingReadingUsingToneKey1() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
+        var state: InputState = InputState.Empty()
+        let keys = Array("vul3a943").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "小買")
+        }
+    }
+
+    func testChnagingReadingUsingToneKey2() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
+        var state: InputState = InputState.Empty()
+        let keys = Array("vul3a946").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "小埋")
+        }
+    }
+
+    func testChnagingReadingUsingToneKey3() {
+        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.associatedPhrasesEnabled = false
+
+        defer {
+            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+        }
+
+        var state: InputState = InputState.Empty()
+        let keys = Array("vul3a947").map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, "小麥˙")
+        }
+    }
+}
