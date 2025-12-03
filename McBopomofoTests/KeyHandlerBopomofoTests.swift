@@ -2709,7 +2709,7 @@ extension KeyHandlerBopomofoTests {
 
 extension KeyHandlerBopomofoTests {
 
-    func testChnagingReadingUsingToneKey1() {
+    func checkChangingReadingUsingToneKey(input: String, expected: String) {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         Preferences.associatedPhrasesEnabled = false
 
@@ -2718,7 +2718,7 @@ extension KeyHandlerBopomofoTests {
         }
 
         var state: InputState = InputState.Empty()
-        let keys = Array("vul3a943").map {
+        let keys = Array(input).map {
             String($0)
         }
         for key in keys {
@@ -2732,61 +2732,22 @@ extension KeyHandlerBopomofoTests {
         }
         XCTAssertTrue(state is InputState.Inputting, "\(state)")
         if let state = state as? InputState.Inputting {
-            XCTAssertEqual(state.composingBuffer, "小買")
+            XCTAssertEqual(state.composingBuffer, expected)
         }
     }
 
-    func testChnagingReadingUsingToneKey2() {
-        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
-        Preferences.associatedPhrasesEnabled = false
-
-        defer {
-            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
-        }
-
-        var state: InputState = InputState.Empty()
-        let keys = Array("vul3a946").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-            } errorCallback: {
-            }
-        }
-        XCTAssertTrue(state is InputState.Inputting, "\(state)")
-        if let state = state as? InputState.Inputting {
-            XCTAssertEqual(state.composingBuffer, "小埋")
-        }
+    // Input 小麥 then change to tone 3
+    func testChangingReadingUsingToneKey1() {
+        checkChangingReadingUsingToneKey(input: "vul3a943", expected: "小買")
     }
 
-    func testChnagingReadingUsingToneKey3() {
-        let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
-        Preferences.associatedPhrasesEnabled = false
+    // Input 小麥 then change to tone 4
+    func testChangingReadingUsingToneKey2() {
+        checkChangingReadingUsingToneKey(input: "vul3a946", expected: "小埋")
+    }
 
-        defer {
-            Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
-        }
-
-        var state: InputState = InputState.Empty()
-        let keys = Array("vul3a947").map {
-            String($0)
-        }
-        for key in keys {
-            let input = KeyHandlerInput(
-                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
-                isVerticalMode: false)
-            handler.handle(input: input, state: state) { newState in
-                state = newState
-            } errorCallback: {
-            }
-        }
-        XCTAssertTrue(state is InputState.Inputting, "\(state)")
-        if let state = state as? InputState.Inputting {
-            XCTAssertEqual(state.composingBuffer, "小麥˙")
-        }
+    // Input 小麥 then change to tone 5
+    func testChangingReadingUsingToneKey3() {
+        checkChangingReadingUsingToneKey(input: "vul3a947", expected: "小麥˙")
     }
 }
