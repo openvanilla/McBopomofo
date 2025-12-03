@@ -458,7 +458,7 @@ class BopomofoReadingBuffer {
 
   const BPMF syllable() const { return syllable_; }
 
-  void setsSyllable(BPMF syllable) { syllable_ = syllable; }
+  void setSyllable(BPMF syllable) { syllable_ = syllable; }
 
   const std::string standardLayoutQueryString() const {
     return BopomofoKeyboardLayout::StandardLayout()->keySequenceFromSyllable(

@@ -472,12 +472,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         size_t cursor = _grid->cursor() - 1;
         std::string reading = _grid->readings()[cursor];
         if (reading.rfind(std::string("_"), 0) != 0) {
-            Formosa::Mandarin::BopomofoReadingBuffer *tmpBuffer = new Formosa::Mandarin::BopomofoReadingBuffer(_bpmfReadingBuffer->keyboardLayout());
+            Formosa::Mandarin::BopomofoReadingBuffer tmpBuffer(_bpmfReadingBuffer->keyboardLayout());
             Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
-            tmpBuffer->setsSyllable(syllable);
-            tmpBuffer->combineKey((char)charCode);
-            std::string newReading = tmpBuffer->syllable().composedString();
-            delete tmpBuffer;
+            tmpBuffer.setSyllable(syllable);
+            tmpBuffer.combineKey((char)charCode);
+            std::string newReading = tmpBuffer.syllable().composedString();
             if (_languageModel->hasUnigrams(newReading)) {
                 _bpmfReadingBuffer->clear();
                 _grid->deleteReadingBeforeCursor();
