@@ -458,7 +458,15 @@ class BopomofoReadingBuffer {
 
   const BPMF syllable() const { return syllable_; }
 
-  void setSyllable(BPMF syllable) { syllable_ = syllable; }
+  void setSyllableRemovingTone(BPMF syllable) {
+    BPMF::Component masked = (syllable.consonantComponent() |
+                               syllable.middleVowelComponent() |
+                               syllable.vowelComponent());
+    syllable_ = BPMF(masked);
+    if (pinyin_mode_) {
+      pinyin_sequence_ = syllable_.HanyuPinyinString(false, false);
+    }
+  }
 
   const std::string standardLayoutQueryString() const {
     return BopomofoKeyboardLayout::StandardLayout()->keySequenceFromSyllable(
@@ -484,3 +492,4 @@ class BopomofoReadingBuffer {
 }  // namespace Formosa
 
 #endif  // SRC_ENGINE_MANDARIN_MANDARIN_H_
+
