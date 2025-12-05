@@ -390,33 +390,36 @@ public class VerticalCandidateController: CandidateController {
             guard let delegate = delegate else {
                 return
             }
-            let selectedRow = tableView.selectedRow
-            let labelCount = keyLabels.count
-            let itemCount = delegate.candidateCountForController(self)
-
             if newValue == UInt.max {
                 tableView.deselectAll(self)
                 return
             }
 
-            if itemCount > labelCount {
-                var rowToScroll = Int(newValue)
+            // The cast is safe: at this point, newValue cannot be UInt.max.
+            let newRowIndex = Int(newValue)
 
-                if selectedRow != -1 && itemCount > 0 {
-                    let firstVisibleRow = tableView.row(at: scrollView.documentVisibleRect.origin)
-                    // If it's not single row movement, trigger forward page switching.
-                    if newValue > selectedRow && (Int(newValue) - selectedRow) > 1 {
-                        let lastVisibleRow = firstVisibleRow + labelCount - 1
-                        rowToScroll = min(lastVisibleRow + labelCount, Int(itemCount) - 1)
-                    }
-                    // If it's not single row movement, trigger backward page switching.
-                    if newValue < selectedRow && (selectedRow - Int(newValue)) > 1 {
-                        rowToScroll = max(0, firstVisibleRow - labelCount)
-                    }
-                }
+            let labelCount = keyLabels.count
+            let itemCount = delegate.candidateCountForController(self)
 
-                if rowToScroll < Int.max {
-                    tableView.scrollRowToVisible(rowToScroll)
+            if itemCount > labelCount && labelCount > 0 {
+                let selectedRow = tableView.selectedRow
+                let pageIndex = newRowIndex / labelCount
+
+                if selectedRow == -1 || abs(newRowIndex - selectedRow) == 1 {
+                    // Simply scroll to the row if never selected or if it's moving by one.
+                    tableView.scrollRowToVisible(newRowIndex)
+                } else {
+                    if newRowIndex > selectedRow {
+                        // Moving forward: scroll to the last row of the page that contains newRowIndex.
+                        let scrollTo = min((pageIndex + 1) * labelCount, Int(itemCount)) - 1
+                        tableView.scrollRowToVisible(scrollTo)
+                    } else if newRowIndex < selectedRow {
+                        // Moving backward: scroll to the first row of the page that contains newRowIndex.
+                        let scrollTo = pageIndex * labelCount
+                        tableView.scrollRowToVisible(scrollTo)
+                    } else {
+                        // No change in the selected index; do nothing.
+                    }
                 }
             }
             tableView.selectRowIndexes(
