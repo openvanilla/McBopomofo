@@ -721,7 +721,7 @@ extension McBopomofoInputMethodController {
             commit(text: previous.composingBuffer, client: client)
         }
         client.setMarkedText(
-            composingBuffer, selectionRange: NSMakeRange(composingBuffer.count, 0),
+            composingBuffer, selectionRange: NSMakeRange(composingBuffer.utf16.count, 0),
             replacementRange: NSMakeRange(NSNotFound, NSNotFound))
     }
 
