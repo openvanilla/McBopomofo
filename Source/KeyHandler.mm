@@ -468,13 +468,20 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     //
     // This allows users to use tone key to change an existing reading before
     // the current cursor.
-    if (_bpmfReadingBuffer->hasToneMarkerOnly() && _grid->readings().size() > 0 && _grid->cursor() > 0) {
+    if (Preferences.allowChangingPriorTone &&
+        _bpmfReadingBuffer->hasToneMarkerOnly() &&
+        _grid->readings().size() > 0 &&
+        _grid->cursor() > 0) {
         size_t cursor = _grid->cursor() - 1;
-        const std::string reading = _grid->readings()[cursor];
+//        const std::string reading = _grid->readings()[cursor];
+        const std::string& reading = _grid->readings()[cursor];
         if (!reading.empty() && reading[0] != '_') {
             Formosa::Mandarin::BopomofoReadingBuffer tmpBuffer(_bpmfReadingBuffer->keyboardLayout());
-            Formosa::Mandarin::BopomofoSyllable syllable =      Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
-            tmpBuffer.setSyllableRemovingTone(syllable);
+            Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
+            std::string keys = _bpmfReadingBuffer->keyboardLayout()->keySequenceFromSyllable(syllable);
+            for (char k:keys) {
+                tmpBuffer.combineKey(k);
+            }
             tmpBuffer.combineKey((char)charCode);
             std::string newReading = tmpBuffer.syllable().composedString();
             if (_languageModel->hasUnigrams(newReading)) {

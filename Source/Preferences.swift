@@ -74,6 +74,7 @@ private let kBig5InputEnabledKey = "Big5InputEnabled"
 let kBeepUponInputErrorKey = "BeepUponInputError"
 
 private let kEnableUserPhrasesInPlainBopomofo = "EnableUserPhrasesInPlainBopomofo"
+private let kAllowChangingPriorTone = "AllowChangingPriorTone"
 
 // MARK: Property wrappers
 
@@ -568,6 +569,11 @@ extension Preferences {
 extension Preferences {
     @UserDefault(key: kEnableUserPhrasesInPlainBopomofo, defaultValue: false)
     @objc static var enableUserPhrasesInPlainBopomofo: Bool
+}
+
+extension Preferences {
+    @UserDefault(key: kAllowChangingPriorTone, defaultValue: false)
+    @objc static var allowChangingPriorTone: Bool
 }
 
 extension Preferences {
