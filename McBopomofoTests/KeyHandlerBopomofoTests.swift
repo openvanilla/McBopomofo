@@ -2711,10 +2711,13 @@ extension KeyHandlerBopomofoTests {
 
     func checkChangingReadingUsingToneKey(input: String, expected: String) {
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        let allowChangingPriorTone = Preferences.allowChangingPriorTone
         Preferences.associatedPhrasesEnabled = false
+        Preferences.allowChangingPriorTone = true
 
         defer {
             Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
+            Preferences.allowChangingPriorTone = allowChangingPriorTone
         }
 
         var state: InputState = InputState.Empty()
