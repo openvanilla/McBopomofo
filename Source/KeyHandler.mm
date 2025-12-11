@@ -468,12 +468,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     //
     // This allows users to use tone key to change an existing reading before
     // the current cursor.
-    if (Preferences.allowChangingPriorTone &&
-        _bpmfReadingBuffer->hasToneMarkerOnly() &&
+    if (_bpmfReadingBuffer->hasToneMarkerOnly() &&
         _grid->readings().size() > 0 &&
-        _grid->cursor() > 0) {
+        _grid->cursor() > 0 &&
+        Preferences.allowChangingPriorTone) {
         size_t cursor = _grid->cursor() - 1;
-//        const std::string reading = _grid->readings()[cursor];
         const std::string& reading = _grid->readings()[cursor];
         if (!reading.empty() && reading[0] != '_') {
             Formosa::Mandarin::BopomofoReadingBuffer tmpBuffer(_bpmfReadingBuffer->keyboardLayout());
