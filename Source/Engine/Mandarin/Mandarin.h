@@ -482,3 +482,4 @@ class BopomofoReadingBuffer {
 }  // namespace Formosa
 
 #endif  // SRC_ENGINE_MANDARIN_MANDARIN_H_
+
