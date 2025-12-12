@@ -7,7 +7,10 @@ all: data.txt data-plain-bpmf.txt associated-phrases-v2.txt
 install: all
 
 data-plain-bpmf.txt: curation/compilers/plain_bpmf_compiler.py BPMFBase.txt BPMFPunctuations.txt
-	$(PYTHON) -m curation.compilers.plain_bpmf_compiler BPMFBase.txt BPMFPunctuations.txt data-plain-bpmf.txt
+	$(PYTHON) -m curation.compilers.plain_bpmf_compiler \
+		--bpmf_base BPMFBase.txt \
+		--punctuations BPMFPunctuations.txt \
+		--output data-plain-bpmf.txt
 
 data.txt: curation/compilers/main_compiler.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
           PhraseFreq.txt phrase.occ Symbols.txt Macros.txt\
