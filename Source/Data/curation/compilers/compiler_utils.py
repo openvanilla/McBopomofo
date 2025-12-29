@@ -3,7 +3,7 @@ __copyright__ = "Copyright 2022 and onwards The McBopomofo Authors"
 __license__ = "MIT"
 
 
-HEADER = '# format org.openvanilla.mcbopomofo.sorted\n'
+HEADER = "# format org.openvanilla.mcbopomofo.sorted\n"
 
 
 def convert_vks_rows_to_sorted_kvs_rows(vks_rows):
@@ -14,14 +14,14 @@ def convert_vks_rows_to_sorted_kvs_rows(vks_rows):
     for value, key, score in vks_rows:
         if type(score) is float:
             # Use the default (which is '%.6f') format
-            score = '%f' % score
+            score = "%f" % score
 
         if key not in key_to_vss:
             key_to_vss[key] = []
 
         key_to_vss[key].append((value, score))
 
-    keys = sorted(key_to_vss.keys(), key=lambda k: k.encode('utf-8'))
+    keys = sorted(key_to_vss.keys(), key=lambda k: k.encode("utf-8"))
 
     output = []
     for key in keys:
@@ -33,3 +33,14 @@ def convert_vks_rows_to_sorted_kvs_rows(vks_rows):
             output.append((key, vs_row[0], vs_row[1]))
 
     return output
+
+
+def normalize_bpmfvs_reading(reading):
+    """Normalizes a BPMF reading in the bpmfvs project.
+
+    In bpmfvs, the 5th tone is placed in front of the reading; this function
+    normalizes it to conform to the format used by McBopomofo.
+    """
+    if reading.startswith("˙"):
+        reading = reading[1:] + "˙"
+    return reading
