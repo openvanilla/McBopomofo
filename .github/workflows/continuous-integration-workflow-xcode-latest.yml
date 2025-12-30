@@ -39,7 +39,7 @@ jobs:
           python-version: '3.12'
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "^16.1.0"
+          xcode-version: "^26.1.1"
       - name: Build McBopomofoLMLibTest
         run: cmake -DENABLE_TEST=1 -S . -B build
         working-directory: Source/Engine
