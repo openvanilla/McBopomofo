@@ -45,17 +45,17 @@ _deploy: _install
 	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
 sort:
-	@sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
+	@env LC_ALL=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
 	@mv tmp phrase.occ
-	@sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
+	@env LC_ALL=C sort -k1 BPMFMappings.txt | uniq | grep -v '^$$' > tmp
 	@mv tmp BPMFMappings.txt
-	@env LANG=C sort -k1 heterophony1.list|uniq>tmp
+	@env LC_ALL=C sort -k1 heterophony1.list|uniq>tmp
 	@mv tmp heterophony1.list
-	@env LANG=C sort -k1 heterophony2.list|uniq>tmp
+	@env LC_ALL=C sort -k1 heterophony2.list|uniq>tmp
 	@mv tmp heterophony2.list
-	@env LANG=C sort -k1 heterophony3.list|uniq>tmp
+	@env LC_ALL=C sort -k1 heterophony3.list|uniq>tmp
 	@mv tmp heterophony3.list
-	@env LANG=C sort -k1 exclusion.txt|uniq>tmp
+	@env LC_ALL=C sort -k1 exclusion.txt|uniq>tmp
 	@mv tmp exclusion.txt
 
 check: SHELL:=/bin/bash
