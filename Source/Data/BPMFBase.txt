@@ -4417,6 +4417,7 @@
 貢 ㄍㄨㄥˋ gong4 ej/4 big5
 羾 ㄍㄨㄥˋ gong4 ej/4 big5
 摃 ㄍㄨㄥˋ gong4 ej/4 big5
+公 ㄍㄨㄥ˙ gong5 ej/5 big5
 官 ㄍㄨㄢ guan ej0 big5
 關 ㄍㄨㄢ guan ej0 big5
 觀 ㄍㄨㄢ guan ej0 big5
@@ -10004,6 +10005,7 @@
 趎 ㄔㄨˊ chu2 tj6 big5
 犓 ㄔㄨˊ chu2 tj6 big5
 欻 ㄔㄨㄚ chua tj8 big5
+抓 ㄔㄨㄚˇ chua3 tj83 big5
 揣 ㄔㄨㄞˇ chuai3 tj93 big5
 踹 ㄔㄨㄞˋ chuai4 tj94 big5
 嘬 ㄔㄨㄞˋ chuai4 tj94 big5
@@ -10602,6 +10604,7 @@
 晲 ㄧˇ yi3 u3 big5
 轙 ㄧˇ yi3 u3 big5
 意 ㄧˋ yi4 u4 big5
+意 ㄧㄜˋ ye4 uk4 big5
 義 ㄧˋ yi4 u4 big5
 易 ㄧˋ yi4 u4 big5
 議 ㄧˋ yi4 u4 big5
@@ -14306,6 +14309,7 @@
 鵩 ㄈㄨˊ fu2 zj6 big5
 鶝 ㄈㄨˊ fu2 zj6 big5
 沸 ㄈㄨˊ fu2 zj6 big5
+夫 ㄈㄨ˙ fu5 zj big5
 非 ㄈㄟ fei zo big5
 飛 ㄈㄟ fei zo big5
 菲 ㄈㄟ fei zo big5
