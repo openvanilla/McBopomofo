@@ -33,11 +33,14 @@ func charCode(_ string: String) -> UInt16 {
 
 class KeyHandlerBopomofoTests: XCTestCase {
     var handler = KeyHandler()
-    var chineseConversionEnabled: Bool  = false
+    var savedKeyboardLayout: KeyboardLayout = .standard
+    var chineseConversionEnabled: Bool = false
 
     override func setUpWithError() throws {
+        savedKeyboardLayout = Preferences.keyboardLayout
         chineseConversionEnabled = Preferences.chineseConversionEnabled
         Preferences.chineseConversionEnabled = false
+        Preferences.keyboardLayout = .standard
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
         handler.inputMode = .bopomofo
@@ -45,6 +48,7 @@ class KeyHandlerBopomofoTests: XCTestCase {
 
     override func tearDownWithError() throws {
         Preferences.chineseConversionEnabled = chineseConversionEnabled
+        Preferences.keyboardLayout = savedKeyboardLayout
     }
 
     func testSyncWithPreferences() {
@@ -2714,7 +2718,6 @@ extension KeyHandlerBopomofoTests {
         let allowChangingPriorTone = Preferences.allowChangingPriorTone
         Preferences.associatedPhrasesEnabled = false
         Preferences.allowChangingPriorTone = true
-
         defer {
             Preferences.associatedPhrasesEnabled = associatedPhrasesEnabled
             Preferences.allowChangingPriorTone = allowChangingPriorTone
@@ -2752,5 +2755,35 @@ extension KeyHandlerBopomofoTests {
     // Input 小麥 then change to tone 5
     func testChangingReadingUsingToneKey3() {
         checkChangingReadingUsingToneKey(input: "vul3a947", expected: "小麥˙")
+    }
+
+    func testBopomofoFontAnnotationSupport(input: String, expected: String) {
+        let bopomofoFontAnnotationSupportEnabled = Preferences.bopomofoFontAnnotationSupportEnabled
+        Preferences.bopomofoFontAnnotationSupportEnabled = true
+        defer {
+            Preferences.bopomofoFontAnnotationSupportEnabled = bopomofoFontAnnotationSupportEnabled
+        }
+
+        var state: InputState = InputState.Empty()
+        let keys = Array(input).map {
+            String($0)
+        }
+        for key in keys {
+            let input = KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false)
+            handler.handle(input: input, state: state) { newState in
+                state = newState
+            } errorCallback: {
+            }
+        }
+        XCTAssertTrue(state is InputState.Inputting, "\(state)")
+        if let state = state as? InputState.Inputting {
+            XCTAssertEqual(state.composingBuffer, expected)
+        }
+    }
+
+    func testBopomofoFontAnnotationSupport_BaseCase() {
+        testBopomofoFontAnnotationSupport(input: "u u <u6ek7", expected: "一一，一\u{E01E1}個\u{E01E1}")
     }
 }

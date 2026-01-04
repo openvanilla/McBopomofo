@@ -150,3 +150,28 @@
 "Only one column was found." = "Only one column was found.";
 
 "Illegal NULL character was found." = "Illegal NULL character was found.";
+
+/* Input menu item title. */
+"Bopomofo Font Annotation Support" = "Bopomofo Font Annotation Support";
+
+/* Used in the notification during mode toggle. */
+"Bopomofo Font Annotation Support On" = "Bopomofo Font Annotation Support On";
+
+/* Used in the notification during mode toggle. */
+"Bopomofo Font Annotation Support Off" = "Bopomofo Font Annotation Support Off";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation support on" = "Bopomofo annotation support on";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation: variant selectors and PUA blocks in text" = "Bopomofo annotation: variant selectors and PUA blocks in text";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation: variant selectors in text" = "Bopomofo annotation: variant selectors in text";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation: PUA blocks in text" = "Bopomofo annotation: PUA blocks in text";
+
+/* Used when the user attempts to mark a phrase when the annotation mode is on. */
+"Cannot add new phrases when Bopomofo annotation is on" = "Cannot add new phrases when Bopomofo annotation is on";
+

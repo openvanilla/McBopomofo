@@ -86,6 +86,21 @@ class McBopomofoInputMethodController: IMKInputController {
         associatedPhrasesItem.state = Preferences.associatedPhrasesEnabled.state
 
         let inputMode = keyHandler.inputMode
+
+        // Only Bopomofo mode supports Bopomofo Font Annotation. If support is
+        // on, ensure that the user has a way to disable it. Otherwise, only
+        // show the item when it is set to show in the input menu.
+        if inputMode == .bopomofo
+            && (Preferences.showBopomofoFontAnnotationSupportItemInInputMenu
+                || Preferences.bopomofoFontAnnotationSupportEnabled)
+        {
+            let bopomofoFontAnnotationSupportItem = menu.addItem(
+                withTitle: NSLocalizedString("Bopomofo Font Annotation Support", comment: ""),
+                action: #selector(toggleBopomofoFontAnnotationSupport(_:)), keyEquivalent: "")
+            bopomofoFontAnnotationSupportItem.state =
+                Preferences.bopomofoFontAnnotationSupportEnabled.state
+        }
+
         let optionKeyPressed = NSEvent.modifierFlags.contains(.option)
         if inputMode == .bopomofo && optionKeyPressed {
             let phaseReplacementItem = menu.addItem(
@@ -292,6 +307,14 @@ class McBopomofoInputMethodController: IMKInputController {
 
     @objc func toggleAssociatedPhrasesEnabled(_ sender: Any?) {
         _ = Preferences.toggleAssociatedPhrasesEnabled()
+    }
+
+    @objc func toggleBopomofoFontAnnotationSupport(_ sender: Any?) {
+        let enabled = Preferences.toggleBopomofoFontAnnotationSupportEnabled()
+        NotifierController.notify(
+            message: enabled
+                ? NSLocalizedString("Bopomofo Font Annotation Support On", comment: "")
+                : NSLocalizedString("Bopomofo Font Annotation Support Off", comment: ""))
     }
 
     @objc func togglePhraseReplacement(_ sender: Any?) {
@@ -884,11 +907,22 @@ extension McBopomofoInputMethodController {
         if cursor == composingBuffer.count && cursor != 0 {
             cursor -= 1
         }
+
+        var isVerticalMode = false
         while lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor >= 0 {
-            (client as? IMKTextInput)?.attributes(
+            let attributes: [AnyHashable: Any]? = (client as? IMKTextInput)?.attributes(
                 forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
+            let useVerticalMode =
+                (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+            isVerticalMode = isVerticalMode || useVerticalMode
             cursor -= 1
         }
+
+        // Make sure that tooltip hovers next to the vertical text.
+        if isVerticalMode && lineHeightRect.size.height > 0 {
+            lineHeightRect.origin.x += (lineHeightRect.size.width + 1.0)
+        }
+
         McBopomofoInputMethodController.tooltipController.show(
             tooltip: tooltip, at: lineHeightRect.origin)
     }

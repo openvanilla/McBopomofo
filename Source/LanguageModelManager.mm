@@ -33,6 +33,7 @@ static const double kObservedOverrideHalflife = 5400.0; // 1.5 hr.
 static McBopomofo::McBopomofoLM gLanguageModelMcBopomofo;
 static McBopomofo::McBopomofoLM gLanguageModelPlainBopomofo;
 static McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static McBopomofo::VariantAnnotator gVariantAnnotator;
 
 static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kUserDataPlainBopomofoTemplateName = @"template-data-plain-bpmf";
@@ -57,6 +58,28 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     lm.loadAssociatedPhrasesV2(dataPath.UTF8String);
 }
 
+static void LTLoadVariantAnnotatorData()
+{
+    Class cls = NSClassFromString(@"McBopomofoInputMethodController");
+    NSString *puaDataPath = [[NSBundle bundleForClass:cls] pathForResource:@"bpmfvs-pua" ofType:@"txt"];
+    if (puaDataPath == nil) {
+        NSLog(@"Error: No PUA data found in bundle");
+        return;
+    }
+
+    NSString *variantsDataPath = [[NSBundle bundleForClass:cls] pathForResource:@"bpmfvs-variants" ofType:@"txt"];
+    if (variantsDataPath == nil) {
+        NSLog(@"Error: No variants data found in bundle");
+        return;
+    }
+
+    BOOL puaLoaded = gVariantAnnotator.loadPUAFile(puaDataPath.UTF8String);
+    BOOL variantsLoaded = gVariantAnnotator.loadVariantsFile(variantsDataPath.UTF8String);
+    if (!gVariantAnnotator.loaded()) {
+        NSLog(@"Error: VariantAnnotator not ready, puaLoaded: %d, variantsLoaded: %d", puaLoaded, variantsLoaded);
+    }
+}
+
 + (void)loadDataModels
 {
     if (!gLanguageModelMcBopomofo.isDataModelLoaded()) {
@@ -72,6 +95,9 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesV2Loaded()) {
         LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
     }
+    if (!gVariantAnnotator.loaded()) {
+        LTLoadVariantAnnotatorData();
+    }
 }
 
 + (void)loadDataModel:(InputMode)mode
@@ -83,6 +109,9 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         if (!gLanguageModelMcBopomofo.isAssociatedPhrasesV2Loaded()) {
             LTLoadAssociatedPhrases(gLanguageModelMcBopomofo);
         }
+        if (!gVariantAnnotator.loaded()) {
+            LTLoadVariantAnnotatorData();
+        }
     }
 
     if ([mode isEqualToString:InputModePlainBopomofo]) {
@@ -91,6 +120,9 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
         }
         if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesV2Loaded()) {
             LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
+        }
+        if (!gVariantAnnotator.loaded()) {
+            LTLoadVariantAnnotatorData();
         }
     }
 }
@@ -428,6 +460,11 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 + (McBopomofo::UserOverrideModel *)userOverrideModel
 {
     return &gUserOverrideModel;
+}
+
++ (McBopomofo::VariantAnnotator *)variantAnnotator
+{
+    return &gVariantAnnotator;
 }
 
 + (BOOL)phraseReplacementEnabled

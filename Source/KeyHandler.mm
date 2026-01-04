@@ -936,10 +936,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     if (input.isShiftHold) {
         // Shift + left
         if (currentState.cursorIndex > 0) {
-            NSInteger previousPosition = [currentState.composingBuffer previousUtf16PositionFor:currentState.cursorIndex];
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition readings:[self _currentReadings]];
-            marking.tooltipForInputting = currentState.tooltip;
-            stateCallback(marking);
+            if (Preferences.bopomofoFontAnnotationSupportEnabled) {
+                currentState = [self _inputtingStateWithMarkingStateUnsupportedTooltip:currentState];
+                errorCallback();
+                stateCallback(currentState);
+            } else {
+                NSInteger previousPosition = [currentState.composingBuffer previousUtf16PositionFor:currentState.cursorIndex];
+                InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:previousPosition readings:[self _currentReadings]];
+                marking.tooltipForInputting = currentState.tooltip;
+                stateCallback(marking);
+            }
         } else {
             errorCallback();
             stateCallback(state);
@@ -974,10 +980,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     if (input.isShiftHold) {
         // Shift + Right
         if (currentState.cursorIndex < currentState.composingBuffer.length) {
-            NSInteger nextPosition = [currentState.composingBuffer nextUtf16PositionFor:currentState.cursorIndex];
-            InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition readings:[self _currentReadings]];
-            marking.tooltipForInputting = currentState.tooltip;
-            stateCallback(marking);
+            if (Preferences.bopomofoFontAnnotationSupportEnabled) {
+                currentState = [self _inputtingStateWithMarkingStateUnsupportedTooltip:currentState];
+                errorCallback();
+                stateCallback(currentState);
+            } else {
+                NSInteger nextPosition = [currentState.composingBuffer nextUtf16PositionFor:currentState.cursorIndex];
+                InputStateMarking *marking = [[InputStateMarking alloc] initWithComposingBuffer:currentState.composingBuffer cursorIndex:currentState.cursorIndex markerIndex:nextPosition readings:[self _currentReadings]];
+                marking.tooltipForInputting = currentState.tooltip;
+                stateCallback(marking);
+            }
         } else {
             errorCallback();
             stateCallback(state);
@@ -2151,9 +2163,40 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     size_t composedCursor = 0; // UTF-8 (so "byte") cursor per fcitx5 requirement.
     NSString *tooltip = @"";
 
+    bool bopomofoAnnotationUsed = false;
+    bool bopomofoAnnotationHasPUAs = false;
+    bool bopomofoAnnotationHasVariants = false;
+
     for (const auto& node : _latestWalk.nodes) {
         std::string value = node->value();
-        composed += value;
+        size_t composedValueLength = value.length();
+
+        bool nodeHasBopomofoAnnotation = false;
+        McBopomofo::VariantAnnotator::CombinedResult nodeAnnotationResult;
+        if (!Preferences.bopomofoFontAnnotationSupportEnabled || _inputMode == InputModePlainBopomofo) {
+            composed += value;
+        } else if (!LanguageModelManager.variantAnnotator->loaded()) {
+            composed += value;
+        } else {
+            size_t cpLen = McBopomofo::CodePointCount(value);
+            if (cpLen != node->spanningLength()) {
+                composed += value;
+            } else {
+                std::vector<std::string> characters = McBopomofo::Split(value);
+                std::vector<std::string> readings = McBopomofo::AssociatedPhrasesV2::SplitReadings(node->reading());
+                if (readings.size() != cpLen) {
+                    composed += value;
+                } else {
+                    nodeAnnotationResult = LanguageModelManager.variantAnnotator->annotate(characters, readings);
+                    nodeHasBopomofoAnnotation = true;
+                    bopomofoAnnotationUsed = true;
+                    bopomofoAnnotationHasPUAs |= nodeAnnotationResult.hasPUACodePoints;
+                    bopomofoAnnotationHasVariants |= nodeAnnotationResult.hasVariantSelectors;
+                    composed += nodeAnnotationResult.annotatedString;
+                    composedValueLength = nodeAnnotationResult.annotatedString.length();
+                }
+            }
+        }
 
         // No work if runningCursor has already caught up with builderCursor.
         if (runningCursor == builderCursor) {
@@ -2163,7 +2206,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         // Simple case: if the running cursor is behind, add the spanning length.
         if (runningCursor + readingLength <= builderCursor) {
-            composedCursor += value.length();
+            composedCursor += composedValueLength;
             runningCursor += readingLength;
             continue;
         }
@@ -2176,7 +2219,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         // distance and the value's code point count.
         size_t cpLen = std::min(distance, valueCodePointCount);
         std::string actualValue = McBopomofo::SubstringToCodePoints(value, cpLen);
-        composedCursor += actualValue.length();
+
+        if (nodeHasBopomofoAnnotation) {
+            composedCursor += nodeAnnotationResult.accumulatedStringLength[cpLen];
+        } else {
+            composedCursor += actualValue.length();
+        }
         runningCursor += distance;
 
         // Create a tooltip to warn the user that their cursor is between two
@@ -2194,6 +2242,23 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             tooltip = [NSString stringWithFormat:NSLocalizedString(@"Cursor is between \"%@\" and \"%@\".", @""),
                 @(prevReading.c_str()),
                 @(nextReading.c_str())];
+        }
+    }
+
+    if (bopomofoAnnotationUsed) {
+        NSString *annotationTooltip = NSLocalizedString(@"Bopomofo annotation support on", @"");
+        if (bopomofoAnnotationHasVariants && bopomofoAnnotationHasPUAs) {
+            annotationTooltip = NSLocalizedString(@"Bopomofo annotation: variant selectors and PUA blocks in text", @"");
+        } else if (bopomofoAnnotationHasVariants) {
+            annotationTooltip = NSLocalizedString(@"Bopomofo annotation: variant selectors in text", @"");
+        } else if (bopomofoAnnotationHasPUAs) {
+            annotationTooltip = NSLocalizedString(@"Bopomofo annotation: PUA blocks in text", @"");
+        }
+
+        if ([tooltip length] > 0) {
+            tooltip = [NSString stringWithFormat:@"%@ / %@", tooltip, annotationTooltip];
+        } else {
+            tooltip = annotationTooltip;
         }
     }
 
@@ -2436,6 +2501,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     return array;
+}
+
+- (InputStateInputting *)_inputtingStateWithMarkingStateUnsupportedTooltip:(InputStateInputting *)state
+{
+    InputStateInputting *updatedState = [[InputStateInputting alloc] initWithComposingBuffer:state.composingBuffer cursorIndex:state.cursorIndex];
+    updatedState.tooltip = NSLocalizedString(@"Cannot add new phrases when Bopomofo annotation is on", @"");
+    return updatedState;
 }
 
 @end

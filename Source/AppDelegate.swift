@@ -22,8 +22,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import Cocoa
-import InputMethodKit
 import FSEventStreamHelper
+import InputMethodKit
 
 private let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 private let kNextUpdateCheckDateKey = "NextUpdateCheckDate"
@@ -185,6 +185,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         serviceProvider.delegate = (serviceProviderHelper as! any ServiceProviderDelegate)
         NSApp.servicesProvider = serviceProvider
 
+        enableBopomofoFontAnnotationSupportMenuItemIfRelevantFontsInstalled()
+
         checkForUpdate()
     }
 
@@ -315,5 +317,87 @@ extension AppDelegate {
 
     @objc func openPhraseReplacementMcBopomofo(_ sender: Any?) {
         open(userFileAt: LanguageModelManager.phraseReplacementDataPathMcBopomofo)
+    }
+}
+
+extension AppDelegate {
+    private func enableBopomofoFontAnnotationSupportMenuItemIfRelevantFontsInstalled() {
+        guard !Preferences.bopomofoFontAnnotationSupportMenuItemEnabledByInstalledFontsCheck_V1
+        else {
+            return
+        }
+
+        Preferences.bopomofoFontAnnotationSupportMenuItemEnabledByInstalledFontsCheck_V1 = true
+
+        let supportedFontNames = [
+            "BpmfGenRyuMin-B",
+            "BpmfGenRyuMin-EL",
+            "BpmfGenRyuMin-H",
+            "BpmfGenRyuMin-L",
+            "BpmfGenRyuMin-M",
+            "BpmfGenRyuMin-R",
+            "BpmfGenRyuMin-SB",
+            "BpmfGenSekiGothic-B",
+            "BpmfGenSekiGothic-H",
+            "BpmfGenSekiGothic-L",
+            "BpmfGenSekiGothic-M",
+            "BpmfGenSekiGothic-R",
+            "BpmfGenSenRounded-B",
+            "BpmfGenSenRounded-EL",
+            "BpmfGenSenRounded-H",
+            "BpmfGenSenRounded-L",
+            "BpmfGenSenRounded-M",
+            "BpmfGenSenRounded-R",
+            "BpmfGenWanMin-EL",
+            "BpmfGenWanMin-L",
+            "BpmfGenWanMin-M",
+            "BpmfGenWanMin-R",
+            "BpmfGenWanMin-SB",
+            "BpmfGenYoGothic-B",
+            "BpmfGenYoGothic-EL",
+            "BpmfGenYoGothic-H",
+            "BpmfGenYoGothic-L",
+            "BpmfGenYoGothic-M",
+            "BpmfGenYoGothic-N",
+            "BpmfGenYoGothic-R",
+            "BpmfGenYoMin-B",
+            "BpmfGenYoMin-EL",
+            "BpmfGenYoMin-H",
+            "BpmfGenYoMin-L",
+            "BpmfGenYoMin-M",
+            "BpmfGenYoMin-R",
+            "BpmfGenYoMin-SB",
+            "BpmfHuninn-Regular",
+            "BpmfIansui-Regular",
+            "BpmfZihiBox-R",
+            "BpmfZihiKaiStd-Regular",
+            "BpmfZihiOnly-R",
+            "BpmfZihiSans-Bold",
+            "BpmfZihiSans-ExtraLight",
+            "BpmfZihiSans-Heavy",
+            "BpmfZihiSans-Light",
+            "BpmfZihiSans-Medium",
+            "BpmfZihiSans-Regular",
+            "BpmfZihiSerif-Bold",
+            "BpmfZihiSerif-ExtraLight",
+            "BpmfZihiSerif-Heavy",
+            "BpmfZihiSerif-Light",
+            "BpmfZihiSerif-Medium",
+            "BpmfZihiSerif-Regular",
+            "BpmfZihiSerif-SemiBold",
+        ]
+
+        var hasSupportingFont = false
+        let allFonts = Set(NSFontManager.shared.availableFonts)
+        for fontName in supportedFontNames {
+            if allFonts.contains(fontName) {
+                hasSupportingFont = true
+                break
+            }
+        }
+
+        if hasSupportingFont {
+            Preferences.showBopomofoFontAnnotationSupportItemInInputMenu = true
+        }
     }
 }
