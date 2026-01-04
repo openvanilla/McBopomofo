@@ -25,7 +25,9 @@
 #define SRC_ENGINE_PARSELESSPHRASEDB_H_
 
 #include <cstddef>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace McBopomofo {
@@ -64,6 +66,10 @@ class ParselessPhraseDB {
   std::vector<std::string> reverseFindRows(const std::string_view& value) const;
 
   static bool ValidatePragma(const char* buf, size_t length);
+
+  // Convenient function for validating and returning a DB instance. nullptr if
+  // the block is empty or is not valid.
+  static std::unique_ptr<ParselessPhraseDB> CreateValidatedDB(const char* buf, size_t length);
 
  private:
   const char* begin_;
