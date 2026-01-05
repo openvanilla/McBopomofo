@@ -1,6 +1,8 @@
-Dictionary Data Structure
-=========================
+# McBopomofo Data Source
 
+## Dictionary Data Structure
+
+```
 ├── BPMFBase.txt          Single character Bopomofo mappings
 ├── BPMFMappings.txt      Multi-character phrases (2-6 chars)
 │                         Originally simplified from tsi.src of libtabe
@@ -16,6 +18,8 @@ Dictionary Data Structure
 ├── Makefile              Build automation
 ├── pyproject.toml        Python package configuration
 ├── textpool.rc           Corpus counting configuration
+├── bpmfvs-pua.txt        Precompiled database bpmfvs PUA code points
+├── bpmfvs-variants.txt   Precompiled database for bpmfvs variant selectors
 │
 ├── curation/             Python package for data processing
 │   │                     (exports PROJECT_ROOT, CONFIG_FILE for path resolution)
@@ -40,17 +44,41 @@ Dictionary Data Structure
     ├── C_Version/        Fast C implementation (phased out 2013)
     ├── Sample_Prep/      Historical corpus preparation methods
     └── disabled/         Legacy Perl/Ruby/Bash implementations
+```
 
------ Build System -----
+## Using the Build System
+
 Use Makefile targets (automatically uses new curation/ structure):
+
+```
   make all      # Build all data files
   make sort     # Sort all data files
   make check    # Validate data integrity
   make clean    # Remove generated files
+```
 
-For detailed build pipeline, see AGENTS.md and ../algorithm.md
+For detailed build pipeline, see `AGENTS.md` and `../algorithm.md`.
 
------ Editorial Rule -----
+## Updating the bpmfvs Databases
+
+The bpmfvs files are precompiled since we work under the assumption that they
+are fairly stable. If you need to update them, assuming `$REPO_ROOT` is the
+base directory in which you have checked out [bpmfvs](https:
+//github.com/ButTaiwan/bpmfvs). Then:
+
+```
+python3 -m curation.compilers.update_bpmfvs_pua_db \
+  --input $REPO_ROOT/bpmfvs/phonetic/phonic_types.txt
+python3 -m curation.compilers.update_bpmfvs_variant_db \
+  --input $REPO_ROOT/bpmfvs/phonetic/phonic_table_Z.txt
+  --bpmf_base BPMFBase.txt
+  --bpmf_mappings BPMFMappings.txt
+```
+
+This will update `bpmfvs-pua.txt` and `bpmfvs-variants.txt` respectively. After
+that, make a pull request so that the maintainers can review the changes.
+
+## Editorial Rule
 * when in doubt, use google/yahoo search to confirm the rarity of the phrases
   for example search: "一瞻丰采" site:.tw
   - if the amount of the results is under 1000, it's likely okay to remove this
