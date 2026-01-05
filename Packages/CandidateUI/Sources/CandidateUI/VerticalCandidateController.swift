@@ -405,8 +405,8 @@ public class VerticalCandidateController: CandidateController {
                 let selectedRow = tableView.selectedRow
                 let pageIndex = newRowIndex / labelCount
 
-                if selectedRow == -1 || abs(newRowIndex - selectedRow) == 1 {
-                    // Simply scroll to the row if never selected or if it's moving by one.
+                if selectedRow == -1 || newRowIndex == 0 || abs(newRowIndex - selectedRow) == 1 {
+                    // Simply scroll to the row if never selected, if to row 0, or if it's moving by one.
                     tableView.scrollRowToVisible(newRowIndex)
                 } else {
                     if newRowIndex > selectedRow {
