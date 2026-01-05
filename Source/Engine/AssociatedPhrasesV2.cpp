@@ -38,6 +38,7 @@
 namespace McBopomofo {
 
 static constexpr char kSeparatorChar = '-';
+static constexpr char kSpecialSymbolAffix = '_';
 
 namespace {
 enum class RowParseState { kParsingValue, kParsingReading };
@@ -210,6 +211,7 @@ std::vector<std::string> AssociatedPhrasesV2::SplitReadings(
     return readings;
   }
 
+  auto begin = combinedReading.cbegin();
   auto it = combinedReading.cbegin();
   auto end = combinedReading.cend();
 
@@ -217,6 +219,15 @@ std::vector<std::string> AssociatedPhrasesV2::SplitReadings(
 
   while (it != end) {
     if (*it == kSeparatorChar) {
+      // Edge case: handle the case where the reading is _punctuation_-.
+      if (it != begin && *(it - 1) == kSpecialSymbolAffix) {
+        // But we need to handle the _punctuation__ case, too.
+        if (!(it - 1 != begin && *(it - 2) == kSpecialSymbolAffix)) {
+          ++it;
+          continue;
+        }
+      }
+
       readings.emplace_back(std::string(prev, it));
       prev = ++it;
       continue;
