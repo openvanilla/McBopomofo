@@ -15,11 +15,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.9.4</string>
+	<string>2.9.5</string>
 	<key>CFBundleSignature</key>
 	<string>BPMF</string>
 	<key>CFBundleVersion</key>
-	<string>2186</string>
+	<string>2245</string>
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
