@@ -163,10 +163,60 @@ TEST(AssociatedPhrasesV2Test, SplitReadings) {
   // Pathological cases, but should still yield the following results.
   result = AssociatedPhrasesV2::SplitReadings("A-B-");
   EXPECT_EQ(result, (std::vector<std::string>{"A", "B", ""}));
+  result = AssociatedPhrasesV2::SplitReadings("A- B -");
+  EXPECT_EQ(result, (std::vector<std::string>{"A", " B ", ""}));
+  result = AssociatedPhrasesV2::SplitReadings("A -B- ");
+  EXPECT_EQ(result, (std::vector<std::string>{"A ", "B", " "}));
+  result = AssociatedPhrasesV2::SplitReadings("A-B ");
+  EXPECT_EQ(result, (std::vector<std::string>{"A", "B "}));
   result = AssociatedPhrasesV2::SplitReadings("A-B--");
   EXPECT_EQ(result, (std::vector<std::string>{"A", "B", "", ""}));
   result = AssociatedPhrasesV2::SplitReadings("-");
   EXPECT_EQ(result, (std::vector<std::string>{"", ""}));
+
+  // Edge cases: _punctuation_- and similar ones need to be treated carefully.
+  result = AssociatedPhrasesV2::SplitReadings("_foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"foo_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("_foo_--_bar_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo_-", "_bar_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("_foo_-_bar_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo_-_bar_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("_foo_--");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo_-", ""}));
+  result = AssociatedPhrasesV2::SplitReadings("-_foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"", "_foo_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("A-_foo_--B");
+  EXPECT_EQ(result, (std::vector<std::string>{"A", "_foo_-", "B"}));
+  result = AssociatedPhrasesV2::SplitReadings("A-_foo_---B");
+  EXPECT_EQ(result, (std::vector<std::string>{"A", "_foo_-", "", "B"}));
+  result = AssociatedPhrasesV2::SplitReadings("-_foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"", "_foo_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("_--_foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"_-", "_foo_-"}));
+
+  // Edge cases: _punctuation__ needs to be split correctly
+  result = AssociatedPhrasesV2::SplitReadings("foo__-");
+  EXPECT_EQ(result, (std::vector<std::string>{"foo__", ""}));
+  result = AssociatedPhrasesV2::SplitReadings("_foo__-_bar_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo__", "_bar_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("A-_foo__-B");
+  EXPECT_EQ(result, (std::vector<std::string>{"A", "_foo__", "B"}));
+  result = AssociatedPhrasesV2::SplitReadings("A-_foo__--B");
+  EXPECT_EQ(result, (std::vector<std::string>{"A", "_foo__", "", "B"}));
+  result = AssociatedPhrasesV2::SplitReadings("_foo_--_foo__-B");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo_-", "_foo__", "B"}));
+  result = AssociatedPhrasesV2::SplitReadings("_foo__-_foo_--B");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo__", "_foo_-", "B"}));
+  result = AssociatedPhrasesV2::SplitReadings("__-_foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"__", "_foo_-"}));
+  result = AssociatedPhrasesV2::SplitReadings("__--_foo_-");
+  EXPECT_EQ(result, (std::vector<std::string>{"__", "", "_foo_-"}));
+
+  // This is actually malformed, but still good to test.
+  result = AssociatedPhrasesV2::SplitReadings("_foo_-_foo_--B");
+  EXPECT_EQ(result, (std::vector<std::string>{"_foo_-_foo_-", "B"}));
 }
 
 TEST(AssociatedPhrasesV2Test, ReturnsDeduplicatedResults) {
