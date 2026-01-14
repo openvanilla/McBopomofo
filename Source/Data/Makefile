@@ -6,15 +6,19 @@ all: data.txt data-plain-bpmf.txt associated-phrases-v2.txt
 
 install: all
 
-data-plain-bpmf.txt: curation/compilers/plain_bpmf_compiler.py BPMFBase.txt BPMFPunctuations.txt
+data-plain-bpmf.txt: curation/compilers/plain_bpmf_compiler.py \
+	curation/compilers/compiler_utils.py \
+	BPMFBase.txt BPMFPunctuations.txt
 	$(PYTHON) -m curation.compilers.plain_bpmf_compiler \
 		--bpmf_base BPMFBase.txt \
 		--punctuations BPMFPunctuations.txt \
 		--output data-plain-bpmf.txt
 
-data.txt: curation/compilers/main_compiler.py BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
-          PhraseFreq.txt phrase.occ Symbols.txt Macros.txt\
-          heterophony1.list heterophony2.list heterophony3.list
+data-raw.txt: curation/compilers/main_compiler.py \
+	curation/compilers/compiler_utils.py \
+	BPMFBase.txt BPMFMappings.txt BPMFPunctuations.txt \
+	PhraseFreq.txt phrase.occ Symbols.txt Macros.txt \
+	heterophony1.list heterophony2.list heterophony3.list
 	$(PYTHON) -m curation.compilers.main_compiler \
 		--heterophony1 heterophony1.list \
 		--heterophony2 heterophony2.list \
@@ -25,6 +29,12 @@ data.txt: curation/compilers/main_compiler.py BPMFBase.txt BPMFMappings.txt BPMF
 		--punctuations BPMFPunctuations.txt \
 		--symbols Symbols.txt \
 		--macros Macros.txt \
+		--output data-raw.txt
+
+data.txt: curation/compilers/postprocess.py curation/mandarin/grid.py data-raw.txt Postprocess.txt
+	$(PYTHON) -m curation.compilers.postprocess \
+		--input data-raw.txt \
+		--directive Postprocess.txt \
 		--output data.txt
 
 associated-phrases-v2.txt: data.txt curation/builders/phrase_deriver.py associated-punctuation.txt
@@ -101,3 +111,13 @@ _mycodecheck:
 	@for myfile in curation/*/*.py scripts/*.py; do \
             pycodestyle --ignore=E501,E722,E701,E221,W605 $$myfile; \
         done
+
+format:
+	black \
+		curation/mandarin/*.py \
+		curation/compilers/postprocess.py \
+		tests/*.py
+
+typecheck:
+	mypy \
+		curation/compilers/postprocess.py
