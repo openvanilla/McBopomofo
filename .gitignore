@@ -17,3 +17,5 @@ xcuserdata
 __pycache__
 codecov_comment.md
 DerivedData
+compile_commands.json
+.cache
