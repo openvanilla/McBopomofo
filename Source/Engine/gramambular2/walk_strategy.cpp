@@ -27,6 +27,8 @@
 #include <limits>
 #include <vector>
 
+#include "contextual_user_model.h"
+
 namespace Formosa::Gramambular2 {
 
 namespace {
@@ -50,12 +52,39 @@ bool JumpsOverFixedSpan(
   return false;
 }
 
+// Compute the edge weight for a candidate node, optionally incorporating
+// user model bigram scoring based on the predecessor node.
+double EdgeWeight(const ReadingGrid::NodePtr& node,
+                  const ReadingGrid::NodePtr& fromNode,
+                  const ContextualUserModel* userModel, double timestamp) {
+  double w = node->score();
+  if (userModel && node->spanningLength() > 0) {
+    std::string leftReading;
+    std::string leftValue;
+    if (fromNode && fromNode->spanningLength() > 0) {
+      leftReading = fromNode->reading();
+      leftValue = fromNode->value();
+    } else {
+      leftReading = ContextualUserModel::kStartSentinel;
+      leftValue = "";
+    }
+    auto suggestion =
+        userModel->suggest(leftReading, leftValue, node->reading(), timestamp);
+    if (suggestion) {
+      w = suggestion->logScore;
+    }
+  }
+  return w;
+}
+
 }  // namespace
 
 WalkStrategy::WalkOutput WalkStrategy::walk(const WalkInput& input) {
   const auto& spans = input.spans;
   const size_t readingLen = input.readingLength;
   const auto* fixedSpans = input.fixedSpans;
+  const auto* userModel = input.userModel;
+  const double timestamp = input.timestamp;
 
   // Mark positions that are interior to a fixed span as blocked.
   std::vector<bool> blocked(readingLen + 1, false);
@@ -93,7 +122,8 @@ WalkStrategy::WalkOutput WalkStrategy::walk(const WalkInput& input) {
       if (fixIt != fixedSpans->end()) {
         const auto& node = fixIt->second;
         ++edges;
-        double score = viterbi[i].maxScore + node->score();
+        double w = EdgeWeight(node, viterbi[i].fromNode, userModel, timestamp);
+        double score = viterbi[i].maxScore + w;
         State& target = viterbi[i + node->spanningLength()];
         if (score > target.maxScore) {
           target.maxScore = score;
@@ -126,7 +156,8 @@ WalkStrategy::WalkOutput WalkStrategy::walk(const WalkInput& input) {
       }
 
       ++edges;
-      double score = viterbi[i].maxScore + node->score();
+      double w = EdgeWeight(node, viterbi[i].fromNode, userModel, timestamp);
+      double score = viterbi[i].maxScore + w;
       State& target = viterbi[end];
       if (score > target.maxScore) {
         target.maxScore = score;

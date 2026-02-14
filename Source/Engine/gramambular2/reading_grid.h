@@ -196,6 +196,11 @@ class ReadingGrid {
 
   void clearFixedSpans();
 
+  // Set the user model for context-dependent scoring during walk.
+  void setUserModel(const class ContextualUserModel* userModel) {
+    userModel_ = userModel;
+  }
+
   WalkResult walk();
 
   struct Candidate {
@@ -270,6 +275,10 @@ class ReadingGrid {
   ScoreRankedLanguageModel lm_;
   std::shared_ptr<class WalkStrategy> walkStrategy_;
   std::map<size_t, NodePtr> fixedSpans_;
+  const class ContextualUserModel* userModel_ = nullptr;
+  // Nodes whose value was overridden by the user model during the last walk.
+  // These are reset before each new walk to avoid stale overrides.
+  std::vector<NodePtr> userModelOverriddenNodes_;
 
   // Internal methods for maintaining the grid.
 

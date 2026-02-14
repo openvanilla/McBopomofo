@@ -24,6 +24,7 @@
 #include "reading_grid.h"
 
 #include <chrono>
+#include <filesystem>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -31,6 +32,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "contextual_user_model.h"
 #include "language_model.h"
 #include "walk_strategy.h"
 
@@ -1032,6 +1034,730 @@ TEST(WalkStrategyTest, QualityWithExplicitStrategy) {
   auto result = grid.walk();
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
+}
+
+// Phase 2 Tests: ContextualUserModel
+
+TEST(ContextualUserModelTest, BasicObserve) {
+  auto lm = std::make_shared<SimpleLM>(kSampleData);
+  ContextualUserModel model(lm);
+
+  double baseNianzhong = model.baseScore("ㄋㄧㄢˊ-ㄓㄨㄥ", "年終");
+  double baseNianzhon = model.baseScore("ㄋㄧㄢˊ-ㄓㄨㄥ", "年中");
+  ASSERT_GT(baseNianzhon, baseNianzhong);
+
+  model.observe("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 1.0);
+
+  auto suggestion =
+      model.suggest("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", 1.0);
+  ASSERT_TRUE(suggestion.has_value());
+  ASSERT_EQ(suggestion->value, "年終");
+  std::cout << "BasicObserve: suggested=" << suggestion->value
+            << " logScore=" << suggestion->logScore << "\n";
+}
+
+TEST(ContextualUserModelTest, MultiContextContinuation) {
+  auto lm = std::make_shared<SimpleLM>(kSampleData);
+  ContextualUserModel model(lm);
+
+  model.observe("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 1.0);
+  model.observe("ㄍㄨㄥ-ㄙ", "公司", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 2.0);
+  model.observe("ㄐㄧㄣ-ㄊㄧㄢ", "今天", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 3.0);
+
+  auto suggestion =
+      model.suggest("ㄒㄧㄣ", "新", "ㄋㄧㄢˊ-ㄓㄨㄥ", 3.0);
+  ASSERT_TRUE(suggestion.has_value());
+  ASSERT_EQ(suggestion->value, "年終");
+
+  auto knownSuggestion =
+      model.suggest("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", 3.0);
+  ASSERT_TRUE(knownSuggestion.has_value());
+  ASSERT_GE(knownSuggestion->logScore, suggestion->logScore);
+  std::cout << "MultiContext: novel logScore=" << suggestion->logScore
+            << " known logScore=" << knownSuggestion->logScore << "\n";
+}
+
+TEST(ContextualUserModelTest, SingleContextNoGeneralization) {
+  auto lm = std::make_shared<SimpleLM>(kSampleData);
+  ContextualUserModel model(lm);
+
+  model.observe("ㄎㄜ-ㄐㄧˋ", "科技", "ㄍㄠ", "膏", 1.0);
+
+  auto sameSuggestion = model.suggest("ㄎㄜ-ㄐㄧˋ", "科技", "ㄍㄠ", 1.0);
+  ASSERT_TRUE(sameSuggestion.has_value());
+  ASSERT_EQ(sameSuggestion->value, "膏");
+
+  auto diffSuggestion = model.suggest("ㄊㄧㄢ-ㄑㄧˋ", "天氣", "ㄍㄠ", 1.0);
+  if (diffSuggestion.has_value()) {
+    std::cout << "SingleContext: diff context suggested="
+              << diffSuggestion->value << "\n";
+  }
+}
+
+TEST(ContextualUserModelTest, TemporalDecay) {
+  auto lm = std::make_shared<SimpleLM>(kSampleData);
+  ContextualUserModel model(lm);
+
+  model.observe("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 1.0);
+
+  auto freshSuggestion =
+      model.suggest("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", 1.0);
+  ASSERT_TRUE(freshSuggestion.has_value());
+
+  auto decayedSuggestion =
+      model.suggest("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", 100.0);
+  ASSERT_TRUE(decayedSuggestion.has_value());
+
+  ASSERT_LT(decayedSuggestion->logScore, freshSuggestion->logScore);
+  std::cout << "TemporalDecay: fresh=" << freshSuggestion->logScore
+            << " decayed=" << decayedSuggestion->logScore << "\n";
+}
+
+TEST(ContextualUserModelTest, SubSpanDecomposition) {
+  std::string data = R"(
+ㄗˋ 字 -6.5
+ㄗˋ 自 -5.0
+ㄏㄨㄟˋ 彙 -8.2
+ㄏㄨㄟˋ 會 -4.8
+)";
+  auto lm = std::make_shared<SimpleLM>(data.c_str());
+  ContextualUserModel model(lm);
+
+  double score = model.decomposedScore("ㄗˋ-ㄏㄨㄟˋ", "字彙");
+  double expected = std::exp(-6.5) * std::exp(-8.2);
+  ASSERT_NEAR(score, expected, 1e-12);
+  std::cout << "SubSpanDecomposition: score=" << score
+            << " expected=" << expected << "\n";
+}
+
+TEST(ContextualUserModelTest, SubSpanDecomposition3Syllable) {
+  std::string data = R"(
+ㄖㄣˊ 人 -3.8
+ㄍㄨㄥ 工 -7.82
+ㄓˋ 智 -7.5
+)";
+  auto lm = std::make_shared<SimpleLM>(data.c_str());
+  ContextualUserModel model(lm);
+
+  double score = model.decomposedScore("ㄖㄣˊ-ㄍㄨㄥ-ㄓˋ", "人工智");
+  double expected = std::exp(-3.8) * std::exp(-7.82) * std::exp(-7.5);
+  ASSERT_NEAR(score, expected, 1e-15);
+  std::cout << "SubSpanDecomposition3: score=" << score
+            << " expected=" << expected << "\n";
+}
+
+TEST(ContextualUserModelTest, Persistence) {
+  auto lm = std::make_shared<SimpleLM>(kSampleData);
+  ContextualUserModel model(lm);
+
+  model.observe("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 1.0);
+  model.observe("ㄍㄨㄥ-ㄙ", "公司", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年終", 2.0);
+  model.observe("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄍㄠ", "膏", 3.0);
+  model.observe("ㄎㄜ-ㄐㄧˋ", "科技", "ㄙ", "司", 4.0);
+  model.observe("ㄉㄜ˙", "的", "ㄋㄧㄢˊ-ㄓㄨㄥ", "年中", 5.0);
+
+  std::string tmpPath =
+      (std::filesystem::temp_directory_path() / "contextual_user_model_test.txt")
+          .string();
+  ASSERT_TRUE(model.saveToFile(tmpPath));
+
+  ContextualUserModel loaded(lm);
+  ASSERT_TRUE(loaded.loadFromFile(tmpPath));
+
+  auto orig =
+      model.suggest("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", 5.0);
+  auto loadedSuggestion =
+      loaded.suggest("ㄍㄠ-ㄎㄜ-ㄐㄧˋ", "高科技", "ㄋㄧㄢˊ-ㄓㄨㄥ", 5.0);
+  ASSERT_TRUE(orig.has_value());
+  ASSERT_TRUE(loadedSuggestion.has_value());
+  ASSERT_EQ(orig->value, loadedSuggestion->value);
+  ASSERT_NEAR(orig->logScore, loadedSuggestion->logScore, 0.01);
+  std::cout << "Persistence: original logScore=" << orig->logScore
+            << " loaded logScore=" << loadedSuggestion->logScore << "\n";
+}
+
+TEST(ContextualUserModelTest, ExplicitUserPhrase) {
+  std::string data = R"(
+ㄗˋ 字 -6.5
+ㄏㄨㄟˋ 彙 -8.2
+ㄏㄨㄟˋ 會 -4.8
+)";
+  auto lm = std::make_shared<SimpleLM>(data.c_str());
+  ContextualUserModel model(lm);
+
+  model.addExplicitPhrase("ㄗˋ-ㄏㄨㄟˋ", "字彙");
+
+  auto suggestion = model.suggest("_START_", "", "ㄗˋ-ㄏㄨㄟˋ", 0);
+  ASSERT_TRUE(suggestion.has_value());
+  ASSERT_EQ(suggestion->value, "字彙");
+
+  auto otherSuggestion = model.suggest("ㄗㄥ-ㄐㄧㄚ", "增加", "ㄗˋ-ㄏㄨㄟˋ", 0);
+  ASSERT_TRUE(otherSuggestion.has_value());
+  ASSERT_EQ(otherSuggestion->value, "字彙");
+  std::cout << "ExplicitUserPhrase: logScore=" << suggestion->logScore << "\n";
+}
+
+TEST(ContextualUserModelTest, LargeObservationVolume) {
+  auto lm = std::make_shared<SimpleLM>(kSampleData);
+  ContextualUserModel model(lm);
+
+  auto startObs = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < 100; i++) {
+    std::string ctx = "ctx" + std::to_string(i);
+    model.observe(ctx, ctx, "ㄙ", "斯", static_cast<double>(i));
+  }
+  auto endObs = std::chrono::high_resolution_clock::now();
+  auto obsUs =
+      std::chrono::duration_cast<std::chrono::microseconds>(endObs - startObs)
+          .count();
+
+  auto startSuggest = std::chrono::high_resolution_clock::now();
+  auto suggestion = model.suggest("ctx50", "ctx50", "ㄙ", 100.0);
+  auto endSuggest = std::chrono::high_resolution_clock::now();
+  auto suggestUs = std::chrono::duration_cast<std::chrono::microseconds>(
+                       endSuggest - startSuggest)
+                       .count();
+
+  ASSERT_TRUE(suggestion.has_value());
+  std::cout << "LargeVolume: 100 observes=" << obsUs
+            << " us, suggest=" << suggestUs << " us\n";
+}
+
+// =============================================================================
+// Phase 3 Tests: Integrated Walk with User Model (C1-C10, D1-D5)
+// =============================================================================
+
+constexpr char kExtendedData[] = R"(
+#
+# Extended sample data for Phase 3 tests.
+# Includes kSampleData entries plus additional vocabulary.
+#
+ㄙ 絲 -9.495858
+ㄙ 思 -9.006414
+ㄙ 私 -99.000000
+ㄙ 斯 -8.091803
+ㄙ 司 -99.000000
+ㄙ 嘶 -13.513987
+ㄙ 撕 -12.259095
+ㄍㄠ 高 -7.171551
+ㄎㄜ 顆 -10.574273
+ㄎㄜ 棵 -11.504072
+ㄎㄜ 刻 -10.450457
+ㄎㄜ 科 -7.171052
+ㄎㄜ 柯 -99.000000
+ㄍㄠ 膏 -11.928720
+ㄍㄠ 篙 -13.624335
+ㄍㄠ 糕 -12.390804
+ㄉㄜ˙ 的 -3.516024
+ㄉㄧˊ 的 -3.516024
+ㄉㄧˋ 的 -3.516024
+ㄓㄨㄥ 中 -5.809297
+ㄉㄜ˙ 得 -7.427179
+ㄍㄨㄥ 共 -8.381971
+ㄍㄨㄥ 供 -8.501463
+ㄐㄧˋ 既 -99.000000
+ㄐㄧㄣ 今 -8.034095
+ㄍㄨㄥ 紅 -8.858181
+ㄐㄧˋ 際 -7.608341
+ㄐㄧˋ 季 -99.000000
+ㄐㄧㄣ 金 -7.290109
+ㄐㄧˋ 騎 -10.939895
+ㄓㄨㄥ 終 -99.000000
+ㄐㄧˋ 記 -99.000000
+ㄐㄧˋ 寄 -99.000000
+ㄐㄧㄣ 斤 -99.000000
+ㄐㄧˋ 繼 -9.715317
+ㄐㄧˋ 計 -7.926683
+ㄐㄧˋ 暨 -8.373022
+ㄓㄨㄥ 鐘 -9.877580
+ㄐㄧㄣ 禁 -10.711079
+ㄍㄨㄥ 公 -7.877973
+ㄍㄨㄥ 工 -7.822167
+ㄍㄨㄥ 攻 -99.000000
+ㄍㄨㄥ 功 -99.000000
+ㄍㄨㄥ 宮 -99.000000
+ㄓㄨㄥ 鍾 -9.685671
+ㄐㄧˋ 繫 -10.425662
+ㄍㄨㄥ 弓 -99.000000
+ㄍㄨㄥ 恭 -99.000000
+ㄐㄧˋ 劑 -8.888722
+ㄐㄧˋ 祭 -10.204425
+ㄐㄧㄣ 浸 -11.378321
+ㄓㄨㄥ 盅 -99.000000
+ㄐㄧˋ 忌 -99.000000
+ㄐㄧˋ 技 -8.450826
+ㄐㄧㄣ 筋 -11.074890
+ㄍㄨㄥ 躬 -99.000000
+ㄐㄧˋ 冀 -12.045357
+ㄓㄨㄥ 忠 -99.000000
+ㄐㄧˋ 妓 -99.000000
+ㄐㄧˋ 濟 -9.517568
+ㄐㄧˋ 薊 -12.021587
+ㄐㄧㄣ 巾 -99.000000
+ㄐㄧㄣ 襟 -12.784206
+ㄋㄧㄢˊ 年 -6.086515
+ㄐㄧㄤˇ 講 -9.164384
+ㄐㄧㄤˇ 獎 -8.690941
+ㄐㄧㄤˇ 蔣 -10.127828
+ㄋㄧㄢˊ 黏 -11.336864
+ㄋㄧㄢˊ 粘 -11.285740
+ㄐㄧㄤˇ 槳 -12.492933
+ㄍㄨㄥㄙ 公司 -6.299461
+ㄎㄜㄐㄧˋ 科技 -6.736613
+ㄐㄧˋㄍㄨㄥ 濟公 -13.336653
+ㄐㄧㄤˇㄐㄧㄣ 獎金 -10.344678
+ㄋㄧㄢˊㄓㄨㄥ 年終 -11.668947
+ㄋㄧㄢˊㄓㄨㄥ 年中 -11.373044
+ㄍㄠㄎㄜㄐㄧˋ 高科技 -9.842421
+ㄨㄛˇ 我 -4.50
+ㄇㄣˊ 們 -7.00
+ㄊㄧㄢ 天 -5.50
+ㄒㄧㄚˋ 下 -4.50
+ㄨˇ 午 -7.00
+ㄑㄩˋ 去 -2.85
+ㄎㄞ 開 -5.30
+ㄏㄨㄟˋ 會 -4.80
+ㄊㄠˇ 討 -8.00
+ㄌㄨㄣˋ 論 -6.50
+ㄨㄟˋ 未 -6.20
+ㄌㄞˊ 來 -4.80
+ㄈㄚ 發 -5.00
+ㄓㄢˇ 展 -6.50
+ㄈㄟ 非 -5.50
+ㄔㄤˊ 常 -5.80
+ㄓˊ 值 -7.20
+ㄉㄜˊ 得 -5.80
+ㄑㄧˊ 期 -6.50
+ㄉㄞˋ 待 -6.80
+ㄊㄞˊ 台 -4.50
+ㄨㄢ 灣 -6.00
+ㄖㄣˊ 人 -3.80
+ㄓˋ 智 -7.50
+ㄏㄨㄟˋ 慧 -7.80
+ㄍㄨㄢ 關 -6.50
+ㄓㄨˋ 注 -6.80
+ㄨㄛˇㄇㄣˊ 我們 -3.80
+ㄐㄧㄣㄊㄧㄢ 今天 -3.29
+ㄒㄧㄚˋㄨˇ 下午 -4.03
+ㄎㄞㄏㄨㄟˋ 開會 -4.57
+ㄊㄠˇㄌㄨㄣˋ 討論 -3.72
+ㄨㄟˋㄌㄞˊ 未來 -3.57
+ㄈㄚㄓㄢˇ 發展 -3.37
+ㄈㄟㄔㄤˊ 非常 -3.48
+ㄓˊㄉㄜˊ 值得 -4.09
+ㄑㄧˊㄉㄞˋ 期待 -4.28
+ㄊㄞˊㄨㄢ 台灣 -2.88
+ㄖㄣˊㄍㄨㄥ 人工 -5.50
+ㄓˋㄏㄨㄟˋ 智慧 -5.20
+ㄊㄧㄢㄒㄧㄚˋ 天下 -5.00
+ㄊㄧㄢㄑㄧˋ 天氣 -4.26
+ㄖㄣˊㄍㄨㄥㄓˋㄏㄨㄟˋ 人工智慧 -5.68
+ㄍㄨㄢㄓㄨˋ 關注 -4.20
+ㄑㄧˋ 氣 -6.20
+ㄏㄣˇ 很 -2.84
+ㄏㄠˇ 好 -2.78
+ㄏㄣˇㄏㄠˇ 很好 -5.00
+)";
+
+// C1: Walk with user model on 10-syllable sentence
+TEST(IntegratedWalkTest, WalkWithUserModel10Syllables) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ",
+                         "ㄉㄜ˙", "ㄋㄧㄢˊ", "ㄓㄨㄥ", "ㄐㄧㄤˇ", "ㄐㄧㄣ"}) {
+    grid.insertReading(r);
+  }
+
+  auto baseResult = grid.walk();
+  ASSERT_EQ(baseResult.valuesAsStrings(),
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
+  std::cout << "C1 base walk: " << baseResult.elapsedMicroseconds << " us\n";
+
+  userModel.observe("ㄉㄜ˙", "的", "ㄋㄧㄢˊㄓㄨㄥ", "年終", 1.0);
+
+  grid.setUserModel(&userModel);
+  auto umResult = grid.walk();
+  std::cout << "C1 user model walk: " << umResult.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : umResult.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  bool hasNianzhong = false;
+  for (const auto& v : umResult.valuesAsStrings()) {
+    if (v == "年終") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong) << "User model should promote 年終";
+
+  grid.setUserModel(nullptr);
+  auto resetResult = grid.walk();
+  ASSERT_EQ(resetResult.valuesAsStrings(),
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
+}
+
+// C2: Walk with user model on 6-syllable sentence
+TEST(IntegratedWalkTest, WalkWithUserModel6Syllables) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+
+  // 今天天氣很好 (6 syllables)
+  for (const auto& r : {"ㄐㄧㄣ", "ㄊㄧㄢ", "ㄊㄧㄢ", "ㄑㄧˋ",
+                         "ㄏㄣˇ", "ㄏㄠˇ"}) {
+    grid.insertReading(r);
+  }
+
+  auto result = grid.walk();
+  std::cout << "C2 6-syl walk: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  ASSERT_GE(result.nodes.size(), 3u);
+}
+
+// C3: Walk with user model, multi-context boost
+TEST(IntegratedWalkTest, WalkWithUserModelMultiContext) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ",
+                         "ㄉㄜ˙", "ㄋㄧㄢˊ", "ㄓㄨㄥ", "ㄐㄧㄤˇ", "ㄐㄧㄣ"}) {
+    grid.insertReading(r);
+  }
+
+  userModel.observe("ㄍㄨㄥㄙ", "公司", "ㄋㄧㄢˊㄓㄨㄥ", "年終", 1.0);
+  userModel.observe("ㄉㄜ˙", "的", "ㄋㄧㄢˊㄓㄨㄥ", "年終", 2.0);
+
+  grid.setUserModel(&userModel);
+  auto result = grid.walk();
+  std::cout << "C3 multi-context walk: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  bool hasNianzhong = false;
+  for (const auto& v : result.valuesAsStrings()) {
+    if (v == "年終") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong) << "Multi-context boost should promote 年終";
+}
+
+// C4: Walk with fixed span AND user model
+TEST(IntegratedWalkTest, WalkWithFixedSpanAndUserModel) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ",
+                         "ㄉㄜ˙", "ㄋㄧㄢˊ", "ㄓㄨㄥ", "ㄐㄧㄤˇ", "ㄐㄧㄣ"}) {
+    grid.insertReading(r);
+  }
+
+  grid.setCursor(7);
+  ASSERT_TRUE(grid.overrideCandidate(7, "年終"));
+  auto fixResult = grid.walk();
+
+  userModel.observe("ㄍㄨㄥㄙ", "公司", "ㄋㄧㄢˊㄓㄨㄥ", "年終", 1.0);
+  grid.setUserModel(&userModel);
+
+  auto result = grid.walk();
+  std::cout << "C4 fixed+UM walk: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"高科技", "公司", "的", "年終", "獎金"}));
+}
+
+// C5: Walk 15 syllables
+TEST(IntegratedWalkTest, Walk15Syllables) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+
+  // 台灣的人工智慧發展非常值得期待 (15 syllables)
+  for (const auto& r : {"ㄊㄞˊ", "ㄨㄢ", "ㄉㄜ˙", "ㄖㄣˊ", "ㄍㄨㄥ",
+                         "ㄓˋ", "ㄏㄨㄟˋ", "ㄈㄚ", "ㄓㄢˇ", "ㄈㄟ",
+                         "ㄔㄤˊ", "ㄓˊ", "ㄉㄜˊ", "ㄑㄧˊ", "ㄉㄞˋ"}) {
+    grid.insertReading(r);
+  }
+
+  auto result = grid.walk();
+  std::cout << "C5 15-syl walk: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  ASSERT_EQ(result.totalReadings, 15u);
+  ASSERT_GE(result.nodes.size(), 5u);
+  ASSERT_LE(result.elapsedMicroseconds, 1000u);
+}
+
+// C6: Walk 20 syllables
+TEST(IntegratedWalkTest, Walk20Syllables) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+
+  // 我們今天下午去高科技公司開會討論未來發展 (20 syllables)
+  for (const auto& r : {"ㄨㄛˇ", "ㄇㄣˊ", "ㄐㄧㄣ", "ㄊㄧㄢ", "ㄒㄧㄚˋ",
+                         "ㄨˇ", "ㄑㄩˋ", "ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ",
+                         "ㄍㄨㄥ", "ㄙ", "ㄎㄞ", "ㄏㄨㄟˋ", "ㄊㄠˇ",
+                         "ㄌㄨㄣˋ", "ㄨㄟˋ", "ㄌㄞˊ", "ㄈㄚ", "ㄓㄢˇ"}) {
+    grid.insertReading(r);
+  }
+
+  auto result = grid.walk();
+  std::cout << "C6 20-syl walk: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  ASSERT_EQ(result.totalReadings, 20u);
+  ASSERT_GE(result.nodes.size(), 8u);
+  ASSERT_LE(result.elapsedMicroseconds, 2000u);
+}
+
+// C7: Walk 35 syllables (C5 + C6 combined)
+TEST(IntegratedWalkTest, Walk35Syllables) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+
+  // 台灣的人工智慧發展非常值得期待 (15 syllables)
+  for (const auto& r : {"ㄊㄞˊ", "ㄨㄢ", "ㄉㄜ˙", "ㄖㄣˊ", "ㄍㄨㄥ",
+                         "ㄓˋ", "ㄏㄨㄟˋ", "ㄈㄚ", "ㄓㄢˇ", "ㄈㄟ",
+                         "ㄔㄤˊ", "ㄓˊ", "ㄉㄜˊ", "ㄑㄧˊ", "ㄉㄞˋ"}) {
+    grid.insertReading(r);
+  }
+  // + 我們今天下午去高科技公司開會討論未來發展 (20 syllables)
+  for (const auto& r : {"ㄨㄛˇ", "ㄇㄣˊ", "ㄐㄧㄣ", "ㄊㄧㄢ", "ㄒㄧㄚˋ",
+                         "ㄨˇ", "ㄑㄩˋ", "ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ",
+                         "ㄍㄨㄥ", "ㄙ", "ㄎㄞ", "ㄏㄨㄟˋ", "ㄊㄠˇ",
+                         "ㄌㄨㄣˋ", "ㄨㄟˋ", "ㄌㄞˊ", "ㄈㄚ", "ㄓㄢˇ"}) {
+    grid.insertReading(r);
+  }
+
+  auto result = grid.walk();
+  std::cout << "C7 35-syl walk: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  ASSERT_EQ(result.totalReadings, 35u);
+  ASSERT_LE(result.elapsedMicroseconds, 5000u);
+}
+
+// C8: Walk 50 syllables stress test
+TEST(IntegratedWalkTest, Walk50SyllablesStress) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+
+  for (int rep = 0; rep < 5; rep++) {
+    for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ",
+                           "ㄉㄜ˙", "ㄋㄧㄢˊ", "ㄓㄨㄥ", "ㄐㄧㄤˇ",
+                           "ㄐㄧㄣ"}) {
+      grid.insertReading(r);
+    }
+  }
+
+  auto result = grid.walk();
+  std::cout << "C8 50-syl walk: " << result.elapsedMicroseconds << " us"
+            << " nodes=" << result.nodes.size() << "\n";
+
+  ASSERT_EQ(result.totalReadings, 50u);
+  ASSERT_LE(result.elapsedMicroseconds, 20000u);
+}
+
+// C9: Walk 100-1000 syllables homogeneous scaling test
+TEST(IntegratedWalkTest, Walk100To1000Scaling) {
+  for (size_t size : {100u, 200u, 500u, 1000u}) {
+    MockLM mockLM;
+    ReadingGrid grid(std::make_shared<MockLM>(mockLM));
+    grid.setReadingSeparator("");
+
+    for (size_t i = 0; i < size; i++) {
+      grid.insertReading("ㄧ");
+    }
+
+    auto result = grid.walk();
+    std::cout << "C9 " << size << "-syl walk: " << result.elapsedMicroseconds
+              << " us, nodes=" << result.nodes.size() << "\n";
+    ASSERT_EQ(result.totalReadings, size);
+  }
+}
+
+// C10: Walk with user model AND fixed spans on 100 syllables
+TEST(IntegratedWalkTest, WalkWithUserModelAndFixedSpans100Syllables) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  for (int rep = 0; rep < 10; rep++) {
+    for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ",
+                           "ㄉㄜ˙", "ㄋㄧㄢˊ", "ㄓㄨㄥ", "ㄐㄧㄤˇ",
+                           "ㄐㄧㄣ"}) {
+      grid.insertReading(r);
+    }
+  }
+
+  for (int i = 0; i < 10; i++) {
+    std::string ctx = "ctx" + std::to_string(i);
+    userModel.observe(ctx, ctx, "ㄋㄧㄢˊㄓㄨㄥ", "年終", static_cast<double>(i));
+    userModel.observe(ctx, ctx, "ㄍㄠ", "膏", static_cast<double>(i));
+  }
+
+  for (size_t pos : {0u, 30u, 60u, 90u}) {
+    auto node = grid.findInSpan(pos, [](const ReadingGrid::NodePtr& n) {
+      return n->spanningLength() == 1;
+    });
+    if (node.has_value()) {
+      grid.fixSpan(pos, node.value());
+    }
+  }
+
+  grid.setUserModel(&userModel);
+  auto result = grid.walk();
+  std::cout << "C10 100-syl+UM+Fix walk: " << result.elapsedMicroseconds
+            << " us, nodes=" << result.nodes.size() << "\n";
+
+  ASSERT_EQ(result.totalReadings, 100u);
+}
+
+// D1: Empty grid edge case
+TEST(IntegratedWalkTest, EmptyGrid) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  ContextualUserModel userModel(lm);
+
+  grid.setUserModel(&userModel);
+  auto result = grid.walk();
+  ASSERT_TRUE(result.nodes.empty());
+  ASSERT_EQ(result.totalReadings, 0u);
+
+  grid.setUserModel(nullptr);
+  auto result2 = grid.walk();
+  ASSERT_TRUE(result2.nodes.empty());
+}
+
+// D2: Single syllable
+TEST(IntegratedWalkTest, SingleSyllable) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  grid.insertReading("ㄍㄠ");
+  grid.setUserModel(&userModel);
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"高"}));
+  std::cout << "D2 single-syl: " << result.elapsedMicroseconds << " us\n";
+}
+
+// D3: All fixed spans (every position fixed)
+TEST(IntegratedWalkTest, AllFixedSpans) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+
+  for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ"}) {
+    grid.insertReading(r);
+  }
+
+  auto makeFixedNode = [&](const std::string& reading, const std::string& value) {
+    return std::make_shared<ReadingGrid::Node>(
+        reading, 1,
+        std::vector<LanguageModel::Unigram>{LanguageModel::Unigram(value, -5.0)});
+  };
+  grid.fixSpan(0, makeFixedNode("ㄍㄠ", "膏"));
+  grid.fixSpan(1, makeFixedNode("ㄎㄜ", "柯"));
+  grid.fixSpan(2, makeFixedNode("ㄐㄧˋ", "計"));
+  grid.fixSpan(3, makeFixedNode("ㄍㄨㄥ", "弓"));
+  grid.fixSpan(4, makeFixedNode("ㄙ", "撕"));
+
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"膏", "柯", "計", "弓", "撕"}));
+  std::cout << "D3 all-fixed: " << result.elapsedMicroseconds << " us\n";
+}
+
+// D4: User model conflicts with fixed span (structural fix wins)
+TEST(IntegratedWalkTest, UserModelConflictsWithFixedSpan) {
+  auto lm = std::make_shared<SimpleLM>(kExtendedData);
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  for (const auto& r : {"ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ",
+                         "ㄉㄜ˙", "ㄋㄧㄢˊ", "ㄓㄨㄥ", "ㄐㄧㄤˇ", "ㄐㄧㄣ"}) {
+    grid.insertReading(r);
+  }
+
+  grid.setCursor(7);
+  ASSERT_TRUE(grid.overrideCandidate(7, "年中"));
+
+  for (int i = 0; i < 10; i++) {
+    userModel.observe("ㄉㄜ˙", "的", "ㄋㄧㄢˊㄓㄨㄥ", "年終",
+                      static_cast<double>(i));
+  }
+  grid.setUserModel(&userModel);
+
+  auto result = grid.walk();
+  std::cout << "D4 conflict: " << result.elapsedMicroseconds << " us"
+            << " values:";
+  for (const auto& v : result.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  bool hasNianzhong = false;
+  for (const auto& v : result.valuesAsStrings()) {
+    if (v == "年中") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong) << "Structural fix should override user model";
+}
+
+// D5: Backoff to decomposition in walk (novel phrase via explicit add)
+TEST(IntegratedWalkTest, BackoffToDecomposition) {
+  std::string data = R"(
+ㄗˋ 字 -6.5
+ㄗˋ 自 -5.0
+ㄏㄨㄟˋ 彙 -8.2
+ㄏㄨㄟˋ 會 -4.8
+)";
+  auto lm = std::make_shared<SimpleLM>(data.c_str());
+  ReadingGrid grid(lm);
+  grid.setReadingSeparator("");
+  ContextualUserModel userModel(lm);
+
+  grid.insertReading("ㄗˋ");
+  grid.insertReading("ㄏㄨㄟˋ");
+
+  auto baseResult = grid.walk();
+  std::cout << "D5 base: values:";
+  for (const auto& v : baseResult.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+  ASSERT_EQ(baseResult.nodes.size(), 2u);
+
+  userModel.addExplicitPhrase("ㄗˋ-ㄏㄨㄟˋ", "字彙");
+
+  grid.setUserModel(&userModel);
+  auto umResult = grid.walk();
+  std::cout << "D5 with user phrase: values:";
+  for (const auto& v : umResult.valuesAsStrings()) std::cout << " " << v;
+  std::cout << "\n";
+
+  // The walk still picks individual characters (since "字彙" isn't a node in
+  // the grid — it only exists in the user model). The user model can only
+  // influence scoring of existing nodes, not create new ones.
+  ASSERT_EQ(umResult.nodes.size(), 2u);
 }
 
 }  // namespace Formosa::Gramambular2

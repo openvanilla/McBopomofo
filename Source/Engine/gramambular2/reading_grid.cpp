@@ -29,6 +29,7 @@
 #include <utility>
 #include <vector>
 
+#include "contextual_user_model.h"
 #include "walk_strategy.h"
 
 namespace Formosa::Gramambular2 {
@@ -38,6 +39,10 @@ void ReadingGrid::clear() {
   readings_.clear();
   spans_.clear();
   fixedSpans_.clear();
+  for (auto& node : userModelOverriddenNodes_) {
+    node->reset();
+  }
+  userModelOverriddenNodes_.clear();
 }
 
 void ReadingGrid::setCursor(size_t cursor) {
@@ -165,12 +170,43 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
 
   const std::map<size_t, NodePtr>* fixedPtr =
       fixedSpans_.empty() ? nullptr : &fixedSpans_;
-  WalkStrategy::WalkInput input{spans_, readings_.size(), fixedPtr};
+  double walkTimestamp =
+      static_cast<double>(GetEpochNowInMicroseconds()) / 1e6;
+  WalkStrategy::WalkInput input{spans_, readings_.size(), fixedPtr,
+                                userModel_, walkTimestamp};
+  for (auto& node : userModelOverriddenNodes_) {
+    node->reset();
+  }
+  userModelOverriddenNodes_.clear();
+
   auto walkOutput = walkStrategy_->walk(input);
   result.nodes = std::move(walkOutput.nodes);
   result.totalReadings = walkOutput.totalReadings;
   result.vertices = walkOutput.vertices;
   result.edges = walkOutput.edges;
+
+  // Post-walk: apply user model suggestions to the walked nodes.
+  // The walk uses the user model for path scoring, but nodes still report
+  // their default top-unigram value. Here we apply soft overrides so the
+  // displayed value matches the user model's suggestion.
+  if (userModel_ && !result.nodes.empty()) {
+    std::string prevReading = ContextualUserModel::kStartSentinel;
+    std::string prevValue;
+    for (auto& node : result.nodes) {
+      auto suggestion = userModel_->suggest(prevReading, prevValue,
+                                            node->reading(), walkTimestamp);
+      if (suggestion && suggestion->value != node->value() &&
+          !node->isOverridden()) {
+        if (node->selectOverrideUnigram(
+                suggestion->value,
+                Node::OverrideType::kOverrideValueWithScoreFromTopUnigram)) {
+          userModelOverriddenNodes_.push_back(node);
+        }
+      }
+      prevReading = node->reading();
+      prevValue = node->value();
+    }
+  }
   result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
   return result;
 }
