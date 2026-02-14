@@ -28,6 +28,7 @@
 #import "McBopomofoLM.h"
 #import "UTF8Helper.h"
 #import "UserOverrideModel.h"
+#import "contextual_user_model.h"
 #import "reading_grid.h"
 
 #import <algorithm>
@@ -59,6 +60,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // user override model
     McBopomofo::UserOverrideModel *_userOverrideModel;
+
+    // contextual user model (KN backoff)
+    Formosa::Gramambular2::ContextualUserModel *_contextualUserModel;
 
     Formosa::Gramambular2::ReadingGrid *_grid;
     Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk;
@@ -104,6 +108,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             std::shared_ptr<Formosa::Gramambular2::LanguageModel> lm(_emptySharedPtr, _languageModel);
             _grid = new Formosa::Gramambular2::ReadingGrid(lm);
             _grid->setReadingSeparator("-");
+            _grid->setUserModel(_contextualUserModel);
         }
 
         if (!_bpmfReadingBuffer->isEmpty()) {
@@ -128,11 +133,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
+        _contextualUserModel = [LanguageModelManager contextualUserModel];
 
         // This returns a shared_ptr that in turn points to an unmanaged object.
         std::shared_ptr<Formosa::Gramambular2::LanguageModel> lm(_emptySharedPtr, _languageModel);
         _grid = new Formosa::Gramambular2::ReadingGrid(lm);
         _grid->setReadingSeparator("-");
+        _grid->setUserModel(_contextualUserModel);
 
         _inputMode = InputModeBopomofo;
     }
@@ -171,26 +178,48 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex useMoveCursorAfterSelectionSetting:(BOOL)flag
 {
     size_t actualCursor = self.actualCandidateCursorIndex;
-    Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
-    if (!_grid->overrideCandidate(actualCursor, candidate)) {
+    std::string readingStr(reading.UTF8String);
+    std::string valueStr(value.UTF8String);
+    Formosa::Gramambular2::ReadingGrid::Candidate candidate(readingStr, valueStr);
+    if (!_grid->overrideCandidate(actualCursor, candidate,
+            Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram)) {
         return;
     }
 
-    Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk;
+    // Structurally fix the overridden node so the walk is constrained to it.
+    auto nodeOpt = _grid->findInSpan(actualCursor, [&readingStr](const auto& node) {
+        return node->reading() == readingStr && node->isOverridden();
+    });
+    if (nodeOpt) {
+        _grid->fixSpan(actualCursor, *nodeOpt);
+    }
+
     [self _walk];
 
-    // Update the user override model if warranted.
     size_t accumulatedCursor = 0;
     auto nodeIter = _latestWalk.findNodeAt(actualCursor, &accumulatedCursor);
     if (nodeIter == _latestWalk.nodes.cend()) {
         return;
     }
     Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
-    if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
-        _userOverrideModel->observe(prevWalk, _latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
+    if (currentNode == nullptr) {
+        _grid->setCursor(originalCursorIndex);
+        return;
     }
 
-    if (currentNode != nullptr && flag && Preferences.moveCursorAfterSelectingCandidate) {
+    std::string leftReading = Formosa::Gramambular2::ContextualUserModel::kStartSentinel;
+    std::string leftValue;
+    if (nodeIter != _latestWalk.nodes.cbegin()) {
+        auto prevNode = *(nodeIter - 1);
+        leftReading = prevNode->reading();
+        leftValue = prevNode->value();
+    }
+    _contextualUserModel->observe(leftReading, leftValue,
+        currentNode->reading(), currentNode->value(),
+        [NSDate date].timeIntervalSince1970);
+    [LanguageModelManager saveContextualUserModel];
+
+    if (flag && Preferences.moveCursorAfterSelectingCandidate) {
         _grid->setCursor(accumulatedCursor);
     } else {
         _grid->setCursor(originalCursorIndex);
@@ -524,16 +553,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         _grid->insertReading(reading);
         [self _walk];
-
-        // get user override model suggestion
-        if (_inputMode != InputModePlainBopomofo) {
-            McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
-            if (!suggestion.empty()) {
-                Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = suggestion.forceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
-                _grid->overrideCandidate(self.actualCandidateCursorIndex, suggestion.candidate, type);
-                [self _walk];
-            }
-        }
 
         // then update the text
         _bpmfReadingBuffer->clear();

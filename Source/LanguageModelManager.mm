@@ -34,6 +34,11 @@ static McBopomofo::McBopomofoLM gLanguageModelMcBopomofo;
 static McBopomofo::McBopomofoLM gLanguageModelPlainBopomofo;
 static McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 
+// Aliasing shared_ptr: wraps the stack-allocated LM for ContextualUserModel.
+static std::shared_ptr<Formosa::Gramambular2::LanguageModel> gEmptySharedPtr;
+static std::shared_ptr<Formosa::Gramambular2::LanguageModel> gLmPtr(gEmptySharedPtr, &gLanguageModelMcBopomofo);
+static Formosa::Gramambular2::ContextualUserModel gContextualUserModel(gLmPtr);
+
 static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kUserDataPlainBopomofoTemplateName = @"template-data-plain-bpmf";
 static NSString *const kExcludedPhrasesMcBopomofoTemplateName = @"template-exclude-phrases";
@@ -71,6 +76,11 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
     }
     if (!gLanguageModelPlainBopomofo.isAssociatedPhrasesV2Loaded()) {
         LTLoadAssociatedPhrases(gLanguageModelPlainBopomofo);
+    }
+
+    NSString *cumPath = [self contextualUserModelDataPath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:cumPath]) {
+        gContextualUserModel.loadFromFile(cumPath.UTF8String);
     }
 }
 
@@ -428,6 +438,21 @@ static void LTLoadAssociatedPhrases(McBopomofo::McBopomofoLM& lm)
 + (McBopomofo::UserOverrideModel *)userOverrideModel
 {
     return &gUserOverrideModel;
+}
+
++ (Formosa::Gramambular2::ContextualUserModel *)contextualUserModel
+{
+    return &gContextualUserModel;
+}
+
++ (NSString *)contextualUserModelDataPath
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"contextual-user-model.txt"];
+}
+
++ (void)saveContextualUserModel
+{
+    gContextualUserModel.saveToFile([self contextualUserModelDataPath].UTF8String);
 }
 
 + (BOOL)phraseReplacementEnabled
