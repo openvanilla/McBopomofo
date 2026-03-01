@@ -52,7 +52,7 @@ bool JumpsOverFixedSpan(
 
 }  // namespace
 
-std::vector<ReadingGrid::NodePtr> WalkStrategy::walk(const WalkInput& input) {
+WalkStrategy::WalkOutput WalkStrategy::walk(const WalkInput& input) {
   const auto& spans = input.spans;
   const size_t readingLen = input.readingLength;
   const auto* fixedSpans = input.fixedSpans;
@@ -73,6 +73,9 @@ std::vector<ReadingGrid::NodePtr> WalkStrategy::walk(const WalkInput& input) {
   std::vector<State> viterbi(readingLen + 1);
   viterbi[0].maxScore = 0.0;
 
+  size_t vertices = 0;
+  size_t edges = 0;
+
   for (size_t i = 0; i < readingLen; ++i) {
     if (viterbi[i].maxScore == -std::numeric_limits<double>::infinity()) {
       continue;
@@ -82,11 +85,14 @@ std::vector<ReadingGrid::NodePtr> WalkStrategy::walk(const WalkInput& input) {
       continue;
     }
 
+    ++vertices;
+
     // If this position has a fixed span, only that node is considered.
     if (fixedSpans) {
       auto fixIt = fixedSpans->find(i);
       if (fixIt != fixedSpans->end()) {
         const auto& node = fixIt->second;
+        ++edges;
         double score = viterbi[i].maxScore + node->score();
         State& target = viterbi[i + node->spanningLength()];
         if (score > target.maxScore) {
@@ -107,6 +113,7 @@ std::vector<ReadingGrid::NodePtr> WalkStrategy::walk(const WalkInput& input) {
         continue;
       }
 
+      ++edges;
       size_t end = i + spanLen;
 
       // Skip if the destination is blocked (interior of a fixed span).
@@ -130,16 +137,19 @@ std::vector<ReadingGrid::NodePtr> WalkStrategy::walk(const WalkInput& input) {
   }
 
   // Backtrace from the end to reconstruct the path.
-  std::vector<ReadingGrid::NodePtr> result;
+  WalkOutput output;
+  output.vertices = vertices;
+  output.edges = edges;
   size_t totalReadingLen = 0;
   for (size_t curr = readingLen; curr > 0; curr = viterbi[curr].fromIndex) {
     assert(viterbi[curr].fromNode != nullptr);
     totalReadingLen += viterbi[curr].fromNode->spanningLength();
-    result.emplace_back(std::move(viterbi[curr].fromNode));
+    output.nodes.emplace_back(std::move(viterbi[curr].fromNode));
   }
-  std::reverse(result.begin(), result.end());
+  std::reverse(output.nodes.begin(), output.nodes.end());
   assert(totalReadingLen == readingLen);
-  return result;
+  output.totalReadings = totalReadingLen;
+  return output;
 }
 
 }  // namespace Formosa::Gramambular2

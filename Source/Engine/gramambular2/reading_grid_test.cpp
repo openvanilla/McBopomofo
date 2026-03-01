@@ -549,7 +549,8 @@ TEST(ReadingGridTest, StressTest) {
   }
   ReadingGrid::WalkResult result = grid.walk();
   std::cout << "stress test elapsed: " << result.elapsedMicroseconds
-            << " microseconds, vertices: " << result.vertices << "\n";
+            << " microseconds, vertices: " << result.vertices
+            << ", edges: " << result.edges << "\n";
 }
 
 TEST(ReadingGridTest, LongGridInsertion) {

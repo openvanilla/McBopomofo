@@ -166,24 +166,11 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   const std::map<size_t, NodePtr>* fixedPtr =
       fixedSpans_.empty() ? nullptr : &fixedSpans_;
   WalkStrategy::WalkInput input{spans_, readings_.size(), fixedPtr};
-  result.nodes = walkStrategy_->walk(input);
-
-  size_t totalReadingLen = 0;
-  size_t vertices = 0;
-  for (const auto& node : result.nodes) {
-    totalReadingLen += node->spanningLength();
-  }
-  for (size_t i = 0, len = spans_.size(); i < len; ++i) {
-    const Span& span = spans_[i];
-    for (size_t j = 1, maxSpanLen = span.maxLength(); j <= maxSpanLen; ++j) {
-      if (span.nodeOf(j) != nullptr) {
-        ++vertices;
-      }
-    }
-  }
-
-  result.totalReadings = totalReadingLen;
-  result.vertices = vertices;
+  auto walkOutput = walkStrategy_->walk(input);
+  result.nodes = std::move(walkOutput.nodes);
+  result.totalReadings = walkOutput.totalReadings;
+  result.vertices = walkOutput.vertices;
+  result.edges = walkOutput.edges;
   result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
   return result;
 }

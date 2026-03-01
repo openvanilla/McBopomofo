@@ -171,6 +171,7 @@ class ReadingGrid {
     std::vector<NodePtr> nodes;
     size_t totalReadings = 0;
     size_t vertices = 0;
+    size_t edges = 0;
     uint64_t elapsedMicroseconds = 0;
 
     // Convenient method for finding the node at the cursor. Returns

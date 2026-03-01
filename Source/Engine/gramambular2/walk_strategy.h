@@ -43,7 +43,14 @@ class WalkStrategy {
     const std::map<size_t, ReadingGrid::NodePtr>* fixedSpans = nullptr;
   };
 
-  virtual std::vector<ReadingGrid::NodePtr> walk(const WalkInput& input);
+  struct WalkOutput {
+    std::vector<ReadingGrid::NodePtr> nodes;
+    size_t totalReadings = 0;
+    size_t vertices = 0;
+    size_t edges = 0;
+  };
+
+  virtual WalkOutput walk(const WalkInput& input);
   virtual std::string name() const = 0;
 };
 
