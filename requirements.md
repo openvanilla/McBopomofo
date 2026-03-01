@@ -96,8 +96,10 @@ Persistence Layer:
    KN-smoothed scores, not hard constraints.
 
 4. **Each phase compiles and passes tests independently**.
-   The implementation is structured as a stack of 6 PRs,
-   each building on the previous.
+   The implementation is structured as 3 stacked PRs
+   (#779, #780, #781, each building on the previous)
+   plus 4 independent PRs (#784, #785, #786, #787)
+   that target master directly.
 
 </required>
 
