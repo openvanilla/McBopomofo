@@ -24,6 +24,7 @@
 #import "LanguageModelManager.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
+#import "contextual_user_model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelMcBopomofo;
 @property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelPlainBopomofo;
 @property (class, readonly, nonatomic) McBopomofo::UserOverrideModel *userOverrideModel;
+@property (class, readonly, nonatomic) Formosa::Gramambular2::ContextualUserModel *contextualUserModel;
+@property (class, readonly, nonatomic) NSString *contextualUserModelDataPath;
++ (void)saveContextualUserModel;
 @end
 
 NS_ASSUME_NONNULL_END

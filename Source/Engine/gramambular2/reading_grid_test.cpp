@@ -972,6 +972,38 @@ TEST(FixedSpanTest, ChainedOverrides) {
             << " us\n";
 }
 
+TEST(FixedSpanTest, ClearAlsoResetsFixedSpans) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  std::vector<std::string> readings = {"ㄍㄠ",    "ㄎㄜ",    "ㄐㄧˋ",
+                                        "ㄍㄨㄥ",  "ㄙ",      "ㄉㄜ˙",
+                                        "ㄋㄧㄢˊ", "ㄓㄨㄥ",  "ㄐㄧㄤˇ",
+                                        "ㄐㄧㄣ"};
+  for (const auto& r : readings) {
+    grid.insertReading(r);
+  }
+
+  auto nzNode = grid.spans()[6].nodeOf(2);
+  nzNode->selectOverrideUnigram(
+      "年終", ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(6, nzNode);
+  auto result = grid.walk();
+  bool hasNianzhong = false;
+  for (const auto& v : result.valuesAsStrings()) {
+    if (v == "年終") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong);
+
+  grid.clear();
+
+  for (const auto& r : readings) {
+    grid.insertReading(r);
+  }
+  result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
+}
+
 // Phase 0B Tests: Walk Strategy
 
 TEST(WalkStrategyTest, Basic10Syllables) {
