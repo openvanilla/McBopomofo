@@ -33,6 +33,8 @@
 
 namespace Formosa::Gramambular2 {
 
+class ContextualUserModel;
+
 class WalkStrategy {
  public:
   virtual ~WalkStrategy() = default;
@@ -41,6 +43,8 @@ class WalkStrategy {
     const std::vector<ReadingGrid::Span>& spans;
     size_t readingLength;
     const std::map<size_t, ReadingGrid::NodePtr>* fixedSpans = nullptr;
+    const ContextualUserModel* userModel = nullptr;
+    double timestamp = 0.0;
   };
 
   struct WalkOutput {
