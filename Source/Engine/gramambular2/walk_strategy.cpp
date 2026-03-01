@@ -113,7 +113,6 @@ WalkStrategy::WalkOutput WalkStrategy::walk(const WalkInput& input) {
         continue;
       }
 
-      ++edges;
       size_t end = i + spanLen;
 
       // Skip if the destination is blocked (interior of a fixed span).
@@ -126,6 +125,7 @@ WalkStrategy::WalkOutput WalkStrategy::walk(const WalkInput& input) {
         continue;
       }
 
+      ++edges;
       double score = viterbi[i].maxScore + node->score();
       State& target = viterbi[end];
       if (score > target.maxScore) {
