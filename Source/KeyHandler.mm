@@ -207,17 +207,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return;
     }
 
-    std::string leftReading = Formosa::Gramambular2::ContextualUserModel::kStartSentinel;
-    std::string leftValue;
-    if (nodeIter != _latestWalk.nodes.cbegin()) {
-        auto prevNode = *(nodeIter - 1);
-        leftReading = prevNode->reading();
-        leftValue = prevNode->value();
+    if (_inputMode != InputModePlainBopomofo) {
+        std::string leftReading = Formosa::Gramambular2::ContextualUserModel::kStartSentinel;
+        std::string leftValue = Formosa::Gramambular2::ContextualUserModel::kStartSentinel;
+        if (nodeIter != _latestWalk.nodes.cbegin()) {
+            auto prevNode = *(nodeIter - 1);
+            leftReading = prevNode->reading();
+            leftValue = prevNode->value();
+        }
+        _contextualUserModel->observe(leftReading, leftValue,
+            currentNode->reading(), currentNode->value(),
+            [NSDate date].timeIntervalSince1970);
+        [LanguageModelManager saveContextualUserModel];
     }
-    _contextualUserModel->observe(leftReading, leftValue,
-        currentNode->reading(), currentNode->value(),
-        [NSDate date].timeIntervalSince1970);
-    [LanguageModelManager saveContextualUserModel];
 
     if (flag && Preferences.moveCursorAfterSelectingCandidate) {
         _grid->setCursor(accumulatedCursor);
