@@ -317,6 +317,12 @@ master (4199b23)
 
 ## 九、設計文件與計劃檔案
 
+> **Note**: The `~/.claude/` paths below are from the author's
+> local development environment. These files are not part of
+> the repository and are not expected to be available to other
+> contributors. They are listed here for provenance and
+> reproducibility of the analysis.
+
 | 文件 | 路徑 | 用途 |
 |------|------|------|
 | 統一使用者模型設計 | `~/.claude/plans/mighty-fluttering-pudding.md` | Phase 0-6 完整設計（1,275 行）|
@@ -327,6 +333,9 @@ master (4199b23)
 ---
 
 ## 十、資料來源說明
+
+> **Note**: Data source paths referencing `~/.claude/` are
+> author-local and not included in this repository.
 
 - **Token 使用數據**: 從 15 個 session JSONL 日誌中直接提取（`~/.claude/projects/.../*.jsonl`）
 - **/insights 數據**: 從 `~/.claude/stats-cache.json` 提取（全域統計，涵蓋所有專案）
