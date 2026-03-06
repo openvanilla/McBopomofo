@@ -128,6 +128,11 @@ class InputState: NSObject {
                     .Number(number: "", candidates: [])
                 }
             ),
+            (
+                NSLocalizedString("Iroha Kana Input", comment: ""),
+                {
+                    .IrohaKana(code: "")
+                }),
         ]
 
         override var description: String {
@@ -249,6 +254,23 @@ class InputState: NSObject {
 
         @objc public var composingBuffer: String {
             return "[內碼] \(code)"
+        }
+    }
+
+    @objc(InputStateIrohaKana)
+    class IrohaKana: InputState {
+        @objc private(set) var code: String
+
+        @objc init(code: String) {
+            self.code = code
+        }
+
+        override var description: String {
+            "<InputState.IrohaKana, code:\(code)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[伊呂波] \(code)"
         }
     }
 
