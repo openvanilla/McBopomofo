@@ -24,6 +24,11 @@
 		6A6ED16D2797650A0012872E /* template-exclude-phrases-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1672797650A0012872E /* template-exclude-phrases-plain-bpmf.txt */; };
 		6A6ED16E2797650A0012872E /* template-exclude-phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A6ED1692797650A0012872E /* template-exclude-phrases.txt */; };
 		6A7C450C2CC571D00076AECA /* template-data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A7C450A2CC571D00076AECA /* template-data-plain-bpmf.txt */; };
+		6A833E4C2F0A0F7F0086AD0C /* bpmfvs-variants.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A833E4B2F0A0F7F0086AD0C /* bpmfvs-variants.txt */; };
+		6A833E4D2F0A0F7F0086AD0C /* bpmfvs-pua.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A833E4A2F0A0F7F0086AD0C /* bpmfvs-pua.txt */; };
+		6A833E4E2F0A0F7F0086AD0C /* bpmfvs-variants.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A833E4B2F0A0F7F0086AD0C /* bpmfvs-variants.txt */; };
+		6A833E4F2F0A0F7F0086AD0C /* bpmfvs-pua.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6A833E4A2F0A0F7F0086AD0C /* bpmfvs-pua.txt */; };
+		6A833E522F0A0FB30086AD0C /* VariantAnnotator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6A833E512F0A0FB30086AD0C /* VariantAnnotator.cpp */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
 		6ACA41FB15FC1D9000935EF6 /* License.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EC15FC1D9000935EF6 /* License.rtf */; };
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
@@ -154,6 +159,10 @@
 		6A6ED1722797651A0012872E /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-phrases-replacement.txt"; sourceTree = "<group>"; };
 		6A7C450B2CC571D00076AECA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text; name = Base; path = "Base.lproj/template-data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6A7C450D2CC571E10076AECA /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text; name = "zh-Hant"; path = "zh-Hant.lproj/template-data-plain-bpmf.txt"; sourceTree = "<group>"; };
+		6A833E4A2F0A0F7F0086AD0C /* bpmfvs-pua.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "bpmfvs-pua.txt"; sourceTree = "<group>"; };
+		6A833E4B2F0A0F7F0086AD0C /* bpmfvs-variants.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "bpmfvs-variants.txt"; sourceTree = "<group>"; };
+		6A833E502F0A0FB30086AD0C /* VariantAnnotator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VariantAnnotator.h; sourceTree = "<group>"; };
+		6A833E512F0A0FB30086AD0C /* VariantAnnotator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VariantAnnotator.cpp; sourceTree = "<group>"; };
 		6A93050C279877FF00D370DA /* McBopomofoInstaller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofoInstaller-Bridging-Header.h"; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* McBopomofoInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = McBopomofoInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -382,6 +391,8 @@
 				D41355DD278EA3ED005E5CBD /* UserPhrasesLM.h */,
 				6ADF5B162BA513E000577D98 /* UTF8Helper.cpp */,
 				6ADF5B172BA513E000577D98 /* UTF8Helper.h */,
+				6A833E502F0A0FB30086AD0C /* VariantAnnotator.h */,
+				6A833E512F0A0FB30086AD0C /* VariantAnnotator.cpp */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -418,6 +429,8 @@
 			isa = PBXGroup;
 			children = (
 				D47D73A727A6C84F00255A50 /* associated-phrases-v2.txt */,
+				6A833E4A2F0A0F7F0086AD0C /* bpmfvs-pua.txt */,
+				6A833E4B2F0A0F7F0086AD0C /* bpmfvs-variants.txt */,
 				6A38BBF615FC117A00A8A51F /* data.txt */,
 				6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */,
 			);
@@ -653,6 +666,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A833E4E2F0A0F7F0086AD0C /* bpmfvs-variants.txt in Resources */,
+				6A833E4F2F0A0F7F0086AD0C /* bpmfvs-pua.txt in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				6A6ED16E2797650A0012872E /* template-exclude-phrases.txt in Resources */,
 				6A0D4F0815FC0DA600ABF4B3 /* Bopomofo.tiff in Resources */,
@@ -698,6 +713,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4E569E527A414CB00AC2CEF /* data.txt in Resources */,
+				6A833E4C2F0A0F7F0086AD0C /* bpmfvs-variants.txt in Resources */,
+				6A833E4D2F0A0F7F0086AD0C /* bpmfvs-pua.txt in Resources */,
 				D4EE675B2B399D0200F062DE /* dictionary_service.json in Resources */,
 				D4E569E427A414CB00AC2CEF /* data-plain-bpmf.txt in Resources */,
 				D47D73A927A6C84F00255A50 /* associated-phrases-v2.txt in Resources */,
@@ -742,6 +759,7 @@
 				D4A13D5A27A59F0B003BE359 /* InputMethodController.swift in Sources */,
 				D44FB74527915565003C80A6 /* Preferences.swift in Sources */,
 				6A660A702EAF371000D53D7B /* ByteBlockBackedDictionary.cpp in Sources */,
+				6A833E522F0A0FB30086AD0C /* VariantAnnotator.cpp in Sources */,
 				D4314F0D2ED3690F0071DD71 /* NumberInputHelper.swift in Sources */,
 				D4E569DC27A34D0E00AC2CEF /* KeyHandler.mm in Sources */,
 				6A4F5F982879E838008C4307 /* reading_grid.cpp in Sources */,

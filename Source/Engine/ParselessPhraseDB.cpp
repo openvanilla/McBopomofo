@@ -39,6 +39,18 @@ bool ParselessPhraseDB::ValidatePragma(const char* buf, size_t length) {
   return header == SORTED_PRAGMA_HEADER;
 }
 
+std::unique_ptr<ParselessPhraseDB> ParselessPhraseDB::CreateValidatedDB(const char* buf, size_t length) {
+  if (buf == nullptr || length == 0) {
+    return nullptr;
+  }
+
+  if (!ValidatePragma(buf, length)) {
+    return nullptr;
+  }
+
+  return std::make_unique<ParselessPhraseDB>(buf, length, /*validate_pragma=*/true);
+}
+
 ParselessPhraseDB::ParselessPhraseDB(const char* buf, size_t length,
                                      bool validate_pragma)
     : begin_(buf), end_(buf + length) {

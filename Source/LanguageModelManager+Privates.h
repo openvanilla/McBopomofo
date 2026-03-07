@@ -24,6 +24,7 @@
 #import "LanguageModelManager.h"
 #import "McBopomofoLM.h"
 #import "UserOverrideModel.h"
+#import "VariantAnnotator.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelMcBopomofo;
 @property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelPlainBopomofo;
 @property (class, readonly, nonatomic) McBopomofo::UserOverrideModel *userOverrideModel;
+@property (class, readonly, nonatomic) McBopomofo::VariantAnnotator *variantAnnotator;
 @end
 
 NS_ASSUME_NONNULL_END

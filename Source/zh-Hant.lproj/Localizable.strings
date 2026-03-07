@@ -150,3 +150,27 @@
 "Only one column was found." = "一行應該有兩欄文字，這行只有一欄。";
 
 "Illegal NULL character was found." = "這一行包含了不合規則的 NULL 字元 (0x00)。";
+
+/* Input menu item title. */
+"Bopomofo Font Annotation Support" = "注音字型破音字標記模式";
+
+/* Used in the notification during mode toggle. */
+"Bopomofo Font Annotation Support On" = "已開啟注音字型破音字標記模式";
+
+/* Used in the notification during mode toggle. */
+"Bopomofo Font Annotation Support Off" = "已關閉注音字型破音字標記模式";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation support on" = "注音字型破音字標記模式開啟";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation: variant selectors and PUA blocks in text" = "注音字型模式：組字區含有破音字選擇字元及個別注音標記";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation: variant selectors in text" = "注音字型模式：組字區含有破音字選擇字元";
+
+/* Used in the tooltip when the mode is on. */
+"Bopomofo annotation: PUA blocks in text" = "注音字型模式：組字區含有個別注音標記";
+
+/* Used when the user attempts to mark a phrase when the annotation mode is on. */
+"Cannot add new phrases when Bopomofo annotation is on" = "注音字型破音字標記模式開啟時，不能增加新詞";

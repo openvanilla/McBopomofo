@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.10)
 project(McBopomofoLMLib)
 
 set(CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 add_subdirectory(gramambular2)
 add_subdirectory(Mandarin)
@@ -12,14 +12,14 @@ add_library(McBopomofoLMLib
         AssociatedPhrasesV2.cpp
         ByteBlockBackedDictionary.h
         ByteBlockBackedDictionary.cpp
-        McBopomofoLM.h
         McBopomofoLM.cpp
+        McBopomofoLM.h
         MemoryMappedFile.h
         MemoryMappedFile.cpp
-        ParselessLM.h
-        ParselessLM.cpp
-        ParselessPhraseDB.h
         ParselessPhraseDB.cpp
+        ParselessPhraseDB.h
+        ParselessLM.cpp
+        ParselessLM.h
         PhraseReplacementMap.h
         PhraseReplacementMap.cpp
         UTF8Helper.h
@@ -27,10 +27,23 @@ add_library(McBopomofoLMLib
         UserOverrideModel.h
         UserOverrideModel.cpp
         UserPhrasesLM.h
-        UserPhrasesLM.cpp)
+        UserPhrasesLM.cpp
+        VariantAnnotator.h
+        VariantAnnotator.cpp)
 
 if (ENABLE_CLANG_TIDY)
     set_target_properties(McBopomofoLMLib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
+endif ()
+
+if (ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag("-mavx512f" HAS_AVX512F)
+    if(HAS_AVX512F)
+        message(STATUS "AVX-512 support detected")
+        target_compile_options(McBopomofoLMLib PRIVATE -mavx512f -march=native -DENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512=1)
+    else()
+        message(FATAL_ERROR "AVX-512 not supported by the compiler")
+    endif()
 endif ()
 
 if (ENABLE_TEST)
@@ -67,7 +80,8 @@ if (ENABLE_TEST)
                 PhraseReplacementMapTest.cpp
                 UTF8HelperTest.cpp
                 UserOverrideModelTest.cpp
-                UserPhrasesLMTest.cpp)
+                UserPhrasesLMTest.cpp
+                VariantAnnotatorTest.cpp)
         target_link_libraries(McBopomofoLMLibTest GTest::gtest_main McBopomofoLMLib gramambular2_lib)
         include(GoogleTest)
         gtest_discover_tests(McBopomofoLMLibTest)
@@ -78,7 +92,14 @@ if (ENABLE_TEST)
         )
         add_dependencies(runMcBopomofoLMLibTest McBopomofoLMLibTest)
 
-        # Benchmark target; to run, manually uncomment the lines below.
+        # Benchmark for ByteBlockBackedDictionary; not enabled by default
+        #
+        # find_package(benchmark)
+        # add_executable(ByteBlockBackedDictionaryBenchmark
+        #         ByteBlockBackedDictionaryBenchmark.cpp)
+        # target_link_libraries(ByteBlockBackedDictionaryBenchmark McBopomofoLMLib benchmark::benchmark)
+
+        # Stressed benchmark for ParselessLM; not enabled by default
         #
         # find_package(benchmark)
         # add_executable(ParselessLMBenchmark

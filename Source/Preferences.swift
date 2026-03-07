@@ -76,6 +76,12 @@ let kBeepUponInputErrorKey = "BeepUponInputError"
 private let kEnableUserPhrasesInPlainBopomofo = "EnableUserPhrasesInPlainBopomofo"
 private let kAllowChangingPriorTone = "AllowChangingPriorTone"
 
+private let kBopomofoFontAnnotationSupportEnabled = "BopomofoFontAnnotationSupportEnabled"
+private let kShowBopomofoFontAnnotationSupportItemInInputMenu =
+    "ShowBopomofoFontAnnotationSupportItemInInputMenu"
+private let kBopomofoFontAnnotationSupportMenuItemEnabledByInstalledFontsCheck_V1 =
+    "BopomofoFontAnnotationSupportMenuItemEnabledByInstalledFontsCheck_V1"
+
 // MARK: Property wrappers
 
 @propertyWrapper
@@ -574,6 +580,29 @@ extension Preferences {
 extension Preferences {
     @UserDefault(key: kAllowChangingPriorTone, defaultValue: false)
     @objc static var allowChangingPriorTone: Bool
+}
+
+extension Preferences {
+    // Whether to enable Bopomofo Font Annotation Support.
+    @UserDefault(key: kBopomofoFontAnnotationSupportEnabled, defaultValue: false)
+    @objc static var bopomofoFontAnnotationSupportEnabled: Bool
+
+    @objc static func toggleBopomofoFontAnnotationSupportEnabled() -> Bool {
+        bopomofoFontAnnotationSupportEnabled = !bopomofoFontAnnotationSupportEnabled
+        return bopomofoFontAnnotationSupportEnabled
+    }
+
+    // Whether to show the "Bopomofo Font Annotation Support" toggle in the input menu.
+    @UserDefault(key: kShowBopomofoFontAnnotationSupportItemInInputMenu, defaultValue: false)
+    @objc static var showBopomofoFontAnnotationSupportItemInInputMenu: Bool
+
+    // Whether at first launch, we have checked if there are any bpmfvs-supporting fonts installed,
+    // and enable showBopomofoFontAnnotationSupportItemInInputMenu as a result. No more check is
+    // performed once this flag is turned to true.
+    @UserDefault(
+        key: kBopomofoFontAnnotationSupportMenuItemEnabledByInstalledFontsCheck_V1,
+        defaultValue: false)
+    @objc static var bopomofoFontAnnotationSupportMenuItemEnabledByInstalledFontsCheck_V1: Bool
 }
 
 extension Preferences {
