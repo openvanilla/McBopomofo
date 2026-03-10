@@ -8,6 +8,7 @@ For comprehensive project documentation, architecture details, build instruction
 - **Source/Data/AGENTS.md** - Dictionary data-specific documentation for AI coding assistants
 
 These files contain detailed information about:
+
 - Project overview and system requirements
 - Building and running the application
 - Architecture (Swift, Objective-C++, C++ layers)
