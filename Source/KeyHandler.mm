@@ -471,17 +471,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     //
     // This allows users to use tone key to change an existing reading before
     // the current cursor.
-    if (_bpmfReadingBuffer->hasToneMarkerOnly() &&
-        _grid->readings().size() > 0 &&
-        _grid->cursor() > 0 &&
-        Preferences.allowChangingPriorTone) {
+    if (_bpmfReadingBuffer->hasToneMarkerOnly() && _grid->readings().size() > 0 && _grid->cursor() > 0 && Preferences.allowChangingPriorTone) {
         size_t cursor = _grid->cursor() - 1;
         const std::string& reading = _grid->readings()[cursor];
         if (!reading.empty() && reading[0] != '_') {
             Formosa::Mandarin::BopomofoReadingBuffer tmpBuffer(_bpmfReadingBuffer->keyboardLayout());
             Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);
             std::string keys = _bpmfReadingBuffer->keyboardLayout()->keySequenceFromSyllable(syllable);
-            for (char k:keys) {
+            for (char k : keys) {
                 tmpBuffer.combineKey(k);
             }
             tmpBuffer.combineKey((char)charCode);
@@ -1389,16 +1386,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         isCursorMovingRight = input.isRight;
     } else {
         switch (Preferences.allowMovingCursorWhenChoosingCandidates) {
-            case MovingCursorKeyUseJK:
-                isCursorMovingLeft = [input.inputText isEqualToString:@"j"];
-                isCursorMovingRight = [input.inputText isEqualToString:@"k"];
-                break;
-            case MovingCursorKeyUseHL:
-                isCursorMovingLeft = [input.inputText isEqualToString:@"h"];
-                isCursorMovingRight = [input.inputText isEqualToString:@"l"];
-                break;
-            default:
-                break;
+        case MovingCursorKeyUseJK:
+            isCursorMovingLeft = [input.inputText isEqualToString:@"j"];
+            isCursorMovingRight = [input.inputText isEqualToString:@"k"];
+            break;
+        case MovingCursorKeyUseHL:
+            isCursorMovingLeft = [input.inputText isEqualToString:@"h"];
+            isCursorMovingRight = [input.inputText isEqualToString:@"l"];
+            break;
+        default:
+            break;
         }
     }
 
@@ -1468,8 +1465,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSMutableArray *entries = [[NSMutableArray alloc] init];
             NSString *title = @"";
             if (isPlusKey) {
-                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"")
-                                                                                           callback:^{
+                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"") callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
                         return;
@@ -1483,8 +1479,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 [entries addObject:boost];
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
             } else if (isMinusKey) {
-                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude", @"")
-                                                                                             callback:^{
+                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude", @"") callback:^{
                     __strong __typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
                         return;
@@ -1499,7 +1494,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
             }
             InputStateCustomMenuEntry *cancel = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel", @"")
-                                                                                        callback:^{
+            callback:^{
                 stateCallback(currentState);
                 gCurrentCandidateController.selectedCandidateIndex = index;
             }];
@@ -1593,8 +1588,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
-        }
-        else {
+        } else {
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         }
@@ -1618,7 +1612,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         if ([state isKindOfClass:[InputStateNumber class]]) {
             InputStateNumber *numberState = (InputStateNumber *)state;
             NSString *candidate = [numberState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
-            InputStateCommitting *committing = [[InputStateCommitting  alloc] initWithPoppedText:candidate];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
@@ -1665,16 +1659,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     isPageDown = charCode == 32 || input.isPageDown || input.emacsKey == McBopomofoEmacsKeyNextPage;
     isPageUp = input.isPageUp;
     switch (Preferences.allowMovingCursorWhenChoosingCandidates) {
-        case MovingCursorKeyUseJK:
-            isPageDown = isPageDown || [input.inputText isEqualToString:@"l"];
-            isPageUp = isPageUp || [input.inputText isEqualToString:@"h"];
-            break;
-        case MovingCursorKeyUseHL:
-            isPageDown = isPageDown || [input.inputText isEqualToString:@"k"];
-            isPageUp = isPageUp || [input.inputText isEqualToString:@"j"];
-            break;
-        default:
-            break;
+    case MovingCursorKeyUseJK:
+        isPageDown = isPageDown || [input.inputText isEqualToString:@"l"];
+        isPageUp = isPageUp || [input.inputText isEqualToString:@"h"];
+        break;
+    case MovingCursorKeyUseHL:
+        isPageDown = isPageDown || [input.inputText isEqualToString:@"k"];
+        isPageUp = isPageUp || [input.inputText isEqualToString:@"j"];
+        break;
+    default:
+        break;
     }
 
     if (isPageDown) {
@@ -1816,7 +1810,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         useInputTextIgnoringModifiers = [(InputStateAssociatedPhrases *)state useShiftKey];
     }
-    
 
     if (useInputTextIgnoringModifiers) {
         if (!input.isShiftHold) {
@@ -1893,7 +1886,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
-- (NSArray <NSString *> *)_candidatesForNumberString:(NSString *)number {
+- (NSArray<NSString *> *)_candidatesForNumberString:(NSString *)number
+{
     if (number.length == 0) {
         return @[];
     }
@@ -1903,9 +1897,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     std::string key = std::string("_number_") + std::string([number UTF8String]);
     if (_languageModel->hasUnigrams(key)) {
         auto unigrams = _languageModel->getUnigrams(key);
-        for (auto unigram: unigrams) {
+        for (auto unigram : unigrams) {
             NSString *candidate = [[NSString alloc] initWithUTF8String:unigram.value().c_str()];
-            if (![array containsObject:candidate]) {    
+            if (![array containsObject:candidate]) {
                 /// Note: Roman numbers may conflict..
                 [array addObject:candidate];
             }
@@ -1918,7 +1912,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     [array addObject:suzhouNumber];
     return array;
 }
-
 
 - (BOOL)_handleNumberState:(InputState *)state
                      input:(KeyHandlerInput *)input
@@ -1955,8 +1948,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
 
         NSString *appended = [NSString stringWithFormat:@"%@%c",
-                              numberState.number,
-                              charCode];
+            numberState.number,
+            charCode];
         NSArray *candidates = [self _candidatesForNumberString:appended];
         InputStateNumber *newState = [[InputStateNumber alloc] initWithNumber:appended candidates:candidates];
         stateCallback(newState);
@@ -1972,8 +1965,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
 
         NSString *appended = [NSString stringWithFormat:@"%@%c",
-                              numberState.number,
-                              charCode];
+            numberState.number,
+            charCode];
         NSArray *candidates = [self _candidatesForNumberString:appended];
         InputStateNumber *newState = [[InputStateNumber alloc] initWithNumber:appended candidates:candidates];
         stateCallback(newState);
@@ -1981,7 +1974,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
     return NO;
 }
-
 
 - (BOOL)_handleBig5State:(InputState *)state
                    input:(KeyHandlerInput *)input
@@ -2040,9 +2032,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 // zonble
 - (BOOL)_handleIrohaKanaState:(InputState *)state
-                   input:(KeyHandlerInput *)input
-           stateCallback:(void (^)(InputState *))stateCallback
-           errorCallback:(void (^)(void))errorCallback;
+                        input:(KeyHandlerInput *)input
+                stateCallback:(void (^)(InputState *))stateCallback
+                errorCallback:(void (^)(void))errorCallback;
 {
     InputStateIrohaKana *irohaKana = (InputStateIrohaKana *)state;
     UniChar charCode = input.charCode;
@@ -2054,7 +2046,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     // Enter or space
-    if (charCode == 13 || charCode == 32 ) {
+    if (charCode == 13 || charCode == 32) {
         NSString *code = irohaKana.code;
         if (code.length == 0) {
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -2117,7 +2109,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     errorCallback();
     return YES;
 }
-
 
 - (BOOL)handleAssociatedPhraseWithState:(InputStateInputting *)state
                         useVerticalMode:(BOOL)useVerticalMode
