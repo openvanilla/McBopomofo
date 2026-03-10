@@ -327,7 +327,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // MARK: Handle Selecting Feature
     if ([state isKindOfClass:[InputStateSelectingFeature class]] ||
-        [state isKindOfClass:[InputStateSelectingDateMacro class]]) {
+        [state isKindOfClass:[InputStateSelectingDateMacro class]] ||
+        [state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -1588,7 +1589,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             _grid->setCursor(originalCursorIndex);
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
-        } else {
+        } else if ([state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
+        }
+        else {
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
         }
@@ -2068,7 +2074,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
                 stateCallback(newState);
             } else {
-                // TODO: candidate
+                NSMutableArray *candidates = [[NSMutableArray alloc] init];
+                for (auto unigram : unigrams) {
+                    NSString *string = [[NSString alloc] initWithUTF8String:unigram.value().c_str()];
+                    [candidates addObject:string];
+                }
+                InputStateIrohaKanaCandidates *newState = [[InputStateIrohaKanaCandidates alloc] initWithCode:code candidates:candidates];
+                stateCallback(newState);
             }
             return YES;
         }

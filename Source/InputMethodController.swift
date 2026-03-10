@@ -425,6 +425,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.IrohaKana:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.IrohaKanaCandidates:
+            handle(state: newState, previous: previous, client: client)
         case let newState as InputState.SelectingDictionary:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.ShowingCharInfo:
@@ -668,6 +670,10 @@ extension McBopomofoInputMethodController {
     private func handle(state: InputState.IrohaKana, previous: InputState, client: Any?) {
         handleStateForCustomInput(
             composingBuffer: state.composingBuffer, previous: previous, client: client)
+    }
+
+    private func handle(state: InputState.IrohaKanaCandidates, previous: InputState, client: Any?) {
+        handleStateWithSimpleCandidateWindow(state: state, previous: previous, client: client)
     }
 
     private func handle(state: InputState.SelectingDictionary, previous: InputState, client: Any?) {

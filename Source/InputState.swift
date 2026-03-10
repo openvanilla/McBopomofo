@@ -274,6 +274,40 @@ class InputState: NSObject {
         }
     }
 
+
+    @objc(InputStateIrohaKanaCandidates)
+    class IrohaKanaCandidates: InputState, CandidateProvider {
+        @objc private(set) var code: String
+
+        @objc private(set) var candidates: [String] = []
+
+        var candidateCount: Int {
+            candidates.count
+        }
+
+        func candidate(at index: Int) -> String {
+            candidates[index]
+        }
+
+        func reading(at index: Int) -> String? {
+            candidates[index]
+        }
+
+        @objc init(code: String, candidates: [String]) {
+            self.code = code
+            self.candidates = candidates
+        }
+
+        override var description: String {
+            "<InputState.IrohaKanaCandidates, code:\(code)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[伊呂波] \(code)"
+        }
+    }
+
+
     // MARK: -
 
     /// Represents that the composing buffer is not empty.
@@ -818,3 +852,4 @@ class InputState: NSObject {
         }
     }
 }
+
