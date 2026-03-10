@@ -2787,3 +2787,93 @@ extension KeyHandlerBopomofoTests {
         testBopomofoFontAnnotationSupport(input: "u u <u6ek7", expected: "一一，一\u{E01E1}個\u{E01E1}")
     }
 }
+
+extension KeyHandlerBopomofoTests {
+
+    func testIrohaKanaInput() {
+        var state: InputState = InputState.IrohaKana(code: "")
+        
+        let inputA = KeyHandlerInput(
+            inputText: "a", keyCode: 0, charCode: charCode("a"), flags: [],
+            isVerticalMode: false)
+        
+        handler.handle(input: inputA, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        
+        XCTAssertTrue(state is InputState.IrohaKana)
+        if let s = state as? InputState.IrohaKana {
+            XCTAssertEqual(s.code, "a")
+        }
+
+        let inputEnter = KeyHandlerInput(
+            inputText: "\r", keyCode: KeyCode.enter.rawValue, charCode: 13, flags: [],
+            isVerticalMode: false)
+        var committing: InputState.Committing?
+        handler.handle(input: inputEnter, state: state) { newState in
+            if let s = newState as? InputState.Committing {
+                committing = s
+            }
+            state = newState
+        } errorCallback: {}
+        
+        XCTAssertNotNil(committing)
+        XCTAssertEqual(committing?.poppedText, "あ")
+        XCTAssertTrue(state is InputState.IrohaKana)
+        if let s = state as? InputState.IrohaKana {
+            XCTAssertEqual(s.code, "")
+        }
+    }
+
+    func testIrohaKanaBackspace() {
+        var state: InputState = InputState.IrohaKana(code: "a")
+        let inputDelete = KeyHandlerInput(
+            inputText: "", keyCode: KeyCode.delete.rawValue, charCode: 8, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputDelete, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        XCTAssertTrue(state is InputState.IrohaKana)
+        if let s = state as? InputState.IrohaKana {
+            XCTAssertEqual(s.code, "")
+        }
+    }
+
+    func testIrohaKanaCancel() {
+        var state: InputState = InputState.IrohaKana(code: "a")
+        let inputEsc = KeyHandlerInput(
+            inputText: "", keyCode: 27, charCode: 27, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputEsc, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        XCTAssertTrue(state is InputState.Empty)
+    }
+
+    func testIrohaKanaCandidateGeneration() {
+        var state: InputState = InputState.IrohaKana(code: "kyou")
+        let inputEnter = KeyHandlerInput(
+            inputText: "\r", keyCode: KeyCode.enter.rawValue, charCode: 13, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputEnter, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        XCTAssertTrue(state is InputState.IrohaKanaCandidates)
+        if let s = state as? InputState.IrohaKanaCandidates {
+            XCTAssertEqual(s.code, "kyou")
+            XCTAssertTrue(s.candidates.contains("今日"))
+            XCTAssertTrue(s.candidates.contains("きょう"))
+        }
+    }
+
+    func testIrohaKanaCandidateCancel() {
+        var state: InputState = InputState.IrohaKanaCandidates(code: "kyou", candidates: ["きょう", "今日"])
+        let inputEsc = KeyHandlerInput(
+            inputText: "", keyCode: 27, charCode: 27, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputEsc, state: state) { newState in
+            state = newState
+        } errorCallback: {}
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState)
+    }
+}
