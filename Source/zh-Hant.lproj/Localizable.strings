@@ -83,6 +83,8 @@
 
 "Associated Phrases" = "聯想詞";
 
+"Use Fuzzy Pinyin" = "使用近似音";
+
 "Certain Unicode symbols or characters not supported as user phrases." = "您輸入了特殊符號，我們還無法支援在這種狀況下手動加詞。";
 
 "Cursor is between \"%@\" and \"%@\"." = "游標正在「%@」與「%@」之間";

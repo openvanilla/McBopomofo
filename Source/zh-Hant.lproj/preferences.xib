@@ -15,6 +15,7 @@
                 <outlet property="chooseUserPhrasesFolderButton" destination="Nf4-gN-42Y" id="chL-PA-nAW"/>
                 <outlet property="customUserPhraseLocationEnabledButton" destination="b15-I3-wDL" id="PUy-eF-NmW"/>
                 <outlet property="fontSizePopUpButton" destination="YF3-dA-BAc" id="Le4-ge-hZ1"/>
+                <outlet property="fuzzyPinyinCheckbox" destination="FzP-zh-001" id="fzp-zh-O01"/>
                 <outlet property="openUserPhrasesFolderButton" destination="Ibr-mk-lwr" id="qs6-94-i9P"/>
                 <outlet property="selectionKeyComboBox" destination="gtY-jT-2F6" id="oWz-wL-72Z"/>
                 <outlet property="userPhrasesSettingsView" destination="M7i-Af-lNp" id="1Hd-xc-cPN"/>
@@ -443,7 +444,7 @@
             <point key="canvasLocation" x="168" y="-350"/>
         </view>
         <view id="L2Q-IX-SXc">
-            <rect key="frame" x="0.0" y="0.0" width="436" height="309"/>
+            <rect key="frame" x="0.0" y="0.0" width="436" height="400"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cks-CZ-m7g">
@@ -525,6 +526,16 @@
                     </buttonCell>
                     <connections>
                         <binding destination="32" name="value" keyPath="values.Big5InputEnabled" id="aQr-XB-Bhd"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FzP-zh-001">
+                    <rect key="frame" x="184" y="70" width="150" height="16"/>
+                    <buttonCell key="cell" type="check" title="使用近似音" bezelStyle="regularSquare" imagePosition="left" state="off" inset="2" id="fzp-zh-C01">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="32" name="value" keyPath="values.FuzzyPinyinEnabled" id="fzp-zh-B01"/>
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92X-g9-wsi">
@@ -640,6 +651,9 @@
                 <constraint firstItem="Toh-FQ-MTf" firstAttribute="leading" secondItem="k5j-ZT-zUm" secondAttribute="leading" constant="-3" id="a42-Ba-UI7"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bAc-Eh-8y4" secondAttribute="trailing" constant="20" symbolic="YES" id="blE-3q-IHj"/>
                 <constraint firstItem="92X-g9-wsi" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="121" id="cWS-6m-SvY"/>
+                <constraint firstItem="FzP-zh-001" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="330" id="fzp-zh-C02"/>
+                <constraint firstAttribute="trailing" secondItem="FzP-zh-001" secondAttribute="trailing" constant="108" id="fzp-zh-C03"/>
+                <constraint firstItem="FzP-zh-001" firstAttribute="leading" secondItem="NXk-oc-9oz" secondAttribute="leading" id="fzp-zh-C04"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QYl-R0-PIq" secondAttribute="trailing" constant="20" symbolic="YES" id="clc-vZ-J9H"/>
                 <constraint firstItem="PuO-lM-5fF" firstAttribute="leading" secondItem="L2Q-IX-SXc" secondAttribute="leading" constant="184" id="d9p-FP-caF"/>
                 <constraint firstItem="k5j-ZT-zUm" firstAttribute="top" secondItem="L2Q-IX-SXc" secondAttribute="top" constant="229" id="dQb-5B-fcp"/>

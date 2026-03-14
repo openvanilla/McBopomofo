@@ -127,6 +127,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
+        _languageModel->setFuzzyPinyinEnabled(Preferences.fuzzyPinyinEnabled);
         _userOverrideModel = [LanguageModelManager userOverrideModel];
 
         // This returns a shared_ptr that in turn points to an unmanaged object.
@@ -166,6 +167,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         Preferences.keyboardLayout = KeyboardLayoutStandard;
     }
     _languageModel->setExternalConverterEnabled(Preferences.chineseConversionStyle == ChineseConversionStyleModel);
+    _languageModel->setFuzzyPinyinEnabled(Preferences.fuzzyPinyinEnabled);
 }
 
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex useMoveCursorAfterSelectionSetting:(BOOL)flag
@@ -523,6 +525,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
 
         _grid->insertReading(reading);
+
         [self _walk];
 
         // get user override model suggestion

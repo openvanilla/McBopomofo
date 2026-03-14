@@ -951,5 +951,149 @@ const BopomofoKeyboardLayout* BopomofoKeyboardLayout::HanyuPinyinLayout() {
   return layout;
 }
 
+std::vector<BopomofoSyllable> BopomofoSyllable::fuzzyVariants() const {
+  std::vector<BopomofoSyllable> result;
+  result.push_back(*this);
+
+  Component consonant = consonantComponent();
+  Component middleVowel = middleVowelComponent();
+  Component vowel = vowelComponent();
+  Component tone = toneMarkerComponent();
+
+  auto addIfNotExists = [&result](Component c, Component mv, Component v, Component t) {
+    BopomofoSyllable newSyllable;
+    if (c) newSyllable += BopomofoSyllable(c);
+    if (mv) newSyllable += BopomofoSyllable(mv);
+    if (v) newSyllable += BopomofoSyllable(v);
+    if (t) newSyllable += BopomofoSyllable(t);
+    for (const auto& existing : result) {
+      if (existing.rawValue() == newSyllable.rawValue()) return;
+    }
+    result.push_back(newSyllable);
+  };
+
+  if (consonant == B || consonant == P) {
+    addIfNotExists(B, middleVowel, vowel, tone);
+    addIfNotExists(P, middleVowel, vowel, tone);
+  }
+
+  if (consonant == G || consonant == K) {
+    addIfNotExists(G, middleVowel, vowel, tone);
+    addIfNotExists(K, middleVowel, vowel, tone);
+  }
+
+  if (consonant == J || consonant == Q) {
+    addIfNotExists(J, middleVowel, vowel, tone);
+    addIfNotExists(Q, middleVowel, vowel, tone);
+  }
+
+  if (consonant == ZH || consonant == Z) {
+    addIfNotExists(ZH, middleVowel, vowel, tone);
+    addIfNotExists(Z, middleVowel, vowel, tone);
+  }
+
+  if (consonant == CH || consonant == C) {
+    addIfNotExists(CH, middleVowel, vowel, tone);
+    addIfNotExists(C, middleVowel, vowel, tone);
+  }
+
+  if (consonant == SH || consonant == S) {
+    addIfNotExists(SH, middleVowel, vowel, tone);
+    addIfNotExists(S, middleVowel, vowel, tone);
+  }
+
+  if (vowel == O || vowel == ER) {
+    addIfNotExists(consonant, middleVowel, O, tone);
+    addIfNotExists(consonant, middleVowel, ER, tone);
+  }
+
+  if (vowel == EN || vowel == ENG) {
+    addIfNotExists(consonant, middleVowel, EN, tone);
+    addIfNotExists(consonant, middleVowel, ENG, tone);
+  }
+
+  // Tone1 (一聲/無聲調) <-> Tone2 (二聲) <-> Tone3 (三聲)
+  // Allow fuzzy matching between these three tones
+  if (tone == Tone1 || tone == Tone2 || tone == Tone3) {
+    addIfNotExists(consonant, middleVowel, vowel, Tone1);
+    addIfNotExists(consonant, middleVowel, vowel, Tone2);
+    addIfNotExists(consonant, middleVowel, vowel, Tone3);
+  }
+
+  return result;
+}
+
+const std::vector<BPMF> BopomofoReadingBuffer::fuzzyVariants() const {
+  std::vector<BPMF> result;
+  result.push_back(syllable_);
+
+  BPMF::Component consonant = syllable_.consonantComponent();
+  BPMF::Component middleVowel = syllable_.middleVowelComponent();
+  BPMF::Component vowel = syllable_.vowelComponent();
+  BPMF::Component tone = syllable_.toneMarkerComponent();
+
+  auto addIfNotExists = [&result](BPMF::Component c, BPMF::Component mv, BPMF::Component v, BPMF::Component t) {
+    BPMF newSyllable;
+    if (c) newSyllable += BPMF(c);
+    if (mv) newSyllable += BPMF(mv);
+    if (v) newSyllable += BPMF(v);
+    if (t) newSyllable += BPMF(t);
+    for (const auto& existing : result) {
+      if (existing.rawValue() == newSyllable.rawValue()) return;
+    }
+    result.push_back(newSyllable);
+  };
+
+  if (consonant == BPMF::B || consonant == BPMF::P) {
+    addIfNotExists(BPMF::B, middleVowel, vowel, tone);
+    addIfNotExists(BPMF::P, middleVowel, vowel, tone);
+  }
+
+  if (consonant == BPMF::G || consonant == BPMF::K) {
+    addIfNotExists(BPMF::G, middleVowel, vowel, tone);
+    addIfNotExists(BPMF::K, middleVowel, vowel, tone);
+  }
+
+  if (consonant == BPMF::J || consonant == BPMF::Q) {
+    addIfNotExists(BPMF::J, middleVowel, vowel, tone);
+    addIfNotExists(BPMF::Q, middleVowel, vowel, tone);
+  }
+
+  if (consonant == BPMF::ZH || consonant == BPMF::Z) {
+    addIfNotExists(BPMF::ZH, middleVowel, vowel, tone);
+    addIfNotExists(BPMF::Z, middleVowel, vowel, tone);
+  }
+
+  if (consonant == BPMF::CH || consonant == BPMF::C) {
+    addIfNotExists(BPMF::CH, middleVowel, vowel, tone);
+    addIfNotExists(BPMF::C, middleVowel, vowel, tone);
+  }
+
+  if (consonant == BPMF::SH || consonant == BPMF::S) {
+    addIfNotExists(BPMF::SH, middleVowel, vowel, tone);
+    addIfNotExists(BPMF::S, middleVowel, vowel, tone);
+  }
+
+  if (vowel == BPMF::O || vowel == BPMF::ER) {
+    addIfNotExists(consonant, middleVowel, BPMF::O, tone);
+    addIfNotExists(consonant, middleVowel, BPMF::ER, tone);
+  }
+
+  if (vowel == BPMF::EN || vowel == BPMF::ENG) {
+    addIfNotExists(consonant, middleVowel, BPMF::EN, tone);
+    addIfNotExists(consonant, middleVowel, BPMF::ENG, tone);
+  }
+
+  // Tone1 (一聲/無聲調) <-> Tone2 (二聲) <-> Tone3 (三聲)
+  // Allow fuzzy matching between these three tones
+  if (tone == BPMF::Tone1 || tone == BPMF::Tone2 || tone == BPMF::Tone3) {
+    addIfNotExists(consonant, middleVowel, vowel, BPMF::Tone1);
+    addIfNotExists(consonant, middleVowel, vowel, BPMF::Tone2);
+    addIfNotExists(consonant, middleVowel, vowel, BPMF::Tone3);
+  }
+
+  return result;
+}
+
 }  // namespace Mandarin
 }  // namespace Formosa

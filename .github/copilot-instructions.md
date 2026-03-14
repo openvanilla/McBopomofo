@@ -62,9 +62,68 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## Tests and Tooling
 - Add Swift tests under `McBopomofoTests` using the `Testing` module with `@Suite`, `@Test`, and `#expect` macros; snapshot and restore `UserDefaults` like `PreferencesTests`.
+- Run single Swift test: `xcodebuild -project McBopomofo.xcodeproj -scheme McBopomofoTests -configuration Debug test -only-testing:McBopomofoTests/ClassName/testMethodName`
 - Register new engine tests in `Source/Engine/CMakeLists.txt`, include them in the `McBopomofoLMLibTest` target, and use GoogleTest assertions.
+- Run single C++ test: `./McBopomofoLMLibTest --gtest_filter=TestName`
 - When dictionary data changes, regenerate artifacts via the make targets in `Source/Data` and check updated binaries into `Source/Data/bin`.
 - Keep shell scripts such as `Source/add-phrase-hook.sh` POSIX-compliant and aligned with the existing shebang and style.
+
+## Code Style Guidelines
+
+### Swift Formatting
+- Line length: 100 characters max (configured in `.swift-format`)
+- Indent: 4 spaces (no tabs)
+- One blank line between top-level definitions
+- No trailing whitespace
+
+### Swift Imports
+```swift
+import Cocoa          // System frameworks first
+import Foundation
+import InputMethodKit
+
+@testable import McBopomofo  // Test imports last
+```
+- Group order: System → Third-party → Project → Test
+
+### Swift Types & Naming
+```swift
+// Properties: explicit types preferred
+@objc var candidateCount: Int { get }
+
+// Private constants: k prefix
+private let kKeyboardLayoutKey = "KeyboardLayout"
+
+// Enums: lowercase cases
+enum KeyboardLayout: Int, CaseIterable {
+    case standard = 0
+    case eten = 1
+}
+
+// Classes/Structs: PascalCase
+// Methods/Properties: camelCase
+// Avoid abbreviations unless well-known (URL, ID, API)
+```
+
+### Swift Error Handling
+```swift
+// Use guard for early exits
+guard let data = loadData() else {
+    return defaultValue
+}
+
+// Use do-catch for recoverable errors
+do {
+    try performRiskyOperation()
+} catch {
+    logError("Operation failed: \(error)")
+}
+```
+
+### Objective-C++ Bridge
+- Use `UTF8Helper`/`NSStringUtils` for string conversion (never manual)
+- Manage C++ lifetimes with `std::shared_ptr` in `init`/`dealloc`
+- Keep bridge methods small: forward to engine, return Foundation types
 
 ## Git Commit Convention
 

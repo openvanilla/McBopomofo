@@ -101,6 +101,9 @@ class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
   void setPhraseReplacementEnabled(bool enabled);
   bool phraseReplacementEnabled() const;
 
+  void setFuzzyPinyinEnabled(bool enabled);
+  bool fuzzyPinyinEnabled() const;
+
   void setExternalConverterEnabled(bool enabled);
   bool externalConverterEnabled() const;
   void setExternalConverter(
@@ -154,6 +157,10 @@ class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
       const std::unordered_set<std::string>& excludedValues,
       std::unordered_set<std::string>& insertedValues) const;
 
+  // Returns fuzzy variant readings for a given reading key.
+  // For example, if key is "ㄧㄣ-ㄍㄞ", returns ["ㄧㄥ-ㄍㄞ"].
+  std::vector<std::string> getFuzzyVariantReadings(const std::string& key) const;
+
   ParselessLM languageModel_;
   UserPhrasesLM userPhrases_;
   UserPhrasesLM excludedPhrases_;
@@ -165,6 +172,7 @@ class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
   std::optional<std::filesystem::path> phraseReplacementPath_;
 
   bool phraseReplacementEnabled_ = false;
+  bool fuzzyPinyinEnabled_ = false;
 
   bool externalConverterEnabled_ = false;
   std::function<std::string(const std::string&)> externalConverter_;

@@ -55,6 +55,10 @@ class BopomofoSyllable {
   static const BopomofoSyllable FromComposedString(const std::string& str);
   const std::string composedString() const;
 
+  // Returns fuzzy variants of this syllable for fuzzy matching.
+  // For example, if syllable contains EN, it returns both EN and ENG variants.
+  std::vector<BopomofoSyllable> fuzzyVariants() const;
+
   void clear() { syllable_ = 0; }
 
   bool isEmpty() const { return !syllable_; }
@@ -73,6 +77,8 @@ class BopomofoSyllable {
   Component vowelComponent() const { return syllable_ & VowelMask; }
 
   Component toneMarkerComponent() const { return syllable_ & ToneMarkerMask; }
+
+  Component rawValue() const { return syllable_; }
 
   bool operator==(const BopomofoSyllable& another) const {
     return syllable_ == another.syllable_;
@@ -457,6 +463,10 @@ class BopomofoReadingBuffer {
   }
 
   const BPMF syllable() const { return syllable_; }
+
+  // Returns fuzzy variants of the current syllable for fuzzy matching.
+  // For example, if syllable is ㄣ (EN), it returns {EN, ENG}.
+  const std::vector<BPMF> fuzzyVariants() const;
 
   const std::string standardLayoutQueryString() const {
     return BopomofoKeyboardLayout::StandardLayout()->keySequenceFromSyllable(

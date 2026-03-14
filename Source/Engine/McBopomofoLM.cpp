@@ -23,6 +23,8 @@
 
 #include "McBopomofoLM.h"
 
+#include "Mandarin/Mandarin.h"
+
 #include <algorithm>
 #include <limits>
 #include <memory>
@@ -135,6 +137,70 @@ std::vector<McBopomofoLM::UserFileIssue> McBopomofoLM::getUserFileIssues()
   return issues;
 }
 
+std::vector<std::string> McBopomofoLM::getFuzzyVariantReadings(const std::string& key) const {
+  std::vector<std::string> results;
+  
+  // Skip special readings like _punctuation_, _punctuation_list, etc.
+  if (!key.empty() && key[0] == '_') {
+    return results;
+  }
+  
+  // Split the key by "-" to get individual syllables
+  std::vector<std::string> syllables;
+  std::string current;
+  for (char c : key) {
+    if (c == '-') {
+      if (!current.empty()) {
+        syllables.push_back(current);
+        current.clear();
+      }
+    } else {
+      current += c;
+    }
+  }
+  if (!current.empty()) {
+    syllables.push_back(current);
+  }
+  
+  if (syllables.empty()) {
+    return results;
+  }
+  
+  // Get fuzzy variants for each syllable
+  std::vector<std::vector<std::string>> allVariants;
+  for (const auto& syllable : syllables) {
+    std::vector<std::string> variants;
+    variants.push_back(syllable);
+    
+    Formosa::Mandarin::BPMF bpmf = Formosa::Mandarin::BPMF::FromComposedString(syllable);
+    std::vector<Formosa::Mandarin::BPMF> fuzzyVariants = bpmf.fuzzyVariants();
+    for (const auto& variant : fuzzyVariants) {
+      std::string variantReading = variant.composedString();
+      if (variantReading != syllable) {
+        variants.push_back(variantReading);
+      }
+    }
+    allVariants.push_back(variants);
+  }
+  
+  // Generate all combinations
+  std::function<void(size_t, std::string)> generateCombinations = [&](size_t idx, std::string current) {
+    if (idx == allVariants.size()) {
+      if (!current.empty() && current != key) {
+        results.push_back(current);
+      }
+      return;
+    }
+    for (const auto& variant : allVariants[idx]) {
+      std::string newReading = current.empty() ? variant : current + "-" + variant;
+      generateCombinations(idx + 1, newReading);
+    }
+  };
+  
+  generateCombinations(0, "");
+  return results;
+}
+
 std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
 McBopomofoLM::getUnigrams(const std::string& key) {
   if (key == " ") {
@@ -215,6 +281,35 @@ McBopomofoLM::getUnigrams(const std::string& key) {
                        rewrittenUserUnigrams.end());
   }
 
+  // Add fuzzy variant unigrams if fuzzy pinyin is enabled
+  if (fuzzyPinyinEnabled_) {
+    std::vector<std::string> fuzzyReadings = getFuzzyVariantReadings(key);
+    for (const auto& fuzzyReading : fuzzyReadings) {
+      if (fuzzyReading != key) {
+        if (userPhrases_.hasUnigrams(fuzzyReading)) {
+          std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+              rawUserUnigrams = userPhrases_.getUnigrams(fuzzyReading);
+          for (const auto& u : rawUserUnigrams) {
+            if (insertedValues.find(u.value()) == insertedValues.end()) {
+              allUnigrams.emplace_back(u.value(), u.score());
+              insertedValues.insert(u.value());
+            }
+          }
+        }
+        if (languageModel_.hasUnigrams(fuzzyReading)) {
+          std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+              rawGlobalUnigrams = languageModel_.getUnigrams(fuzzyReading);
+          for (const auto& u : rawGlobalUnigrams) {
+            if (insertedValues.find(u.value()) == insertedValues.end()) {
+              allUnigrams.emplace_back(u.value(), u.score());
+              insertedValues.insert(u.value());
+            }
+          }
+        }
+      }
+    }
+  }
+
   return allUnigrams;
 }
 
@@ -223,11 +318,23 @@ bool McBopomofoLM::hasUnigrams(const std::string& key) {
     return true;
   }
 
-  if (!excludedPhrases_.hasUnigrams(key)) {
-    return userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key);
+  if (userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key)) {
+    return true;
   }
 
-  return !getUnigrams(key).empty();
+  // Check fuzzy variants if fuzzy pinyin is enabled
+  if (fuzzyPinyinEnabled_) {
+    std::vector<std::string> fuzzyReadings = getFuzzyVariantReadings(key);
+    for (const auto& fuzzyReading : fuzzyReadings) {
+      if (fuzzyReading != key) {
+        if (userPhrases_.hasUnigrams(fuzzyReading) || languageModel_.hasUnigrams(fuzzyReading)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 std::string McBopomofoLM::getReading(const std::string& value) const {
@@ -256,6 +363,14 @@ void McBopomofoLM::setPhraseReplacementEnabled(bool enabled) {
 
 bool McBopomofoLM::phraseReplacementEnabled() const {
   return phraseReplacementEnabled_;
+}
+
+void McBopomofoLM::setFuzzyPinyinEnabled(bool enabled) {
+  fuzzyPinyinEnabled_ = enabled;
+}
+
+bool McBopomofoLM::fuzzyPinyinEnabled() const {
+  return fuzzyPinyinEnabled_;
 }
 
 void McBopomofoLM::setExternalConverterEnabled(bool enabled) {

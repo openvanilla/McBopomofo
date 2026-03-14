@@ -49,6 +49,7 @@ private let kAllowMovingCursorWhenChoosingCandidates = "AllowMovingCursorWhenCho
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
+private let kFuzzyPinyinEnabledKey = "FuzzyPinyinEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
 private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
@@ -230,6 +231,7 @@ class Preferences: NSObject {
             kPhraseReplacementEnabledKey,
             kChineseConversionStyleKey,
             kAssociatedPhrasesEnabledKey,
+            kFuzzyPinyinEnabledKey,
             kControlEnterOutputKey,
             kShiftEnterEnabledKey,
             kRepeatedPunctuationToSelectCandidateEnabledKey,
@@ -447,6 +449,14 @@ extension Preferences {
     @objc static func toggleAssociatedPhrasesEnabled() -> Bool {
         associatedPhrasesEnabled = !associatedPhrasesEnabled
         return associatedPhrasesEnabled
+    }
+
+    @UserDefault(key: kFuzzyPinyinEnabledKey, defaultValue: false)
+    @objc static var fuzzyPinyinEnabled: Bool
+
+    @objc static func toggleFuzzyPinyinEnabled() -> Bool {
+        fuzzyPinyinEnabled = !fuzzyPinyinEnabled
+        return fuzzyPinyinEnabled
     }
 
     @UserDefault(key: kShiftEnterEnabledKey, defaultValue: true)

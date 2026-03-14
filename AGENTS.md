@@ -1,215 +1,166 @@
 # AGENTS.md
 
-This file provides guidance to AI coding assistants when working with code in this repository.
+McBopomofo (小麥注音輸入法) is a Traditional Chinese Bopomofo input method for macOS. Built with Swift (UI/state), Objective-C++ (bridge), and C++ (engine), using Input Method Kit (IMK).
 
-## Project Overview
+## Build Commands
 
-McBopomofo (小麥注音輸入法) is a Traditional Chinese input method engine for macOS that enables users to input Traditional Chinese characters using the Bopomofo phonetic system (注音符號). The project is built with Swift (UI/state management), Objective-C++ (bridge layer), and C++ (core engine), using macOS Input Method Kit (IMK) framework.
+### Xcode (Recommended)
+Open `McBopomofo.xcodeproj`, select **McBopomofoInstaller** scheme, Build: ⌘+B, Run: ⌘+R
 
-## System Requirements
-
-**Runtime:** macOS 10.15 (Catalina) or later
-
-**Development:**
-- macOS 14.7 or later
-- Xcode 15.3 or later
-- Python 3.9 (for dictionary data generation)
-
-## Building and Running
-
-### Xcode Project Structure
-
-The project contains these main **targets**:
-- `McBopomofo`: Main input method bundle
-- `McBopomofoInstaller`: Installer app (recommended for development)
-- `Data`: Dictionary data generation
-- `McBopomofoTests`: Swift test suite
-
-**Build configurations:** Debug, Release (default when building from command line)
-
-**Available schemes:** McBopomofo, McBopomofoInstaller, Data, plus individual schemes for local packages (BopomofoBraille, CandidateUI, ChineseNumbers, FSEventStreamHelper, InputSourceHelper, NotifierUI, NSStringUtils, OpenCCBridge, SystemCharacterInfo, TooltipUI)
-
-### Primary Development Workflow
-
-1. Open `McBopomofo.xcodeproj` in Xcode
-2. Select the **"McBopomofoInstaller"** target
-3. Build (⌘+B) and run to install McBopomofo
-4. The installer automatically kills and restarts the input method process
-
-**Important:** macOS limits how many times an input method process can be killed in a single login session. If installation stops working after multiple installs, log out and log back in.
-
-### Command-Line Build
-
+### Command Line
 ```bash
-# Build the installer
-xcodebuild -project McBopomofo.xcodeproj -target McBopomofoInstaller -configuration Debug build
-
-# Build the main input method
+xcodebuild -project McBopomofo.xcodeproj -scheme McBopomofoInstaller -configuration Debug build
 xcodebuild -project McBopomofo.xcodeproj -target McBopomofo -configuration Debug build
-
-# Build dictionary data only
-xcodebuild -project McBopomofo.xcodeproj -target Data -configuration Debug build
 ```
 
-### Running Tests
-
-#### Swift Tests
-- Target: `McBopomofoTests` in Xcode
-- Framework: XCTest with Swift `Testing` module
-- Run in Xcode with ⌘+U or test navigator
-
-#### C++ Engine Tests
+### Release Build
 ```bash
-cd Source/Engine
-mkdir build && cd build
-cmake -DENABLE_TEST=ON ..
-make
-ctest
-# Or run directly: ./McBopomofoLMLibTest
+xcodebuild -project McBopomofo.xcodeproj -scheme McBopomofoInstaller -configuration Release build
 ```
 
-The C++ tests use Google Test framework and are defined in `Source/Engine/CMakeLists.txt`.
+## Lint & Format
+```bash
+swift format -i --configuration .swift-format Source/**/*.swift
+swift format --check --configuration .swift-format Source/**/*.swift
+```
 
-### Dictionary Data Generation
+Config (`.swift-format`): line length 100, 4-space indent, max 1 blank line
 
-Dictionary data must be regenerated when modifying phrase mappings or frequency data:
+## Testing
 
+### Swift Tests
+```bash
+# Run all
+xcodebuild -project McBopomofo.xcodeproj -scheme McBopomofoTests -configuration Debug test
+
+# Single test method
+xcodebuild -project McBopomofo.xcodeproj -scheme McBopomofoTests -configuration Debug test -only-testing:McBopomofoTests/PreferencesTests/testKeyboardLayout
+
+# Single test class
+xcodebuild -project McBopomofo.xcodeproj -scheme McBopomofoTests -configuration Debug test -only-testing:McBopomofoTests/PreferencesTests
+```
+
+### C++ Tests
+```bash
+cd Source/Engine && mkdir -p build && cd build
+cmake -DENABLE_TEST=ON .. && make && ctest
+./McBopomofoLMLibTest --gtest_filter=TestName  # Single test
+```
+
+## Code Style
+
+### General
+- **Never use emoji** in code (except `Source/Data/`)
+- **Language:** English or Traditional Chinese only (no Simplified Chinese)
+- **License:** Include MIT header on new files
+
+### Swift: Imports
+```swift
+import Cocoa          // System first
+import Foundation
+import InputMethodKit
+@testable import McBopomofo  // Test last
+```
+
+### Swift: Types & Naming
+```swift
+@objc var candidateCount: Int { get }  // Explicit types for properties
+private let kKeyboardLayoutKey = "KeyboardLayout"  // k prefix for private keys
+
+// PascalCase: InputState, KeyHandler
+// camelCase: composingBuffer, candidateCount
+// Enum cases: lowercase (case standard, case eten)
+```
+
+### Swift: Error Handling
+```swift
+guard let data = loadData() else { return defaultValue }
+
+do {
+    try performRiskyOperation()
+} catch {
+    logError("Failed: \(error)")
+}
+```
+
+### Objective-C++ Bridge
+- Use `UTF8Helper`/`NSStringUtils` for string conversion (never manual)
+- Manage C++ lifetimes with `std::shared_ptr` in `init`/`dealloc`
+- Keep methods small: forward to engine, return Foundation types
+
+### C++ Engine
+- C++17: use `std::vector`, `std::unordered_map`, `std::optional`
+- Namespaces: `McBopomofo`, `Formosa::Gramambular2`, `Formosa::Mandarin`
+- Keep algorithms deterministic and side-effect free
+
+### State Machine
+- Treat `InputState` subclasses as immutable; create new state on transition
+- Extend by adding new states, not booleans
+
+## Architecture
+
+### Key Components
+| Layer | Files | Purpose |
+|-------|-------|---------|
+| UI | `InputMethodController.swift` | IMK entry point |
+| State | `InputState.swift` | State machine |
+| Bridge | `KeyHandler.mm` | ObjC++ bridge |
+| Engine | `McBopomofoLM.cpp` | Language model |
+| Mandarin | `Mandarin.cpp` | Bopomofo syllable handling |
+
+### Fuzzy Pinyin (近似音)
+Implemented in language model (`McBopomofoLM.cpp`) and syllable layer (`Mandarin.cpp`).
+
+**Supported Fuzzy Pairs:**
+| Type | Pairs |
+|------|-------|
+| Consonant | ㄅ↔ㄆ, ㄍ↔ㄎ, ㄐ↔ㄑ, ㄓ↔ㄗ, ㄔ↔ㄘ, ㄕ↔ㄙ |
+| Vowel | ㄛ↔ㄜ, ㄣ↔ㄥ |
+| Tone | 一聲↔二聲↔三聲 |
+
+**Key methods:** `BopomofoSyllable::fuzzyVariants()`, `McBopomofoLM::getFuzzyVariantReadings()`, `McBopomofoLM::getUnigrams()`. Skip special readings (starting with `_`).
+
+## Preferences
+
+Add new preferences in `Source/Preferences.swift`:
+```swift
+private let kNewFeatureKey = "NewFeatureKey"
+
+@UserDefault(key: kNewFeatureKey, defaultValue: false)
+@objc static var newFeatureEnabled: Bool
+```
+
+Update `allKeys` array for preference synchronization.
+
+## Dictionary Data
 ```bash
 cd Source/Data
-make all           # Generate data.txt, data-plain-bpmf.txt, associated-phrases-v2.txt
-make sort          # Sort all data files using C locale
-make check         # Validate data integrity
-make tidy          # Clean up formatting
+make tidy sort check all    # Recommended workflow
+make all                    # Generate data.txt, data-plain-bpmf.txt
 ```
 
-**Critical:** Both `BPMFMappings.txt` and `phrase.occ` must be sorted with C locale:
+Critical: `BPMFMappings.txt` and `phrase.occ` must be sorted with C locale:
 ```bash
 LC_ALL=C sort -o BPMFMappings.txt BPMFMappings.txt
 LC_ALL=C sort -o phrase.occ phrase.occ
 ```
 
-**For detailed dictionary data documentation**, see `Source/Data/AGENTS.md` which covers file formats, editing workflows, Python tools, and troubleshooting.
+## Local Packages
+`Packages/` contains Swift Package dependencies: `CandidateUI`, `NSStringUtils`, `OpenCCBridge`, `SystemCharacterInfo`
 
-## GitHub Copilot Configuration
+## Things to Avoid
+- Don't replace AppKit with SwiftUI (runtime depends on NSWindow/XIB)
+- Don't bypass Objective-C++ bridge to access engine directly
+- Don't hardcode user data paths; use preference APIs
+- Don't apply fuzzy matching to special readings (starting with `_`)
 
-GitHub Copilot uses `.github/copilot-instructions.md` for its custom instructions. That file references this AGENTS.md for comprehensive context but includes essential guidelines inline since Copilot cannot automatically load AGENTS.md.
-
-For GitHub Copilot-specific configuration, see:
-- `.github/copilot-instructions.md` - Repository-wide Copilot instructions
-- `.github/instructions/Data.instructions.md` - Path-specific instructions for Source/Data
-
-## Architecture Overview
-
-McBopomofo uses a three-layer architecture (Swift/Objective-C++/C++). For detailed architecture and algorithm documentation, see:
-- `algorithm.md`: Comprehensive technical documentation (Chinese)
-- [Wiki: 程式架構](https://github.com/openvanilla/McBopomofo/wiki/程式架構): Program architecture
-- [Wiki: Gramambular 演算法](https://github.com/openvanilla/McBopomofo/wiki/程式架構_Gramambular): Gramambular algorithm
-
-## Key Files Reference
+## Reference Files
 
 | File | Purpose |
 |------|---------|
-| `Source/InputMethodController.swift` | Main IMK entry point, coordinates candidate menus and preferences |
-| `Source/InputState.swift` | State machine base and all state implementations |
-| `Source/KeyHandler.mm` | Objective-C++ bridge between Swift events and C++ engine |
-| `Source/LanguageModelManager.mm` | Wraps C++ language model for Swift consumption |
-| `Source/Engine/McBopomofoLM.cpp` | Core language model logic and unigram processing |
-| `Source/Engine/Mandarin/Mandarin.cpp` | Bopomofo syllable processing and keyboard layouts |
-| `Source/Engine/gramambular2/` | Text segmentation algorithms (HMM-based) |
-| `Source/Data/Makefile` | Dictionary data build system |
-| `Source/Data/AGENTS.md` | Comprehensive dictionary data documentation |
-| `algorithm.md` | Detailed algorithm explanation (Chinese) |
-| `McBopomofoTests/PreferencesTests.swift` | Example Swift Testing suite patterns |
-
-## Development Guidelines
-
-### General
-
-- **Never use emoji** in code, comments, documentation, or generated content outside `Source/Data/`. Emoji are permitted only within dictionary data files in `Source/Data` where mappings include emoji.
-- **Language restriction:** Use only English or Traditional Chinese. Simplified Chinese is prohibited in all documentation, comments, and reviews.
-- **Date/time format:** When noting "last updated" or timestamps in documentation, always use full ISO 8601 datetime in UTC+8 timezone (e.g., `2025-10-12T14:30:00+08:00`). Use the `date` command to get the current system time and adjust to UTC+8 if needed
-
-### Conventional Commits
-
-- **MUST use Conventional Commits format** for all git commits and pull requests
-- Format: `type(scope): description`
-- Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-- Examples:
-  - `feat(input): add new keyboard layout support`
-  - `fix(engine): correct syllable composition for edge case`
-  - `docs(readme): update installation instructions`
-  - `refactor(state): simplify state transition logic`
-- Keep descriptions concise and in present tense
-- See: https://www.conventionalcommits.org/
-
-### Swift & AppKit
-
-- Use `Preferences` static properties and property wrappers instead of direct `UserDefaults` access
-- Localize all UI strings with `NSLocalizedString("…", comment: "")` and update `.strings` files in `Base.lproj`, `en.lproj`, `zh-Hant.lproj`
-- Perform UI work on main thread; use existing helpers/notifications rather than ad-hoc dispatch queues
-- Interact with engine through `KeyHandler`/`LanguageModelManager` bridges, not directly
-- Keep AppKit/IMKit work in Swift classes with `private`/`fileprivate` scope
-
-### State Machine
-
-- Treat `InputState` subclasses as immutable; always create new state objects on transitions
-- Funnel all key handling through `KeyHandler` for consistent state transitions
-- Derive UI and candidate lists from state object, not scattered flags
-- Extend by adding new `InputState` subclasses with explicit transitions, not booleans
-
-### Objective-C++ Bridge
-
-- Manage C++ object lifetimes in `.mm` files with proper `init`/`dealloc`
-- Use `std::shared_ptr` when passing to C++ APIs
-- Surface engine capabilities by extending bridge classes and declaring in `McBopomofo-Bridging-Header.h`
-- Convert between `NSString` and `std::string` using `UTF8Helper`/`NSStringUtils`, not manual conversion
-- Keep bridge methods small: forward to engine, return Foundation types
-
-### C++ Engine
-
-- Follow C++17 style with `std::vector`, `std::unordered_map`, `std::optional`, `std::string_view`
-- Place code in existing namespaces: `McBopomofo`, `Formosa::Gramambular2`, `Formosa::Mandarin`
-- Reuse blob readers (`KeyValueBlobReader`, `ParselessPhraseDB`, `PhraseReplacementMap`)
-- Keep algorithms deterministic and side-effect free; logging stays in Objective-C++ layer
-
-### Testing
-
-- **Swift tests:** Use Swift `Testing` module with `@Suite`, `@Test`, `#expect` macros in `McBopomofoTests/`
-- **C++ tests:** Add to `Source/Engine/CMakeLists.txt` in `McBopomofoLMLibTest` target, use GoogleTest
-- **Mixed tests:** Use Objective-C++ (`.mm`) with bridging header for Swift-C++ interop
-- Snapshot/restore `UserDefaults` in tests (see `PreferencesTests.swift`)
-
-### Dictionary Data Modifications
-
-For dictionary data modifications, see [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明) or `Source/Data/AGENTS.md` for detailed workflows.
-
-## Things to Avoid
-
-- Don't replace AppKit windows with SwiftUI or Combine; runtime depends on NSWindow/XIB
-- Don't bypass the Objective-C++ bridge to access engine from Swift directly
-- Don't hardcode paths to user data; use preference APIs
-- Don't modify large dictionary blobs unless specifically targeting them
-- Don't add generic development practices or obvious instructions
-
-## Local Packages
-
-The `Packages/` directory contains local Swift Package dependencies:
-- `BopomofoBraille`: Braille output support
-- `CandidateUI`: Candidate window rendering
-- `ChineseNumbers`: Chinese numeral conversion
-- `FSEventStreamHelper`: File system monitoring
-- `InputSourceHelper`: Input source management
-- `NotifierUI`: User notifications
-- `NSStringUtils`: String utility functions
-- `OpenCCBridge`: Traditional/Simplified Chinese conversion (wraps SwiftyOpenCC)
-- `SystemCharacterInfo`: Character information lookup (uses SQLite.swift)
-- `TooltipUI`: Tooltip display
-
-These are referenced directly by Xcode project, not through Package.swift.
-
-### External Package Dependencies
-
-The project also depends on these external Swift packages (resolved automatically by Xcode):
-- `swift-toolchain-sqlite` (1.0.4): Low-level SQLite bindings from Swift toolchain
-- `SQLite.swift` (0.15.4): Swift wrapper for SQLite3
-- `SwiftyOpenCC` (2.0.0-beta): Swift wrapper for OpenCC (Chinese text conversion)
+| `Source/InputMethodController.swift` | IMK entry point |
+| `Source/InputState.swift` | State machine |
+| `Source/KeyHandler.mm` | ObjC++ bridge |
+| `Source/Preferences.swift` | User preferences |
+| `Source/Engine/McBopomofoLM.cpp` | Language model, fuzzy matching |
+| `Source/Engine/Mandarin/Mandarin.cpp` | Syllable handling, fuzzy variants |

@@ -52,6 +52,8 @@ private let kWindowTitleHeight: CGFloat = 78
 
     @IBOutlet weak var addPhraseHookPathField: NSTextField!
 
+    @IBOutlet weak var fuzzyPinyinCheckbox: NSButton!
+
     override func awakeFromNib() {
         let toolbar = NSToolbar(identifier: "preference toolbar")
         toolbar.allowsUserCustomization = false

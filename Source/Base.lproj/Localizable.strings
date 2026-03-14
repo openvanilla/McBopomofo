@@ -83,6 +83,8 @@
 
 "Associated Phrases" = "Associated Phrases";
 
+"Use Fuzzy Pinyin" = "Use Fuzzy Pinyin";
+
 "Certain Unicode symbols or characters not supported as user phrases." = "Certain Unicode symbols or characters not supported as user phrases.";
 
 "Cursor is between \"%@\" and \"%@\"." = "Cursor is between \"%@\" and \"%@\".";
