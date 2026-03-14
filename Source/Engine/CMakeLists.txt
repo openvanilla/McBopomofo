@@ -46,6 +46,19 @@ if (ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
     endif()
 endif ()
 
+# NEON is supported by default on AArch64 (ARM64), so we can enable it automatically
+# Users can disable it by setting ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON to OFF
+# if (NOT DEFINED ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+#     if (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
+#         message(STATUS "Detected architecture: ${CMAKE_SYSTEM_PROCESSOR}, enabling NEON support automatically")
+#         set(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON ON)
+#     endif ()
+# endif ()
+
+if (ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+    target_compile_definitions(McBopomofoLMLib PRIVATE ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON=1)
+endif ()
+
 if (ENABLE_TEST)
         enable_testing()
         if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
@@ -92,17 +105,43 @@ if (ENABLE_TEST)
         )
         add_dependencies(runMcBopomofoLMLibTest McBopomofoLMLibTest)
 
-        # Benchmark for ByteBlockBackedDictionary; not enabled by default
-        #
-        # find_package(benchmark)
-        # add_executable(ByteBlockBackedDictionaryBenchmark
-        #         ByteBlockBackedDictionaryBenchmark.cpp)
-        # target_link_libraries(ByteBlockBackedDictionaryBenchmark McBopomofoLMLib benchmark::benchmark)
+        if (ENABLE_BENCHMARK)
+            set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+            set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+            set(BENCHMARK_VERSION "v1.9.5")
+            MESSAGE(STATUS "Fetching Google Benchmark ${BENCHMARK_VERSION} from GitHub")
+            include(FetchContent)
+            FetchContent_Declare(
+                    benchmark
+                    URL "https://github.com/google/benchmark/archive/refs/tags/${BENCHMARK_VERSION}.zip"
+            )
+            FetchContent_MakeAvailable(benchmark)
 
-        # Stressed benchmark for ParselessLM; not enabled by default
-        #
-        # find_package(benchmark)
-        # add_executable(ParselessLMBenchmark
-        #         ParselessLMBenchmark.cpp)
-        # target_link_libraries(ParselessLMBenchmark McBopomofoLMLib benchmark::benchmark)
+            add_executable(ByteBlockBackedDictionaryBenchmark
+                    ByteBlockBackedDictionaryBenchmark.cpp)
+            target_link_libraries(ByteBlockBackedDictionaryBenchmark McBopomofoLMLib benchmark::benchmark)
+
+            if (ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+                target_compile_definitions(ByteBlockBackedDictionaryBenchmark PRIVATE ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON=1)
+            endif ()
+            if (ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
+                target_compile_options(ByteBlockBackedDictionaryBenchmark PRIVATE -mavx512f -march=native -DENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512=1)
+            endif ()
+
+            add_custom_target(
+                    runByteBlockBackedDictionaryBenchmark
+                    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/ByteBlockBackedDictionaryBenchmark
+            )
+            add_dependencies(runByteBlockBackedDictionaryBenchmark ByteBlockBackedDictionaryBenchmark)
+
+            add_executable(ParselessLMBenchmark
+                    ParselessLMBenchmark.cpp)
+            target_link_libraries(ParselessLMBenchmark McBopomofoLMLib benchmark::benchmark)
+
+            add_custom_target(
+                    runParselessLMBenchmark
+                    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/ParselessLMBenchmark
+            )
+            add_dependencies(runParselessLMBenchmark ParselessLMBenchmark)
+        endif ()
 endif ()
