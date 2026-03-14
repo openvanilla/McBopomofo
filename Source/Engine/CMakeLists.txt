@@ -31,6 +31,8 @@ add_library(McBopomofoLMLib
         VariantAnnotator.h
         VariantAnnotator.cpp)
 
+target_link_libraries(McBopomofoLMLib MandarinLib)
+
 if (ENABLE_CLANG_TIDY)
     set_target_properties(McBopomofoLMLib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 endif ()
@@ -82,7 +84,7 @@ if (ENABLE_TEST)
                 UserOverrideModelTest.cpp
                 UserPhrasesLMTest.cpp
                 VariantAnnotatorTest.cpp)
-        target_link_libraries(McBopomofoLMLibTest GTest::gtest_main McBopomofoLMLib gramambular2_lib)
+        target_link_libraries(McBopomofoLMLibTest GTest::gtest_main McBopomofoLMLib gramambular2_lib MandarinLib)
         include(GoogleTest)
         gtest_discover_tests(McBopomofoLMLibTest)
 
