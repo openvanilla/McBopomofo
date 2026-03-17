@@ -337,10 +337,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
+    // MARK: Handle Iroha Japanese Kana Input
     if ([state isKindOfClass:[InputStateIrohaKana class]]) {
         return [self _handleIrohaKanaState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
+    // MARK: Handle Chinese Number Input
     if ([state isKindOfClass:[InputStateNumber class]]) {
         BOOL result = [self _handleNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
         if (!result) {
@@ -2030,7 +2032,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return YES;
 }
 
-// zonble
 - (BOOL)_handleIrohaKanaState:(InputState *)state
                         input:(KeyHandlerInput *)input
                 stateCallback:(void (^)(InputState *))stateCallback
