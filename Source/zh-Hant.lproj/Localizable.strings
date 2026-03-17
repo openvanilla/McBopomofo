@@ -175,4 +175,4 @@
 /* Used when the user attempts to mark a phrase when the annotation mode is on. */
 "Cannot add new phrases when Bopomofo annotation is on" = "注音字型破音字標記模式開啟時，不能增加新詞";
 
-"Add Variant Annotation (Need BPMFS Font Support)" = "加上破音字標記 (需意使用注音字體)";
+"Add Variant Annotation (Need BPMFVS Font Support)" = "加上破音字標記 (需意使用注音字體)";

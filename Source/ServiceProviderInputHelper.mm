@@ -85,7 +85,7 @@
     [self reset];
 }
 
-- (NSString * _Nonnull)service:(ServiceProvider * _Nonnull)provider didRequestConvertReadintToHanyuPinyin:(NSString * _Nonnull)input
+- (NSString * _Nonnull)service:(ServiceProvider * _Nonnull)provider didRequestConvertReadingToHanyuPinyin:(NSString * _Nonnull)input
 {
     std::string reading = std::string([input UTF8String]);
     Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);

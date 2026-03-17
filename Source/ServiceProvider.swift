@@ -129,10 +129,10 @@ class ServiceProvider: NSObject {
     /// Converts a Bopomofo reading to Hanyu Pinyin.
     /// - Parameters:
     ///   - provider: The calling service provider.
-    ///   - didRequestConvertReadintToHanyuPinyin: The Bopomofo reading to convert.
+    ///   - didRequestConvertReadingToHanyuPinyin: The Bopomofo reading to convert.
     /// - Returns: The converted Hanyu Pinyin string.
-    @objc(service:didRequestConvertReadintToHanyuPinyin:)
-    func serviceProvider(_ provider: ServiceProvider, didRequestConvertReadintToHanyuPinyin: String) -> String
+    @objc(service:didRequestConvertReadingToHanyuPinyin:)
+    func serviceProvider(_ provider: ServiceProvider, didRequestConvertReadingToHanyuPinyin: String) -> String
 }
 
 // MARK: -
@@ -323,7 +323,7 @@ extension ServiceProvider {
 
     func addHanyuPinyin(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
-            let pinyin = delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? ""
+            let pinyin = delegate?.serviceProvider(self, didRequestConvertReadingToHanyuPinyin: $1) ?? ""
             return "\($0)(\(pinyin))"
         } readingNotFoundCallback: {
             $0
@@ -370,7 +370,7 @@ extension ServiceProvider {
 
     func convertToHanyuPinyin(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
-            delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? $1
+            delegate?.serviceProvider(self, didRequestConvertReadingToHanyuPinyin: $1) ?? $1
         } readingNotFoundCallback: {
             $0
         }

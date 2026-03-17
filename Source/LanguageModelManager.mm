@@ -492,6 +492,11 @@ static void LTLoadVariantAnnotatorData()
 
 + (NSString *)annotateVariantForCharacters:(NSString *)inCharacters readings:(NSString *)inReadings
 {
+    McBopomofo::VariantAnnotator *annotator = LanguageModelManager.variantAnnotator;
+    if (!annotator || !annotator->loaded()) {
+        return inCharacters;
+    }
+
     std::string value(inCharacters.UTF8String);
     std::string readingString(inReadings.UTF8String);
     std::vector<std::string> characters = McBopomofo::Split(value);
