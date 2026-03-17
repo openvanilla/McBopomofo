@@ -55,4 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadDataModels;
 @end
 
+@interface LanguageModelManager ()
++ (NSString *)annotateVariantForCharacters:(NSString *)characters readings:(NSString *)readings NS_SWIFT_NAME(annotateVariant(characters:readings:));
+@end
+
 NS_ASSUME_NONNULL_END

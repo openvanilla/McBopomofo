@@ -233,6 +233,8 @@ extension ServiceProvider {
         return output
     }
 
+    // MARK: - Add readings
+
     func addReading(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
             "\($0)(\($1))"
@@ -287,6 +289,8 @@ extension ServiceProvider {
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.writeObjects([output as NSString])
     }
+
+    // MARK: - Convert to readings
 
     func convertToReadings(string: String) -> String {
         process(string: string, addSpace: false, convertEachCharacter: true) {
@@ -399,6 +403,34 @@ extension ServiceProvider {
             return
         }
         let output = convertBrailleToChineseText(string: string)
+        if output.isEmpty {
+            return
+        }
+
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
+    // MARK: - BPMF vs font
+
+    func convertToBpmfAnnotatedText(string: String) -> String {
+        process(string: string, addSpace: true, convertEachCharacter: true) {
+            LanguageModelManager.annotateVariant(characters: $0, readings: $1)
+        } readingNotFoundCallback: {
+            $0
+        }
+    }
+
+    /// Converts selected Taiwanese Braille to Chinese characters.
+    @objc func convertToBpmfAnnotatedText(
+        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+    ) {
+        guard let string = pasteboard.string(forType: .string)
+        else {
+            return
+        }
+        let output = convertToBpmfAnnotatedText(string: string)
         if output.isEmpty {
             return
         }

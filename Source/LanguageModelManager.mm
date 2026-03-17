@@ -25,6 +25,9 @@
 #import "LanguageModelManager+Privates.h"
 #import "McBopomofo-Swift.h"
 
+#include "UTF8Helper.h"
+#include "AssociatedPhrasesV2.h"
+
 @import OpenCCBridge;
 
 static const int kUserOverrideModelCapacity = 500;
@@ -486,5 +489,18 @@ static void LTLoadVariantAnnotatorData()
     std::string reading = gLanguageModelMcBopomofo.getReading(phrase.UTF8String);
     return !reading.empty() ? @(reading.c_str()) : nil;
 }
+
++ (NSString *)annotateVariantForCharacters:(NSString *)inCharacters readings:(NSString *)inReadings
+{
+    std::string value(inCharacters.UTF8String);
+    std::string readingString(inReadings.UTF8String);
+    std::vector<std::string> characters = McBopomofo::Split(value);
+    std::vector<std::string> readings = McBopomofo::AssociatedPhrasesV2::SplitReadings(readingString);
+
+    McBopomofo::VariantAnnotator::CombinedResult result = LanguageModelManager.variantAnnotator->annotate(characters,
+                                                                                                          readings);
+    return [[NSString alloc] initWithUTF8String:result.annotatedString.c_str()];
+}
+
 
 @end
