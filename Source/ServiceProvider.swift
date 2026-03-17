@@ -25,8 +25,22 @@ import AppKit
 import BopomofoBraille
 import OpenCCBridge
 
-/// Provides text services.
+/// Exposes macOS Services for text transformations powered by McBopomofo.
+///
+/// `ServiceProvider` is the bridge between AppKit's Services infrastructure and
+/// the input method's conversion logic. It reads text from the system
+/// pasteboard, applies the requested transformation, and writes the result back
+/// to the pasteboard when appropriate.
+///
+/// Stateless conversions, such as adding readings or generating Braille, are
+/// handled directly in this type. Stateful conversions that need access to the
+/// input method's composing buffer are delegated through
+/// ``ServiceProviderDelegate``.
 class ServiceProvider: NSObject {
+    /// Handles stateful conversion requests that require composing context.
+    ///
+    /// Assigning a delegate resets its composing state so each service request
+    /// starts from a known baseline.
     weak var delegate: ServiceProviderDelegate? {
         didSet {
             delegate?.serviceProvider(didRequestReset: self)
@@ -69,7 +83,7 @@ class ServiceProvider: NSObject {
         return reading
     }
 
-    /// Adds the selected text to the user phrases.
+    /// Adds the first selected token to the user phrase list.
     @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string),
               let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
@@ -92,13 +106,31 @@ class ServiceProvider: NSObject {
     }
 }
 
+/// Handles stateful conversion requests issued by ``ServiceProvider``.
 @objc protocol ServiceProviderDelegate: NSObjectProtocol {
+    /// Inserts a reading into the delegate-managed composing buffer.
+    /// - Parameters:
+    ///   - provider: The calling service provider.
+    ///   - didRequestInsertReading: The reading to insert.
     @objc(serviceProvider:didRequestInsertReading:)
     func serviceProvider(_ provider: ServiceProvider, didRequestInsertReading: String)
+
+    /// Commits and returns the current composed text from the delegate.
+    /// - Parameter provider: The calling service provider.
+    /// - Returns: The committed text.
     @objc(serviceProviderDidRequestCommitting:)
     func serviceProvider(didRequestCommitting provider: ServiceProvider) -> String
+
+    /// Resets the delegate-managed composing state.
+    /// - Parameter provider: The calling service provider.
     @objc(serviceProviderDidRequestReset:)
     func serviceProvider(didRequestReset provider: ServiceProvider)
+
+    /// Converts a Bopomofo reading to Hanyu Pinyin.
+    /// - Parameters:
+    ///   - provider: The calling service provider.
+    ///   - didRequestConvertReadintToHanyuPinyin: The Bopomofo reading to convert.
+    /// - Returns: The converted Hanyu Pinyin string.
     @objc(service:didRequestConvertReadintToHanyuPinyin:)
     func serviceProvider(_ provider: ServiceProvider, didRequestConvertReadintToHanyuPinyin: String) -> String
 }
@@ -137,7 +169,9 @@ extension ServiceProvider {
         pasteboard.writeObjects([output as NSString])
     }
 
-    /// Use Apple's tokenizer to tokenize the input string.
+    /// Tokenizes the input string with Apple's tokenizer.
+    /// - Parameter string: The input string.
+    /// - Returns: An array of token strings and their token types.
     func tokenize(string: String) -> [(String, CFStringTokenizerTokenType)] {
         let cfString = string as CFString
         let tokenizer = CFStringTokenizerCreate(
@@ -173,12 +207,14 @@ extension ServiceProvider {
         return output
     }
 
-    /// Convert to desired output
-    /// - string: The input string
-    /// - addSpace: Should add space in each tokens or not
-    /// - convertEachCharacter: Split a phrase into characters to convert or not
-    /// - readingFoundCallback: The callback for a reading
-    /// - readingNotFoundCallback: The callback for a non-reading component
+    /// Converts text with reading-aware callbacks.
+    /// - Parameters:
+    ///   - string: The input string.
+    ///   - addSpace: Whether to insert spaces between CJK and ASCII tokens when needed.
+    ///   - convertEachCharacter: Whether to process non-phrase tokens character by character.
+    ///   - readingFoundCallback: Called when a reading is found for a token or character.
+    ///   - readingNotFoundCallback: Called when no reading is found.
+    /// - Returns: The transformed string.
     private func process(
         string: String,
         addSpace: Bool,
@@ -268,7 +304,7 @@ extension ServiceProvider {
         }
     }
 
-    /// Add Bopomofo readings to selected text.
+    /// Adds Bopomofo readings to the selected text.
     @objc func addReading(_ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer) {
         transformPasteboardString(
             pasteboard,
@@ -294,7 +330,7 @@ extension ServiceProvider {
         }
     }
 
-    /// Add Hanyu Pinyin readings to selected text.
+    /// Adds Hanyu Pinyin readings to the selected text.
     @objc func addHanyuPinyin(_ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer) {
         transformPasteboardString(
             pasteboard,
@@ -321,7 +357,7 @@ extension ServiceProvider {
         }
     }
 
-    /// Converts selected text to Bopomofo readings.
+    /// Converts the selected text to Bopomofo readings.
     @objc func convertToReadings(
         _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
@@ -340,7 +376,7 @@ extension ServiceProvider {
         }
     }
 
-    /// Converts selected text to Bopomofo readings.
+    /// Converts the selected text to Hanyu Pinyin.
     @objc func convertToHanyuPinyin(
         _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
@@ -396,7 +432,7 @@ extension ServiceProvider {
         return output
     }
 
-    /// Converts selected Taiwanese Braille to Chinese characters.
+    /// Converts the selected Taiwanese Braille to Chinese text.
     @objc func convertBrailleToChineseText(
         _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
@@ -415,7 +451,7 @@ extension ServiceProvider {
         }
     }
 
-    /// Converts selected Taiwanese Braille to Chinese characters.
+    /// Converts the selected text to annotated text for BPMF VS font support.
     @objc func convertToBpmfAnnotatedText(
         _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
