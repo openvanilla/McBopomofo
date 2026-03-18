@@ -2101,7 +2101,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             errorCallback();
             return YES;
         }
-        NSString *appended = [NSString stringWithFormat:@"%@%c", irohaKana.code, charCode];
+        NSString *appended = [NSString stringWithFormat:@"%@%c", irohaKana.code, tolower(charCode)];
         InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:appended];
         stateCallback(newState);
         return YES;
