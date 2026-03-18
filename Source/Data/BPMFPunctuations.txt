@@ -774,7 +774,6 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ぁ _kana_xa 0.0
 ぁ _kana_la 0.0
 い _kana_i 0.0
-伊呂波 _kana_iroha 0.0
 ぃ _kana_xi 0.0
 ぃ _kana_li 0.0
 ぃ _kana_lyi 0.0
@@ -913,8 +912,8 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ちゅう _kana_chuu 0.0
 ちゅう _kana_cyuu 0.0
 ちぇ _kana_tye 0.0
-ちぇ _kana_chu 0.0
-ちぇ _kana_cyu 0.0
+ちぇ _kana_che 0.0
+ちぇ _kana_cye 0.0
 ちょ _kana_tyo 0.0
 ちょ _kana_cho 0.0
 ちょ _kana_cyo 0.0
@@ -1084,8 +1083,6 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ヴぉ _kana_vo 0.0
 ヴォ _kana_vo 0.0
 ヴゃ _kana_vya 0.0
-ヴャ _kana_vya 0.0
-ヴャ _kana_vya 0.0
 ヴぃ _kana_vyi 0.0
 ヴィ _kana_vyi 0.0
 ヴゅ _kana_vyu 0.0
@@ -1227,7 +1224,7 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ヂュ _kana_dyu 0.0
 ヂェ _kana_dye 0.0
 ヂョ _kana_dyo 0.0
-ツ _kana_du 0.0
+ヅ _kana_du 0.0
 デ _kana_DE 0.0
 デャ _kana_dha 0.0
 ディ _kana_dhi 0.0
