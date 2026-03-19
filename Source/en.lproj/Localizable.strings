@@ -178,3 +178,5 @@
 
 /* Used when the user attempts to mark a phrase when the annotation mode is on. */
 "Cannot add new phrases when Bopomofo annotation is on" = "Cannot add new phrases when Bopomofo annotation is on";
+
+"Add Variant Annotation (Need BPMF IVS Font Support)" = "Add Variant Annotation (Need BPMF IVS Font Support)";

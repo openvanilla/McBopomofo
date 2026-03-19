@@ -25,9 +25,22 @@ import AppKit
 import BopomofoBraille
 import OpenCCBridge
 
-
-/// Provides text services.
+/// Exposes macOS Services for text transformations powered by McBopomofo.
+///
+/// `ServiceProvider` is the bridge between AppKit's Services infrastructure and
+/// the input method's conversion logic. It reads text from the system
+/// pasteboard, applies the requested transformation, and writes the result back
+/// to the pasteboard when appropriate.
+///
+/// Stateless conversions, such as adding readings or generating Braille, are
+/// handled directly in this type. Stateful conversions that need access to the
+/// input method's composing buffer are delegated through
+/// ``ServiceProviderDelegate``.
 class ServiceProvider: NSObject {
+    /// Handles stateful conversion requests that require composing context.
+    ///
+    /// Assigning a delegate resets its composing state so each service request
+    /// starts from a known baseline.
     weak var delegate: ServiceProviderDelegate? {
         didSet {
             delegate?.serviceProvider(didRequestReset: self)
@@ -49,7 +62,7 @@ class ServiceProvider: NSObject {
             while drop < substringCount {
                 let candidate = String(substring.dropLast(drop))
                 if let converted = OpenCCBridge.shared.convertToTraditional(candidate),
-                    let match = LanguageModelManager.reading(for: converted)
+                   let match = LanguageModelManager.reading(for: converted)
                 {
                     // append the match and skip over the matched portion
                     matches.append(match)
@@ -70,11 +83,10 @@ class ServiceProvider: NSObject {
         return reading
     }
 
-
-    /// Adds the selected text to the user phrases.
-    @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
+    /// Adds the first selected token to the user phrase list.
+    @objc func addUserPhrase(_ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer) {
         guard let string = pasteboard.string(forType: .string),
-            let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
+              let firstWord = string.components(separatedBy: .whitespacesAndNewlines).first
         else {
             return
         }
@@ -94,15 +106,33 @@ class ServiceProvider: NSObject {
     }
 }
 
+/// Handles stateful conversion requests issued by ``ServiceProvider``.
 @objc protocol ServiceProviderDelegate: NSObjectProtocol {
+    /// Inserts a reading into the delegate-managed composing buffer.
+    /// - Parameters:
+    ///   - provider: The calling service provider.
+    ///   - didRequestInsertReading: The reading to insert.
     @objc(serviceProvider:didRequestInsertReading:)
     func serviceProvider(_ provider: ServiceProvider, didRequestInsertReading: String)
+
+    /// Commits and returns the current composed text from the delegate.
+    /// - Parameter provider: The calling service provider.
+    /// - Returns: The committed text.
     @objc(serviceProviderDidRequestCommitting:)
     func serviceProvider(didRequestCommitting provider: ServiceProvider) -> String
+
+    /// Resets the delegate-managed composing state.
+    /// - Parameter provider: The calling service provider.
     @objc(serviceProviderDidRequestReset:)
     func serviceProvider(didRequestReset provider: ServiceProvider)
-    @objc(service:didRequestConvertReadintToHanyuPinyin:)
-    func serviceProvider(_ provider: ServiceProvider, didRequestConvertReadintToHanyuPinyin: String) -> String
+
+    /// Converts a Bopomofo reading to Hanyu Pinyin.
+    /// - Parameters:
+    ///   - provider: The calling service provider.
+    ///   - didRequestConvertReadingToHanyuPinyin: The Bopomofo reading to convert.
+    /// - Returns: The converted Hanyu Pinyin string.
+    @objc(service:didRequestConvertReadingToHanyuPinyin:)
+    func serviceProvider(_ provider: ServiceProvider, didRequestConvertReadingToHanyuPinyin: String) -> String
 }
 
 // MARK: -
@@ -110,14 +140,43 @@ class ServiceProvider: NSObject {
 private let kMaxLength = 3000
 
 extension ServiceProvider {
-
     // MARK: -
 
-    /// Use Apple's tokenizer to tokenize the input string.
+    private func transformPasteboardString(
+        _ pasteboard: NSPasteboard,
+        maximumLength: Int? = nil,
+        skipIfOutputIsEmpty: Bool = false,
+        transform: (String) -> String?
+    ) {
+        guard let string = pasteboard.string(forType: .string) else {
+            return
+        }
+
+        if let maximumLength, string.count >= maximumLength {
+            return
+        }
+
+        guard let output = transform(string) else {
+            return
+        }
+
+        if skipIfOutputIsEmpty, output.isEmpty {
+            return
+        }
+
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.writeObjects([output as NSString])
+    }
+
+    /// Tokenizes the input string with Apple's tokenizer.
+    /// - Parameter string: The input string.
+    /// - Returns: An array of token strings and their token types.
     func tokenize(string: String) -> [(String, CFStringTokenizerTokenType)] {
         let cfString = string as CFString
         let tokenizer = CFStringTokenizerCreate(
-            nil, cfString, CFRange(location: 0, length: CFStringGetLength(cfString)), 0, nil)
+            nil, cfString, CFRange(location: 0, length: CFStringGetLength(cfString)), 0, nil
+        )
         var readHead = 0
         var output: [(String, CFStringTokenizerTokenType)] = []
         while readHead < CFStringGetLength(cfString) {
@@ -125,8 +184,8 @@ extension ServiceProvider {
             let range = CFStringTokenizerGetCurrentTokenRange(tokenizer)
             if range.location == kCFNotFound {
                 if let subString = CFStringCreateWithSubstring(
-                    nil, cfString, CFRangeMake(readHead, 1))
-                {
+                    nil, cfString, CFRangeMake(readHead, 1)
+                ) {
                     output.append((subString as String, CFStringTokenizerTokenType.normal))
                 }
                 readHead += 1
@@ -135,8 +194,8 @@ extension ServiceProvider {
 
             if range.location > readHead {
                 if let subString = CFStringCreateWithSubstring(
-                    nil, cfString, CFRange(location: readHead, length: range.location - readHead))
-                {
+                    nil, cfString, CFRange(location: readHead, length: range.location - readHead)
+                ) {
                     output.append((subString as String, CFStringTokenizerTokenType.normal))
                 }
             }
@@ -148,12 +207,14 @@ extension ServiceProvider {
         return output
     }
 
-    /// Convert to desired output
-    /// - string: The input string
-    /// - addSpace: Should add space in each tokens or not
-    /// - convertEachCharacter: Split a phrase into characters to convert or not
-    /// - readingFoundCallback: The callback for a reading
-    /// - readingNotFoundCallback: The callback for a non-reading component
+    /// Converts text with reading-aware callbacks.
+    /// - Parameters:
+    ///   - string: The input string.
+    ///   - addSpace: Whether to insert spaces between CJK and ASCII tokens when needed.
+    ///   - convertEachCharacter: Whether to process non-phrase tokens character by character.
+    ///   - readingFoundCallback: Called when a reading is found for a token or character.
+    ///   - readingNotFoundCallback: Called when no reading is found.
+    /// - Returns: The transformed string.
     private func process(
         string: String,
         addSpace: Bool,
@@ -179,7 +240,7 @@ extension ServiceProvider {
                         output.append(" ")
                     } else if (!previousTokenType.contains(.isCJWordMask)
                         && previousToken[previousToken.index(before: previousToken.endIndex)]
-                            .isASCII)
+                        .isASCII)
                         && type.contains(.isCJWordMask)
                     {
                         output.append(" ")
@@ -200,7 +261,7 @@ extension ServiceProvider {
                     }
                 }
             }
-            
+
             var buffer = ""
 
             for c in token {
@@ -233,6 +294,8 @@ extension ServiceProvider {
         return output
     }
 
+    // MARK: - Add readings
+
     func addReading(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
             "\($0)(\($1))"
@@ -241,52 +304,50 @@ extension ServiceProvider {
         }
     }
 
-    /// Add Bopomofo readings to selected text.
-    @objc func addReading(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
-        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength,
-            let converted = OpenCCBridge.shared.convertToTraditional(String(string))
-        else {
-            return
-        }
-        let output = converted.components(separatedBy: "\n").map { input in
-            addReading(string: input)
-        }.joined(separator: "\n")
+    /// Adds Bopomofo readings to the selected text.
+    @objc func addReading(_ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer) {
+        transformPasteboardString(
+            pasteboard,
+            maximumLength: kMaxLength,
+            skipIfOutputIsEmpty: true
+        ) { string in
+            guard let converted = OpenCCBridge.shared.convertToTraditional(string) else {
+                return nil
+            }
 
-        if output.isEmpty {
-            return
+            return converted.components(separatedBy: "\n").map { input in
+                addReading(string: input)
+            }.joined(separator: "\n")
         }
-        pasteboard.clearContents()
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.writeObjects([output as NSString])
     }
 
     func addHanyuPinyin(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
-            let pinyin = delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? ""
+            let pinyin = delegate?.serviceProvider(self, didRequestConvertReadingToHanyuPinyin: $1) ?? ""
             return "\($0)(\(pinyin))"
         } readingNotFoundCallback: {
             $0
         }
     }
 
-    /// Add Hanyu Pinyin readings to selected text.
-    @objc func addHanyuPinyin(_ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer) {
-        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength,
-            let converted = OpenCCBridge.shared.convertToTraditional(String(string))
-        else {
-            return
-        }
-        let output = converted.components(separatedBy: "\n").map { input in
-            addHanyuPinyin(string: input)
-        }.joined(separator: "\n")
+    /// Adds Hanyu Pinyin readings to the selected text.
+    @objc func addHanyuPinyin(_ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer) {
+        transformPasteboardString(
+            pasteboard,
+            maximumLength: kMaxLength,
+            skipIfOutputIsEmpty: true
+        ) { string in
+            guard let converted = OpenCCBridge.shared.convertToTraditional(string) else {
+                return nil
+            }
 
-        if output.isEmpty {
-            return
+            return converted.components(separatedBy: "\n").map { input in
+                addHanyuPinyin(string: input)
+            }.joined(separator: "\n")
         }
-        pasteboard.clearContents()
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.writeObjects([output as NSString])
     }
+
+    // MARK: - Convert to readings
 
     func convertToReadings(string: String) -> String {
         process(string: string, addSpace: false, convertEachCharacter: true) {
@@ -296,46 +357,34 @@ extension ServiceProvider {
         }
     }
 
-    /// Converts selected text to Bopomofo readings.
+    /// Converts the selected text to Bopomofo readings.
     @objc func convertToReadings(
-        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
-        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength
-        else {
-            return
+        transformPasteboardString(pasteboard, maximumLength: kMaxLength) { string in
+            string.components(separatedBy: "\n").map { input in
+                convertToReadings(string: input)
+            }.joined(separator: "\n")
         }
-        let output = string.components(separatedBy: "\n").map { input in
-            convertToReadings(string: input)
-        }.joined(separator: "\n")
-
-        pasteboard.clearContents()
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.writeObjects([output as NSString])
     }
 
     func convertToHanyuPinyin(string: String) -> String {
         process(string: string, addSpace: true, convertEachCharacter: true) {
-            delegate?.serviceProvider(self, didRequestConvertReadintToHanyuPinyin: $1) ?? $1
+            delegate?.serviceProvider(self, didRequestConvertReadingToHanyuPinyin: $1) ?? $1
         } readingNotFoundCallback: {
             $0
         }
     }
 
-    /// Converts selected text to Bopomofo readings.
+    /// Converts the selected text to Hanyu Pinyin.
     @objc func convertToHanyuPinyin(
-        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
-        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength
-        else {
-            return
+        transformPasteboardString(pasteboard, maximumLength: kMaxLength) { string in
+            string.components(separatedBy: "\n").map { input in
+                convertToHanyuPinyin(string: input)
+            }.joined(separator: "\n")
         }
-        let output = string.components(separatedBy: "\n").map { input in
-            convertToHanyuPinyin(string: input)
-        }.joined(separator: "\n")
-
-        pasteboard.clearContents()
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.writeObjects([output as NSString])
     }
 
     // MARK: - Braille
@@ -346,23 +395,17 @@ extension ServiceProvider {
         } readingNotFoundCallback: {
             BopomofoBrailleConverter.convert(bopomofo: $0)
         }
-
     }
 
     /// Converts selected text to Taiwanese Braille.
     @objc func convertToBraille(
-        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
-        guard let string = pasteboard.string(forType: .string), string.count < kMaxLength
-        else {
-            return
+        transformPasteboardString(pasteboard, maximumLength: kMaxLength) { string in
+            string.components(separatedBy: "\n").map { input in
+                convertToBraille(string: input)
+            }.joined(separator: "\n")
         }
-        let output = string.components(separatedBy: "\n").map { input in
-            convertToBraille(string: input)
-        }.joined(separator: "\n")
-        pasteboard.clearContents()
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.writeObjects([output as NSString])
     }
 
     func convertBrailleToChineseText(string: String) -> String {
@@ -389,23 +432,31 @@ extension ServiceProvider {
         return output
     }
 
-
-    /// Converts selected Taiwanese Braille to Chinese characters.
+    /// Converts the selected Taiwanese Braille to Chinese text.
     @objc func convertBrailleToChineseText(
-        _ pasteboard: NSPasteboard, userData: String?, error: NSErrorPointer
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
-        guard let string = pasteboard.string(forType: .string)
-        else {
-            return
+        transformPasteboardString(pasteboard, skipIfOutputIsEmpty: true) { string in
+            convertBrailleToChineseText(string: string)
         }
-        let output = convertBrailleToChineseText(string: string)
-        if output.isEmpty {
-            return
-        }
-
-        pasteboard.clearContents()
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.writeObjects([output as NSString])
     }
 
+    // MARK: - BPMF vs font
+
+    func convertToBpmfAnnotatedText(string: String) -> String {
+        process(string: string, addSpace: true, convertEachCharacter: true) {
+            LanguageModelManager.annotateVariant(characters: $0, readings: $1)
+        } readingNotFoundCallback: {
+            $0
+        }
+    }
+
+    /// Converts the selected text to annotated text for BPMF VS font support.
+    @objc func convertToBpmfAnnotatedText(
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
+    ) {
+        transformPasteboardString(pasteboard, skipIfOutputIsEmpty: true) { string in
+            convertToBpmfAnnotatedText(string: string)
+        }
+    }
 }

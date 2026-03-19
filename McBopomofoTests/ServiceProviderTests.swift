@@ -21,12 +21,27 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+import AppKit
 import Testing
 
 @testable import McBopomofo
 
-@Suite("Test the service provider")
+@Suite("Test the service provider", .serialized)
 final class ServiceProviderTests {
+    private func makePasteboard() -> NSPasteboard {
+        NSPasteboard(name: NSPasteboard.Name(UUID().uuidString))
+    }
+
+    private func write(_ string: String, to pasteboard: NSPasteboard) {
+        pasteboard.clearContents()
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.setString(string, forType: .string)
+    }
+
+    private func read(from pasteboard: NSPasteboard) -> String? {
+        pasteboard.string(forType: .string)
+    }
+
     @Test(
         "Test extrct reading",
         arguments: [
@@ -184,5 +199,59 @@ final class ServiceProviderTests {
         provider.delegate = helper as? any ServiceProviderDelegate
         let result = provider.convertToBraille(string: input)
         #expect(result == expected)
+    }
+
+    @Test("Test add reading service with pasteboard")
+    func testAddReadingServiceWithPasteboard() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let pasteboard = makePasteboard()
+        let input = "美好的朝陽"
+        write(input, to: pasteboard)
+
+        provider.addReading(pasteboard, userData: nil, error: nil)
+
+        #expect(read(from: pasteboard) == provider.addReading(string: input))
+    }
+
+    @Test("Test convert to readings service rejects overlong input")
+    func testConvertToReadingsServiceRejectsOverlongInput() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let pasteboard = makePasteboard()
+        let input = String(repeating: "美", count: 3000)
+        write(input, to: pasteboard)
+
+        provider.convertToReadings(pasteboard, userData: nil, error: nil)
+
+        #expect(read(from: pasteboard) == input)
+    }
+
+    @Test("Test convert braille to Chinese service with pasteboard")
+    func testConvertBrailleToChineseServiceWithPasteboard() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let pasteboard = makePasteboard()
+        let input = "⠰⠤⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐⠤⠆"
+        write(input, to: pasteboard)
+
+        provider.convertBrailleToChineseText(pasteboard, userData: nil, error: nil)
+
+        #expect(read(from: pasteboard) == provider.convertBrailleToChineseText(string: input))
+    }
+
+    @Test("Test convert to annotated text service with pasteboard")
+    func testConvertToBpmfAnnotatedTextServiceWithPasteboard() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let pasteboard = makePasteboard()
+        let input = "你好"
+        write(input, to: pasteboard)
+
+        provider.convertToBpmfAnnotatedText(pasteboard, userData: nil, error: nil)
+
+        #expect(read(from: pasteboard) == provider.convertToBpmfAnnotatedText(string: input))
     }
 }
