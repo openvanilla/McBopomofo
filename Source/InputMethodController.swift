@@ -473,7 +473,9 @@ extension McBopomofoInputMethodController {
         case let previous as InputState.NotEmpty:
             commit(text: previous.composingBuffer, client: client)
         case is InputState.Big5,
-            is InputState.Number:
+            is InputState.Number,
+            is InputState.IrohaKana,
+            is InputState.IrohaKanaCandidates:
             client.setMarkedText(
                 "", selectionRange: NSMakeRange(0, 0), replacementRange: NSMakeRange(0, 0))
         default:
