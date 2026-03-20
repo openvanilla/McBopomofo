@@ -1083,6 +1083,7 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ヴぉ _kana_vo 0.0
 ヴォ _kana_vo 0.0
 ヴゃ _kana_vya 0.0
+ヴャ _kana_vya 0.0
 ヴぃ _kana_vyi 0.0
 ヴィ _kana_vyi 0.0
 ヴゅ _kana_vyu 0.0
