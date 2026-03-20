@@ -2809,20 +2809,16 @@ extension KeyHandlerBopomofoTests {
         let inputEnter = KeyHandlerInput(
             inputText: "\r", keyCode: KeyCode.enter.rawValue, charCode: 13, flags: [],
             isVerticalMode: false)
-        var committing: InputState.Committing?
+        var irohaCandidate: InputState.IrohaKanaCandidates?
         handler.handle(input: inputEnter, state: state) { newState in
-            if let s = newState as? InputState.Committing {
-                committing = s
+            if let s = newState as? InputState.IrohaKanaCandidates {
+                irohaCandidate = s
             }
             state = newState
         } errorCallback: {}
         
-        XCTAssertNotNil(committing)
-        XCTAssertEqual(committing?.poppedText, "あ")
-        XCTAssertTrue(state is InputState.IrohaKana)
-        if let s = state as? InputState.IrohaKana {
-            XCTAssertEqual(s.code, "")
-        }
+        XCTAssertNotNil(irohaCandidate)
+        XCTAssertEqual(irohaCandidate?.candidate(at: 0), "あ")
     }
 
     func testIrohaKanaBackspace() {
