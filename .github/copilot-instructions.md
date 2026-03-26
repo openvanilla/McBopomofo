@@ -29,6 +29,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## Project Context
 - Input method for macOS built with AppKit/IMKit in Swift and bridged Objective-C++, backed by the C++ language model in `Source/Engine`.
+- The app supports two Taiwanese Braille formats: Unicode and ASCII.
 - Build and run with Xcode target `McBopomofo Installer`; Swift front end pulls helper frameworks from the local `Packages/` directory.
 - Dictionary assets and generation scripts live in `Source/Data`; compiled blobs are stored in `Source/Data/bin`.
 - Tests cover both layers: Swift XCTest-style suites in `McBopomofoTests` and GoogleTest cases in `Source/Engine/*Test.cpp` via CMake.
