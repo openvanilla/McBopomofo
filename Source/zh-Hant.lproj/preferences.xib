@@ -28,7 +28,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="489" y="334" width="433" height="575"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1049"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1050"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="433" height="575"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -505,7 +505,8 @@
                                 <menuItem title="關閉" state="on" id="4VD-Kh-SxN"/>
                                 <menuItem title="注音符號" tag="1" id="eyd-n5-aYf"/>
                                 <menuItem title="HTML旁注標記" tag="2" id="fS8-3m-elO"/>
-                                <menuItem title="台灣點字" tag="3" id="xYc-er-OPo"/>
+                                <menuItem title="台灣點字 (Unicode)" tag="3" id="xYc-er-OPo"/>
+                                <menuItem title="台灣點字 (ASCII)" tag="5" id="sBI-Yu-2NO"/>
                                 <menuItem title="漢語拼音" tag="4" id="Yv7-rt-txE"/>
                             </items>
                         </menu>

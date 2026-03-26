@@ -74,8 +74,21 @@ public enum Letter: String, CaseIterable {
         Letter.bpmfBrailleMap[self]!.0
     }
 
+    var bralleAscii: String {
+        return rawValue
+    }
+
     var brailleCode: String {
         Letter.bpmfBrailleMap[self]!.1
+    }
+
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            braille
+        case .ascii:
+            bralleAscii
+        }
     }
 
     case a = "a"

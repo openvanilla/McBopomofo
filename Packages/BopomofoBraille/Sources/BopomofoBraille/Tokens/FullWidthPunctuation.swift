@@ -93,6 +93,70 @@ public enum FullWidthPunctuation: String, CaseIterable {
         }
     }
 
+    /// Maps each full-width punctuation to its braille dots and an ASCII sequence used for input.
+    var brailleAscii: String {
+        switch self {
+        case .period:
+            "-"
+        case .dot:
+            "."
+        case .comma:
+            "2"
+        case .semicolon:
+            ";"
+        case .ideographicComma:
+            ","
+        case .questionMark:
+            "?"
+        case .exclamationMark:
+            "l"
+        case .colon:
+            "33"
+        case .personNameMark:
+            "|"
+        case .slash:
+            "-"
+        case .bookNameMark:
+            "~"
+        case .ellipsis:
+            "'''"
+        case .referenceMark:
+            "`#"
+        case .doubleRing:
+            "{o"
+        case .singleQuotationMarkLeft:
+            ";-"
+        case .singleQuotationMarkRight:
+            "-2"
+        case .doubleQuotationMarkLeft:
+            "88"
+        case .doubleQuotationMarkRight:
+            "00"
+        case .parenthesesLeft:
+            "{"
+        case .parenthesesRight:
+            "o"
+        case .bracketLeft:
+            "``("
+        case .bracketRight:
+            "``)"
+        case .braceLeft:
+            ".("
+        case .braceRight:
+            ".)"
+        }
+    }
+
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            braille
+        case .ascii:
+            brailleAscii
+        }
+
+    }
+
     var supposedToBeAtStart: Bool {
         switch self {
         case .singleQuotationMarkLeft:

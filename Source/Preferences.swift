@@ -460,8 +460,9 @@ extension Preferences {
     case off = 0
     case bpmfReading = 1
     case htmlRuby = 2
-    case braille = 3
+    case brailleUnicode = 3
     case hanyuPinyin = 4
+    case brailleAscii = 5
 }
 
 extension ControlEnterOutput {
@@ -470,7 +471,8 @@ extension ControlEnterOutput {
         case .off: "Off"
         case .bpmfReading: "Bopomofo Reading"
         case .htmlRuby: "HTML Ruby Text"
-        case .braille: "Taiwan Braille"
+        case .brailleUnicode: "Taiwan Braille (Unicode)"
+        case .brailleAscii: "Taiwan Braille (Ascii)"
         case .hanyuPinyin: "Hanyu Pinyin"
         }
     }

@@ -2360,7 +2360,7 @@ extension KeyHandlerBopomofoTests {
 
     func testCtrlEnter3() {
         let controlEnterOutput = Preferences.controlEnterOutput
-        Preferences.controlEnterOutput = .braille
+        Preferences.controlEnterOutput = .brailleUnicode
         var state: InputState = InputState.Empty()
         var commitState: InputState?
         let keys = Array("su3").map {

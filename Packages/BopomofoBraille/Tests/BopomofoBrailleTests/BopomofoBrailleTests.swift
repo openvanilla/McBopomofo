@@ -87,4 +87,34 @@ final class BopomofoBrailleTests {
         }
     }
 
+    @Test(
+        "Test ASCII Braille conversion",
+        arguments: [
+            ("k*\"", "ㄐㄧˋ"),
+            ("c!a", "ㄌㄜ˙"),
+            ("/`", "ㄨˇ"),
+        ])
+    func testAsciiBrailleReversed(input: String, expected: String) {
+        let output = BopomofoBrailleConverter.convert(braille: input, type: .ascii)
+        #expect(output == expected)
+    }
+
+    @Test("Test ASCII Braille digit sign")
+    func testAsciiDigitSign() {
+        let braille = BopomofoBrailleConverter.convert(bopomofo: "123", type: .ascii)
+        #expect(braille == "#123")
+
+        let output = BopomofoBrailleConverter.convert(braille: "#123", type: .ascii)
+        #expect(output == "123")
+    }
+
+    @Test("Test ASCII Braille uppercase sign")
+    func testAsciiUppercaseSign() {
+        let braille = BopomofoBrailleConverter.convert(bopomofo: "ABcd", type: .ascii)
+        #expect(braille == ",a,bcd")
+
+        let output = BopomofoBrailleConverter.convert(braille: ",a,bcd", type: .ascii)
+        #expect(output == "ABcd")
+    }
+
 }

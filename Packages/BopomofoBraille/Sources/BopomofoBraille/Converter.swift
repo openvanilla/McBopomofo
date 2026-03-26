@@ -26,6 +26,42 @@ import Foundation
 /// Convert Bopomofo to Braille and vice versa.
 @objc public class BopomofoBrailleConverter: NSObject {
 
+    private static func numberSign(for type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            "⠼"
+        case .ascii:
+            "#"
+        }
+    }
+
+    private static func uppercaseSign(for type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            "⠠"
+        case .ascii:
+            ","
+        }
+    }
+
+    private static func digit(from string: String, type: BrailleType) -> Digit? {
+        switch type {
+        case .unicode:
+            Digit(braille: string)
+        case .ascii:
+            Digit(rawValue: string)
+        }
+    }
+
+    private static func letter(from string: String, type: BrailleType) -> Letter? {
+        switch type {
+        case .unicode:
+            Letter(braille: string)
+        case .ascii:
+            Letter(rawValue: string.lowercased())
+        }
+    }
+
     private enum ConverterState {
         case initial
         case bpmf
@@ -37,8 +73,8 @@ import Foundation
     ///
     /// - Parameter bopomofo: the input text in Bopomofo.
     /// - Returns: Converted Taiwanese Braille.
-    @objc(convertFromBopomofo:)
-    public static func convert(bopomofo: String) -> String {
+    @objc(convertFromBopomofo:type:)
+    public static func convert(bopomofo: String, type: BrailleType = .unicode) -> String {
         var state = ConverterState.initial
         var output = ""
         var readHead = 0
@@ -69,7 +105,7 @@ import Foundation
                 let substring = String(
                     bopomofo[bopomofo.index(bopomofo.startIndex, offsetBy: readHead)])
                 if let aCase = Digit(rawValue: substring) {
-                    output += aCase.braille
+                    output += aCase.getBraille(by: type)
                     readHead += 1
                     continue
                 }
@@ -80,7 +116,7 @@ import Foundation
                     let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead + i)
                     let substring = bopomofo[start...end]
                     if let aCase = DigitRelated(rawValue: String(substring)) {
-                        output += aCase.braille
+                        output += aCase.getBraille(by: type)
                         readHead += i + 1
                         found = true
                         break
@@ -99,16 +135,16 @@ import Foundation
                 let lowered = substring.lowercased()
                 if ("a"..."z").contains(lowered) {
                     if ("A"..."Z").contains(substring) {
-                        output += "⠠"
+                        output += uppercaseSign(for: type)
                     }
                     if let aCase = Letter(rawValue: lowered) {
-                        output += aCase.braille
+                        output += aCase.getBraille(by: type)
                     }
                     readHead += 1
                     continue
                 }
                 if let aCase = HalfWidthPunctuation(rawValue: substring) {
-                    output += aCase.braille
+                    output += aCase.getBraille(by: type)
                     readHead += 1
                     continue
                 }
@@ -124,7 +160,10 @@ import Foundation
                     let end = bopomofo.index(bopomofo.startIndex, offsetBy: readHead + i)
                     let substring = bopomofo[start...end]
                     do {
-                        let syllable = try BopomofoSyllable(rawValue: String(substring))
+                        let syllable = try BopomofoSyllable(
+                            rawValue: String(substring),
+                            type: type
+                        )
                         if state != .bpmf && state != .initial {
                             output += " "
                         }
@@ -149,7 +188,7 @@ import Foundation
                     if state != .bpmf && state != .initial {
                         output += " "
                     }
-                    output += punctuation.braille
+                    output += punctuation.getBraille(by: type)
                     readHead += 1
                     state = .bpmf
                     continue
@@ -163,9 +202,9 @@ import Foundation
                 if state != .initial && state != .digits {
                     output += " "
                 }
-                output += "⠼"
+                output += numberSign(for: type)
                 if let aCase = Digit(rawValue: substring) {
-                    output += aCase.braille
+                    output += aCase.getBraille(by: type)
                 }
                 readHead += 1
                 state = ConverterState.digits
@@ -179,10 +218,10 @@ import Foundation
                     output += " "
                 }
                 if ("A"..."Z").contains(substring) {
-                    output += "⠠"
+                    output += uppercaseSign(for: type)
                 }
                 if let aCase = Letter(rawValue: lowered) {
-                    output += aCase.braille
+                    output += aCase.getBraille(by: type)
                 }
                 readHead += 1
                 state = .letters
@@ -193,7 +232,7 @@ import Foundation
                 if state != .initial && state != .letters {
                     output += " "
                 }
-                output += punctuation.braille
+                output += punctuation.getBraille(by: type)
                 readHead += 1
                 state = .letters
             }
@@ -212,10 +251,10 @@ import Foundation
     ///
     /// - Parameter braille: The text in Taiwanese Barille.
     /// - Returns: The converted text in Bopomofo.
-    @objc(convertFromBraille:)
-    public static func convert(braille: String) -> String {
+    @objc(convertFromBraille:type:)
+    public static func convert(braille: String, type: BrailleType = .unicode) -> String {
         var output = ""
-        let tokens = self.convert(brailleToTokens: braille)
+        let tokens = self.convert(brailleToTokens: braille, type: type)
         for token in tokens {
             if let token = token as? BopomofoSyllable {
                 output += token.rawValue
@@ -232,8 +271,8 @@ import Foundation
     ///
     /// - Parameter braille: The text in Taiwanese Braille.
     /// - Returns: The tokens.
-    @objc(convertBrailleToTokens:)
-    public static func convert(brailleToTokens braille: String) -> [Any] {
+    @objc(convertBrailleToTokens:type:)
+    public static func convert(brailleToTokens braille: String, type:BrailleType = .unicode) -> [Any] {
         var state = ConverterState.initial
         var output: [Any] = []
         var readHead = 0
@@ -267,7 +306,7 @@ import Foundation
             if state == .digits {
                 let substring = String(
                     braille[braille.index(braille.startIndex, offsetBy: readHead)])
-                if let digit = Digit(braille: substring) {
+                if let digit = digit(from: substring, type: type) {
                     nonBpmfText += digit.rawValue
                     readHead += 1
                     continue
@@ -295,13 +334,13 @@ import Foundation
                 var substring = String(
                     braille[braille.index(braille.startIndex, offsetBy: readHead)])
                 var isUppercase = false
-                if substring == "⠠" {
+                if substring == uppercaseSign(for: type) {
                     // Uppercase1;
                     isUppercase = true
                     substring = String(
                         braille[braille.index(braille.startIndex, offsetBy: readHead + 1)])
                 }
-                if let letter = Letter(braille: substring) {
+                if let letter = letter(from: substring, type: type) {
                     if isUppercase {
                         nonBpmfText += letter.rawValue.uppercased()
                         readHead += 2
@@ -333,6 +372,19 @@ import Foundation
                 state = .initial
             }
 
+            let substring = String(braille[braille.index(braille.startIndex, offsetBy: readHead)])
+
+            if substring == uppercaseSign(for: type) && readHead + 1 < braille.count {
+                let next = String(
+                    braille[braille.index(braille.startIndex, offsetBy: readHead + 1)])
+                if let letter = letter(from: next, type: type) {
+                    nonBpmfText += letter.rawValue.uppercased()
+                    readHead += 2
+                    state = .letters
+                    continue
+                }
+            }
+
             // BPMF
             do {
                 let target = min(2, length - readHead - 1)
@@ -350,7 +402,10 @@ import Foundation
                         }
 
                         do {
-                            let bpmf = try BopomofoSyllable(braille: String(substring))
+                            let bpmf = try BopomofoSyllable(
+                                braille: String(substring),
+                                type: type
+                            )
                             readHead += i + 1
                             if !nonBpmfText.isEmpty {
                                 output.append(nonBpmfText)
@@ -395,12 +450,10 @@ import Foundation
                 }
             }
 
-            let substring = String(braille[braille.index(braille.startIndex, offsetBy: readHead)])
-
-            if substring == "⠼" {
+            if substring == numberSign(for: type) {
                 let next = String(
                     braille[braille.index(braille.startIndex, offsetBy: readHead + 1)])
-                if let digit = Digit(braille: next) {
+                if let digit = digit(from: next, type: type) {
                     nonBpmfText += digit.rawValue
                     readHead += 2
                     state = .digits
@@ -408,18 +461,7 @@ import Foundation
                 }
             }
 
-            if substring == "⠠" && readHead < braille.count {
-                let next = String(
-                    braille[braille.index(braille.startIndex, offsetBy: readHead + 1)])
-                if let letter = Letter(braille: next) {
-                    nonBpmfText += letter.rawValue.uppercased()
-                    readHead += 2
-                    state = .letters
-                    continue
-                }
-            }
-
-            if let letter = Letter(braille: substring) {
+            if let letter = letter(from: substring, type: type) {
                 nonBpmfText += letter.rawValue
                 readHead += 1
                 state = .letters

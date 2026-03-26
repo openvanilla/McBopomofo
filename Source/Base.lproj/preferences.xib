@@ -28,7 +28,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="401" y="295" width="475" height="567"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1049"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1050"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="475" height="567"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -547,7 +547,8 @@
                                 <menuItem title="Off" state="on" id="bAf-tJ-tnK"/>
                                 <menuItem title="Bopomofo Readings" tag="1" id="X6F-Wk-ZkH"/>
                                 <menuItem title="HTML Ruby" tag="2" id="ZwE-fD-480"/>
-                                <menuItem title="Taiwanese Braille" tag="3" id="JEj-fm-gxW"/>
+                                <menuItem title="Taiwanese Braille Unicode" tag="3" id="JEj-fm-gxW"/>
+                                <menuItem title="Taiwanese Braille ASCII" tag="5" id="9kV-LJ-jbA"/>
                                 <menuItem title="Hanyu Pinyin" tag="4" id="sV1-fA-YT0"/>
                             </items>
                         </menu>
@@ -635,11 +636,11 @@
             <point key="canvasLocation" x="131" y="-92"/>
         </view>
         <customView id="7EY-3X-sVm">
-            <rect key="frame" x="0.0" y="0.0" width="477" height="329"/>
+            <rect key="frame" x="0.0" y="0.0" width="478" height="329"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jIf-hP-5m5">
-                    <rect key="frame" x="18" y="293" width="137" height="16"/>
+                    <rect key="frame" x="19" y="293" width="137" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="User Phrase Location:" id="Sc6-Rd-pOy">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -647,7 +648,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z8D-qk-sAN">
-                    <rect key="frame" x="20" y="252" width="95" height="24"/>
+                    <rect key="frame" x="21" y="252" width="95" height="24"/>
                     <popUpButtonCell key="cell" type="push" title="Default" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="avu-Uo-JGI" id="Kln-Ca-WBd">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="message"/>
@@ -667,7 +668,7 @@
                     </connections>
                 </popUpButton>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEv-3b-PV4">
-                    <rect key="frame" x="127" y="252" width="290" height="25"/>
+                    <rect key="frame" x="128" y="252" width="290" height="25"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="6kS-fE-Kz7">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -679,7 +680,7 @@
                     </connections>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="svr-IJ-6mz">
-                    <rect key="frame" x="20" y="170" width="439" height="28"/>
+                    <rect key="frame" x="20" y="170" width="440" height="28"/>
                     <textFieldCell key="cell" id="Vz3-KS-1rk">
                         <font key="font" metaFont="smallSystem"/>
                         <string key="title">You can specify the folder to store user phrases to the folder of Google Drive, DropBox and so on so you can backup the phrases.</string>
@@ -688,7 +689,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dY1-Wz-mrw">
-                    <rect key="frame" x="425" y="252" width="32" height="24"/>
+                    <rect key="frame" x="426" y="252" width="32" height="24"/>
                     <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="NSFolder" imagePosition="overlaps" alignment="center" imageScaling="proportionallyDown" inset="2" id="cyL-Sf-xhj">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -699,7 +700,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="249" verticalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="OKJ-84-kIv">
-                    <rect key="frame" x="127" y="227" width="330" height="21"/>
+                    <rect key="frame" x="128" y="227" width="330" height="21"/>
                     <buttonCell key="cell" type="bevel" title="Button" bezelStyle="rounded" imagePosition="overlaps" alignment="left" controlSize="small" imageScaling="proportionallyDown" inset="2" id="wCH-YR-bl5">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -709,10 +710,10 @@
                     </connections>
                 </button>
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5ce-rm-tsn">
-                    <rect key="frame" x="20" y="147" width="433" height="5"/>
+                    <rect key="frame" x="21" y="147" width="433" height="5"/>
                 </box>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="HkV-PJ-yTW">
-                    <rect key="frame" x="18" y="113" width="437" height="16"/>
+                    <rect key="frame" x="19" y="113" width="437" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="After Adding a New Phrase:" id="wGR-0A-cqv">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -720,7 +721,7 @@
                     </textFieldCell>
                 </textField>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="LVc-PG-N32">
-                    <rect key="frame" x="20" y="83" width="249" height="16"/>
+                    <rect key="frame" x="21" y="83" width="249" height="16"/>
                     <buttonCell key="cell" type="check" title="Run a shell script" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="DaH-1b-AEw">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -730,7 +731,7 @@
                     </connections>
                 </button>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FMN-EJ-wzd">
-                    <rect key="frame" x="62" y="57" width="391" height="24"/>
+                    <rect key="frame" x="62" y="57" width="392" height="24"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Sbq-JE-A4U">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -749,7 +750,7 @@
                     </textFieldCell>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="0R5-DI-uXK">
-                    <rect key="frame" x="20" y="20" width="439" height="28"/>
+                    <rect key="frame" x="20" y="20" width="440" height="28"/>
                     <textFieldCell key="cell" title="You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder." id="byk-Br-x2Z">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>

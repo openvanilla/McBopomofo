@@ -66,6 +66,15 @@ enum Digit: String, CaseIterable {
         }
     }
 
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            braille
+        case .ascii:
+            rawValue
+        }
+    }
+
     case zero = "0"
     case one = "1"
     case two = "2"
@@ -99,7 +108,26 @@ enum DigitRelated: String, CaseIterable {
         case .celsius:
             "⠘⠨⠡ ⠰⠠⠉"
         }
+    }
 
+    var brailleAscii: String {
+        switch self {
+        case .point:
+            "."
+        case .percent:
+            "%"
+        case .celsius:
+            "~.* ;,c"
+        }
+    }
+
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            braille
+        case .ascii:
+            brailleAscii
+        }
     }
 
     case point = "."

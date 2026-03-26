@@ -82,6 +82,20 @@ public enum HalfWidthPunctuation: String, CaseIterable {
         }
     }
 
+    var brailleAscii: String {
+        rawValue
+    }
+
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            braille
+        case .ascii:
+            rawValue
+        }
+
+    }
+
     case period = "."
     case comma = ","
     case semicolon = ";"
