@@ -27,40 +27,23 @@ private let kMinimalBopomofoLength = 1
 private let kMinimalBrailleLength = 2
 
 private protocol Syllable {
-    var bopomofo: String { get }
-    var braille: String { get }
-    var brailleAscii: String { get }
-    var brailleCode: String { get }
     func getBraille(by type: BrailleType) -> String
-}
-
-extension Syllable {
-    func getBraille(by type: BrailleType) -> String {
-        switch type {
-        case .unicode:
-            braille
-        case .ascii:
-            brailleAscii
-        }
-    }
 }
 
 private protocol Combination {
-    var bopomofo: String { get }
-    var braille: String { get }
-    var brailleAscii: String { get }
-    var brailleCode: String { get }
     func getBraille(by type: BrailleType) -> String
 }
 
-extension Combination {
-    func getBraille(by type: BrailleType) -> String {
-        switch type {
-        case .unicode:
-            braille
-        case .ascii:
-            brailleAscii
-        }
+private func braille(
+    unicode: String,
+    ascii: String,
+    by type: BrailleType
+) -> String {
+    switch type {
+    case .unicode:
+        unicode
+    case .ascii:
+        ascii
     }
 }
 
@@ -92,20 +75,9 @@ private enum Consonant: String, CaseIterable, Syllable {
         .ㄙ: ("⠑", "e", "15"),
     ]
 
-    fileprivate var bopomofo: String {
-        self.rawValue
-    }
-
-    fileprivate var braille: String {
-        Consonant.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        Consonant.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        Consonant.bpmfBrailleMap[self]!.2
+    fileprivate func getBraille(by type: BrailleType) -> String {
+        let pair = Consonant.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     fileprivate var isSingle: Bool {
@@ -146,20 +118,10 @@ private enum MiddleVowel: String, CaseIterable, Syllable {
         .ㄨ: ("⠌", "/", "34"),
         .ㄩ: ("⠳", "|", "1256"),
     ]
-    fileprivate var bopomofo: String {
-        self.rawValue
-    }
 
-    fileprivate var braille: String {
-        MiddleVowel.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        MiddleVowel.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        MiddleVowel.bpmfBrailleMap[self]!.2
+    fileprivate func getBraille(by type: BrailleType) -> String {
+        let pair = MiddleVowel.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     fileprivate func buildCombination(rawValue: String) throws -> Combination {
@@ -201,20 +163,9 @@ private enum Vowel: String, CaseIterable, Syllable {
         .ㄦ: ("⠱", ":", "156"),
     ]
 
-    fileprivate var bopomofo: String {
-        self.rawValue
-    }
-
-    fileprivate var braille: String {
-        Vowel.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        Vowel.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        Vowel.bpmfBrailleMap[self]!.2
+    fileprivate func getBraille(by type: BrailleType) -> String {
+        let pair = Vowel.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     case ㄚ = "ㄚ"
@@ -248,20 +199,9 @@ private enum ㄧ_Combination: String, CaseIterable, Combination {
         .ㄧㄥ: ("⠽", "y", "13456"),
     ]
 
-    fileprivate var bopomofo: String {
-        "ㄧ" + self.rawValue
-    }
-
-    fileprivate var braille: String {
-        ㄧ_Combination.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        ㄧ_Combination.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        ㄧ_Combination.bpmfBrailleMap[self]!.2
+    fileprivate func getBraille(by type: BrailleType) -> String {
+        let pair = ㄧ_Combination.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     case ㄧㄚ = "ㄚ"
@@ -288,20 +228,9 @@ private enum ㄨ_Combination: String, CaseIterable, Combination {
         .ㄨㄥ: ("⠯", "&", "12346"),
     ]
 
-    fileprivate var bopomofo: String {
-        "ㄨ" + self.rawValue
-    }
-
-    fileprivate var braille: String {
-        ㄨ_Combination.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        ㄨ_Combination.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        ㄨ_Combination.bpmfBrailleMap[self]!.2
+    fileprivate func getBraille(by type: BrailleType) -> String {
+        let pair = ㄨ_Combination.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     case ㄨㄚ = "ㄚ"
@@ -322,20 +251,9 @@ private enum ㄩ_Combination: String, CaseIterable, Combination {
         .ㄩㄥ: ("⠖", "6", "235"),
     ]
 
-    fileprivate var bopomofo: String {
-        "ㄩ" + self.rawValue
-    }
-
-    fileprivate var braille: String {
-        ㄩ_Combination.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        ㄩ_Combination.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        ㄩ_Combination.bpmfBrailleMap[self]!.2
+    fileprivate func getBraille(by type: BrailleType) -> String {
+        let pair = ㄩ_Combination.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     case ㄩㄝ = "ㄝ"
@@ -356,30 +274,9 @@ private enum Tone: String, CaseIterable {
         .tone5: ("⠁", "a", "1"),
     ]
 
-    fileprivate var bopomofo: String {
-        return self.rawValue
-    }
-
-    fileprivate var braille: String {
-        Tone.bpmfBrailleMap[self]!.0
-    }
-
-    fileprivate var brailleAscii: String {
-        Tone.bpmfBrailleMap[self]!.1
-    }
-
-    fileprivate var brailleCode: String {
-        Tone.bpmfBrailleMap[self]!.1
-    }
-
     func getBraille(by type: BrailleType) -> String {
-        switch type {
-        case .unicode:
-            braille
-        case .ascii:
-            brailleAscii
-        }
-
+        let pair = Tone.bpmfBrailleMap[self]!
+        return braille(unicode: pair.0, ascii: pair.1, by: type)
     }
 
     case tone1 = ""
@@ -444,32 +341,32 @@ public struct BopomofoSyllable {
     private static let toneValues = Set(Tone.allCases.map { $0.rawValue })
 
     private static let consonantBraille = [
-        Set(Consonant.allCases.map { $0.braille }),
-        Set(Consonant.allCases.map { $0.brailleAscii }),
+        Set(Consonant.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(Consonant.allCases.map { $0.getBraille(by: .ascii) }),
     ]
     private static let middleVowelBraille = [
-        Set(MiddleVowel.allCases.map { $0.braille }),
-        Set(MiddleVowel.allCases.map { $0.brailleAscii }),
+        Set(MiddleVowel.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(MiddleVowel.allCases.map { $0.getBraille(by: .ascii) }),
     ]
     private static let vowelBraille = [
-        Set(Vowel.allCases.map { $0.braille }),
-        Set(Vowel.allCases.map { $0.brailleAscii }),
+        Set(Vowel.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(Vowel.allCases.map { $0.getBraille(by: .ascii) }),
     ]
     private static let toneBraille = [
-        Set(Tone.allCases.map { $0.braille }),
-        Set(Tone.allCases.map { $0.brailleAscii }),
+        Set(Tone.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(Tone.allCases.map { $0.getBraille(by: .ascii) }),
     ]
     private static let ㄧBraille = [
-        Set(ㄧ_Combination.allCases.map { $0.braille }),
-        Set(ㄧ_Combination.allCases.map { $0.brailleAscii }),
+        Set(ㄧ_Combination.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(ㄧ_Combination.allCases.map { $0.getBraille(by: .ascii) }),
     ]
     private static let ㄨBraille = [
-        Set(ㄨ_Combination.allCases.map { $0.braille }),
-        Set(ㄨ_Combination.allCases.map { $0.brailleAscii }),
+        Set(ㄨ_Combination.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(ㄨ_Combination.allCases.map { $0.getBraille(by: .ascii) }),
     ]
     private static let ㄩBraille = [
-        Set(ㄩ_Combination.allCases.map { $0.braille }),
-        Set(ㄩ_Combination.allCases.map { $0.brailleAscii }),
+        Set(ㄩ_Combination.allCases.map { $0.getBraille(by: .unicode) }),
+        Set(ㄩ_Combination.allCases.map { $0.getBraille(by: .ascii) }),
     ]
 
     private static func braille<S: Syllable>(for value: S, type: BrailleType) -> String {

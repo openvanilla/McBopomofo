@@ -57,7 +57,7 @@ public enum Letter: String, CaseIterable {
 
     init?(braille: String) {
         let aCase = Letter.allCases.first { aCase in
-            aCase.braille == braille
+            aCase.getBraille(by: .unicode) == braille
         }
         if let aCase {
             self = aCase
@@ -66,28 +66,12 @@ public enum Letter: String, CaseIterable {
         }
     }
 
-    var bopomofo: String {
-        return rawValue
-    }
-
-    var braille: String {
-        Letter.bpmfBrailleMap[self]!.0
-    }
-
-    var bralleAscii: String {
-        return rawValue
-    }
-
-    var brailleCode: String {
-        Letter.bpmfBrailleMap[self]!.1
-    }
-
     func getBraille(by type: BrailleType) -> String {
         switch type {
         case .unicode:
-            braille
+            Letter.bpmfBrailleMap[self]!.0
         case .ascii:
-            bralleAscii
+            rawValue
         }
     }
 

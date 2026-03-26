@@ -272,7 +272,9 @@ import Foundation
     /// - Parameter braille: The text in Taiwanese Braille.
     /// - Returns: The tokens.
     @objc(convertBrailleToTokens:type:)
-    public static func convert(brailleToTokens braille: String, type:BrailleType = .unicode) -> [Any] {
+    public static func convert(brailleToTokens braille: String, type: BrailleType = .unicode)
+        -> [Any]
+    {
         var state = ConverterState.initial
         var output: [Any] = []
         var readHead = 0
@@ -358,7 +360,10 @@ import Foundation
                         let start = braille.index(braille.startIndex, offsetBy: readHead)
                         let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                         let substring = braille[start...end]
-                        if let punctuation = HalfWidthPunctuation(braille: String(substring)) {
+                        if let punctuation = HalfWidthPunctuation(
+                            braille: String(substring),
+                            type: type
+                        ) {
                             nonBpmfText += punctuation.rawValue
                             readHead += i + 1
                             found = true
@@ -432,7 +437,10 @@ import Foundation
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
-                    if let punctuation = FullWidthPunctuation(braille: String(substring)) {
+                    if let punctuation = FullWidthPunctuation(
+                        braille: String(substring),
+                        type: type
+                    ) {
                         if state == .initial
                             && punctuation.supposedToBeAtStart == false
                         {
@@ -475,7 +483,10 @@ import Foundation
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
-                    if let punctuation = HalfWidthPunctuation(braille: String(substring)) {
+                    if let punctuation = HalfWidthPunctuation(
+                        braille: String(substring),
+                        type: type
+                    ) {
                         nonBpmfText += punctuation.rawValue
                         readHead += i + 1
                         state = .letters

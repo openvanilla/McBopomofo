@@ -26,9 +26,9 @@ import Foundation
 /// Represents the half-width punctuations
 public enum HalfWidthPunctuation: String, CaseIterable {
 
-    init?(braille: String) {
+    init?(braille: String, type: BrailleType) {
         let aCase = HalfWidthPunctuation.allCases.first { aCase in
-            aCase.braille == braille
+            aCase.getBraille(by: type) == braille
         }
         if let aCase {
             self = aCase
@@ -37,63 +37,50 @@ public enum HalfWidthPunctuation: String, CaseIterable {
         }
     }
 
-    var bopomofo: String {
-        return rawValue
-    }
-
-    var braille: String {
-        switch self {
-        case .period:
-            "⠲"
-        case .comma:
-            "⠂"
-        case .semicolon:
-            "⠒"
-        case .dash:
-            "⠄"
-        case .questionMark:
-            "⠦"
-        case .exclamationMark:
-            "⠖"
-        case .colon:
-            "⠒"
-        case .slash:
-            "⠤"
-        case .star:
-            "⠔⠔"
-        case .dotDotDot:
-            "⠄⠄⠄"
-        case .singleQuotationMarkLeft:
-            "⠠⠦"
-        case .singleQuotationMarkRight:
-            "⠴⠄"
-        case .doubleQuotationMarkLeft:
-            "⠦"
-        case .doubleQuotationMarkRight:
-            "⠴"
-        case .parenthesesLeft:
-            "⠶"
-        case .parenthesesRight:
-            "⠶"
-        case .bracketLeft:
-            "⠠⠶"
-        case .bracketRight:
-            "⠶⠄"
-        }
-    }
-
-    var brailleAscii: String {
-        rawValue
-    }
-
     func getBraille(by type: BrailleType) -> String {
         switch type {
         case .unicode:
-            braille
+            switch self {
+            case .period:
+                "⠲"
+            case .comma:
+                "⠂"
+            case .semicolon:
+                "⠒"
+            case .dash:
+                "⠄"
+            case .questionMark:
+                "⠦"
+            case .exclamationMark:
+                "⠖"
+            case .colon:
+                "⠒"
+            case .slash:
+                "⠤"
+            case .star:
+                "⠔⠔"
+            case .dotDotDot:
+                "⠄⠄⠄"
+            case .singleQuotationMarkLeft:
+                "⠠⠦"
+            case .singleQuotationMarkRight:
+                "⠴⠄"
+            case .doubleQuotationMarkLeft:
+                "⠦"
+            case .doubleQuotationMarkRight:
+                "⠴"
+            case .parenthesesLeft:
+                "⠶"
+            case .parenthesesRight:
+                "⠶"
+            case .bracketLeft:
+                "⠠⠶"
+            case .bracketRight:
+                "⠶⠄"
+            }
         case .ascii:
             rawValue
         }
-
     }
 
     case period = "."

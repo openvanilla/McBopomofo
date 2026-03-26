@@ -218,6 +218,7 @@ final class ServiceProviderTests {
     @Test(
         "Test coverting Chinese to ASCII Taiwanese Braille, then coverting it back",
         arguments: [
+            ("「」", ""),
             ("由「小麥」的作者", ""),
             ("This is a test", ""),
             ("第1名", "地 1 明"),
