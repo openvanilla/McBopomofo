@@ -3,5 +3,7 @@
 "Add Hanyu Pinyin to Text" = "Add Hanyu Pinyin to Text";
 "Convert Text to Bopomofo Readings" = "Convert Text to Bopomofo Readings";
 "Convert Text to Hanyu Pinyin" = "Convert Text to Hanyu Pinyin";
-"Convert Text to Taiwanese Braille" = "Convert Text to Taiwanese Braille";
-"Convert Taiwanese Braille to Text" = "Convert Taiwanese Braille to Text";
+"Convert Text to Unicode Taiwanese Braille" = "Convert Text to Unicode Taiwanese Braille";
+"Convert Text to ASCII Taiwanese Braille" = "Convert Text to ASCII Taiwanese Braille";
+"Convert Unicode Taiwanese Braille to Text" = "Convert Unicode Taiwanese Braille to Text";
+"Convert ASCII Taiwanese Braille to Text" = "Convert ASCII Taiwanese Braille to Text";

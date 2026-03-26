@@ -117,4 +117,20 @@ final class BopomofoBrailleTests {
         #expect(output == "ABcd")
     }
 
+    @Test(
+        "Test ASCII Braille yv combinations",
+        arguments: [
+            ("ㄩㄝˋ", "8\""),
+            ("ㄩㄢˋ", "~\""),
+            ("ㄩㄣˋ", "4\""),
+            ("ㄩㄥˋ", "6\""),
+        ])
+    func testAsciiYvCombinations(input: String, expected: String) {
+        let braille = BopomofoBrailleConverter.convert(bopomofo: input, type: .ascii)
+        #expect(braille == expected)
+
+        let output = BopomofoBrailleConverter.convert(braille: expected, type: .ascii)
+        #expect(output == input)
+    }
+
 }

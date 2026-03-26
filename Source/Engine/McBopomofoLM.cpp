@@ -24,6 +24,7 @@
 #include "McBopomofoLM.h"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <string>
@@ -361,3 +362,4 @@ void McBopomofoLM::loadPhraseReplacementMap(const char* data, size_t length) {
 }
 
 }  // namespace McBopomofo
+

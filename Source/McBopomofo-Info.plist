@@ -215,10 +215,10 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>Convert Text to Taiwanese Braille</string>
+				<string>Convert Text to Unicode Taiwanese Braille</string>
 			</dict>
 			<key>NSMessage</key>
-			<string>convertToBraille</string>
+			<string>convertToUnicodeBraille</string>
 			<key>NSRequiredContext</key>
 			<dict/>
 			<key>NSReturnTypes</key>
@@ -236,10 +236,52 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>Convert Taiwanese Braille to Text</string>
+				<string>Convert Text to ASCII Taiwanese Braille</string>
 			</dict>
 			<key>NSMessage</key>
-			<string>convertBrailleToChineseText</string>
+			<string>convertToASCIIBraille</string>
+			<key>NSRequiredContext</key>
+			<dict/>
+			<key>NSReturnTypes</key>
+			<array>
+				<string>NSPasteboardTypeString</string>
+				<string>NSStringPboardType</string>
+			</array>
+			<key>NSSendTypes</key>
+			<array>
+				<string>NSPasteboardTypeString</string>
+				<string>NSStringPboardType</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Convert Unicode Taiwanese Braille to Text</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>convertUnicodeBrailleToChineseText</string>
+			<key>NSRequiredContext</key>
+			<dict/>
+			<key>NSReturnTypes</key>
+			<array>
+				<string>NSPasteboardTypeString</string>
+				<string>NSStringPboardType</string>
+			</array>
+			<key>NSSendTypes</key>
+			<array>
+				<string>NSPasteboardTypeString</string>
+				<string>NSStringPboardType</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Convert ASCII Taiwanese Braille to Text</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>convertASCIIBrailleToChineseText</string>
 			<key>NSRequiredContext</key>
 			<dict/>
 			<key>NSReturnTypes</key>

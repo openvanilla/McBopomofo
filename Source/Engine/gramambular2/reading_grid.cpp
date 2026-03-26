@@ -414,7 +414,9 @@ std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
   for (size_t i = 1, len = spans_[loc].maxLength(); i <= len; ++i) {
     NodePtr ptr = spans_[loc].nodeOf(i);
     if (ptr != nullptr) {
-      ReadingGrid::NodeInSpan element{.node = std::move(ptr), .spanIndex = loc};
+      ReadingGrid::NodeInSpan element;
+      element.node = std::move(ptr);
+      element.spanIndex = loc;
       results.emplace_back(std::move(element));
     }
   }
@@ -426,7 +428,9 @@ std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
     for (size_t j = beginLen; j <= endLen; ++j) {
       NodePtr ptr = spans_[i].nodeOf(j);
       if (ptr != nullptr) {
-        ReadingGrid::NodeInSpan element{.node = std::move(ptr), .spanIndex = i};
+        ReadingGrid::NodeInSpan element;
+        element.node = std::move(ptr);
+        element.spanIndex = i;
         results.emplace_back(std::move(element));
       }
     }
