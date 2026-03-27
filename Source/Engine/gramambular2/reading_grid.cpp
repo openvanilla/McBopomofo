@@ -223,7 +223,8 @@ std::vector<ReadingGrid::Candidate> ReadingGrid::candidatesAt(size_t loc) {
 
   for (const NodeInSpan& nodeInSpan : nodes) {
     for (const LanguageModel::Unigram& unigram : nodeInSpan.node->unigrams()) {
-        result.emplace_back(nodeInSpan.node->reading(), unigram.value(), unigram.rawValue());
+      result.emplace_back(nodeInSpan.node->reading(), unigram.value(),
+                          unigram.rawValue());
     }
   }
   return result;
@@ -414,9 +415,7 @@ std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
   for (size_t i = 1, len = spans_[loc].maxLength(); i <= len; ++i) {
     NodePtr ptr = spans_[loc].nodeOf(i);
     if (ptr != nullptr) {
-      ReadingGrid::NodeInSpan element;
-      element.node = std::move(ptr);
-      element.spanIndex = loc;
+      ReadingGrid::NodeInSpan element{std::move(ptr), loc};
       results.emplace_back(std::move(element));
     }
   }
@@ -428,9 +427,7 @@ std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
     for (size_t j = beginLen; j <= endLen; ++j) {
       NodePtr ptr = spans_[i].nodeOf(j);
       if (ptr != nullptr) {
-        ReadingGrid::NodeInSpan element;
-        element.node = std::move(ptr);
-        element.spanIndex = i;
+        ReadingGrid::NodeInSpan element{std::move(ptr), i};
         results.emplace_back(std::move(element));
       }
     }

@@ -103,36 +103,23 @@ VariantAnnotator::Result VariantAnnotator::annotateSingleCharacter(
   if (!variant.empty()) {
     // If variant != value, a variant selector must have been used.
     bool selectorUsed = variant != value;
-    Result r;
-    r.annotatedString = variant;
-    r.hasVariantSelectors = selectorUsed;
-    return r;
+    return Result{variant, selectorUsed, false};
   }
 
   // Now try the fallback.
   variant = findUnannotatedVariant(value);
   if (variant.empty() || variant == reading) {
-    Result r;
-    r.annotatedString = value;
-    return r;
+    return Result{value, false, false};
   }
 
   std::string puaBlock = findCombinedPUABopomofoReading(reading);
   if (!puaBlock.empty()) {
     // The string is the value + Variant 0 selector + the Bopomofo block in PUA.
-    Result r;
-    r.annotatedString = variant + puaBlock;
-    r.hasVariantSelectors = true;
-    r.hasPUACodePoints = true;
-    return r;
+    return Result{variant + puaBlock, true, true};
   }
 
-  {
-    Result r;
-    r.annotatedString = variant;
-    r.hasVariantSelectors = true;
-    return r;
-  }
+  // Only the unannotated Variant 0 is found.
+  return Result{variant, true, false};
 }
 
 VariantAnnotator::CombinedResult VariantAnnotator::annotate(
@@ -199,4 +186,3 @@ void VariantAnnotator::closeMemoryMapFiles() {
 }
 
 }  // namespace McBopomofo
-
