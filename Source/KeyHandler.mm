@@ -754,7 +754,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 }
                 InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
                 choosingCandidate.originalCursorIndex = originalCursorIndex;
-                stateCallback(choosingCandidate);
+                InputChoosingPunctuationList *choosingPunctuationList = [[InputChoosingPunctuationList alloc] initWithChoosingCandidate:choosingCandidate];
+                stateCallback(choosingPunctuationList);
             } else { // If there is still unfinished bpmf reading, ignore the punctuation
                 errorCallback();
             }
@@ -1382,11 +1383,42 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     UniChar charCode = input.charCode;
     VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
+    if ([state isKindOfClass:[InputChoosingPunctuationList class]]) {
+        if ([input.inputText isEqualToString:@"`"]) {
+            _grid->clear();
+            _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult {};
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
+            InputStateSelectingFeature *selectingFeature = [[InputStateSelectingFeature alloc] init];
+            stateCallback(selectingFeature);
+            return YES;
+        }
+
+        std::string key = "_punctuation_list_" + std::string(input.inputText.UTF8String);
+        if (_languageModel->hasUnigrams(key)) {
+            if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                _grid->deleteReadingAfterCursor();
+            } else {
+                _grid->deleteReadingBeforeCursor();
+            }
+            _grid->insertReading(key);
+            [self _walk];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+            stateCallback(inputting);
+            return YES;
+        }
+    }
+
     BOOL cancelCandidateKey = (charCode == 27) || (charCode == 8) || input.isDelete;
 
     BOOL isCursorMovingLeft = NO;
     BOOL isCursorMovingRight = NO;
-    if (input.isShiftHold) {
+
+    if ([state isKindOfClass:[InputChoosingPunctuationList class]]) {
+        // Not allowed to move the cursor in the punctuation list mode.
+        isCursorMovingLeft = NO;
+        isCursorMovingRight = NO;
+    } else if (input.isShiftHold) {
         isCursorMovingLeft = input.isLeft;
         isCursorMovingRight = input.isRight;
     } else {
@@ -1580,19 +1612,28 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
+        } else if ([state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
+            [self clear];
+            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+            stateCallback(empty);
         } else if (_inputMode == InputModePlainBopomofo) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
+        } else if ([state isKindOfClass:[InputChoosingPunctuationList class]]) {
+            if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                _grid->deleteReadingAfterCursor();
+            } else {
+                _grid->deleteReadingBeforeCursor();
+            }
+            [self _walk];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+            stateCallback(inputting);
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             size_t originalCursorIndex = ((InputStateChoosingCandidate *)state).originalCursorIndex;
             _grid->setCursor(originalCursorIndex);
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);
-        } else if ([state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
-            [self clear];
-            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
-            stateCallback(empty);
         } else {
             InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
             stateCallback(inputting);

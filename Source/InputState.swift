@@ -132,7 +132,8 @@ class InputState: NSObject {
                 NSLocalizedString("Iroha Kana Input", comment: ""),
                 {
                     .IrohaKana(code: "")
-                }),
+                }
+            ),
         ]
 
         override var description: String {
@@ -274,7 +275,6 @@ class InputState: NSObject {
         }
     }
 
-
     @objc(InputStateIrohaKanaCandidates)
     class IrohaKanaCandidates: InputState, CandidateProvider {
         @objc private(set) var code: String
@@ -306,7 +306,6 @@ class InputState: NSObject {
             return "[伊呂波] \(code)"
         }
     }
-
 
     // MARK: -
 
@@ -569,6 +568,24 @@ class InputState: NSObject {
 
         func reading(at index: Int) -> String? {
             candidates[index].reading
+        }
+    }
+
+    ///  Subclass of ChoosingCandidate specially for choosing punctuations in
+    ///  the punctuation input mode.
+    @objc(InputChoosingPunctuationList)
+    class ChoosingPunctuationList: ChoosingCandidate {
+        override var description: String {
+            "<InputState.ChoosingPunctuationList, candidates:\(candidates), useVerticalMode:\(useVerticalMode),  composingBuffer:\(composingBuffer), cursorIndex:\(cursorIndex)>"
+        }
+
+        @objc init(choosingCandidate: ChoosingCandidate) {
+            super.init(
+                composingBuffer: choosingCandidate.composingBuffer,
+                cursorIndex: choosingCandidate.cursorIndex,
+                candidates: choosingCandidate.candidates,
+                useVerticalMode: choosingCandidate.useVerticalMode
+            )
         }
     }
 
@@ -852,4 +869,3 @@ class InputState: NSObject {
         }
     }
 }
-
