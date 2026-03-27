@@ -94,7 +94,8 @@ const char* AdvanceToNextNonContentCharacter(const char* ptr, const char* end) {
   return ptr;
 }
 
-#ifndef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if !defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512) && \
+    !defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
 const char* FindFirstNULL(const char* ptr, const char* end,
                           size_t* firstLineNumber = nullptr) {
   const char* i = ptr;
