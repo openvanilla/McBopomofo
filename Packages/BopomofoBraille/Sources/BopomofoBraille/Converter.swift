@@ -235,7 +235,9 @@ import Foundation
                 output += punctuation.getBraille(by: type)
                 readHead += 1
                 state = .letters
+                continue
             }
+
             if state != .initial {
                 output += " "
             }
