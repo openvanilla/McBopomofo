@@ -103,26 +103,23 @@ VariantAnnotator::Result VariantAnnotator::annotateSingleCharacter(
   if (!variant.empty()) {
     // If variant != value, a variant selector must have been used.
     bool selectorUsed = variant != value;
-    return Result{.annotatedString = variant,
-                  .hasVariantSelectors = selectorUsed};
+    return Result{variant, selectorUsed, false};
   }
 
   // Now try the fallback.
   variant = findUnannotatedVariant(value);
   if (variant.empty() || variant == reading) {
-    return Result{.annotatedString = value};
+    return Result{value, false, false};
   }
 
   std::string puaBlock = findCombinedPUABopomofoReading(reading);
   if (!puaBlock.empty()) {
     // The string is the value + Variant 0 selector + the Bopomofo block in PUA.
-    return Result{.annotatedString = variant + puaBlock,
-                  .hasVariantSelectors = true,
-                  .hasPUACodePoints = true};
+    return Result{variant + puaBlock, true, true};
   }
 
   // Only the unannotated Variant 0 is found.
-  return Result{.annotatedString = variant, .hasVariantSelectors = true};
+  return Result{variant, true, false};
 }
 
 VariantAnnotator::CombinedResult VariantAnnotator::annotate(
