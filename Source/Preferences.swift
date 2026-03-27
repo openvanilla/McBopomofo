@@ -471,8 +471,8 @@ extension ControlEnterOutput {
         case .off: "Off"
         case .bpmfReading: "Bopomofo Reading"
         case .htmlRuby: "HTML Ruby Text"
-        case .brailleUnicode: "Taiwan Braille (Unicode)"
-        case .brailleAscii: "Taiwan Braille (Ascii)"
+        case .brailleUnicode: "Taiwanese Braille (Unicode)"
+        case .brailleAscii: "Taiwanese Braille (ASCII)"
         case .hanyuPinyin: "Hanyu Pinyin"
         }
     }

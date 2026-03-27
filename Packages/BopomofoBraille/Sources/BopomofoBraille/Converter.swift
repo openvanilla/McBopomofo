@@ -319,7 +319,7 @@ import Foundation
                     let start = braille.index(braille.startIndex, offsetBy: readHead)
                     let end = braille.index(braille.startIndex, offsetBy: readHead + i)
                     let substring = braille[start...end]
-                    if let punctuation = DigitRelated(braille: String(substring)) {
+                    if let punctuation = DigitRelated(braille: String(substring), type: type) {
                         nonBpmfText += punctuation.rawValue
                         readHead += i + 1
                         found = true

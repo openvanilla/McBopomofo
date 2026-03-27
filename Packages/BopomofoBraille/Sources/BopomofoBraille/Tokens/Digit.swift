@@ -84,9 +84,9 @@ enum Digit: String, CaseIterable {
 }
 
 enum DigitRelated: String, CaseIterable {
-    init?(braille: String) {
+    init?(braille: String, type: BrailleType) {
         let aCase = DigitRelated.allCases.first { aCase in
-            aCase.getBraille(by: .unicode) == braille
+            aCase.getBraille(by: type) == braille
         }
         if let aCase {
             self = aCase
