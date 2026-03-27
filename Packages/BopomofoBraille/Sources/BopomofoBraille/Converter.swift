@@ -24,6 +24,9 @@
 import Foundation
 
 /// Convert Bopomofo to Braille and vice versa.
+///
+/// Note: there is another implementation could be a reference
+/// https://hurthuang.github.io/vi.note/brl/tw-brl-trans/braille-translate-bkline.htm
 @objc public class BopomofoBrailleConverter: NSObject {
 
     private static func numberSign(for type: BrailleType) -> String {

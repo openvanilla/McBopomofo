@@ -110,7 +110,7 @@ public enum FullWidthPunctuation: String, CaseIterable {
             case .personNameMark:
                 "|"
             case .slash:
-                "-"
+                "---"
             case .bookNameMark:
                 "~"
             case .ellipsis:
