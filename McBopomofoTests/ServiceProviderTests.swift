@@ -135,21 +135,21 @@ final class ServiceProviderTests {
     }
 
     @Test(
-        "Test converting Taiwanese Braille to Chinese",
+        "Test converting Unicode Taiwanese Braille to Chinese",
         arguments: [
             ("⠰⠤⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐⠤⠆", "「台灣人最需要的就是消波塊」")
         ])
-    func testConvertBrailleToChinese(input: String, expected: String) {
+    func testConvertUnicodeBrailleToChinese(input: String, expected: String) {
         LanguageModelManager.loadDataModels()
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let output = provider.convertBrailleToChineseText(string: input)
+        let output = provider.convertUnicodeBrailleToChineseText(string: input)
         #expect(output == expected, "\(output)")
     }
 
     @Test(
-        "Test coverting Chinese to Taiwanese Braille, then coverting it back",
+        "Test coverting Chinese to Unicode Taiwanese Braille, then coverting it back",
         arguments: [
             ("由「小麥」的作者", ""),
             ("This is a test", ""),
@@ -163,8 +163,8 @@ final class ServiceProviderTests {
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let r1 = provider.convertToBraille(string: input)
-        let r2 = provider.convertBrailleToChineseText(string: r1)
+        let r1 = provider.convertToUnicodeBraille(string: input)
+        let r2 = provider.convertUnicodeBrailleToChineseText(string: r1)
         if expected == "" {
             #expect(r2 == input, "\(r2)")
         } else {
@@ -173,31 +173,84 @@ final class ServiceProviderTests {
     }
 
     @Test(
-        "Test coverting letters to Taiwanese Braille",
+        "Test coverting letters to Unicode Taiwanese Braille",
         arguments: [
             ("This is a test", "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞"),
             ("This is a test 台灣人最需要的就是消波塊", "⠠⠞⠓⠊⠎ ⠊⠎ ⠁ ⠞⠑⠎⠞ ⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐"),
         ])
-    func testLetters(input: String, expected: String) {
+    func testUnicodeBrailleLetters(input: String, expected: String) {
         LanguageModelManager.loadDataModels()
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let result = provider.convertToBraille(string: input)
+        let result = provider.convertToUnicodeBraille(string: input)
         #expect(result == expected)
     }
 
     @Test(
-        "Test coverting digits to Taiwanese Braille",
+        "Test coverting digits to Unicode Taiwanese Braille",
         arguments: [
             ("24", "⠼⠆⠲")
         ])
-    func testDigit(input: String, expected: String) {
+    func testUnicodeBrailleDigit(input: String, expected: String) {
         LanguageModelManager.loadDataModels()
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
         provider.delegate = helper as? any ServiceProviderDelegate
-        let result = provider.convertToBraille(string: input)
+        let result = provider.convertToUnicodeBraille(string: input)
+        #expect(result == expected)
+    }
+
+    @Test(
+        "Test coverting letters to ASCII Taiwanese Braille",
+        arguments: [
+            ("This is a test", ",this is a test")
+        ])
+    func testASCIIBrailleLetters(input: String, expected: String) {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let result = provider.convertToASCIIBraille(string: input)
+        #expect(result == expected)
+    }
+
+    @Test(
+        "Test coverting Chinese to ASCII Taiwanese Braille, then coverting it back",
+        arguments: [
+            ("「」", ""),
+            ("由「小麥」的作者", ""),
+            ("This is a test", ""),
+            ("第1名", "地 1 明"),
+            ("第A名", "地 A 明"),
+            ("第AB名", "地 AB 明"),
+            ("第A1名", "地 A1 明"),
+        ])
+    func testConvertASCIIBrailleThenBack(input: String, expected: String) {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let r1 = provider.convertToASCIIBraille(string: input)
+        let r2 = provider.convertASCIIBrailleToChineseText(string: r1)
+        if expected == "" {
+            #expect(r2 == input, "\(r2)")
+        } else {
+            #expect(r2 == expected, "\(r2)")
+        }
+    }
+
+    @Test(
+        "Test coverting digits to ASCII Taiwanese Braille",
+        arguments: [
+            ("24", "#24")
+        ])
+    func testASCIIBrailleDigit(input: String, expected: String) {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let result = provider.convertToASCIIBraille(string: input)
         #expect(result == expected)
     }
 
@@ -227,8 +280,8 @@ final class ServiceProviderTests {
         #expect(read(from: pasteboard) == input)
     }
 
-    @Test("Test convert braille to Chinese service with pasteboard")
-    func testConvertBrailleToChineseServiceWithPasteboard() {
+    @Test("Test convert Unicode braille to Chinese service with pasteboard")
+    func testConvertUnicodeBrailleToChineseServiceWithPasteboard() {
         LanguageModelManager.loadDataModels()
         let provider = ServiceProvider()
         let helper = ServiceProviderInputHelper()
@@ -237,9 +290,24 @@ final class ServiceProviderTests {
         let input = "⠰⠤⠋⠺⠂⠻⠄⠛⠥⠂⠓⠫⠐⠑⠳⠄⠪⠐⠙⠮⠁⠅⠎⠐⠊⠱⠐⠑⠪⠄⠏⠣⠄⠇⠶⠐⠤⠆"
         write(input, to: pasteboard)
 
-        provider.convertBrailleToChineseText(pasteboard, userData: nil, error: nil)
+        provider.convertUnicodeBrailleToChineseText(pasteboard, userData: nil, error: nil)
 
-        #expect(read(from: pasteboard) == provider.convertBrailleToChineseText(string: input))
+        #expect(read(from: pasteboard) == provider.convertUnicodeBrailleToChineseText(string: input))
+    }
+
+    @Test("Test convert ASCII braille to Chinese service with pasteboard")
+    func testConvertASCIIBrailleToChineseServiceWithPasteboard() {
+        LanguageModelManager.loadDataModels()
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let pasteboard = makePasteboard()
+        let input = provider.convertToASCIIBraille(string: "「台灣人最需要的就是消波塊」")
+        write(input, to: pasteboard)
+
+        provider.convertASCIIBrailleToChineseText(pasteboard, userData: nil, error: nil)
+
+        #expect(read(from: pasteboard) == provider.convertASCIIBrailleToChineseText(string: input))
     }
 
     @Test("Test convert to annotated text service with pasteboard")

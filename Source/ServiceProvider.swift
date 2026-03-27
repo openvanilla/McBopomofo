@@ -389,29 +389,48 @@ extension ServiceProvider {
 
     // MARK: - Braille
 
-    func convertToBraille(string: String) -> String {
+    private func convertToBraille(string: String, type: BrailleType) -> String {
         process(string: string, addSpace: true, convertEachCharacter: false) {
-            BopomofoBrailleConverter.convert(bopomofo: $1)
+            BopomofoBrailleConverter.convert(bopomofo: $1, type: type)
         } readingNotFoundCallback: {
-            BopomofoBrailleConverter.convert(bopomofo: $0)
+            BopomofoBrailleConverter.convert(bopomofo: $0, type: type)
         }
     }
 
-    /// Converts selected text to Taiwanese Braille.
-    @objc func convertToBraille(
+    func convertToUnicodeBraille(string: String) -> String {
+        convertToBraille(string: string, type: .unicode)
+    }
+
+    /// Converts selected text to Unicode Taiwanese Braille.
+    @objc func convertToUnicodeBraille(
         _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
         transformPasteboardString(pasteboard, maximumLength: kMaxLength) { string in
             string.components(separatedBy: "\n").map { input in
-                convertToBraille(string: input)
+                convertToUnicodeBraille(string: input)
             }.joined(separator: "\n")
         }
     }
 
-    func convertBrailleToChineseText(string: String) -> String {
+    func convertToASCIIBraille(string: String) -> String {
+        convertToBraille(string: string, type: .ascii)
+    }
+
+    /// Converts selected text to ASCII Taiwanese Braille.
+    @objc func convertToASCIIBraille(
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
+    ) {
+        transformPasteboardString(pasteboard, maximumLength: kMaxLength) { string in
+            string.components(separatedBy: "\n").map { input in
+                convertToASCIIBraille(string: input)
+            }.joined(separator: "\n")
+        }
+    }
+
+    private func convertBrailleToChineseText(string: String, type: BrailleType) -> String {
         delegate?.serviceProvider(didRequestReset: self)
         var output = ""
-        let tokens = BopomofoBrailleConverter.convert(brailleToTokens: string)
+        let tokens = BopomofoBrailleConverter.convert(brailleToTokens: string, type: type)
 
         for token in tokens {
             switch token {
@@ -432,12 +451,29 @@ extension ServiceProvider {
         return output
     }
 
-    /// Converts the selected Taiwanese Braille to Chinese text.
-    @objc func convertBrailleToChineseText(
+    func convertUnicodeBrailleToChineseText(string: String) -> String {
+        convertBrailleToChineseText(string: string, type: .unicode)
+    }
+
+    /// Converts the selected Unicode Taiwanese Braille to Chinese text.
+    @objc func convertUnicodeBrailleToChineseText(
         _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
     ) {
         transformPasteboardString(pasteboard, skipIfOutputIsEmpty: true) { string in
-            convertBrailleToChineseText(string: string)
+            convertUnicodeBrailleToChineseText(string: string)
+        }
+    }
+
+    func convertASCIIBrailleToChineseText(string: String) -> String {
+        convertBrailleToChineseText(string: string, type: .ascii)
+    }
+
+    /// Converts the selected ASCII Taiwanese Braille to Chinese text.
+    @objc func convertASCIIBrailleToChineseText(
+        _ pasteboard: NSPasteboard, userData _: String?, error _: NSErrorPointer
+    ) {
+        transformPasteboardString(pasteboard, skipIfOutputIsEmpty: true) { string in
+            convertASCIIBrailleToChineseText(string: string)
         }
     }
 

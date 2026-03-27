@@ -25,9 +25,9 @@ import Foundation
 
 /// Represents the full-width punctuations
 public enum FullWidthPunctuation: String, CaseIterable {
-    init?(braille: String) {
+    init?(braille: String, type: BrailleType) {
         let aCase = FullWidthPunctuation.allCases.first { aCase in
-            aCase.braille == braille
+            aCase.getBraille(by: type) == braille
         }
         if let aCase {
             self = aCase
@@ -36,60 +36,110 @@ public enum FullWidthPunctuation: String, CaseIterable {
         }
     }
 
-    var bopomofo: String {
-        return rawValue
-    }
-
-    var braille: String {
-        switch self {
-        case .period:
-            "⠤"
-        case .dot:
-            "⠤"
-        case .comma:
-            "⠆"
-        case .semicolon:
-            "⠰"
-        case .ideographicComma:
-            "⠠"
-        case .questionMark:
-            "⠕"
-        case .exclamationMark:
-            "⠇"
-        case .colon:
-            "⠒⠒"
-        case .personNameMark:
-            "⠰⠰"
-        case .slash:
-            "⠐⠂"
-        case .bookNameMark:
-            "⠠⠤"
-        case .ellipsis:
-            "⠐⠐⠐"
-        case .referenceMark:
-            "⠈⠼"
-        case .doubleRing:
-            "⠪⠕"
-        case .singleQuotationMarkLeft:
-            "⠰⠤"
-        case .singleQuotationMarkRight:
-            "⠤⠆"
-        case .doubleQuotationMarkLeft:
-            "⠰⠤⠰⠤"
-        case .doubleQuotationMarkRight:
-            "⠤⠆⠤⠆"
-        case .parenthesesLeft:
-            "⠪"
-        case .parenthesesRight:
-            "⠕"
-        case .bracketLeft:
-            "⠯"
-        case .bracketRight:
-            "⠽"
-        case .braceLeft:
-            "⠦"
-        case .braceRight:
-            "⠴"
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            switch self {
+            case .period:
+                "⠤"
+            case .dot:
+                "⠤"
+            case .comma:
+                "⠆"
+            case .semicolon:
+                "⠰"
+            case .ideographicComma:
+                "⠠"
+            case .questionMark:
+                "⠕"
+            case .exclamationMark:
+                "⠇"
+            case .colon:
+                "⠒⠒"
+            case .personNameMark:
+                "⠰⠰"
+            case .slash:
+                "⠐⠂"
+            case .bookNameMark:
+                "⠠⠤"
+            case .ellipsis:
+                "⠐⠐⠐"
+            case .referenceMark:
+                "⠈⠼"
+            case .doubleRing:
+                "⠪⠕"
+            case .singleQuotationMarkLeft:
+                "⠰⠤"
+            case .singleQuotationMarkRight:
+                "⠤⠆"
+            case .doubleQuotationMarkLeft:
+                "⠰⠤⠰⠤"
+            case .doubleQuotationMarkRight:
+                "⠤⠆⠤⠆"
+            case .parenthesesLeft:
+                "⠪"
+            case .parenthesesRight:
+                "⠕"
+            case .bracketLeft:
+                "⠯"
+            case .bracketRight:
+                "⠽"
+            case .braceLeft:
+                "⠦"
+            case .braceRight:
+                "⠴"
+            }
+        case .ascii:
+            switch self {
+            case .period:
+                "-"
+            case .dot:
+                "."
+            case .comma:
+                "2"
+            case .semicolon:
+                ";"
+            case .ideographicComma:
+                ","
+            case .questionMark:
+                "?"
+            case .exclamationMark:
+                "l"
+            case .colon:
+                "33"
+            case .personNameMark:
+                "|"
+            case .slash:
+                "---"
+            case .bookNameMark:
+                "~"
+            case .ellipsis:
+                "'''"
+            case .referenceMark:
+                "`#"
+            case .doubleRing:
+                "{o"
+            case .singleQuotationMarkLeft:
+                ";-"
+            case .singleQuotationMarkRight:
+                "-2"
+            case .doubleQuotationMarkLeft:
+                "88"
+            case .doubleQuotationMarkRight:
+                "00"
+            case .parenthesesLeft:
+                "{"
+            case .parenthesesRight:
+                "o"
+            case .bracketLeft:
+                "``("
+            case .bracketRight:
+                "``)"
+            case .braceLeft:
+                ".("
+            case .braceRight:
+                ".)"
+            }
         }
     }
 

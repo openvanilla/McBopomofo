@@ -361,3 +361,4 @@ void McBopomofoLM::loadPhraseReplacementMap(const char* data, size_t length) {
 }
 
 }  // namespace McBopomofo
+

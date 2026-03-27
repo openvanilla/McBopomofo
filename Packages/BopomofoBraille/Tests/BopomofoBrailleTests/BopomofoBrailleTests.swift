@@ -87,4 +87,50 @@ final class BopomofoBrailleTests {
         }
     }
 
+    @Test(
+        "Test ASCII Braille conversion",
+        arguments: [
+            ("k*\"", "ㄐㄧˋ"),
+            ("c!a", "ㄌㄜ˙"),
+            ("/`", "ㄨˇ"),
+        ])
+    func testAsciiBrailleReversed(input: String, expected: String) {
+        let output = BopomofoBrailleConverter.convert(braille: input, type: .ascii)
+        #expect(output == expected)
+    }
+
+    @Test("Test ASCII Braille digit sign")
+    func testAsciiDigitSign() {
+        let braille = BopomofoBrailleConverter.convert(bopomofo: "123", type: .ascii)
+        #expect(braille == "#123")
+
+        let output = BopomofoBrailleConverter.convert(braille: "#123", type: .ascii)
+        #expect(output == "123")
+    }
+
+    @Test("Test ASCII Braille uppercase sign")
+    func testAsciiUppercaseSign() {
+        let braille = BopomofoBrailleConverter.convert(bopomofo: "ABcd", type: .ascii)
+        #expect(braille == ",a,bcd")
+
+        let output = BopomofoBrailleConverter.convert(braille: ",a,bcd", type: .ascii)
+        #expect(output == "ABcd")
+    }
+
+    @Test(
+        "Test ASCII Braille yv combinations",
+        arguments: [
+            ("ㄩㄝˋ", "8\""),
+            ("ㄩㄢˋ", "~\""),
+            ("ㄩㄣˋ", "4\""),
+            ("ㄩㄥˋ", "6\""),
+        ])
+    func testAsciiYvCombinations(input: String, expected: String) {
+        let braille = BopomofoBrailleConverter.convert(bopomofo: input, type: .ascii)
+        #expect(braille == expected)
+
+        let output = BopomofoBrailleConverter.convert(braille: expected, type: .ascii)
+        #expect(output == input)
+    }
+
 }

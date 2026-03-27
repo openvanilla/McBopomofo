@@ -3,5 +3,7 @@
 "Add Hanyu Pinyin to Text" = "將選定的文字加上漢語拼音";
 "Convert Text to Bopomofo Readings" = "將中文轉換成注音";
 "Convert Text to Hanyu Pinyin" = "將中文轉換成漢語拼音";
-"Convert Text to Taiwanese Braille" = "將中文轉換成台灣點字";
-"Convert Taiwanese Braille to Text" = "將台灣點字轉換成中文";
+"Convert Text to Unicode Taiwanese Braille" = "將中文轉換成 Unicode 台灣點字";
+"Convert Text to ASCII Taiwanese Braille" = "將中文轉換成 ASCII 台灣點字";
+"Convert Unicode Taiwanese Braille to Text" = "將 Unicode 台灣點字轉換成中文";
+"Convert ASCII Taiwanese Braille to Text" = "將 ASCII 台灣點字轉換成中文";

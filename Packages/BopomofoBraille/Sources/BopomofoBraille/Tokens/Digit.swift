@@ -28,7 +28,7 @@ enum Digit: String, CaseIterable {
 
     init?(braille: String) {
         let aCase = Digit.allCases.first { aCase in
-            aCase.braille == braille
+            aCase.getBraille(by: .unicode) == braille
         }
         if let aCase {
             self = aCase
@@ -38,31 +38,36 @@ enum Digit: String, CaseIterable {
     }
 
     var digit: String {
-        return rawValue
+        rawValue
     }
 
-    var braille: String {
-        switch self {
-        case .zero:
-            "⠴"
-        case .one:
-            "⠂"
-        case .two:
-            "⠆"
-        case .three:
-            "⠒"
-        case .four:
-            "⠲"
-        case .five:
-            "⠢"
-        case .six:
-            "⠖"
-        case .seven:
-            "⠶"
-        case .eight:
-            "⠦"
-        case .nine:
-            "⠔"
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            switch self {
+            case .zero:
+                "⠴"
+            case .one:
+                "⠂"
+            case .two:
+                "⠆"
+            case .three:
+                "⠒"
+            case .four:
+                "⠲"
+            case .five:
+                "⠢"
+            case .six:
+                "⠖"
+            case .seven:
+                "⠶"
+            case .eight:
+                "⠦"
+            case .nine:
+                "⠔"
+            }
+        case .ascii:
+            rawValue
         }
     }
 
@@ -79,9 +84,9 @@ enum Digit: String, CaseIterable {
 }
 
 enum DigitRelated: String, CaseIterable {
-    init?(braille: String) {
+    init?(braille: String, type: BrailleType) {
         let aCase = DigitRelated.allCases.first { aCase in
-            aCase.braille == braille
+            aCase.getBraille(by: type) == braille
         }
         if let aCase {
             self = aCase
@@ -90,16 +95,27 @@ enum DigitRelated: String, CaseIterable {
         }
     }
 
-    var braille: String {
-        switch self {
-        case .point:
-            "⠨"
-        case .percent:
-            "⠈⠴"
-        case .celsius:
-            "⠘⠨⠡ ⠰⠠⠉"
+    func getBraille(by type: BrailleType) -> String {
+        switch type {
+        case .unicode:
+            switch self {
+            case .point:
+                "⠨"
+            case .percent:
+                "⠈⠴"
+            case .celsius:
+                "⠘⠨⠡ ⠰⠠⠉"
+            }
+        case .ascii:
+            switch self {
+            case .point:
+                "."
+            case .percent:
+                "%"
+            case .celsius:
+                "~.* ;,c"
+            }
         }
-
     }
 
     case point = "."

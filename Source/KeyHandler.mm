@@ -686,8 +686,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             case ControlEnterOutputHtmlRuby:
                 string = [self _currentHtmlRuby];
                 break;
-            case ControlEnterOutputBraille:
-                string = [self _currentBraille];
+            case ControlEnterOutputBrailleUnicode:
+                string = [self _currentBraille:BrailleTypeUnicode];
+                break;
+            case ControlEnterOutputBrailleAscii:
+                string = [self _currentBraille:BrailleTypeAscii];
                 break;
             case ControlEnterOutputHanyuPinyin:
                 string = [self _currentHanyuPinyin];
@@ -1160,7 +1163,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return [NSString stringWithUTF8String:composed.c_str()];
 }
 
-- (NSString *)_currentBraille
+- (NSString *)_currentBraille:(BrailleType)type
 {
     NSMutableString *composingBuffer = [[NSMutableString alloc] init];
     for (const auto& node : _latestWalk.nodes) {
@@ -1168,7 +1171,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         std::string reading = node->reading();
         if (reading[0] == '_') {
             NSString *punctuation = [[NSString alloc] initWithUTF8String:value.c_str()];
-            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:punctuation];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:punctuation type: type];
             [composingBuffer appendString:converted];
         } else {
             std::string delimiter = "-";
@@ -1177,12 +1180,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             while ((pos = reading.find(delimiter)) != std::string::npos) {
                 token = reading.substr(0, pos);
                 NSString *tokenString = [[NSString alloc] initWithUTF8String:token.c_str()];
-                NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString];
+                NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString type: type];
                 [composingBuffer appendString:converted];
                 reading.erase(0, pos + delimiter.length());
             }
             NSString *tokenString = [[NSString alloc] initWithUTF8String:reading.c_str()];
-            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString type: type];
             [composingBuffer appendString:converted];
         }
     }
