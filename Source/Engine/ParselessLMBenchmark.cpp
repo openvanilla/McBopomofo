@@ -50,7 +50,7 @@ static void BM_ParselessLMFindUnigrams(benchmark::State& state) {
   ParselessLM lm;
   lm.open(kDataPath);
   for (auto _ : state) {
-    lm.unigramsForKey(kUnigramSearchKey);
+    lm.getUnigrams(kUnigramSearchKey);
   }
   lm.close();
 }

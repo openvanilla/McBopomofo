@@ -31,6 +31,16 @@
 #endif
 #endif
 
+#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
+#if defined(__ARM_NEON)
+#include <arm_neon.h>
+
+#include <cstdint>
+#else
+#error ARM NEON support required
+#endif
+#endif
+
 #include "ByteBlockBackedDictionary.h"
 
 namespace McBopomofo {
@@ -84,7 +94,8 @@ const char* AdvanceToNextNonContentCharacter(const char* ptr, const char* end) {
   return ptr;
 }
 
-#ifndef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if !defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512) && \
+    !defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
 const char* FindFirstNULL(const char* ptr, const char* end,
                           size_t* firstLineNumber = nullptr) {
   const char* i = ptr;
@@ -271,6 +282,188 @@ const char* AVX512_FindFirstNULL(const char* ptr, const char* end,
 
 #endif
 
+#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
+
+// Returns the index of the first non-zero byte in v, or 16 if all zero
+static inline int FirstNonZeroLane16(uint8x16_t v) {
+  if (vmaxvq_u8(v) == 0) {
+    return 16;
+  }
+  // Scalar fallback for the position
+  alignas(16) uint8_t tmp[16];
+  vst1q_u8(tmp, v);
+  for (int i = 0; i < 16; ++i) {
+    if (tmp[i]) {
+      return i;
+    }
+  }
+  return 16;
+}
+
+const char* NEON_AdvanceToNextCRLF(const char* ptr, const char* unaligned16End,
+                                   const char* end) {
+  const uint8x16_t lfs = vdupq_n_u8(static_cast<uint8_t>('\n'));
+  const uint8x16_t crs = vdupq_n_u8(static_cast<uint8_t>('\r'));
+
+  while (ptr < unaligned16End) {
+    const uint8x16_t block = vld1q_u8(reinterpret_cast<const uint8_t*>(ptr));
+    const uint8x16_t matchLF = vceqq_u8(block, lfs);
+    const uint8x16_t matchCR = vceqq_u8(block, crs);
+    const uint8x16_t match = vorrq_u8(matchLF, matchCR);
+    const int pos = FirstNonZeroLane16(match);
+    if (pos < 16) {
+      return ptr + pos;
+    }
+    ptr += 16;
+  }
+
+  return AdvanceToNextCRLF(ptr, end);
+}
+
+// Four chars: 0x09 (Tab), 0x0a (LF), 0x0d (CR), 0x20 (Space)
+// Tab maps to 0x01
+// LF maps to 0x02
+// CR maps to 0x04
+// Tab|LF|CR = 0x07
+// Space maps to 0x08
+alignas(16) constexpr uint8_t NEON_LO_NIBBLES_LOOKUP[16] = {
+    0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x01, 0x02, 0x00, 0x00, 0x04, 0x00, 0x00,
+};
+
+alignas(16) constexpr uint8_t NEON_HI_NIBBLES_LOOKUP[16] = {
+    0x07, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
+
+const char* NEON_AdvanceToNextNonContentCharacter(const char* ptr,
+                                                  const char* unaligned16End,
+                                                  const char* end) {
+  const uint8x16_t loTbl =
+      vld1q_u8(reinterpret_cast<const uint8_t*>(NEON_LO_NIBBLES_LOOKUP));
+  const uint8x16_t hiTbl =
+      vld1q_u8(reinterpret_cast<const uint8_t*>(NEON_HI_NIBBLES_LOOKUP));
+  const uint8x16_t nibbleMask = vdupq_n_u8(0x0f);
+
+  while (ptr < unaligned16End) {
+    const uint8x16_t input = vld1q_u8(reinterpret_cast<const uint8_t*>(ptr));
+    const uint8x16_t loNibbles = vandq_u8(input, nibbleMask);
+    const uint8x16_t hiNibbles = vandq_u8(vshrq_n_u8(input, 4), nibbleMask);
+    const uint8x16_t lo = vqtbl1q_u8(loTbl, loNibbles);
+    const uint8x16_t hi = vqtbl1q_u8(hiTbl, hiNibbles);
+    const uint8x16_t intersection = vandq_u8(lo, hi);
+    // non-content characters have a non-zero intersection
+    const int pos = FirstNonZeroLane16(intersection);
+    if (pos < 16) {
+      return ptr + pos;
+    }
+    ptr += 16;
+  }
+
+  return AdvanceToNextNonContentCharacter(ptr, end);
+}
+
+constexpr uintptr_t NEON_ALIGN16 = 16;
+constexpr uintptr_t NEON_ALIGN16_MASK = NEON_ALIGN16 - 1;
+
+const char* NEON_FindFirstNULL(const char* ptr, const char* end,
+                               size_t* firstLineNumber = nullptr) {
+  const char* i = ptr;
+  bool found = false;
+
+  // Handle unaligned head
+  if ((reinterpret_cast<uintptr_t>(i) & NEON_ALIGN16_MASK) != 0) {
+    const char* headEnd = reinterpret_cast<const char*>(
+        (reinterpret_cast<uintptr_t>(i) + NEON_ALIGN16_MASK) &
+        ~NEON_ALIGN16_MASK);
+    headEnd = headEnd < end ? headEnd : end;
+    while (i != headEnd) {
+      if (*i == '\0') {
+        found = true;
+        break;
+      }
+      ++i;
+    }
+  }
+
+  if (!found && i != end) {
+    const char* middleEnd = reinterpret_cast<const char*>(
+        reinterpret_cast<uintptr_t>(end) & ~NEON_ALIGN16_MASK);
+    const uint8x16_t zeros = vdupq_n_u8(0);
+    while (i < middleEnd) {
+      const uint8x16_t block = vld1q_u8(reinterpret_cast<const uint8_t*>(i));
+      const uint8x16_t match = vceqq_u8(block, zeros);
+      const int pos = FirstNonZeroLane16(match);
+      if (pos < 16) {
+        i += pos;
+        found = true;
+        break;
+      }
+      i += NEON_ALIGN16;
+    }
+  }
+
+  // Handle tail
+  if (!found) {
+    while (i != end) {
+      if (*i == '\0') {
+        found = true;
+        break;
+      }
+      ++i;
+    }
+  }
+
+  if (!found || firstLineNumber == nullptr) {
+    return i;
+  }
+
+  // Count newlines from ptr to i
+  size_t lineCounter = 1;
+  const char* p = ptr;
+
+  // Scalar head
+  if ((reinterpret_cast<uintptr_t>(p) & NEON_ALIGN16_MASK) != 0) {
+    const char* headEnd = reinterpret_cast<const char*>(
+        (reinterpret_cast<uintptr_t>(p) + NEON_ALIGN16_MASK) &
+        ~NEON_ALIGN16_MASK);
+    headEnd = headEnd < i ? headEnd : i;
+    while (p != headEnd) {
+      if (*p == '\n') {
+        ++lineCounter;
+      }
+      ++p;
+    }
+  }
+
+  // NEON middle
+  if (p != i) {
+    const char* middleEnd = reinterpret_cast<const char*>(
+        reinterpret_cast<uintptr_t>(i) & ~NEON_ALIGN16_MASK);
+    const uint8x16_t linefeeds = vdupq_n_u8(static_cast<uint8_t>('\n'));
+    while (p < middleEnd) {
+      const uint8x16_t block = vld1q_u8(reinterpret_cast<const uint8_t*>(p));
+      const uint8x16_t match = vceqq_u8(block, linefeeds);
+      // Count set bytes
+      lineCounter += vaddvq_u8(vshrq_n_u8(match, 7));
+      p += NEON_ALIGN16;
+    }
+  }
+
+  // Scalar tail
+  while (p != i) {
+    if (*p == '\n') {
+      ++lineCounter;
+    }
+    ++p;
+  }
+
+  *firstLineNumber = lineCounter;
+  return i;
+}
+
+#endif
+
 }  // namespace
 
 void ByteBlockBackedDictionary::clear() {
@@ -305,12 +498,20 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
   if (unaligned32End < ptr) {
     unaligned32End = ptr;
   }
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+  const char* unaligned16End =
+      reinterpret_cast<const char*>(reinterpret_cast<uintptr_t>(end) - 16);
+  if (unaligned16End < ptr) {
+    unaligned16End = ptr;
+  }
 #endif
 
   // Validate that no NULL characters are in the text.
   size_t errorAtLine = 0;
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
   const char* ctrlCharPtr = AVX512_FindFirstNULL(ptr, end, &errorAtLine);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+  const char* ctrlCharPtr = NEON_FindFirstNULL(ptr, end, &errorAtLine);
 #else
   const char* ctrlCharPtr = FindFirstNULL(ptr, end, &errorAtLine);
 #endif
@@ -330,8 +531,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
       }
 
       if (*ptr == '#') {
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
         ptr = AVX512_AdvanceToNextCRLF(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+        ptr = NEON_AdvanceToNextCRLF(ptr, unaligned16End, end);
 #else
         ptr = AdvanceToNextCRLF(ptr, end);
 #endif
@@ -339,8 +542,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
       }
 
       const char* keyStart = ptr;
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
       ptr = AVX512_AdvanceToNextNonContentCharacter(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+      ptr = NEON_AdvanceToNextNonContentCharacter(ptr, unaligned16End, end);
 #else
       ptr = AdvanceToNextNonContentCharacter(ptr, end);
 #endif
@@ -356,8 +561,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
       }
 
       const char* valueStart = ptr;
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
       ptr = AVX512_AdvanceToNextCRLF(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+      ptr = NEON_AdvanceToNextCRLF(ptr, unaligned16End, end);
 #else
       ptr = AdvanceToNextCRLF(ptr, end);
 #endif
@@ -405,8 +612,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
       }
 
       if (*ptr == '#') {
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
         ptr = AVX512_AdvanceToNextCRLF(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+        ptr = NEON_AdvanceToNextCRLF(ptr, unaligned16End, end);
 #else
         ptr = AdvanceToNextCRLF(ptr, end);
 #endif
@@ -414,8 +623,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
       }
 
       const char* valueStart = ptr;
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
       ptr = AVX512_AdvanceToNextNonContentCharacter(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+      ptr = NEON_AdvanceToNextNonContentCharacter(ptr, unaligned16End, end);
 #else
       ptr = AdvanceToNextNonContentCharacter(ptr, end);
 #endif
@@ -430,8 +641,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
       }
 
       const char* maybeKeyStart = ptr;
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
       ptr = AVX512_AdvanceToNextNonContentCharacter(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+      ptr = NEON_AdvanceToNextNonContentCharacter(ptr, unaligned16End, end);
 #else
       ptr = AdvanceToNextNonContentCharacter(ptr, end);
 #endif
@@ -457,8 +670,10 @@ bool ByteBlockBackedDictionary::parse(const char* block, size_t size,
         // More content incoming.
         valueEnd = maybeKeyEnd;
         maybeKeyStart = ptr;
-#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512
+#if defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_AVX512)
         ptr = AVX512_AdvanceToNextNonContentCharacter(ptr, unaligned32End, end);
+#elif defined(ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON)
+        ptr = NEON_AdvanceToNextNonContentCharacter(ptr, unaligned16End, end);
 #else
         ptr = AdvanceToNextNonContentCharacter(ptr, end);
 #endif
