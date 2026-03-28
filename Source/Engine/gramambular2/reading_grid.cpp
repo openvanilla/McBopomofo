@@ -25,11 +25,11 @@
 
 #include <algorithm>
 #include <chrono>
-#include <limits>
-#include <stack>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "walk_strategy.h"
 
 namespace Formosa::Gramambular2 {
 
@@ -37,6 +37,7 @@ void ReadingGrid::clear() {
   cursor_ = 0;
   readings_.clear();
   spans_.clear();
+  fixedSpans_.clear();
 }
 
 void ReadingGrid::setCursor(size_t cursor) {
@@ -121,14 +122,36 @@ int64_t GetEpochNowInMicroseconds() {
 
 }  // namespace
 
-// Find the weightiest path in the grid graph. The path represents the most
-// likely hidden chain of events from the observations.
-// We use the Viterbi algorithm to compute such path.
-// Instead of computing the path with the shortest distance, though, we compute
-// the path with the longest distance (so the weightiest), since with log
-// probability a larger value means a larger probability. The algorithm runs in
-// O(|V| + |E|) time for G = (V, E) where G is a DAG. This means the walk is
-// fairly economical even when the grid is large.
+void ReadingGrid::setWalkStrategy(std::shared_ptr<WalkStrategy> strategy) {
+  walkStrategy_ = std::move(strategy);
+}
+
+void ReadingGrid::fixSpan(size_t position, NodePtr node) {
+  assert(node != nullptr);
+  assert(position < readings_.size());
+  assert(position + node->spanningLength() <= readings_.size());
+  size_t newEnd = position + node->spanningLength();
+  auto it = fixedSpans_.begin();
+  while (it != fixedSpans_.end()) {
+    size_t existStart = it->first;
+    size_t existEnd = existStart + it->second->spanningLength();
+    // Two spans overlap if their ranges intersect.
+    if (existStart < newEnd && position < existEnd) {
+      it = fixedSpans_.erase(it);
+    } else {
+      ++it;
+    }
+  }
+  fixedSpans_[position] = std::move(node);
+}
+
+void ReadingGrid::clearFixedSpans() {
+  for (auto& [pos, node] : fixedSpans_) {
+    node->reset();
+  }
+  fixedSpans_.clear();
+}
+
 ReadingGrid::WalkResult ReadingGrid::walk() {
   WalkResult result;
   if (spans_.empty()) {
@@ -136,68 +159,18 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   }
   int64_t start = GetEpochNowInMicroseconds();
 
-  // Defines a state in the DP table. This structure tracks the maximum
-  // accumulated score and the back-pointer required for path reconstruction in
-  // the Viterbi algorithm.
-  struct State {
-    size_t fromIndex = 0;
-    ReadingGrid::NodePtr fromNode = nullptr;
-    double maxScore = -std::numeric_limits<double>::infinity();
-  };
-
-  const size_t readingLen = readings_.size();
-  std::vector<State> viterbi(readingLen + 1);
-  viterbi[0].maxScore = 0.0;
-
-  // Iterate through the grid and compute the maximum accumulated score for each
-  // reachable position. Since the grid is a lattice where edges only point
-  // forward, processing nodes in index order is equivalent to processing them
-  // in topological order.
-  size_t reachableStates = 0;
-  size_t evaluatedEdges = 0;
-  for (size_t i = 0; i < readingLen; ++i) {
-    ++reachableStates;
-
-    const ReadingGrid::Span& span = spans_[i];
-    const size_t maxSpanLen = span.maxLength();
-
-    for (size_t spanLen = 1; spanLen <= maxSpanLen; ++spanLen) {
-      const ReadingGrid::NodePtr& node = span.nodeOf(spanLen);
-      if (node == nullptr) {
-        continue;
-      }
-      ++evaluatedEdges;
-
-      // Performs a relaxation on a transition. This updates the destination
-      // state if the path through the current node yields a higher score than
-      // the previously known best path. This is the core operation of the
-      // Viterbi algorithm, adapted for finding the maximum likelihood path.
-      double score = viterbi[i].maxScore + node->score();
-      State& target = viterbi[i + spanLen];
-      if (score > target.maxScore) {
-        target.maxScore = score;
-        target.fromNode = node;
-        target.fromIndex = i;
-      }
-    }
+  if (!walkStrategy_) {
+    walkStrategy_ = std::make_shared<ViterbiStrategy>();
   }
-  // Vertices are the reachable states
-  // Edges are the candidate word transitions
-  result.vertices = reachableStates;
-  result.edges = evaluatedEdges;
 
-  // Reconstruct the most likely path by tracing back from the end of the grid
-  // to the root using the back-pointers
-  size_t totalReadingLen = 0;
-  for (size_t curr = readingLen; curr > 0; curr = viterbi[curr].fromIndex) {
-    assert(viterbi[curr].fromNode != nullptr);
-    totalReadingLen += viterbi[curr].fromNode->spanningLength();
-    result.nodes.emplace_back(std::move(viterbi[curr].fromNode));
-  }
-  std::reverse(result.nodes.begin(), result.nodes.end());
-  assert(totalReadingLen == readingLen);
-  result.totalReadings = totalReadingLen;
-
+  const std::map<size_t, NodePtr>* fixedPtr =
+      fixedSpans_.empty() ? nullptr : &fixedSpans_;
+  WalkStrategy::WalkInput input{spans_, readings_.size(), fixedPtr};
+  auto walkOutput = walkStrategy_->walk(input);
+  result.nodes = std::move(walkOutput.nodes);
+  result.totalReadings = walkOutput.totalReadings;
+  result.vertices = walkOutput.vertices;
+  result.edges = walkOutput.edges;
   result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
   return result;
 }
@@ -293,7 +266,7 @@ void ReadingGrid::removeAffectedNodes(size_t loc) {
   if (spans_.empty()) {
     return;
   }
-  size_t affectedLength = kMaximumSpanLength - 1;
+  size_t affectedLength = maxSpanLength_ - 1;
   size_t begin = loc <= affectedLength ? 0 : loc - affectedLength;
   size_t end = loc >= 1 ? loc - 1 : 0;
   for (size_t i = begin; i <= end; ++i) {
@@ -334,14 +307,14 @@ bool ReadingGrid::hasNodeAt(size_t loc, size_t readingLen,
 
 void ReadingGrid::update() {
   size_t begin =
-      (cursor_ <= kMaximumSpanLength) ? 0 : cursor_ - kMaximumSpanLength;
-  size_t end = cursor_ + kMaximumSpanLength;
+      (cursor_ <= maxSpanLength_) ? 0 : cursor_ - maxSpanLength_;
+  size_t end = cursor_ + maxSpanLength_;
   if (end > readings_.size()) {
     end = readings_.size();
   }
 
   for (size_t pos = begin; pos < end; pos++) {
-    for (size_t len = 1; len <= kMaximumSpanLength && pos + len <= end; len++) {
+    for (size_t len = 1; len <= maxSpanLength_ && pos + len <= end; len++) {
       std::string combinedReading =
           combineReading(readings_.begin() + static_cast<ptrdiff_t>(pos),
                          readings_.begin() + static_cast<ptrdiff_t>(pos + len));
@@ -420,7 +393,7 @@ std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
     }
   }
 
-  size_t begin = loc - std::min(loc, kMaximumSpanLength - 1);
+  size_t begin = loc - std::min(loc, maxSpanLength_ - 1);
   for (size_t i = begin; i < loc; ++i) {
     size_t beginLen = loc - i + 1;
     size_t endLen = spans_[i].maxLength();
@@ -542,22 +515,25 @@ std::vector<std::string> ReadingGrid::WalkResult::readingsAsStrings() const {
 }
 
 void ReadingGrid::Span::clear() {
-  nodes_.fill(nullptr);
+  nodes_.clear();
   maxLength_ = 0;
 }
 
 void ReadingGrid::Span::add(const ReadingGrid::NodePtr& node) {
-  assert(node->spanningLength() > 0 &&
-         node->spanningLength() <= kMaximumSpanLength);
-  nodes_[node->spanningLength() - 1] = node;
+  assert(node->spanningLength() > 0);
+  size_t idx = node->spanningLength() - 1;
+  if (idx >= nodes_.size()) {
+    nodes_.resize(idx + 1);
+  }
+  nodes_[idx] = node;
   if (node->spanningLength() >= maxLength_) {
     maxLength_ = node->spanningLength();
   }
 }
 
 void ReadingGrid::Span::removeNodesOfOrLongerThan(size_t length) {
-  assert(length > 0 && length <= kMaximumSpanLength);
-  for (size_t i = length - 1; i < kMaximumSpanLength; ++i) {
+  assert(length > 0);
+  for (size_t i = length - 1; i < nodes_.size(); ++i) {
     nodes_[i] = nullptr;
   }
   maxLength_ = 0;
@@ -581,7 +557,10 @@ void ReadingGrid::Span::removeNodesOfOrLongerThan(size_t length) {
 }
 
 ReadingGrid::NodePtr ReadingGrid::Span::nodeOf(size_t length) const {
-  assert(length > 0 && length <= kMaximumSpanLength);
+  assert(length > 0);
+  if (length - 1 >= nodes_.size()) {
+    return nullptr;
+  }
   return nodes_[length - 1];
 }
 

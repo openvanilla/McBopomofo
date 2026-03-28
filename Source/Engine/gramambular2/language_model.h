@@ -41,6 +41,10 @@ class LanguageModel {
   virtual std::vector<Unigram> getUnigrams(const std::string& reading) = 0;
   virtual bool hasUnigrams(const std::string& reading) = 0;
 
+  // Maximum key length in syllables. Returns 0 if unknown, in which case the
+  // grid uses a default value.
+  virtual size_t maxKeyLength() const { return 0; }
+
   // An immutable unigram with an actual value, along with a score, which is
   // usually a log probability from a language model.
   class Unigram {
