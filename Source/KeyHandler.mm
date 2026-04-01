@@ -753,8 +753,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                     _grid->setCursor(originalCursorIndex - 1);
                 }
                 InputStateChoosingCandidate *choosingCandidate = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
-                choosingCandidate.originalCursorIndex = originalCursorIndex;
                 InputChoosingPunctuationList *choosingPunctuationList = [[InputChoosingPunctuationList alloc] initWithChoosingCandidate:choosingCandidate];
+                choosingPunctuationList.originalCursorIndex = originalCursorIndex;
                 stateCallback(choosingPunctuationList);
             } else { // If there is still unfinished bpmf reading, ignore the punctuation
                 errorCallback();
