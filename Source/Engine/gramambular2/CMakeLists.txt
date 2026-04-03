@@ -4,7 +4,7 @@ project(gramambular2)
 set(CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-add_library(gramambular2_lib language_model.h reading_grid.h reading_grid.cpp)
+add_library(gramambular2_lib language_model.h reading_grid.h reading_grid.cpp walk_strategy.h walk_strategy.cpp)
 
 if (ENABLE_CLANG_TIDY)
     set_target_properties(gramambular2_lib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")

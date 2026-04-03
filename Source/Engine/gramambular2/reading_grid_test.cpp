@@ -23,13 +23,16 @@
 
 #include "reading_grid.h"
 
+#include <chrono>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "gtest/gtest.h"
 #include "language_model.h"
+#include "walk_strategy.h"
 
 namespace Formosa::Gramambular2 {
 
@@ -187,13 +190,13 @@ TEST(ReadingGridTest, Span) {
   ASSERT_EQ(span.nodeOf(1), n1);
   ASSERT_EQ(span.nodeOf(2), nullptr);
   ASSERT_EQ(span.nodeOf(3), n3);
-  ASSERT_EQ(span.nodeOf(ReadingGrid::kMaximumSpanLength), nullptr);
+  ASSERT_EQ(span.nodeOf(ReadingGrid::kDefaultMaxSpanLength), nullptr);
   span.clear();
   ASSERT_EQ(span.maxLength(), 0);
   ASSERT_EQ(span.nodeOf(1), nullptr);
   ASSERT_EQ(span.nodeOf(2), nullptr);
   ASSERT_EQ(span.nodeOf(3), nullptr);
-  ASSERT_EQ(span.nodeOf(ReadingGrid::kMaximumSpanLength), nullptr);
+  ASSERT_EQ(span.nodeOf(ReadingGrid::kDefaultMaxSpanLength), nullptr);
 
   span.add(n1);
   span.add(n3);
@@ -207,12 +210,15 @@ TEST(ReadingGridTest, Span) {
   ASSERT_EQ(span.nodeOf(1), nullptr);
 
 #ifndef NDEBUG
-  auto n10 = std::make_shared<ReadingGrid::Node>("", 10, lm.getUnigrams(""));
-  ASSERT_DEATH({ (void)span.add(n10); }, "Assertion");
   ASSERT_DEATH({ (void)span.nodeOf(0); }, "Assertion");
-  ASSERT_DEATH({ (void)span.nodeOf(ReadingGrid::kMaximumSpanLength + 1); },
-               "Assertion");
 #endif
+
+  ASSERT_EQ(span.nodeOf(ReadingGrid::kDefaultMaxSpanLength + 1), nullptr);
+
+  auto n10 = std::make_shared<ReadingGrid::Node>("", 10, lm.getUnigrams(""));
+  span.add(n10);
+  ASSERT_EQ(span.maxLength(), 10);
+  ASSERT_EQ(span.nodeOf(10), n10);
 }
 
 TEST(ReadingGridTest, ScoreRankedLanguageModel) {
@@ -813,6 +819,219 @@ TEST(ReadingGridTest, FindInSpan2) {
   ASSERT_EQ(result->get()->spanningLength(), 2);
   ASSERT_EQ(result->get()->reading(), "ㄍㄠㄖㄜˋ");
   ASSERT_EQ(result->get()->value(), "高熱");
+}
+
+// Phase 1 Tests: Structural Fixes (fixedSpans)
+
+TEST(FixedSpanTest, Basic) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  grid.insertReading("ㄍㄠ");
+  grid.insertReading("ㄎㄜ");
+  grid.insertReading("ㄐㄧˋ");
+
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"高科技"}));
+
+  auto gaoNode = grid.spans()[0].nodeOf(1);
+  ASSERT_NE(gaoNode, nullptr);
+  gaoNode->selectOverrideUnigram("膏",
+                                  ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(0, gaoNode);
+  result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"膏", "科技"}));
+  std::cout << "FixedSpanBasic walk: " << result.elapsedMicroseconds
+            << " us\n";
+}
+
+TEST(FixedSpanTest, Overlapping) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  grid.insertReading("ㄍㄠ");
+  grid.insertReading("ㄎㄜ");
+  grid.insertReading("ㄐㄧˋ");
+
+  auto gaoNode = grid.spans()[0].nodeOf(1);
+  gaoNode->selectOverrideUnigram("膏",
+                                  ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(0, gaoNode);
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"膏", "科技"}));
+
+  auto gaokejiNode = grid.spans()[0].nodeOf(3);
+  ASSERT_NE(gaokejiNode, nullptr);
+  grid.fixSpan(0, gaokejiNode);
+  result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"高科技"}));
+
+  auto keNode = grid.spans()[1].nodeOf(1);
+  keNode->selectOverrideUnigram("柯",
+                                 ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(1, keNode);
+  result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings()[1], "柯");
+  std::cout << "FixedSpanOverlapping walk: " << result.elapsedMicroseconds
+            << " us\n";
+}
+
+TEST(FixedSpanTest, Boundary) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  grid.insertReading("ㄋㄧㄢˊ");
+  grid.insertReading("ㄓㄨㄥ");
+  grid.insertReading("ㄐㄧㄤˇ");
+  grid.insertReading("ㄐㄧㄣ");
+
+  auto nianzhongNode = grid.spans()[0].nodeOf(2);
+  ASSERT_NE(nianzhongNode, nullptr);
+  nianzhongNode->selectOverrideUnigram("年終",
+                                        ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(0, nianzhongNode);
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"年終", "獎金"}));
+  std::cout << "FixedSpanBoundary walk: " << result.elapsedMicroseconds
+            << " us\n";
+}
+
+TEST(FixedSpanTest, ClearFixedSpans) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  std::vector<std::string> readings = {"ㄍㄠ",    "ㄎㄜ",    "ㄐㄧˋ",
+                                        "ㄍㄨㄥ",  "ㄙ",      "ㄉㄜ˙",
+                                        "ㄋㄧㄢˊ", "ㄓㄨㄥ",  "ㄐㄧㄤˇ",
+                                        "ㄐㄧㄣ"};
+  for (const auto& r : readings) {
+    grid.insertReading(r);
+  }
+
+  auto baseResult = grid.walk();
+  auto baseValues = baseResult.valuesAsStrings();
+
+  auto nianzhongNode = grid.spans()[6].nodeOf(2);
+  nianzhongNode->selectOverrideUnigram("年終",
+                                        ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(6, nianzhongNode);
+  auto fixedResult = grid.walk();
+  auto fixedValues = fixedResult.valuesAsStrings();
+  bool hasNianzhong = false;
+  for (const auto& v : fixedValues) {
+    if (v == "年終") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong);
+
+  grid.clearFixedSpans();
+  auto clearedResult = grid.walk();
+  ASSERT_EQ(clearedResult.valuesAsStrings(), baseValues);
+  std::cout << "ClearFixedSpans walk: " << clearedResult.elapsedMicroseconds
+            << " us\n";
+}
+
+TEST(FixedSpanTest, ChainedOverrides) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  std::vector<std::string> readings = {"ㄍㄠ",    "ㄎㄜ",    "ㄐㄧˋ",
+                                        "ㄍㄨㄥ",  "ㄙ",      "ㄉㄜ˙",
+                                        "ㄋㄧㄢˊ", "ㄓㄨㄥ",  "ㄐㄧㄤˇ",
+                                        "ㄐㄧㄣ"};
+  for (const auto& r : readings) {
+    grid.insertReading(r);
+  }
+
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
+
+  auto nzNode = grid.spans()[6].nodeOf(2);
+  nzNode->selectOverrideUnigram("年終",
+                                 ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(6, nzNode);
+  result = grid.walk();
+  bool hasNianzhong = false;
+  for (const auto& v : result.valuesAsStrings()) {
+    if (v == "年終") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong);
+
+  auto gaoNode = grid.spans()[0].nodeOf(1);
+  gaoNode->selectOverrideUnigram("膏",
+                                  ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore);
+  grid.fixSpan(0, gaoNode);
+  result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings()[0], "膏");
+  hasNianzhong = false;
+  for (const auto& v : result.valuesAsStrings()) {
+    if (v == "年終") hasNianzhong = true;
+  }
+  ASSERT_TRUE(hasNianzhong);
+  std::cout << "ChainedOverrides walk: " << result.elapsedMicroseconds
+            << " us\n";
+}
+
+// Phase 0B Tests: Walk Strategy
+
+TEST(WalkStrategyTest, Basic10Syllables) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  std::vector<std::string> readings = {"ㄍㄠ",    "ㄎㄜ",    "ㄐㄧˋ",
+                                        "ㄍㄨㄥ",  "ㄙ",      "ㄉㄜ˙",
+                                        "ㄋㄧㄢˊ", "ㄓㄨㄥ",  "ㄐㄧㄤˇ",
+                                        "ㄐㄧㄣ"};
+  for (const auto& r : readings) {
+    grid.insertReading(r);
+  }
+
+  grid.setWalkStrategy(std::make_shared<ViterbiStrategy>());
+  auto result = grid.walk();
+  auto values = result.valuesAsStrings();
+  ASSERT_EQ(values,
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
+}
+
+TEST(WalkStrategyTest, ScalingComparison) {
+  constexpr char kStressData[] = R"(
+ㄧ 一 -2.08170692
+ㄧ-ㄧ 一一 -4.38468400
+)";
+
+  std::vector<int> sizes = {100, 500, 1000, 5000};
+
+  std::cout << "\n--- Scaling ---\n";
+  for (int size : sizes) {
+    ReadingGrid grid(std::make_shared<SimpleLM>(kStressData));
+    for (int i = 0; i < size; i++) {
+      grid.insertReading("ㄧ");
+    }
+
+    grid.setWalkStrategy(std::make_shared<ViterbiStrategy>());
+    auto start = std::chrono::high_resolution_clock::now();
+    auto result = grid.walk();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto us =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+            .count();
+    ASSERT_FALSE(result.nodes.empty());
+    std::cout << "n=" << size << " Viterbi: " << us << " us\n";
+  }
+}
+
+TEST(WalkStrategyTest, QualityWithExplicitStrategy) {
+  ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+  grid.setReadingSeparator("");
+  std::vector<std::string> readings = {"ㄍㄠ",    "ㄎㄜ",    "ㄐㄧˋ",
+                                        "ㄍㄨㄥ",  "ㄙ",      "ㄉㄜ˙",
+                                        "ㄋㄧㄢˊ", "ㄓㄨㄥ",  "ㄐㄧㄤˇ",
+                                        "ㄐㄧㄣ"};
+  for (const auto& r : readings) {
+    grid.insertReading(r);
+  }
+
+  grid.setWalkStrategy(std::make_shared<ViterbiStrategy>());
+  auto result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"高科技", "公司", "的", "年中", "獎金"}));
 }
 
 }  // namespace Formosa::Gramambular2
