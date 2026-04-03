@@ -27,8 +27,12 @@
     - [演算法流程](#演算法流程)
       - [插入注音時的處理](#插入注音時的處理)
       - [節點更新機制](#節點更新機制)
-      - [最佳路徑演算法：DAG 最短路徑](#最佳路徑演算法dag-最短路徑)
+      - [最佳路徑演算法：Viterbi](#最佳路徑演算法viterbi)
     - [實際範例](#實際範例)
+    - [Viterbi 動態規劃表格展開](#viterbi-動態規劃表格展開)
+    - [時間與空間複雜度](#時間與空間複雜度)
+    - [與教科書 Viterbi 演算法的關係](#與教科書-viterbi-演算法的關係)
+    - [結構性固定與使用者模型整合](#結構性固定與使用者模型整合)
   - [語言模型架構](#語言模型架構)
     - [McBopomofoLM：統一介面](#mcbopomofolm統一介面)
     - [Unigram 處理流水線](#unigram-處理流水線)
@@ -38,6 +42,13 @@
     - [ParselessLM 與二元搜尋](#parselesslm-與二元搜尋)
       - [ParselessPhraseDB 資料格式](#parselessphrasedb-資料格式)
       - [二元搜尋實作](#二元搜尋實作)
+  - [情境式使用者模型](#情境式使用者模型)
+    - [動機：舊有評分機制的問題](#動機舊有評分機制的問題)
+    - [平滑演算法選型](#平滑演算法選型)
+    - [關鍵洞見：「丼」問題](#關鍵洞見丼問題)
+    - [四層退回模型](#四層退回模型)
+    - [時間衰減](#時間衰減)
+    - [三層架構](#三層架構)
   - [字典資料的生成與使用](#字典資料的生成與使用)
     - [資料檔案結構](#資料檔案結構)
       - [輸入檔案（手動維護）](#輸入檔案手動維護)
@@ -51,6 +62,7 @@
     - [資料排序的重要性](#資料排序的重要性)
   - [關鍵程式碼位置](#關鍵程式碼位置)
     - [演算法核心](#演算法核心)
+    - [演算法擴展](#演算法擴展)
     - [語言模型](#語言模型)
     - [字典資料處理](#字典資料處理)
     - [Swift \& Objective-C++ 層](#swift--objective-c-層)
@@ -105,23 +117,21 @@ Gramambular 使用三種核心資料結構，定義於 `Source/Engine/gramambula
 
 #### 1. Unigram (語元)
 
-```cpp
-class LanguageModel::Unigram {
-    std::string value_;      // 字詞本身，如「在」
-    std::string rawValue_;   // 原始值（用於轉換前追蹤）
-    double score_;           // 對數機率分數，如 -2.23651546
-};
+```text
+Record UNIGRAM
+    value    : string    // 字詞本身，如「在」
+    rawValue : string    // 原始值（用於轉換前追蹤）
+    score    : double    // 對數機率分數，如 -2.23651546
 ```
 
 #### 2. Node (節點)
 
-```cpp
-class Node {
-    std::string reading_;                        // 讀音，如「ㄗㄞˋ」
-    size_t spanningLength_;                      // 跨越長度（佔幾個注音）
-    std::vector<LanguageModel::Unigram> unigrams_; // 候選字詞列表
-    OverrideType overrideType_;                  // 使用者選字覆寫狀態
-};
+```text
+Record NODE
+    reading        : string        // 讀音，如「ㄗㄞˋ」
+    spanningLength : integer       // 跨越長度（佔幾個注音）
+    unigrams       : UNIGRAM[]     // 候選字詞列表
+    overrideType   : OverrideType  // 使用者選字覆寫狀態
 ```
 
 一個 Node 代表：
@@ -131,24 +141,22 @@ class Node {
 
 #### 3. Span (跨度)
 
-```cpp
-class Span {
-    std::array<NodePtr, kMaximumSpanLength> nodes_;  // 最多 8 個不同長度的節點
-    size_t maxLength_;                               // 當前最大長度
-};
+```text
+Record SPAN
+    nodes     : NODE[1..MAX-SPAN-LENGTH]  // 依長度索引，最多 8 個不同長度的節點
+    maxLength : integer                   // 當前最大長度
 ```
 
 一個 Span 是相同起點位置的節點集合，依長度分類（1字詞、2字詞...最多8字詞）。
 
 #### 4. ReadingGrid (讀音網格)
 
-```cpp
-class ReadingGrid {
-    std::vector<std::string> readings_;    // 使用者輸入的注音序列
-    std::vector<Span> spans_;              // 每個位置的 Span
-    size_t cursor_;                        // 游標位置
-    ScoreRankedLanguageModel lm_;          // 語言模型介面
-};
+```text
+Record READING-GRID
+    readings : string[]   // 使用者輸入的注音序列
+    spans    : SPAN[]     // 每個位置的 Span
+    cursor   : integer    // 游標位置
+    lm       : LM         // 語言模型介面
 ```
 
 ReadingGrid 是所有 Span 的集合，大小等於輸入的注音數量。
@@ -159,157 +167,128 @@ ReadingGrid 是所有 Span 的集合，大小等於輸入的注音數量。
 
 當使用者輸入一個新的注音符號時（`Source/Engine/gramambular2/reading_grid.cpp:51`）：
 
-```cpp
-bool ReadingGrid::insertReading(const std::string& reading) {
+```text
+Procedure INSERT-READING(grid : READING-GRID, reading : string)
+    Input:  grid — 讀音網格；reading — 新的注音字串
+    Output: true 若插入成功，false 若讀音無對應字詞
+
     // 1. 驗證注音是否有對應字詞
-    if (!lm_.hasUnigrams(reading)) {
-        return false;
-    }
+    if not grid.lm.hasUnigrams(reading):
+        return false
 
     // 2. 插入讀音到序列中
-    readings_.insert(readings_.begin() + cursor_, reading);
+    insert reading into grid.readings at grid.cursor
 
     // 3. 擴展網格（新增一個 Span 位置）
-    expandGridAt(cursor_);
+    EXPAND-GRID-AT(grid, grid.cursor)
 
     // 4. 更新受影響範圍的節點
-    update();
+    UPDATE(grid)
 
     // 5. 移動游標
-    ++cursor_;
-    return true;
-}
+    grid.cursor = grid.cursor + 1
+    return true
 ```
 
 #### 節點更新機制
 
 `update()` 方法會在游標附近的範圍內（前後 8 個位置），嘗試建立所有可能的多字詞節點：
 
-```cpp
-void ReadingGrid::update() {
-    size_t begin = (cursor_ <= kMaximumSpanLength) ? 0 : cursor_ - kMaximumSpanLength;
-    size_t end = cursor_ + kMaximumSpanLength;
+```text
+Procedure UPDATE(grid : READING-GRID)
+    Input:  grid — 讀音網格（游標附近的範圍將被重新計算）
+    Output: 無（就地更新 grid.spans）
 
-    for (size_t pos = begin; pos < end; pos++) {
-        for (size_t len = 1; len <= kMaximumSpanLength && pos + len <= end; len++) {
+    begin = max(0, grid.cursor - MAX-SPAN-LENGTH)
+    end   = grid.cursor + MAX-SPAN-LENGTH
+
+    for pos = begin to end - 1:
+        for len = 1 to MAX-SPAN-LENGTH while pos + len <= end:
             // 組合連續的注音（用 "-" 分隔）
-            std::string combinedReading = combineReading(
-                readings_.begin() + pos,
-                readings_.begin() + pos + len
-            );
+            combinedReading = COMBINE-READING(grid.readings, pos, pos + len)
 
             // 向語言模型查詢是否有對應字詞
-            auto unigrams = lm_.getUnigrams(combinedReading);
-            if (!unigrams.empty()) {
+            unigrams = grid.lm.getUnigrams(combinedReading)
+            if unigrams is not empty:
                 // 建立新節點並插入對應的 Span
-                insert(pos, std::make_shared<Node>(combinedReading, len, unigrams));
-            }
-        }
-    }
-}
+                node = new NODE(combinedReading, len, unigrams)
+                grid.spans[pos].nodes[len] = node
 ```
 
-#### 最佳路徑演算法：DAG 最短路徑
+#### 最佳路徑演算法：Viterbi
 
-`walk()` 方法使用 **有向無環圖（DAG）最短路徑演算法** 找出分數最高的路徑（`reading_grid.cpp:216`）：
+`walk()` 方法使用 **Viterbi 演算法** 找出分數最高的路徑（`reading_grid.cpp`）。
 
-**步驟 1：建立 DAG**
+Reading Grid 本身是一個線性格架（lattice）：每個位置只能連接到更後方的位置，構成天然的拓撲順序。因此不需要額外的拓撲排序，直接按位置順序前向掃描即可。
 
-```cpp
-ReadingGrid::WalkResult ReadingGrid::walk() {
-    // 1. 將所有 Node 轉換為圖的 Vertex（頂點）
-    std::vector<VertexSpan> vspans(spans_.size());
-    for (size_t i = 0; i < spans_.size(); i++) {
-        const Span& span = spans_[i];
-        for (size_t j = 1; j <= span.maxLength(); j++) {
-            NodePtr node = span.nodeOf(j);
-            if (node != nullptr) {
-                vspans[i].emplace_back(Vertex(node));
-            }
-        }
-    }
+演算法使用一個動態規劃（DP）表格，每個 entry 記錄到達該位置的最大累計分數和回溯指標：
 
-    // 2. 建立邊（Edge）：連接相鄰節點
-    for (size_t i = 0; i < vspans.size(); i++) {
-        for (Vertex& v : vspans[i]) {
-            size_t nextPos = i + v.node->spanningLength();
-            // 連接到下一個位置的所有節點
-            for (Vertex& nv : vspans[nextPos]) {
-                v.edges.push_back(&nv);
-            }
-        }
-    }
+```text
+Record STATE
+    fromIndex : integer = 0          // 回溯來源位置
+    fromNode  : NODE    = nil        // 回溯來源節點
+    maxScore  : double  = -infinity  // 到達此位置的最大累計分數
 ```
 
-**步驟 2：拓撲排序**
+**步驟 1：前向傳遞（Forward Pass）**
 
-使用非遞迴的深度優先搜尋（DFS）進行拓撲排序（`reading_grid.cpp:166`）：
+從位置 0 開始，依序掃描每個位置。對於每個位置上所有可能的候選詞節點，計算「到達該詞末端位置」的累計分數，並執行鬆弛（relaxation）：
 
-```cpp
-std::vector<Vertex*> TopologicalSort(Vertex* root) {
-    std::vector<Vertex*> result;
-    std::stack<State> stack;
-    stack.emplace(root);
+```text
+Procedure VITERBI-FORWARD(grid : READING-GRID)
+    Input:  grid — 讀音網格
+    Output: viterbi — STATE 陣列（大小 readingLen + 1）
 
-    while (!stack.empty()) {
-        State& state = stack.top();
-        Vertex* v = state.v;
+    readingLen = length(grid.readings)
+    viterbi = array of STATE, size = readingLen + 1
+    viterbi[0].maxScore = 0.0
 
-        if (state.edgeIter != v->edges.end()) {
-            Vertex* nv = *state.edgeIter;
-            ++state.edgeIter;
-            if (!nv->topologicallySorted) {
-                stack.emplace(nv);
-                continue;
-            }
-        }
+    for i = 0 to readingLen - 1:
+        span       = grid.spans[i]
+        maxSpanLen = span.maxLength
 
-        v->topologicallySorted = true;
-        result.push_back(v);
-        stack.pop();
-    }
-    return result;
-}
+        for spanLen = 1 to maxSpanLen:
+            node = span.nodes[spanLen]
+            if node is nil:
+                continue
+
+            // 鬆弛操作：若經由目前節點到達目標位置的分數更高，則更新
+            score  = viterbi[i].maxScore + node.score
+            target = viterbi[i + spanLen]
+            if score > target.maxScore:
+                target.maxScore  = score
+                target.fromNode  = node
+                target.fromIndex = i
+
+    return viterbi
 ```
 
-**步驟 3：鬆弛演算法（Relaxation）**
+**核心洞察**：此鬆弛操作與 HMM Viterbi 解碼的遞迴式相同（Jurafsky & Martin, SLP3 附錄 A）：
 
-對拓撲排序後的頂點依序執行鬆弛操作，找出最大權重路徑（`reading_grid.cpp:134`）：
+$$v_t(j) = \max_i \left[ v_{t-1}(i) \times a_{ij} \times b_j(o_t) \right]$$
 
-```cpp
-void Relax(Vertex* u, Vertex* v) {
-    double w = v->node->score();  // 獲取節點的對數機率
+但因為我們的 unigram 模型沒有轉移機率（$a_{ij} = 1$），且發射分數是對數機率（乘法變為加法），遞迴式簡化為：
 
-    // 因為我們要找最大權重，所以用 > 而非 <
-    if (v->distance < u->distance + w) {
-        v->distance = u->distance + w;
-        v->prev = u;  // 記錄前驅節點
-    }
-}
+$$\text{viterbi}[i + L] = \max\left(\text{viterbi}[i + L],\; \text{viterbi}[i] + \text{score}(node)\right)$$
 
-// 主流程
-std::vector<Vertex*> ordered = TopologicalSort(&root);
-for (auto it = ordered.rbegin(); it != ordered.rend(); ++it) {
-    Vertex* u = *it;
-    for (Vertex* v : u->edges) {
-        Relax(u, v);
-    }
-}
-```
+因為使用對數機率，分數越大代表機率越高，所以鬆弛操作使用 `>` 而非 `<`。
 
-**步驟 4：回溯路徑**
+**步驟 2：回溯路徑（Backward Pass）**
 
-從終點回溯找出完整路徑：
+從 DP 表格的末端回溯，透過 `fromIndex` 和 `fromNode` 指標重建最佳路徑：
 
-```cpp
-std::vector<NodePtr> walked;
-Vertex* it = &terminal;
-while (it->prev != nullptr) {
-    walked.push_back(it->prev->node);
-    it = it->prev;
-}
-// 反轉得到正確順序
-result.nodes = std::vector<NodePtr>(walked.rbegin() + 1, walked.rend());
+```text
+Procedure VITERBI-BACKWARD(viterbi : STATE[], readingLen : integer)
+    Input:  viterbi — 前向傳遞產生的 STATE 陣列；readingLen — 讀音數量
+    Output: nodes — 最佳路徑的節點序列（由左至右）
+
+    nodes = empty list
+    curr = readingLen
+    while curr > 0:
+        append viterbi[curr].fromNode to nodes
+        curr = viterbi[curr].fromIndex
+    reverse nodes
+    return nodes
 ```
 
 ### 實際範例
@@ -333,6 +312,127 @@ result.nodes = std::vector<NodePtr>(walked.rbegin() + 1, walked.rend());
 
 演算法選擇分數最高的路徑「在我平凡」作為輸出結果。
 
+### Viterbi 動態規劃表格展開
+
+以下使用上述「在我平凡」的相同資料，展示 `viterbi[]` 表格如何逐步填充。此展開方式參考 SLP3 附錄 A 的 trellis 圖解（Figure A.8）以及 FSNLP 第 9 章的 delta 表格：
+
+```
+viterbi[] 表格（初始化為 -inf，viterbi[0] = 0）：
+
+位置 0（ㄗㄞˋ）：
+  spanLen=1: 在(-2.24) → viterbi[1] = max(-inf, 0 + -2.24) = -2.24, from=0, node=在
+  spanLen=1: 再(-4.12) → viterbi[1] = max(-2.24, 0 + -4.12) = -2.24（未更新）
+
+位置 1（ㄨㄛˇ）：
+  spanLen=1: 我(-2.27) → viterbi[2] = max(-inf, -2.24 + -2.27) = -4.51, from=1, node=我
+
+位置 2（ㄆㄧㄥˊ）：
+  spanLen=1: 平(-3.27) → viterbi[3] = max(-inf, -4.51 + -3.27) = -7.78, from=2, node=平
+  spanLen=2: 平凡(-5.14) → viterbi[4] = max(-inf, -4.51 + -5.14) = -9.65, from=2, node=平凡
+
+位置 3（ㄈㄢˊ）：
+  spanLen=1: 繁(-4.14) → viterbi[4] = max(-9.65, -7.78 + -4.14) = -9.65（未更新，-11.92 < -9.65）
+
+回溯 viterbi[4]：平凡(from=2) → 我(from=1) → 在(from=0)
+結果：在 → 我 → 平凡（分數：-9.65）
+```
+
+此表格展開與上方的路徑枚舉結果完全一致，但計算方式不同：路徑枚舉需要考察所有可能路徑（指數級），而 Viterbi DP 在 O(n x m) 時間內完成，其中 n 為讀音位置數，m 為最大跨度長度。
+
+### 時間與空間複雜度
+
+**時間複雜度**：O(n x m)
+
+- n = 讀音位置數（`readings_.size()`）
+- m = 最大跨度長度（`span.maxLength()`，通常 <= 8）
+- 等價於 O(|V| + |E|)，其中 V = 可達位置，E = 候選詞轉移
+- 在 McBopomofo 的格狀結構中，m 受 `kMaximumSpanLength`（8）限制，因此實際上是 **O(n)** -- 隨輸入長度線性增長
+- 比較：枚舉所有路徑的時間複雜度為 O(m^n)，即指數級。Viterbi 透過**最優子結構**性質達到多項式時間（SLP3 附錄 A；FSNLP 第 9.3.2 節）
+- 實測在 8001 個注音的壓力測試中，約 1ms 完成
+
+**空間複雜度**：O(n)
+
+- `viterbi[]` 陣列有 n+1 個元素，每個元素儲存一個 `State`（分數 + 回溯指標）
+- 比較：SLP3 的一般 HMM Viterbi 需要 O(N x T) 空間，其中 N = 隱藏狀態數，T = 序列長度。我們的格狀結構中每個位置的候選數量不固定，但 DP 表格是一維的 -- 因為我們只追蹤每個位置的最佳分數，而非每個狀態的分數
+
+### 與教科書 Viterbi 演算法的關係
+
+McBopomofo 的格狀 walk 與標準 HMM Viterbi 演算法的對應關係：
+
+| 概念 | 標準 HMM（SLP3/FSNLP） | McBopomofo 讀音網格 |
+|------|-------------------------|---------------------|
+| 隱藏狀態 | 固定狀態集合（如詞性標籤） | 每個位置的候選字詞（數量可變） |
+| 觀測序列 | Token 序列 | 讀音（注音符號）序列 |
+| 轉移機率 | $a_{ij}$（狀態間轉移） | 隱含 = 1（無 bigram 模型） |
+| 發射機率 | $b_j(o_t)$ | `node->score()`（unigram 對數機率） |
+| DP 遞迴式 | $v_t(j) = \max_i [v_{t-1}(i) \cdot a_{ij} \cdot b_j(o_t)]$ | `viterbi[i+L] = max(viterbi[i] + score)` |
+| DP 表格形狀 | N x T（狀態數 x 時間步） | 一維：n+1 個位置 |
+
+因為沒有轉移機率，格狀 Viterbi 退化為 DAG 最長路徑問題。這也是為什麼 CLRS 的 DAG 最短路徑分析同樣適用。NLP 框架（MLE 解碼）解釋了**為什麼**此演算法正確；圖論框架解釋了**多快**能完成計算。
+
+### 結構性固定與使用者模型整合
+
+基本 Viterbi walk 僅使用基礎語言模型的 unigram 分數。實際使用時，walk 還需要支援兩類擴展：**結構性固定**（使用者在當前 session 明確選擇的候選詞）與**使用者模型評分**（從歷史觀察中學習的偏好分數）。
+
+以下用虛擬碼描述擴展後的 walk 流程：
+
+**前置處理：計算被封鎖的位置**
+
+```
+blocked = array of false, size = readingLen
+for each (position, fixedNode) in fixedSpans:
+    for j = position+1 to position+fixedNode.length-1:
+        blocked[j] = true
+```
+
+**擴展後的前向傳遞**
+
+```
+for i = 0 to readingLen-1:
+    if blocked[i]: continue    // 位於固定跨度內部，跳過
+
+    if fixedSpans contains i:
+        // 結構性固定：僅使用固定節點，忽略所有其他候選
+        node = fixedSpans[i]
+        relax(i, i + node.length, node)
+        continue
+
+    for each (spanLen, node) in spans[i]:
+        if edge lands inside a fixedSpan: continue
+
+        score = node.score    // 基礎語言模型分數
+
+        // 使用者模型評分：查詢前文脈絡
+        if userModel != null:
+            leftReading = predecessor's reading, or "_START_" if i=0
+            leftValue = predecessor's value, or "" if i=0
+            suggestion = userModel.suggest(leftReading, leftValue,
+                                           node.reading, timestamp)
+            if suggestion exists:
+                score = suggestion.logScore
+
+        relax(i, i + spanLen, node, score)
+```
+
+**Post-walk 軟覆蓋**
+
+回溯得到最佳路徑後，對每個非手動選擇的節點，查詢使用者模型是否建議不同的顯示值：
+
+```
+for each node in walkResult:
+    if node is manually overridden: continue
+    suggestion = userModel.suggest(leftContext, node.reading, timestamp)
+    if suggestion exists and suggestion.value != node.currentValue:
+        node.overrideDisplayValue(suggestion.value)
+        // 保留原始分數，僅替換顯示值
+```
+
+**優先順序**：結構性固定 > 使用者模型 > 基礎語言模型
+
+- **結構性固定（fixedSpans）**：使用者在當前 session 明確選擇的候選詞。Walk 在該位置只考慮固定節點，不考慮任何替代候選。Session 結束時清除。
+- **使用者模型**：根據歷史觀察提供的 KN 平滑分數（詳見[情境式使用者模型](#情境式使用者模型)）。分數在前向傳遞的鬆弛階段替換基礎分數。
+- **基礎語言模型**：字典中的 unigram 對數機率，作為預設分數。
+
 ---
 
 ## 語言模型架構
@@ -341,20 +441,17 @@ result.nodes = std::vector<NodePtr>(walked.rbegin() + 1, walked.rend());
 
 `McBopomofoLM` (`Source/Engine/McBopomofoLM.h`) 是語言模型的 Facade 類別，整合多個資料來源：
 
-```cpp
-class McBopomofoLM : public Formosa::Gramambular2::LanguageModel {
-protected:
-    ParselessLM languageModel_;           // 主要詞庫
-    UserPhrasesLM userPhrases_;           // 使用者自訂詞彙
-    UserPhrasesLM excludedPhrases_;       // 使用者排除詞彙
-    PhraseReplacementMap phraseReplacement_;  // 詞彙替換表
-    AssociatedPhrasesV2 associatedPhrasesV2_; // 聯想詞
-
-    bool phraseReplacementEnabled_;       // 是否啟用詞彙替換
-    bool externalConverterEnabled_;       // 是否啟用外部轉換（如簡繁轉換）
-    std::function<std::string(const std::string&)> externalConverter_;
-    std::function<std::string(const std::string&)> macroConverter_;
-};
+```text
+Record MCBOPOMOFO-LM
+    languageModel            : ParselessLM          // 主要詞庫
+    userPhrases              : UserPhrasesLM         // 使用者自訂詞彙
+    excludedPhrases          : UserPhrasesLM         // 使用者排除詞彙
+    phraseReplacement        : PhraseReplacementMap  // 詞彙替換表
+    associatedPhrasesV2      : AssociatedPhrasesV2   // 聯想詞
+    phraseReplacementEnabled : boolean               // 是否啟用詞彙替換
+    externalConverterEnabled : boolean               // 是否啟用外部轉換（如簡繁轉換）
+    externalConverter        : function(string) -> string
+    macroConverter           : function(string) -> string
 ```
 
 ### Unigram 處理流水線
@@ -363,92 +460,82 @@ protected:
 
 #### 階段 1：收集原始 Unigrams
 
-```cpp
-std::vector<Unigram> McBopomofoLM::getUnigrams(const std::string& key) {
-    std::vector<Unigram> allUnigrams;
-    std::vector<Unigram> userUnigrams;
-    std::unordered_set<std::string> excludedValues;
-    std::unordered_set<std::string> insertedValues;
+```text
+Procedure GET-UNIGRAMS(lm : MCBOPOMOFO-LM, key : string)
+    Input:  lm — 語言模型；key — 讀音查詢鍵
+    Output: allUnigrams — 經過濾的 UNIGRAM 列表
+
+    allUnigrams    = empty list
+    userUnigrams   = empty list
+    excludedValues = empty set
+    insertedValues = empty set
 
     // 1. 載入排除清單
-    if (excludedPhrases_.hasUnigrams(key)) {
-        std::vector<Unigram> excludedUnigrams = excludedPhrases_.getUnigrams(key);
-        for (const auto& u : excludedUnigrams) {
-            excludedValues.insert(u.value());
-        }
-    }
+    if lm.excludedPhrases.hasUnigrams(key):
+        for each u in lm.excludedPhrases.getUnigrams(key):
+            add u.value to excludedValues
 
     // 2. 處理使用者自訂詞彙
-    if (userPhrases_.hasUnigrams(key)) {
-        std::vector<Unigram> rawUserUnigrams = userPhrases_.getUnigrams(key);
-        userUnigrams = filterAndTransformUnigrams(rawUserUnigrams,
-                                                  excludedValues,
-                                                  insertedValues);
-    }
+    if lm.userPhrases.hasUnigrams(key):
+        rawUserUnigrams = lm.userPhrases.getUnigrams(key)
+        userUnigrams = FILTER-AND-TRANSFORM(rawUserUnigrams,
+                                            excludedValues, insertedValues)
 
     // 3. 處理主詞庫
-    if (languageModel_.hasUnigrams(key)) {
-        std::vector<Unigram> rawGlobalUnigrams = languageModel_.getUnigrams(key);
-        allUnigrams = filterAndTransformUnigrams(rawGlobalUnigrams,
-                                                 excludedValues,
-                                                 insertedValues);
-    }
+    if lm.languageModel.hasUnigrams(key):
+        rawGlobalUnigrams = lm.languageModel.getUnigrams(key)
+        allUnigrams = FILTER-AND-TRANSFORM(rawGlobalUnigrams,
+                                           excludedValues, insertedValues)
 ```
 
 #### 階段 2：過濾與轉換
 
 `filterAndTransformUnigrams` 執行以下步驟（`McBopomofoLM.cpp:234`）：
 
-```cpp
-std::vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(
-    const std::vector<Unigram> unigrams,
-    const std::unordered_set<std::string>& excludedValues,
-    std::unordered_set<std::string>& insertedValues) {
+```text
+Procedure FILTER-AND-TRANSFORM(unigrams : UNIGRAM[],
+                               excludedValues : set,
+                               insertedValues : set)
+    Input:  unigrams — 原始 UNIGRAM 列表；
+            excludedValues — 需排除的字詞集合；
+            insertedValues — 已插入的字詞集合（用於去除重複）
+    Output: results — 經過濾與轉換的 UNIGRAM 列表
 
-    std::vector<Unigram> results;
+    results = empty list
 
-    for (auto&& unigram : unigrams) {
-        const std::string& rawValue = unigram.value();
+    for each unigram in unigrams:
+        rawValue = unigram.value
 
         // 步驟 1：過濾排除詞彙
-        if (excludedValues.find(rawValue) != excludedValues.end()) {
-            continue;
-        }
+        if rawValue in excludedValues:
+            continue
 
-        std::string value = rawValue;
+        value = rawValue
 
         // 步驟 2：詞彙替換（如果啟用）
-        if (phraseReplacementEnabled_) {
-            std::string replacement = phraseReplacement_.valueForKey(value);
-            if (!replacement.empty()) {
-                value = replacement;
-            }
-        }
+        if phraseReplacementEnabled:
+            replacement = phraseReplacement.valueForKey(value)
+            if replacement is not empty:
+                value = replacement
 
         // 步驟 3：巨集轉換（如日期巨集）
-        if (macroConverter_ != nullptr) {
-            std::string replacement = macroConverter_(value);
-            if (value != replacement) {
-                value = replacement;
-            }
-        }
+        if macroConverter is not nil:
+            replacement = macroConverter(value)
+            if value != replacement:
+                value = replacement
 
         // 步驟 4：外部轉換（如簡繁轉換）
-        if (externalConverterEnabled_ && externalConverter_ != nullptr) {
-            std::string replacement = externalConverter_(value);
-            if (value != replacement) {
-                value = replacement;
-            }
-        }
+        if externalConverterEnabled and externalConverter is not nil:
+            replacement = externalConverter(value)
+            if value != replacement:
+                value = replacement
 
-        // 步驟 5：去重
-        if (insertedValues.find(value) == insertedValues.end()) {
-            results.emplace_back(value, unigram.score(), rawValue);
-            insertedValues.insert(value);
-        }
-    }
-    return results;
-}
+        // 步驟 5：去除重複
+        if value not in insertedValues:
+            append UNIGRAM(value, unigram.score, rawValue) to results
+            add value to insertedValues
+
+    return results
 ```
 
 完整流水線：
@@ -464,7 +551,7 @@ std::vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(
     ↓
 步驟 4: 外部轉換
     ↓
-步驟 5: 去重處理
+步驟 5: 去除重複
     ↓
 最終 Unigrams
 ```
@@ -473,35 +560,34 @@ std::vector<Unigram> McBopomofoLM::filterAndTransformUnigrams(
 
 對於單音節使用者詞彙，需要特別處理以避免過度優先（`McBopomofoLM.cpp:120`）：
 
-```cpp
-bool isKeyMultiSyllable =
-    key.find(Formosa::Gramambular2::ReadingGrid::kDefaultSeparator) != std::string::npos;
+```text
+Procedure ADJUST-USER-PHRASE-SCORES(key : string,
+                                    allUnigrams : UNIGRAM[],
+                                    userUnigrams : UNIGRAM[])
+    Input:  key — 讀音查詢鍵；
+            allUnigrams — 主詞庫的 UNIGRAM 列表；
+            userUnigrams — 使用者自訂的 UNIGRAM 列表
+    Output: allUnigrams（就地更新，使用者詞彙插入至最前方）
 
-if (isKeyMultiSyllable || allUnigrams.empty()) {
-    // 多音節或無詞庫詞彙：直接使用使用者詞彙（分數為 0）
-    allUnigrams.insert(allUnigrams.begin(), userUnigrams.begin(), userUnigrams.end());
-} else if (!userUnigrams.empty()) {
-    // 單音節：調整分數為最高分 + epsilon
-    double topScore = std::numeric_limits<double>::lowest();
-    for (const auto& unigram : allUnigrams) {
-        if (unigram.score() > topScore) {
-            topScore = unigram.score();
-        }
-    }
+    isMultiSyllable = key contains SEPARATOR
 
-    constexpr double epsilon = 0.000000001;
-    double boostedScore = topScore + epsilon;
+    if isMultiSyllable or allUnigrams is empty:
+        // 多音節或無詞庫詞彙：直接使用使用者詞彙（分數為 0）
+        prepend userUnigrams to allUnigrams
+    else if userUnigrams is not empty:
+        // 單音節：調整分數為最高分 + epsilon
+        topScore = -infinity
+        for each unigram in allUnigrams:
+            if unigram.score > topScore:
+                topScore = unigram.score
 
-    std::vector<Unigram> rewrittenUserUnigrams;
-    for (const auto& unigram : userUnigrams) {
-        rewrittenUserUnigrams.emplace_back(
-            Unigram(unigram.value(), boostedScore)
-        );
-    }
-    allUnigrams.insert(allUnigrams.begin(),
-                      rewrittenUserUnigrams.begin(),
-                      rewrittenUserUnigrams.end());
-}
+        epsilon = 0.000000001
+        boostedScore = topScore + epsilon
+
+        rewritten = empty list
+        for each unigram in userUnigrams:
+            append UNIGRAM(unigram.value, boostedScore) to rewritten
+        prepend rewritten to allUnigrams
 ```
 
 **原理**：
@@ -534,34 +620,139 @@ if (isKeyMultiSyllable || allUnigrams.empty()) {
 
 `ParselessPhraseDB` 使用標準二元搜尋找到符合讀音的資料行（`ParselessPhraseDB.cpp`）：
 
-```cpp
-std::vector<std::string_view> ParselessPhraseDB::findRows(
-    const std::string_view& key) const {
+```text
+Procedure FIND-ROWS(db : ParselessPhraseDB, key : string)
+    Input:  db — 詞庫資料庫（已排序的記憶體映射檔案）；
+            key — 讀音前綴（含尾隨空格）
+    Output: results — 符合前綴的資料行列表
 
-    const char* line = findFirstMatchingLine(key);
-    if (line == nullptr) {
-        return {};
-    }
+    line = FIND-FIRST-MATCHING-LINE(db, key)  // 二元搜尋
+    if line is nil:
+        return empty list
 
-    std::vector<std::string_view> results;
+    results = empty list
     // 從找到的位置開始，收集所有前綴匹配的行
-    while (line < end_) {
-        std::string_view lineView(line, end_ - line);
-        if (!lineView.starts_with(key)) {
-            break;
-        }
-        // 找到完整的一行
-        const char* lineEnd = std::find(line, end_, '\n');
-        results.emplace_back(line, lineEnd - line);
-        line = lineEnd + 1;
-    }
-    return results;
-}
+    while line < db.end:
+        if line does not start with key:
+            break
+        lineEnd = find next newline from line
+        append line[0..lineEnd] to results
+        line = lineEnd + 1
+
+    return results
 ```
 
 時間複雜度：
 - **查詢**：O(log n + k)，其中 n 是總行數，k 是符合的行數
 - **空間**：O(1)，使用 memory-mapped file，不需載入全部資料
+
+---
+
+## 情境式使用者模型
+
+### 動機：舊有評分機制的問題
+
+舊有系統使用四個互相重疊的機制來表達使用者偏好，其中三個使用超出對數機率定義域的常數：
+
+1. **`kOverridingScore = 42`**：任意常數，遠超正常對數機率範圍（-2 到 -13）。無條件覆蓋所有語言模型證據，無法與真實機率進行插值。
+
+2. **`kUserUnigramScore = 0`**：使用者自訂詞彙的對數機率為零。與基礎語言模型的多音節候選詞不公平競爭（單音節詞分數為 0 時，多音節詞永遠無法勝出）。
+
+3. **`topScore + epsilon`**：在最高分 unigram 上加微量 epsilon。脆弱且順序相依，僅對單音節有效。
+
+4. **`UserOverrideModel`**：記憶體內 LRU 快取，不持久化。學習到的偏好在重啟後遺失，且產生 magic score 42。
+
+這些機制導致層疊的變通方案：重疊節點重設、`forceHighScoreOverride` 啟發式、以及 key handler 中的雙次 walk 模式。根本原因在於使用者偏好以分數駭客（score hack）而非有原則的機率證據來表達。
+
+### 平滑演算法選型
+
+針對「稀疏使用者觀察疊加在強基礎語言模型（約 16 萬條目）上」的場景，評估了七種平滑技術：
+
+| 技術 | 優點 | 缺點 | 結論 |
+|------|------|------|------|
+| Absolute Discounting | 簡單、充分研究 | d=0.75 對稀疏資料過於激進（多數計數僅 1-2） | 不採用 |
+| Standard Kneser-Ney | 大語料庫的金標準（Chen & Goodman 1999） | 使用者資料過於稀疏，延續機率退化；忽略強基礎 LM | 不採用 |
+| Modified Kneser-Ney | 大資料上最高準確率 | 需從 n1-n4 統計量估計 d1、d2、d3+；零計數導致不穩定 | 不採用 |
+| Bayesian/Dirichlet | 先驗權重 mu 直覺清晰；完美適合強基礎+稀疏使用者場景 | 無多脈絡泛化；無未知詞處理 | 部分適合 |
+| Witten-Bell | 無需調參（自動） | 無法控制先驗信任度；不自然地使用基礎模型作為退回 | 不採用 |
+| Jelinek-Mercer | 最簡單（一行公式） | 固定 lambda 忽略觀察計數；動態 lambda 即退化為 Dirichlet | 過於簡單 |
+| Stupid Backoff | 實作簡單 | 非機率分佈；無效的對數機率；設計用於 Google 規模資料 | 不合格 |
+
+### 關鍵洞見：「丼」問題
+
+決定性的洞見來自「丼（don，丼飯）問題」：如果一個字僅在「牛肉」之後被觀察到，它是否應該在無關的脈絡（如「天氣」）中佔主導地位？
+
+- **僅用 Dirichlet**：「丼」不論觀察多樣性如何，在所有脈絡中過度泛化。
+- **加入 KN 延續計數**：N+(丼) = 1 對僅在單一脈絡出現的詞提供弱泛化，在無關脈絡中正確地退回到基礎語言模型。
+
+這個洞見導致了混合式四層設計：結合 KN 的延續機率（控制脈絡泛化）、基礎語言模型整合（類似 Dirichlet 先驗）、以及子跨度分解（針對未知詞的新貢獻）。
+
+### 四層退回模型
+
+**第 1 層（Bigram）**：使用者 bigram 的折扣計數與插值
+
+$$P_{KN}(w \mid \text{context}, \text{reading}) = \frac{\max(c(w) - d, 0)}{c_{\text{total}}} + \lambda \cdot P_{\text{cont}}(w \mid \text{reading})$$
+
+其中 $\lambda = d \cdot \frac{|\text{types}(\text{context}, \text{reading})|}{c_{\text{total}}}$
+
+**第 2 層（Continuation）**：基於不同左脈絡計數的延續機率
+
+$$P_{\text{cont}}(w \mid \text{reading}) = \frac{\max(N_+(w) - d, 0)}{N_{++}} + \lambda_{\text{cont}} \cdot P_{\text{base}}(w \mid \text{reading})$$
+
+其中 $N_+(w)$ = 特定 (reading, w) 的不同左脈絡數，$N_{++}$ = 所有唯一 bigram 總數
+
+**第 3 層（Base LM）**：從字典查詢基礎語言模型
+
+$$P_{\text{base}}(w \mid \text{reading}) = \exp(\text{logprob})$$
+
+若基礎語言模型中無此讀音，則退回到第 4 層。
+
+**第 4 層（Decomposed）**：將讀音拆解為音節，乘以個別機率
+
+$$P_{\text{decomp}}(w \mid \text{reading}) = \prod_i P_{\text{base}}(\text{char}_i \mid \text{syllable}_i)$$
+
+未知音節回傳 floor 機率 $10^{-10}$。
+
+**參數設定**：
+- 折扣 $d = 0.5$（固定值，保留單次觀察 50% 的證據）
+- Floor 機率 $= 10^{-10}$
+
+### 時間衰減
+
+每筆觀察計數隨時間指數衰減：
+
+$$\text{decayedCount}(t) = \text{rawCount} \times \exp\left(-\frac{\ln 2 \times (t - t_{\text{observed}})}{\text{halfLife}}\right)$$
+
+其中 halfLife = 20。經過 20 個時間單位後，觀察值剩餘原始權重的一半。
+
+此設計平衡了近期偏好與長期基礎語言模型分數：
+- 最近的選擇具有強影響力
+- 舊的觀察逐漸衰減，讓基礎語言模型的機率重新主導
+- halfLife 越短，使用者偏好越快被遺忘；越長，偏好越持久
+
+### 三層架構
+
+情境式使用者模型採用三層架構，將不同生命週期的偏好分開管理：
+
+```
+Session 層（記憶體內，commit 時清除）：
+  fixedSpans  →  Viterbi 跳過替代候選
+
+Scoring 層（四層 KN 退回）：
+  使用者 bigram:  P(w | left_context)  ← 使用者觀察
+  延續機率:      P_cont(w)            ← 不同左脈絡計數
+  基礎詞庫:      P_base(w)            ← data.txt
+  分解:          Pi P_base(syllable_i) ← 退回
+
+Persistence 層：
+  ContextualUserModel 序列化到磁碟
+  (contextual-user-model.txt)
+  跨重啟保存，觀察隨時間衰減
+```
+
+- **Session 層**：結構性固定（fixedSpans）代表使用者在當前輸入 session 的明確選擇。Commit 後清除，不跨 session 保存。
+- **Scoring 層**：KN 平滑分數跨 session 累積。提供有統計支撐的使用者偏好，自然地與基礎語言模型整合。
+- **Persistence 層**：磁碟檔案跨重啟保存。觀察透過時間衰減逐漸減弱，避免過時的偏好永久佔據。
 
 ---
 
@@ -690,7 +881,7 @@ flowchart TD
 - **方形節點**：外部實體（External Entity）— McBopomofo.app
 - **標籤箭頭**：資料流（Data Flow）
 
-> **📝 工具路徑更新 (2024年10月)**
+> **工具路徑更新 (2024年10月)**
 >
 > Python 工具已從 `bin/` 遷移至 `curation/` 套件結構。
 > 所有模組使用集中式路徑配置（從 `curation` 套件匯入 `PROJECT_ROOT`）。
@@ -877,10 +1068,19 @@ LC_ALL=C sort -o phrase.occ phrase.occ
 |------|----------|---------------|
 | Reading Grid 主邏輯 | `Source/Engine/gramambular2/reading_grid.h` | `ReadingGrid` |
 | 插入注音處理 | `Source/Engine/gramambular2/reading_grid.cpp:51` | `insertReading()` |
-| 節點更新 | `Source/Engine/gramambular2/reading_grid.cpp:417` | `update()` |
-| 最佳路徑演算法 | `Source/Engine/gramambular2/reading_grid.cpp:216` | `walk()` |
-| 拓撲排序 | `Source/Engine/gramambular2/reading_grid.cpp:166` | `TopologicalSort()` |
-| 鬆弛演算法 | `Source/Engine/gramambular2/reading_grid.cpp:134` | `Relax()` |
+| 節點更新 | `Source/Engine/gramambular2/reading_grid.cpp:334` | `update()` |
+| 最佳路徑演算法（Viterbi） | `Source/Engine/gramambular2/reading_grid.cpp:132` | `walk()` |
+
+### 演算法擴展
+
+| 功能 | 檔案路徑 | 關鍵函式/類別 |
+|------|----------|---------------|
+| Walk 演算法實作 | `Source/Engine/gramambular2/walk_strategy.h` (PR #779) | `WalkStrategy::walk()` |
+| Viterbi 前向傳遞 | `Source/Engine/gramambular2/walk_strategy.cpp` (PR #779) | `WalkStrategy::walk()` |
+| 結構性固定（fixedSpans） | `Source/Engine/gramambular2/reading_grid.h` (PR #779) | `fixSpan()`, `clearFixedSpans()` |
+| 情境式使用者模型 | `Source/Engine/gramambular2/contextual_user_model.h` (PR #780) | `ContextualUserModel` |
+| KN 退回與觀察 | `Source/Engine/gramambular2/contextual_user_model.cpp` (PR #780) | `suggest()`, `observe()` |
+| Post-walk 使用者模型覆蓋 | `Source/Engine/gramambular2/reading_grid.cpp` (PR #780) | `walk()` 內部邏輯 |
 
 ### 語言模型
 
@@ -925,14 +1125,23 @@ LC_ALL=C sort -o phrase.occ phrase.occ
 
 ## 延伸閱讀
 
+**Viterbi 演算法與語言模型**：
+- Jurafsky & Martin, *Speech and Language Processing*, 3rd Edition, Chapter 8 (Viterbi); Appendix A (HMM Viterbi DP)
+- 格架上的 Viterbi：[vene.ro/blog/shortest-paths-in-lattices](https://vene.ro/blog/shortest-paths-in-lattices.html)
+
+**平滑與退回**：
+- Jurafsky & Martin, *SLP3*, Chapter 3 (Smoothing, Backoff vs Interpolation, Kneser-Ney); Appendix C (Kneser-Ney detail)
+- Manning & Schutze, *Foundations of Statistical Natural Language Processing*, Chapter 6, Sec. 6.3-6.4 (Good-Turing, Katz backoff, linear interpolation)
+- Chen, S. F. & Goodman, J. (1999). An empirical study of smoothing techniques for language modeling. *Computer Speech & Language*, 13(4), 359-394.
+
+**專案資源**：
 - [Wiki: 程式架構](https://github.com/openvanilla/McBopomofo/wiki/程式架構)
 - [Wiki: Gramambular 演算法](https://github.com/openvanilla/McBopomofo/wiki/程式架構_Gramambular)
 - [Wiki: 詞庫開發說明](https://github.com/openvanilla/McBopomofo/wiki/詞庫開發說明)
 - [X/Twitter 演算法說明串](https://x.com/McBopomofo/status/1559356063622631424)
-- DAG 最短路徑演算法：Cormen et al., *Introduction to Algorithms*, 3rd Edition
 
 ---
 
-**文件版本**：1.2
-**最後更新**：2025-10-12T13:12:00+08:00
+**文件版本**：1.3
+**最後更新**：2026-02-15T06:53:00+08:00
 **適用版本**：McBopomofo 2.x 及以上
