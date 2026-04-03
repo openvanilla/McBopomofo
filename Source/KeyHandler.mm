@@ -1403,8 +1403,21 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             }
             _grid->insertReading(key);
             [self _walk];
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
+            if (_inputMode == InputModePlainBopomofo) {
+                InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
+                if (candidateState.candidates.count == 1) {
+                    [self clear];
+                    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value];
+                    stateCallback(committing);
+                    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                    stateCallback(empty);
+                } else {
+                    stateCallback(candidateState);
+                }
+            } else {
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                stateCallback(inputting);
+            }
             return YES;
         }
     }
@@ -1621,14 +1634,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         } else if ([state isKindOfClass:[InputChoosingPunctuationList class]]) {
-            if (Preferences.selectPhraseAfterCursorAsCandidate) {
-                _grid->deleteReadingAfterCursor();
+            if (_inputMode == InputModePlainBopomofo) {
+                InputState *empty = [[InputStateEmpty alloc] init];
+                stateCallback(empty);
             } else {
-                _grid->deleteReadingBeforeCursor();
+                if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                    _grid->deleteReadingAfterCursor();
+                } else {
+                    _grid->deleteReadingBeforeCursor();
+                }
+                [self _walk];
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                stateCallback(inputting);
             }
-            [self _walk];
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             size_t originalCursorIndex = ((InputStateChoosingCandidate *)state).originalCursorIndex;
             _grid->setCursor(originalCursorIndex);
