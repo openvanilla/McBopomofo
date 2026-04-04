@@ -1634,20 +1634,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
         } else if ([state isKindOfClass:[InputChoosingPunctuationList class]]) {
-            if (_inputMode == InputModePlainBopomofo) {
-                [self clear];
-                InputState *empty = [[InputStateEmpty alloc] init];
-                stateCallback(empty);
+            if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                _grid->deleteReadingAfterCursor();
             } else {
-                if (Preferences.selectPhraseAfterCursorAsCandidate) {
-                    _grid->deleteReadingAfterCursor();
-                } else {
-                    _grid->deleteReadingBeforeCursor();
-                }
-                [self _walk];
-                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-                stateCallback(inputting);
+                _grid->deleteReadingBeforeCursor();
             }
+            [self _walk];
+            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+            stateCallback(inputting);
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             size_t originalCursorIndex = ((InputStateChoosingCandidate *)state).originalCursorIndex;
             _grid->setCursor(originalCursorIndex);
