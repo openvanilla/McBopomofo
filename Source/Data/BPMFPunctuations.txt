@@ -563,7 +563,7 @@ _ _half_punctuation_HanyuPinyin__ 0.0
 ＝ _punctuation_list_+ 0.0
 ＝ _punctuation_list_= 0.0
 ＼ _punctuation_list_\ 0.0
-／ _punctuation_list_\ 0.0
+／ _punctuation_list_/ 0.0
 — _punctuation_list__ 0.0
 … _punctuation_list__ 0.0
 － _punctuation_list__ 0.0

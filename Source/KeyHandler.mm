@@ -1403,8 +1403,21 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             }
             _grid->insertReading(key);
             [self _walk];
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
+            if (_inputMode == InputModePlainBopomofo) {
+                InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
+                if (candidateState.candidates.count == 1) {
+                    [self clear];
+                    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value];
+                    stateCallback(committing);
+                    InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                    stateCallback(empty);
+                } else {
+                    stateCallback(candidateState);
+                }
+            } else {
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                stateCallback(inputting);
+            }
             return YES;
         }
     }
