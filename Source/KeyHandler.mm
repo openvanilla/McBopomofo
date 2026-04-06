@@ -306,9 +306,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // Upon force-commit, clear the BPMF reading, then "steal" the composing buffer text from the built inputting state.
     _bpmfReadingBuffer->clear();
     InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+    NSString *readingString = [self _walkReadingString];
     [self clear];
 
-    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:inputting.composingBuffer];
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:inputting.composingBuffer reading:readingString];
     stateCallback(committing);
 }
 
@@ -576,7 +577,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 [self clear];
                 NSString *text = choosingCandidates.candidates.firstObject.value;
                 NSString *candidateReading = choosingCandidates.candidates.firstObject.reading;
-                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text];
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:text reading:candidateReading];
                 stateCallback(committing);
 
                 if (!Preferences.associatedPhrasesEnabled) {
@@ -618,7 +619,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 if (_grid->cursor() >= _grid->length()) {
                     NSString *composingBuffer = ((InputStateNotEmpty *)state).composingBuffer;
                     if (composingBuffer.length) {
-                        InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+                        NSString *readingString = [self _walkReadingString];
+                        InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer reading:readingString];
                         stateCallback(committing);
                     }
                     [self clear];
@@ -740,11 +742,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // MARK: Enter Big5 code mode
     if (input.isControlHold && (charCode == '`')) {
         if (Preferences.big5InputEnabled) {
+            NSString *readingString = [self _walkReadingString];
             [self clear];
             if ([state isKindOfClass:[InputStateInputting class]]) {
                 InputStateInputting *current = (InputStateInputting *)state;
                 NSString *composingBuffer = current.composingBuffer;
-                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer reading:readingString];
                 stateCallback(committing);
             }
             InputStateBig5 *big5 = [[InputStateBig5 alloc] initWithCode:@""];
@@ -754,11 +757,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isControlHold && (input.keyCode == 42)) {
+        NSString *readingString = [self _walkReadingString];
         [self clear];
         if ([state isKindOfClass:[InputStateInputting class]]) {
             InputStateInputting *current = (InputStateInputting *)state;
             NSString *composingBuffer = current.composingBuffer;
-            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer reading:readingString];
             stateCallback(committing);
         }
         InputStateSelectingFeature *selecting = [[InputStateSelectingFeature alloc] init];
@@ -1166,6 +1170,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return composingBuffer;
 }
 
+- (NSString *)_walkReadingString
+{
+    NSMutableArray *readings = [[NSMutableArray alloc] init];
+    for (const auto& node : _latestWalk.nodes) {
+        std::string reading = node->reading();
+        // Skip punctuation/symbol readings that start with underscore
+        if (reading.rfind("_", 0) != 0) {
+            [readings addObject:[NSString stringWithUTF8String:reading.c_str()]];
+        }
+    }
+    return [readings componentsJoinedByString:@" "];
+}
+
 - (NSString *)_currentHtmlRuby
 {
     std::string composed;
@@ -1251,11 +1268,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return NO;
     }
 
+    NSString *readingString = [self _walkReadingString];
     [self clear];
 
     InputStateInputting *current = (InputStateInputting *)state;
     NSString *composingBuffer = current.composingBuffer;
-    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer];
+    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:composingBuffer reading:readingString];
     stateCallback(committing);
     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
     stateCallback(empty);
@@ -1309,7 +1327,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         if (candidateState.candidates.count == 1) {
             [self clear];
-            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value reading:candidateState.candidates.firstObject.reading];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
             stateCallback(empty);
@@ -1439,7 +1457,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 InputStateChoosingCandidate *candidateState = [self _buildCandidateStateFromInputtingState:(InputStateInputting *)[self buildInputtingState] useVerticalMode:input.useVerticalMode];
                 if (candidateState.candidates.count == 1) {
                     [self clear];
-                    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value];
+                    InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidateState.candidates.firstObject.value reading:candidateState.candidates.firstObject.reading];
                     stateCallback(committing);
                     InputStateEmpty *empty = [[InputStateEmpty alloc] init];
                     stateCallback(empty);
