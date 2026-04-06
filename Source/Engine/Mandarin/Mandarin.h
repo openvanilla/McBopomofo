@@ -66,6 +66,11 @@ class BopomofoSyllable {
 
   bool hasToneMarker() const { return !!(syllable_ & ToneMarkerMask); }
 
+  bool isConsonantOnly() const {
+    return hasConsonant() && !hasMiddleVowel() && !hasVowel() &&
+           !hasToneMarker();
+  }
+
   Component consonantComponent() const { return syllable_ & ConsonantMask; }
 
   Component middleVowelComponent() const { return syllable_ & MiddleVowelMask; }
