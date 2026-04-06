@@ -35,6 +35,7 @@ class InputLogger {
     private var currentMonth: String = ""
     private let logDirectory: URL
 
+    // UTC+8 (Taiwan) for consistent log timestamps regardless of system timezone
     private static let monthFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM"
