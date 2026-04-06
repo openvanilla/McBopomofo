@@ -245,7 +245,7 @@ class McBopomofoInputMethodController: IMKInputController {
                 if !event.modifierFlags.contains(.shift) && relevantFlags.isEmpty {
                     // SHIFT released with no other modifiers held — bare SHIFT press
                     shiftPressed = false
-                    if state is InputState.Empty || state is InputState.Deactivated {
+                    if state is InputState.Empty || state is InputState.EmptyIgnoringPreviousState || state is InputState.Deactivated {
                         isAlphanumericMode.toggle()
                         let message = isAlphanumericMode ? "英數" : "注音"
                         NotifierController.notify(message: message)
@@ -256,7 +256,7 @@ class McBopomofoInputMethodController: IMKInputController {
                 }
             }
             // If in active input state (not Empty), suppress flagsChanged
-            if !(state is InputState.Empty) && !(state is InputState.Deactivated) {
+            if !(state is InputState.Empty) && !(state is InputState.EmptyIgnoringPreviousState) && !(state is InputState.Deactivated) {
                 return true
             }
             return false
