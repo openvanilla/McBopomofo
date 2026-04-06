@@ -22,6 +22,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 #include <cmath>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <utility>
@@ -283,6 +284,34 @@ TEST(McBopomofoLMTest, MacroValueNotRecognizedByMacroConverterIsFiltered) {
   ASSERT_EQ(unigrams.size(), 2);  // only one macro is supported
   EXPECT_EQ(unigrams[0].value(), "今天");
   EXPECT_EQ(unigrams[1].value(), "6/10/21");
+}
+
+TEST(McBopomofoLMTest, AbbreviatedQuery) {
+  McBopomofoLM lm;
+  constexpr char kData[] = R"(# format org.openvanilla.mcbopomofo.sorted
+ㄅㄚ 八 -3.27631260
+ㄅㄚ 吧 -3.59800309
+ㄊㄨˊ-ㄕㄨ-ㄍㄨㄢˇ 圖書館 -5.50000000
+)";
+  auto db = std::make_unique<ParselessPhraseDB>(kData, strlen(kData));
+  lm.loadLanguageModel(std::move(db));
+
+  // Abbreviated single consonant
+  EXPECT_TRUE(lm.hasUnigrams("ㄅ"));
+  auto results = lm.getUnigrams("ㄅ");
+  EXPECT_GE(results.size(), 2);
+
+  // Abbreviated multi-syllable
+  EXPECT_TRUE(lm.hasUnigrams("ㄊ-ㄕ-ㄍ"));
+  auto multiResults = lm.getUnigrams("ㄊ-ㄕ-ㄍ");
+  ASSERT_EQ(multiResults.size(), 1);
+  EXPECT_EQ(multiResults[0].value(), "圖書館");
+
+  // Full key still works
+  EXPECT_TRUE(lm.hasUnigrams("ㄅㄚ"));
+  auto fullResults = lm.getUnigrams("ㄅㄚ");
+  ASSERT_GE(fullResults.size(), 2);
+  EXPECT_EQ(fullResults[0].value(), "八");
 }
 
 }  // namespace McBopomofo
