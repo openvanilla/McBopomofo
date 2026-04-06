@@ -31,10 +31,37 @@
 #include <utility>
 #include <vector>
 
+#include "Mandarin/Mandarin.h"
 #include "ReadingTrie.h"
 #include "gramambular2/reading_grid.h"
 
 namespace McBopomofo {
+
+using BPMF = Formosa::Mandarin::BopomofoSyllable;
+
+// Check if a single-syllable reading has no tone marker.
+static bool IsTonelessSyllable(const std::string& key) {
+  if (key.find('-') != std::string::npos) return false;  // multi-syllable
+  auto syllable = BPMF::FromComposedString(key);
+  return !syllable.isEmpty() && !syllable.hasToneMarker() &&
+         (syllable.hasMiddleVowel() || syllable.hasVowel());
+}
+
+// Generate all toned variants of a toneless reading.
+static std::vector<std::string> ToneVariants(const std::string& key) {
+  auto syllable = BPMF::FromComposedString(key);
+  BPMF::Component base = syllable.consonantComponent() |
+                          syllable.middleVowelComponent() |
+                          syllable.vowelComponent();
+  BPMF::Component tones[] = {BPMF::Tone1, BPMF::Tone2, BPMF::Tone3,
+                              BPMF::Tone4, BPMF::Tone5};
+  std::vector<std::string> variants;
+  for (auto tone : tones) {
+    BPMF candidate(base | tone);
+    variants.push_back(candidate.composedString());
+  }
+  return variants;
+}
 
 static constexpr std::string_view kMacroPrefix = "MACRO@";
 static constexpr double kMacroScore = -8.0;
@@ -216,6 +243,21 @@ McBopomofoLM::getUnigrams(const std::string& key) {
                        rewrittenUserUnigrams.end());
   }
 
+  // If key is a toneless syllable, supplement with all tone variants.
+  if (IsTonelessSyllable(key)) {
+    for (const auto& variant : ToneVariants(key)) {
+      if (languageModel_.hasUnigrams(variant)) {
+        auto variantUnigrams = languageModel_.getUnigrams(variant);
+        for (const auto& u : variantUnigrams) {
+          if (insertedValues.find(u.value()) == insertedValues.end()) {
+            allUnigrams.push_back(u);
+            insertedValues.insert(u.value());
+          }
+        }
+      }
+    }
+  }
+
   // If key contains abbreviated syllables, supplement with trie results.
   if (ReadingTrie::containsAbbreviatedSyllable(key)) {
     auto abbreviatedUnigrams = languageModel_.getAbbreviatedUnigrams(key);
@@ -238,6 +280,11 @@ bool McBopomofoLM::hasUnigrams(const std::string& key) {
   if (!excludedPhrases_.hasUnigrams(key)) {
     if (userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key)) {
       return true;
+    }
+    if (IsTonelessSyllable(key)) {
+      for (const auto& variant : ToneVariants(key)) {
+        if (languageModel_.hasUnigrams(variant)) return true;
+      }
     }
     if (ReadingTrie::containsAbbreviatedSyllable(key)) {
       return languageModel_.hasAbbreviatedUnigrams(key);
