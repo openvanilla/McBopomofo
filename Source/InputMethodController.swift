@@ -56,6 +56,13 @@ class McBopomofoInputMethodController: IMKInputController {
     var state: InputState = InputState.Empty()
     lazy var charInfo: SystemCharacterInfo? = try? SystemCharacterInfo()
 
+    /// Whether the input method is in alphanumeric (English) passthrough mode.
+    var isAlphanumericMode = false
+
+    /// Tracks whether SHIFT was pressed without any other key in between,
+    /// to distinguish a bare SHIFT press from SHIFT+key combos.
+    private var shiftPressed = false
+
     // Share the stored issues, so a set of issues is shown as notification only once.
     static var latestUserFileIssues: [String] = []
 
@@ -174,6 +181,8 @@ class McBopomofoInputMethodController: IMKInputController {
             withKeyboardNamed: Preferences.basisKeyboardLayout)
         // reset the state
         currentClient = client
+        isAlphanumericMode = false
+        shiftPressed = false
 
         keyHandler.clear()
         keyHandler.syncWithPreferences()
@@ -183,6 +192,8 @@ class McBopomofoInputMethodController: IMKInputController {
 
     override func deactivateServer(_ client: Any!) {
         currentClient = nil
+        isAlphanumericMode = false
+        shiftPressed = false
         keyHandler.clear()
         self.handle(state: .Deactivated(), client: client)
     }
@@ -225,36 +236,34 @@ class McBopomofoInputMethodController: IMKInputController {
         }
 
         if event.type == .flagsChanged {
-            if state is InputState.Empty {
-                return false
+            let shiftOnly = event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .shift
+            if shiftOnly {
+                // SHIFT key went down
+                shiftPressed = true
+            } else if shiftPressed {
+                // A modifier changed while shiftPressed was true.
+                // If SHIFT is no longer held, this is a SHIFT release.
+                if !event.modifierFlags.contains(.shift) {
+                    shiftPressed = false
+                    // Only toggle if composing buffer is empty
+                    if state is InputState.Empty || state is InputState.Deactivated {
+                        isAlphanumericMode.toggle()
+                        let message = isAlphanumericMode ? "英數" : "注音"
+                        NotifierController.notify(message: message)
+                    }
+                }
             }
-            // Handle key up events during active input state.
-            //
-            // This prevents double-space from affecting the current input.
-            // While macOS may normally insert a period on double space, this
-            // should be suppressed when there is an active composing buffer or
-            // candidate window.
-            return true
+            // If in active input state (not Empty), suppress flagsChanged
+            if !(state is InputState.Empty) && !(state is InputState.Deactivated) {
+                return true
+            }
+            return false
         }
 
-        if event.type == .flagsChanged {
-            let functionKeyKeyboardLayoutID = Preferences.functionKeyboardLayout
-            let basisKeyboardLayoutID = Preferences.basisKeyboardLayout
+        // Any non-flagsChanged event cancels the pending SHIFT toggle
+        shiftPressed = false
 
-            if functionKeyKeyboardLayoutID == basisKeyboardLayoutID {
-                return false
-            }
-
-            let includeShift = Preferences.functionKeyKeyboardLayoutOverrideIncludeShiftKey
-            let notShift = NSEvent.ModifierFlags(rawValue: ~(NSEvent.ModifierFlags.shift.rawValue))
-            if event.modifierFlags.contains(notShift)
-                || (event.modifierFlags.contains(.shift) && includeShift)
-            {
-                (client as? IMKTextInput)?.overrideKeyboard(
-                    withKeyboardNamed: functionKeyKeyboardLayoutID)
-                return false
-            }
-            (client as? IMKTextInput)?.overrideKeyboard(withKeyboardNamed: basisKeyboardLayoutID)
+        if isAlphanumericMode {
             return false
         }
 
