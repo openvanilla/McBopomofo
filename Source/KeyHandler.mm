@@ -457,18 +457,24 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // see if it's valid BPMF reading
     bool isValidKey = _bpmfReadingBuffer->isValidKey((char)charCode);
     if (!skipBpmfHandling && isValidKey) {
-        // Abbreviated input: if buffer has consonant-only and new key is also a consonant,
-        // emit the current consonant as an abbreviated reading before processing the new key.
-        if (!_bpmfReadingBuffer->isEmpty() &&
-            _bpmfReadingBuffer->syllable().isConsonantOnly()) {
-            Formosa::Mandarin::BopomofoReadingBuffer testBuffer(_bpmfReadingBuffer->keyboardLayout());
-            testBuffer.combineKey((char)charCode);
-            if (!testBuffer.isEmpty() && testBuffer.syllable().isConsonantOnly()) {
-                std::string reading = _bpmfReadingBuffer->syllable().composedString();
-                if (_languageModel->hasUnigrams(reading)) {
-                    _grid->insertReading(reading);
-                    [self _walk];
-                    _bpmfReadingBuffer->clear();
+        // Auto-commit: if the buffer already has a syllable with consonant + vowel/middle-vowel,
+        // and the new key would introduce a new consonant (overwriting the existing one),
+        // commit the current syllable first and start a new one.
+        if (!_bpmfReadingBuffer->isEmpty()) {
+            auto currentSyllable = _bpmfReadingBuffer->syllable();
+            bool bufferHasBody = currentSyllable.hasConsonant() &&
+                (currentSyllable.hasMiddleVowel() || currentSyllable.hasVowel());
+            if (bufferHasBody || currentSyllable.isConsonantOnly()) {
+                Formosa::Mandarin::BopomofoReadingBuffer testBuffer(_bpmfReadingBuffer->keyboardLayout());
+                testBuffer.combineKey((char)charCode);
+                bool newKeyIsConsonant = !testBuffer.isEmpty() && testBuffer.syllable().isConsonantOnly();
+                if (newKeyIsConsonant) {
+                    std::string reading = currentSyllable.composedString();
+                    if (_languageModel->hasUnigrams(reading)) {
+                        _grid->insertReading(reading);
+                        [self _walk];
+                        _bpmfReadingBuffer->clear();
+                    }
                 }
             }
         }
