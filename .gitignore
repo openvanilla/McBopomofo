@@ -16,4 +16,5 @@ xcuserdata
 .vscode
 __pycache__
 codecov_comment.md
-DerivedData.worktrees/
+DerivedData
+.worktrees/

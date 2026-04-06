@@ -468,8 +468,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 if (_languageModel->hasUnigrams(reading)) {
                     _grid->insertReading(reading);
                     [self _walk];
+                    _bpmfReadingBuffer->clear();
                 }
-                _bpmfReadingBuffer->clear();
             }
         }
 

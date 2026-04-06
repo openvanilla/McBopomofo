@@ -1,3 +1,26 @@
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 #include "ReadingTrie.h"
 
 #include <sstream>
@@ -14,6 +37,11 @@ void ReadingTrie::insert(const std::string& key, const std::string& value,
     auto it = current->children.find(syllable);
     if (it == current->children.end()) {
       current->children[syllable] = std::make_unique<Node>();
+      // Build consonant index for abbreviated lookups.
+      std::string consonant = consonantOf(syllable);
+      if (!consonant.empty()) {
+        current->consonantIndex[consonant].push_back(syllable);
+      }
     }
     current = current->children[syllable].get();
   }
@@ -36,6 +64,16 @@ bool ReadingTrie::hasAbbreviatedUnigrams(const std::string& key) const {
 }
 
 void ReadingTrie::clear() { root_.children.clear(); }
+
+bool ReadingTrie::containsAbbreviatedSyllable(const std::string& key) {
+  auto syllables = splitKey(key);
+  for (const auto& s : syllables) {
+    if (isAbbreviated(s)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 std::vector<std::string> ReadingTrie::splitKey(const std::string& key) {
   std::vector<std::string> result;
@@ -74,10 +112,14 @@ void ReadingTrie::findRecursive(const Node* node,
   const auto& syllable = syllables[depth];
 
   if (isAbbreviated(syllable)) {
-    std::string targetConsonant = syllable;
-    for (const auto& [childKey, childNode] : node->children) {
-      if (consonantOf(childKey) == targetConsonant) {
-        findRecursive(childNode.get(), syllables, depth + 1, results);
+    // Use pre-built consonant index instead of scanning all children.
+    auto indexIt = node->consonantIndex.find(syllable);
+    if (indexIt != node->consonantIndex.end()) {
+      for (const auto& childKey : indexIt->second) {
+        auto childIt = node->children.find(childKey);
+        if (childIt != node->children.end()) {
+          findRecursive(childIt->second.get(), syllables, depth + 1, results);
+        }
       }
     }
   } else {
@@ -98,11 +140,14 @@ bool ReadingTrie::hasRecursive(const Node* node,
   const auto& syllable = syllables[depth];
 
   if (isAbbreviated(syllable)) {
-    std::string targetConsonant = syllable;
-    for (const auto& [childKey, childNode] : node->children) {
-      if (consonantOf(childKey) == targetConsonant) {
-        if (hasRecursive(childNode.get(), syllables, depth + 1)) {
-          return true;
+    auto indexIt = node->consonantIndex.find(syllable);
+    if (indexIt != node->consonantIndex.end()) {
+      for (const auto& childKey : indexIt->second) {
+        auto childIt = node->children.find(childKey);
+        if (childIt != node->children.end()) {
+          if (hasRecursive(childIt->second.get(), syllables, depth + 1)) {
+            return true;
+          }
         }
       }
     }

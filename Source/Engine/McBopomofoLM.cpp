@@ -26,31 +26,15 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include "Mandarin/Mandarin.h"
+#include "ReadingTrie.h"
 #include "gramambular2/reading_grid.h"
 
 namespace McBopomofo {
-
-static bool ContainsAbbreviatedSyllable(const std::string& key) {
-  std::istringstream stream(key);
-  std::string token;
-  while (std::getline(stream, token, '-')) {
-    if (!token.empty()) {
-      auto syllable =
-          Formosa::Mandarin::BopomofoSyllable::FromComposedString(token);
-      if (syllable.isConsonantOnly()) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
 static constexpr std::string_view kMacroPrefix = "MACRO@";
 static constexpr double kMacroScore = -8.0;
@@ -233,7 +217,7 @@ McBopomofoLM::getUnigrams(const std::string& key) {
   }
 
   // If key contains abbreviated syllables, supplement with trie results.
-  if (ContainsAbbreviatedSyllable(key)) {
+  if (ReadingTrie::containsAbbreviatedSyllable(key)) {
     auto abbreviatedUnigrams = languageModel_.getAbbreviatedUnigrams(key);
     for (const auto& u : abbreviatedUnigrams) {
       if (insertedValues.find(u.value()) == insertedValues.end()) {
@@ -255,7 +239,7 @@ bool McBopomofoLM::hasUnigrams(const std::string& key) {
     if (userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key)) {
       return true;
     }
-    if (ContainsAbbreviatedSyllable(key)) {
+    if (ReadingTrie::containsAbbreviatedSyllable(key)) {
       return languageModel_.hasAbbreviatedUnigrams(key);
     }
     return false;
