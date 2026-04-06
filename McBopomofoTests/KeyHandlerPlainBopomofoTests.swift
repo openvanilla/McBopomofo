@@ -26,6 +26,7 @@ import XCTest
 @testable import McBopomofo
 
 class KeyHandlerPlainBopomofoTests: XCTestCase {
+
     var savedKeyboardLayout: KeyboardLayout = .standard
     var handler = KeyHandler()
 
@@ -407,5 +408,104 @@ class KeyHandlerPlainBopomofoTests: XCTestCase {
             XCTAssertTrue(committing.poppedText == "。")
         }
         XCTAssertTrue(state is InputState.Empty)
+    }
+
+    func testBacktickKey() {
+        // Handle ` key
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift,
+            isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.ChoosingCandidate, "\(state)")
+    }
+
+    func testBacktickThenEsc() {
+        // Handle ` key then ESC
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift,
+            isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        let esc = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        handler.handle(input: esc, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    }
+
+    func testBacktickThenBackspace() {
+        // Handle ` key then Backspace
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift,
+            isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        let backspace = KeyHandlerInput(
+            inputText: " ", keyCode: KeyCode.delete.rawValue, charCode: 0, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: backspace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState, "\(state)")
+    }
+
+    func testBacktickThenBacktick() {
+        // Handle ` key then ` key
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift,
+            isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        let input2 = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift,
+            isVerticalMode: false)
+        handler.handle(input: input2, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        // Should remain in candidate state or reset, depending on implementation
+        XCTAssertTrue(
+            state is InputState.SelectingFeature,
+            "\(state)"
+        )
+    }
+
+    func testBacktickThenPunctuation() {
+        // Handle ` key then valid punctuation (e.g., < for comma)
+        let input = KeyHandlerInput(
+            inputText: "`", keyCode: 0, charCode: charCode("`"), flags: .shift,
+            isVerticalMode: false)
+        var state: InputState = InputState.Empty()
+        handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        let punct = KeyHandlerInput(
+            inputText: "<", keyCode: 0, charCode: charCode("<"), flags: .shift,
+            isVerticalMode: false)
+        handler.handle(input: punct, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        // Should either commit a punctuation or reset
+        XCTAssertTrue(
+            state is InputState.ChoosingCandidate || state is InputState.EmptyIgnoringPreviousState
+                || state is InputState.Inputting, "\(state)")
     }
 }

@@ -1172,7 +1172,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         std::string reading = node->reading();
         if (reading[0] == '_') {
             NSString *punctuation = [[NSString alloc] initWithUTF8String:value.c_str()];
-            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:punctuation type: type];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:punctuation type:type];
             [composingBuffer appendString:converted];
         } else {
             std::string delimiter = "-";
@@ -1181,12 +1181,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             while ((pos = reading.find(delimiter)) != std::string::npos) {
                 token = reading.substr(0, pos);
                 NSString *tokenString = [[NSString alloc] initWithUTF8String:token.c_str()];
-                NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString type: type];
+                NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString type:type];
                 [composingBuffer appendString:converted];
                 reading.erase(0, pos + delimiter.length());
             }
             NSString *tokenString = [[NSString alloc] initWithUTF8String:reading.c_str()];
-            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString type: type];
+            NSString *converted = [BopomofoBrailleConverter convertFromBopomofo:tokenString type:type];
             [composingBuffer appendString:converted];
         }
     }
@@ -1385,10 +1385,18 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     if ([state isKindOfClass:[InputChoosingPunctuationList class]]) {
         if ([input.inputText isEqualToString:@"`"]) {
-            _grid->clear();
-            _latestWalk = Formosa::Gramambular2::ReadingGrid::WalkResult {};
-            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
-            stateCallback(empty);
+            if (Preferences.selectPhraseAfterCursorAsCandidate) {
+                _grid->deleteReadingAfterCursor();
+            } else {
+                _grid->deleteReadingBeforeCursor();
+            }
+            [self _walk];
+            if (_grid->length()) {
+                [self handleForceCommitWithStateCallback:stateCallback];
+            } else {
+                InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
+                stateCallback(empty);
+            }
             InputStateSelectingFeature *selectingFeature = [[InputStateSelectingFeature alloc] init];
             stateCallback(selectingFeature);
             return YES;
@@ -1515,39 +1523,41 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             NSMutableArray *entries = [[NSMutableArray alloc] init];
             NSString *title = @"";
             if (isPlusKey) {
-                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"") callback:^{
-                    __strong __typeof(weakSelf) strongSelf = weakSelf;
-                    if (!strongSelf) {
-                        return;
-                    }
-                    [strongSelf.delegate keyHandler:strongSelf didRequestBoostScoreForPhrase:candidate.value reading:reading];
-                    [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
-                    [strongSelf _walk];
-                    InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
-                    stateCallback(inputting);
-                }];
+                InputStateCustomMenuEntry *boost = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Boost", @"")
+                                                                                           callback:^{
+                                                                                               __strong __typeof(weakSelf) strongSelf = weakSelf;
+                                                                                               if (!strongSelf) {
+                                                                                                   return;
+                                                                                               }
+                                                                                               [strongSelf.delegate keyHandler:strongSelf didRequestBoostScoreForPhrase:candidate.value reading:reading];
+                                                                                               [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
+                                                                                               [strongSelf _walk];
+                                                                                               InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
+                                                                                               stateCallback(inputting);
+                                                                                           }];
                 [entries addObject:boost];
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to boost the score of the phrase \"%@\"?", @""), candidate.value];
             } else if (isMinusKey) {
-                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude", @"") callback:^{
-                    __strong __typeof(weakSelf) strongSelf = weakSelf;
-                    if (!strongSelf) {
-                        return;
-                    }
-                    [strongSelf.delegate keyHandler:strongSelf didRequestExcludePhrase:candidate.value reading:reading];
-                    [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
-                    [strongSelf _walk];
-                    InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
-                    stateCallback(inputting);
-                }];
+                InputStateCustomMenuEntry *exclude = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Exclude", @"")
+                                                                                             callback:^{
+                                                                                                 __strong __typeof(weakSelf) strongSelf = weakSelf;
+                                                                                                 if (!strongSelf) {
+                                                                                                     return;
+                                                                                                 }
+                                                                                                 [strongSelf.delegate keyHandler:strongSelf didRequestExcludePhrase:candidate.value reading:reading];
+                                                                                                 [strongSelf.delegate keyHandlerDidRequestReloadLanguageModel:strongSelf];
+                                                                                                 [strongSelf _walk];
+                                                                                                 InputStateInputting *inputting = (InputStateInputting *)[strongSelf buildInputtingState];
+                                                                                                 stateCallback(inputting);
+                                                                                             }];
                 [entries addObject:exclude];
                 title = [NSString stringWithFormat:NSLocalizedString(@"Do you want to exclude the phrase \"%@\"?", @""), candidate.value];
             }
             InputStateCustomMenuEntry *cancel = [[InputStateCustomMenuEntry alloc] initWithTitle:NSLocalizedString(@"Cancel", @"")
-            callback:^{
-                stateCallback(currentState);
-                gCurrentCandidateController.selectedCandidateIndex = index;
-            }];
+                                                                                        callback:^{
+                                                                                            stateCallback(currentState);
+                                                                                            gCurrentCandidateController.selectedCandidateIndex = index;
+                                                                                        }];
             [entries addObject:cancel];
 
             InputStateCustomMenu *confirm = [[InputStateCustomMenu alloc] initWithComposingBuffer:[currentState composingBuffer] cursorIndex:[currentState cursorIndex] title:title entries:entries previousState:currentState selectedIndex:index];
@@ -1639,9 +1649,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             } else {
                 _grid->deleteReadingBeforeCursor();
             }
-            [self _walk];
-            InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
-            stateCallback(inputting);
+            if (_grid->length() == 0) {
+                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                stateCallback(empty);
+            } else {
+                [self _walk];
+                InputStateInputting *inputting = (InputStateInputting *)[self buildInputtingState];
+                stateCallback(inputting);
+            }
         } else if ([state isKindOfClass:[InputStateChoosingCandidate class]]) {
             size_t originalCursorIndex = ((InputStateChoosingCandidate *)state).originalCursorIndex;
             _grid->setCursor(originalCursorIndex);
