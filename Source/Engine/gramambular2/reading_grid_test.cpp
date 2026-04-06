@@ -26,6 +26,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gtest/gtest.h"
@@ -813,6 +814,48 @@ TEST(ReadingGridTest, FindInSpan2) {
   ASSERT_EQ(result->get()->spanningLength(), 2);
   ASSERT_EQ(result->get()->reading(), "ㄍㄠㄖㄜˋ");
   ASSERT_EQ(result->get()->value(), "高熱");
+}
+
+class AbbreviatedLM : public Formosa::Gramambular2::LanguageModel {
+ public:
+  std::vector<Unigram> getUnigrams(const std::string& reading) override {
+    auto it = data_.find(reading);
+    if (it != data_.end()) return it->second;
+    return {};
+  }
+  bool hasUnigrams(const std::string& reading) override {
+    return data_.find(reading) != data_.end();
+  }
+  void addEntry(const std::string& reading, const std::string& value,
+                double score) {
+    data_[reading].emplace_back(value, score);
+  }
+ private:
+  std::unordered_map<std::string, std::vector<Unigram>> data_;
+};
+
+TEST(ReadingGridTest, AbbreviatedReadingsWalk) {
+  auto lm = std::make_shared<AbbreviatedLM>();
+  lm->addEntry("ㄊ", "他", -4.0);
+  lm->addEntry("ㄕ", "是", -3.5);
+  lm->addEntry("ㄍ", "個", -4.5);
+  lm->addEntry("ㄊ-ㄕ-ㄍ", "圖書館", -5.0);
+
+  Formosa::Gramambular2::ReadingGrid grid(lm);
+  grid.insertReading("ㄊ");
+  grid.insertReading("ㄕ");
+  grid.insertReading("ㄍ");
+
+  auto result = grid.walk();
+  ASSERT_FALSE(result.nodes.empty());
+
+  // The walk should prefer "圖書館" (span=3, score=-5.0)
+  // over "他"+"是"+"個" (sum: -4.0+-3.5+-4.5=-12.0)
+  std::string combined;
+  for (const auto& node : result.nodes) {
+    combined += node->value();
+  }
+  EXPECT_EQ(combined, "圖書館");
 }
 
 }  // namespace Formosa::Gramambular2

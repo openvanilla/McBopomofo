@@ -457,6 +457,22 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     // see if it's valid BPMF reading
     bool isValidKey = _bpmfReadingBuffer->isValidKey((char)charCode);
     if (!skipBpmfHandling && isValidKey) {
+        // Abbreviated input: if buffer has consonant-only and new key is also a consonant,
+        // emit the current consonant as an abbreviated reading before processing the new key.
+        if (!_bpmfReadingBuffer->isEmpty() &&
+            _bpmfReadingBuffer->syllable().isConsonantOnly()) {
+            Formosa::Mandarin::BopomofoReadingBuffer testBuffer(_bpmfReadingBuffer->keyboardLayout());
+            testBuffer.combineKey((char)charCode);
+            if (!testBuffer.isEmpty() && testBuffer.syllable().isConsonantOnly()) {
+                std::string reading = _bpmfReadingBuffer->syllable().composedString();
+                if (_languageModel->hasUnigrams(reading)) {
+                    _grid->insertReading(reading);
+                    [self _walk];
+                    _bpmfReadingBuffer->clear();
+                }
+            }
+        }
+
         _bpmfReadingBuffer->combineKey((char)charCode);
         keyConsumedByReading = YES;
 

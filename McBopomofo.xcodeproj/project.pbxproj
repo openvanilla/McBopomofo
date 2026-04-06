@@ -36,6 +36,7 @@
 		6ACA420215FC1E5200935EF6 /* McBopomofo.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* McBopomofo.app */; };
 		6ACC3D442793701600F1B140 /* ParselessPhraseDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */; };
 		6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ACC3D422793701600F1B140 /* ParselessLM.cpp */; };
+		D4AB12362F9C000000001236 /* ReadingTrie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4AB12342F9C000000001234 /* ReadingTrie.cpp */; };
 		6AD7CBC815FE555000691B5B /* data-plain-bpmf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */; };
 		6ADF5B192BA513E000577D98 /* AssociatedPhrasesV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF5B132BA513E000577D98 /* AssociatedPhrasesV2.cpp */; };
 		6ADF5B1A2BA513E000577D98 /* MemoryMappedFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF5B152BA513E000577D98 /* MemoryMappedFile.cpp */; };
@@ -177,6 +178,8 @@
 		6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParselessPhraseDB.cpp; sourceTree = "<group>"; };
 		6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParselessPhraseDB.h; sourceTree = "<group>"; };
 		6ACC3D422793701600F1B140 /* ParselessLM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParselessLM.cpp; sourceTree = "<group>"; };
+		D4AB12342F9C000000001234 /* ReadingTrie.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReadingTrie.cpp; sourceTree = "<group>"; };
+		D4AB12352F9C000000001235 /* ReadingTrie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadingTrie.h; sourceTree = "<group>"; };
 		6ACC3D432793701600F1B140 /* ParselessLM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParselessLM.h; sourceTree = "<group>"; };
 		6AD7CBC715FE555000691B5B /* data-plain-bpmf.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "data-plain-bpmf.txt"; sourceTree = "<group>"; };
 		6ADF5B132BA513E000577D98 /* AssociatedPhrasesV2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AssociatedPhrasesV2.cpp; sourceTree = "<group>"; };
@@ -381,6 +384,8 @@
 				6ADF5B142BA513E000577D98 /* MemoryMappedFile.h */,
 				6ACC3D422793701600F1B140 /* ParselessLM.cpp */,
 				6ACC3D432793701600F1B140 /* ParselessLM.h */,
+				D4AB12342F9C000000001234 /* ReadingTrie.cpp */,
+				D4AB12352F9C000000001235 /* ReadingTrie.h */,
 				6ACC3D402793701600F1B140 /* ParselessPhraseDB.cpp */,
 				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
 				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */,
@@ -770,6 +775,7 @@
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
+				D4AB12362F9C000000001236 /* ReadingTrie.cpp in Sources */,
 				D4CB1A5B2B389B78006EA984 /* DictionaryService.swift in Sources */,
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				D43737C92DF9C35800D9707C /* InputMethodController+KeyHandlerDelegate.swift in Sources */,

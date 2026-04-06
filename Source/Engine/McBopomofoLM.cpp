@@ -31,6 +31,7 @@
 #include <utility>
 #include <vector>
 
+#include "ReadingTrie.h"
 #include "gramambular2/reading_grid.h"
 
 namespace McBopomofo {
@@ -215,6 +216,17 @@ McBopomofoLM::getUnigrams(const std::string& key) {
                        rewrittenUserUnigrams.end());
   }
 
+  // If key contains abbreviated syllables, supplement with trie results.
+  if (ReadingTrie::containsAbbreviatedSyllable(key)) {
+    auto abbreviatedUnigrams = languageModel_.getAbbreviatedUnigrams(key);
+    for (const auto& u : abbreviatedUnigrams) {
+      if (insertedValues.find(u.value()) == insertedValues.end()) {
+        allUnigrams.push_back(u);
+        insertedValues.insert(u.value());
+      }
+    }
+  }
+
   return allUnigrams;
 }
 
@@ -224,7 +236,13 @@ bool McBopomofoLM::hasUnigrams(const std::string& key) {
   }
 
   if (!excludedPhrases_.hasUnigrams(key)) {
-    return userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key);
+    if (userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key)) {
+      return true;
+    }
+    if (ReadingTrie::containsAbbreviatedSyllable(key)) {
+      return languageModel_.hasAbbreviatedUnigrams(key);
+    }
+    return false;
   }
 
   return !getUnigrams(key).empty();

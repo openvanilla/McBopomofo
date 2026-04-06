@@ -116,5 +116,28 @@ TEST(MandarinTest, IBMLayout) {
   ASSERT_EQ(buf.composedString(), "ㄍㄨㄛˊ");
 }
 
+TEST(MandarinTest, IsConsonantOnly) {
+  // Consonant-only syllables
+  ASSERT_TRUE(BPMF::FromComposedString("ㄅ").isConsonantOnly());
+  ASSERT_TRUE(BPMF::FromComposedString("ㄊ").isConsonantOnly());
+  ASSERT_TRUE(BPMF::FromComposedString("ㄕ").isConsonantOnly());
+  ASSERT_TRUE(BPMF::FromComposedString("ㄍ").isConsonantOnly());
+
+  // Full syllables - should return false
+  ASSERT_FALSE(BPMF::FromComposedString("ㄅㄚ").isConsonantOnly());
+  ASSERT_FALSE(BPMF::FromComposedString("ㄊㄨˊ").isConsonantOnly());
+  ASSERT_FALSE(BPMF::FromComposedString("ㄕㄨ").isConsonantOnly());
+
+  // Standalone vowels - should return false
+  ASSERT_FALSE(BPMF::FromComposedString("ㄚ").isConsonantOnly());
+  ASSERT_FALSE(BPMF::FromComposedString("ㄧ").isConsonantOnly());
+
+  // Tone-only - should return false
+  ASSERT_FALSE(BPMF::FromComposedString("ˊ").isConsonantOnly());
+
+  // Empty - should return false
+  ASSERT_FALSE(BPMF().isConsonantOnly());
+}
+
 }  // namespace Mandarin
 }  // namespace Formosa
