@@ -540,6 +540,7 @@ extension McBopomofoInputMethodController {
 
         let poppedText = state.poppedText
         if !poppedText.isEmpty {
+            InputLogger.shared.log(text: poppedText, reading: state.reading)
             commit(text: poppedText, client: client)
         }
         client.setMarkedText(
