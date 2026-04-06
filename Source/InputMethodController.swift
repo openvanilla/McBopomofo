@@ -57,7 +57,7 @@ class McBopomofoInputMethodController: IMKInputController {
     lazy var charInfo: SystemCharacterInfo? = try? SystemCharacterInfo()
 
     /// Whether the input method is in alphanumeric (English) passthrough mode.
-    var isAlphanumericMode = false
+    private var isAlphanumericMode = false
 
     /// Tracks whether SHIFT was pressed without any other key in between,
     /// to distinguish a bare SHIFT press from SHIFT+key combos.
@@ -236,21 +236,23 @@ class McBopomofoInputMethodController: IMKInputController {
         }
 
         if event.type == .flagsChanged {
-            let shiftOnly = event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .shift
+            let relevantFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting(.capsLock)
+            let shiftOnly = relevantFlags == .shift
             if shiftOnly {
-                // SHIFT key went down
+                // SHIFT key went down (no other modifiers)
                 shiftPressed = true
             } else if shiftPressed {
-                // A modifier changed while shiftPressed was true.
-                // If SHIFT is no longer held, this is a SHIFT release.
-                if !event.modifierFlags.contains(.shift) {
+                if !event.modifierFlags.contains(.shift) && relevantFlags.isEmpty {
+                    // SHIFT released with no other modifiers held — bare SHIFT press
                     shiftPressed = false
-                    // Only toggle if composing buffer is empty
                     if state is InputState.Empty || state is InputState.Deactivated {
                         isAlphanumericMode.toggle()
                         let message = isAlphanumericMode ? "英數" : "注音"
                         NotifierController.notify(message: message)
                     }
+                } else {
+                    // Other modifiers involved — not a bare SHIFT press
+                    shiftPressed = false
                 }
             }
             // If in active input state (not Empty), suppress flagsChanged
