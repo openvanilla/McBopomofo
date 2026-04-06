@@ -653,6 +653,8 @@
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
+				D4F00001300000000000F001 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				D4F00002300000000000F002 /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */,
 			);
 			productRefGroup = 6A0D4EA315FC0D2D00ABF4B3 /* Products */;
 			projectDirPath = "";
@@ -1519,6 +1521,16 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SystemCharacterInfo;
 		};
+		D4F00003300000000000F003 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4F00001300000000000F001 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+		D4F00004300000000000F004 /* OpenCC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4F00002300000000000F002 /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */;
+			productName = OpenCC;
+		};
 		D47D73C227A7200500255A50 /* FSEventStreamHelper */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FSEventStreamHelper;
@@ -1536,6 +1548,25 @@
 			productName = ChineseNumbers;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D4F00001300000000000F001 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
+		D4F00002300000000000F002 /* XCRemoteSwiftPackageReference "SwiftyOpenCC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ddddxxx/SwiftyOpenCC.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0-beta;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
 }
