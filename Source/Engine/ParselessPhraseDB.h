@@ -71,6 +71,9 @@ class ParselessPhraseDB {
   // the block is empty or is not valid.
   static std::unique_ptr<ParselessPhraseDB> CreateValidatedDB(const char* buf, size_t length);
 
+  const char* begin() const { return begin_; }
+  const char* end() const { return end_; }
+
  private:
   const char* begin_;
   const char* end_;

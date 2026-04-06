@@ -24,11 +24,24 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <utility>
 #include <vector>
 
 #include "ParselessLM.h"
 #include "gtest/gtest.h"
+
+namespace {
+constexpr char kAbbreviatedSample[] = R"(# format org.openvanilla.mcbopomofo.sorted
+ㄅㄚ 八 -3.27631260
+ㄅㄚ 吧 -3.59800309
+ㄅㄚˊ 拔 -5.43164490
+ㄅㄚ-ㄅㄚ 爸爸 -5.10000000
+ㄅㄞˊ 白 -4.00000000
+ㄊㄨˊ-ㄕㄨ-ㄍㄨㄢˇ 圖書館 -5.50000000
+ㄊㄞˋ-ㄕㄠˇ-ㄍㄜˋ 太少個 -9.00000000
+)";
+}  // namespace
 
 namespace McBopomofo {
 
@@ -127,6 +140,47 @@ TEST(ParselessLMTest, SanityCheckTest) {
   ASSERT_EQ(found_readings[0].reading, "ㄉㄜˊ");
 
   lm.close();
+}
+
+TEST(ParselessLMTest, AbbreviatedSingleConsonant) {
+  ParselessLM lm;
+  auto db = std::make_unique<ParselessPhraseDB>(
+      kAbbreviatedSample, strlen(kAbbreviatedSample));
+  ASSERT_TRUE(lm.open(std::move(db)));
+
+  EXPECT_TRUE(lm.hasAbbreviatedUnigrams("ㄅ"));
+  auto results = lm.getAbbreviatedUnigrams("ㄅ");
+  EXPECT_GE(results.size(), 3);  // 八, 吧, 拔 at minimum (白 has consonant ㄅ too)
+
+  for (const auto& u : results) {
+    EXPECT_LT(u.score(), 0);
+  }
+}
+
+TEST(ParselessLMTest, AbbreviatedMultiSyllable) {
+  ParselessLM lm;
+  auto db = std::make_unique<ParselessPhraseDB>(
+      kAbbreviatedSample, strlen(kAbbreviatedSample));
+  ASSERT_TRUE(lm.open(std::move(db)));
+
+  auto results = lm.getAbbreviatedUnigrams("ㄊ-ㄕ-ㄍ");
+  ASSERT_EQ(results.size(), 2);
+
+  std::set<std::string> values;
+  for (const auto& u : results) values.insert(u.value());
+  EXPECT_TRUE(values.count("圖書館"));
+  EXPECT_TRUE(values.count("太少個"));
+}
+
+TEST(ParselessLMTest, AbbreviatedNoMatch) {
+  ParselessLM lm;
+  auto db = std::make_unique<ParselessPhraseDB>(
+      kAbbreviatedSample, strlen(kAbbreviatedSample));
+  ASSERT_TRUE(lm.open(std::move(db)));
+
+  EXPECT_FALSE(lm.hasAbbreviatedUnigrams("ㄍ-ㄍ-ㄍ"));
+  auto results = lm.getAbbreviatedUnigrams("ㄍ-ㄍ-ㄍ");
+  EXPECT_TRUE(results.empty());
 }
 
 }  // namespace McBopomofo

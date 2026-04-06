@@ -30,6 +30,7 @@
 
 #include "MemoryMappedFile.h"
 #include "ParselessPhraseDB.h"
+#include "ReadingTrie.h"
 #include "gramambular2/language_model.h"
 
 namespace McBopomofo {
@@ -53,6 +54,10 @@ class ParselessLM : public Formosa::Gramambular2::LanguageModel {
       const std::string& key) override;
   bool hasUnigrams(const std::string& key) override;
 
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+  getAbbreviatedUnigrams(const std::string& key);
+  bool hasAbbreviatedUnigrams(const std::string& key);
+
   struct FoundReading {
     std::string reading;
     double score = 0;
@@ -64,6 +69,9 @@ class ParselessLM : public Formosa::Gramambular2::LanguageModel {
  private:
   MemoryMappedFile mmapedFile_;
   std::unique_ptr<ParselessPhraseDB> db_;
+  ReadingTrie trie_;
+  static constexpr double kAbbreviatedScorePenalty = -1.0;
+  void buildTrie();
 };
 
 }  // namespace McBopomofo

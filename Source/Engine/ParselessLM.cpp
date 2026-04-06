@@ -44,12 +44,14 @@ bool ParselessLM::open(const char* path) {
   }
   db_ = std::unique_ptr<ParselessPhraseDB>(new ParselessPhraseDB(
       mmapedFile_.data(), mmapedFile_.length(), /*validate_pragma=*/true));
+  buildTrie();
   return true;
 }
 
 void ParselessLM::close() {
   mmapedFile_.close();
   db_ = nullptr;
+  trie_.clear();
 }
 
 bool ParselessLM::open(std::unique_ptr<ParselessPhraseDB> db) {
@@ -58,6 +60,7 @@ bool ParselessLM::open(std::unique_ptr<ParselessPhraseDB> db) {
   }
 
   db_ = std::move(db);
+  buildTrie();
   return true;
 }
 
@@ -167,6 +170,68 @@ std::vector<ParselessLM::FoundReading> ParselessLM::getReadings(
     results.emplace_back(ParselessLM::FoundReading{key, score});
   }
   return results;
+}
+
+void ParselessLM::buildTrie() {
+  if (db_ == nullptr) return;
+
+  const char* ptr = db_->begin();
+  const char* end = db_->end();
+
+  while (ptr < end) {
+    // Find the end of this line.
+    const char* lineStart = ptr;
+    while (ptr < end && *ptr != '\n') ++ptr;
+    const char* lineEnd = ptr;
+    if (ptr < end) ++ptr;  // skip newline
+
+    // Skip blank lines and comment/pragma lines.
+    if (lineStart == lineEnd || *lineStart == '#') continue;
+
+    const char* p = lineStart;
+
+    // Find key (first space-delimited field)
+    const char* keyStart = p;
+    while (p < lineEnd && *p != ' ') ++p;
+    if (p == lineEnd) continue;  // no space found, malformed line
+    std::string key(keyStart, p);
+    ++p;  // skip space
+
+    // Find value (second space-delimited field)
+    const char* valueStart = p;
+    while (p < lineEnd && *p != ' ') ++p;
+    if (p == lineEnd) continue;  // no second space, malformed line
+    std::string value(valueStart, p);
+    ++p;  // skip space
+
+    // Find score (rest of line)
+    if (p >= lineEnd) continue;  // no score field
+    double score = 0;
+    try {
+      score = std::stod(std::string(p, lineEnd));
+    } catch (...) {
+      continue;
+    }
+
+    if (!key.empty() && !value.empty()) {
+      trie_.insert(key, value, score);
+    }
+  }
+}
+
+std::vector<Formosa::Gramambular2::LanguageModel::Unigram>
+ParselessLM::getAbbreviatedUnigrams(const std::string& key) {
+  auto results = trie_.findAbbreviated(key);
+  std::vector<Formosa::Gramambular2::LanguageModel::Unigram> penalized;
+  penalized.reserve(results.size());
+  for (const auto& u : results) {
+    penalized.emplace_back(u.value(), u.score() + kAbbreviatedScorePenalty);
+  }
+  return penalized;
+}
+
+bool ParselessLM::hasAbbreviatedUnigrams(const std::string& key) {
+  return trie_.hasAbbreviatedUnigrams(key);
 }
 
 }  // namespace McBopomofo
