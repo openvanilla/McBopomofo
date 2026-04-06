@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unordered_set>
 #include <utility>
@@ -61,6 +62,59 @@ static std::vector<std::string> ToneVariants(const std::string& key) {
     variants.push_back(candidate.composedString());
   }
   return variants;
+}
+
+// Check if a multi-syllable key has any toneless syllable.
+static bool ContainsTonelessSyllable(const std::string& key) {
+  if (key.find('-') == std::string::npos) return IsTonelessSyllable(key);
+  std::istringstream stream(key);
+  std::string token;
+  while (std::getline(stream, token, '-')) {
+    if (!token.empty() && IsTonelessSyllable(token)) return true;
+  }
+  return false;
+}
+
+// For a multi-syllable key with toneless syllables, generate all toned
+// expansions. Each toneless syllable is expanded to 5 tone variants.
+// Returns a list of fully-toned keys to query the LM with.
+static void ExpandTonelessKey(
+    const std::vector<std::string>& syllables, size_t idx,
+    std::vector<std::string>& current,
+    std::vector<std::string>& results) {
+  if (idx == syllables.size()) {
+    std::string combined;
+    for (size_t i = 0; i < current.size(); ++i) {
+      if (i > 0) combined += "-";
+      combined += current[i];
+    }
+    results.push_back(combined);
+    return;
+  }
+  if (IsTonelessSyllable(syllables[idx])) {
+    for (const auto& v : ToneVariants(syllables[idx])) {
+      current.push_back(v);
+      ExpandTonelessKey(syllables, idx + 1, current, results);
+      current.pop_back();
+    }
+  } else {
+    current.push_back(syllables[idx]);
+    ExpandTonelessKey(syllables, idx + 1, current, results);
+    current.pop_back();
+  }
+}
+
+static std::vector<std::string> GetTonelessExpansions(const std::string& key) {
+  std::vector<std::string> syllables;
+  std::istringstream stream(key);
+  std::string token;
+  while (std::getline(stream, token, '-')) {
+    if (!token.empty()) syllables.push_back(token);
+  }
+  std::vector<std::string> current;
+  std::vector<std::string> results;
+  ExpandTonelessKey(syllables, 0, current, results);
+  return results;
 }
 
 static constexpr std::string_view kMacroPrefix = "MACRO@";
@@ -243,11 +297,12 @@ McBopomofoLM::getUnigrams(const std::string& key) {
                        rewrittenUserUnigrams.end());
   }
 
-  // If key is a toneless syllable, supplement with all tone variants.
-  if (IsTonelessSyllable(key)) {
-    for (const auto& variant : ToneVariants(key)) {
-      if (languageModel_.hasUnigrams(variant)) {
-        auto variantUnigrams = languageModel_.getUnigrams(variant);
+  // If key contains any toneless syllable, expand to all tone variants.
+  if (ContainsTonelessSyllable(key)) {
+    for (const auto& expanded : GetTonelessExpansions(key)) {
+      if (expanded == key) continue;  // skip identity
+      if (languageModel_.hasUnigrams(expanded)) {
+        auto variantUnigrams = languageModel_.getUnigrams(expanded);
         for (const auto& u : variantUnigrams) {
           if (insertedValues.find(u.value()) == insertedValues.end()) {
             allUnigrams.push_back(u);
@@ -281,9 +336,10 @@ bool McBopomofoLM::hasUnigrams(const std::string& key) {
     if (userPhrases_.hasUnigrams(key) || languageModel_.hasUnigrams(key)) {
       return true;
     }
-    if (IsTonelessSyllable(key)) {
-      for (const auto& variant : ToneVariants(key)) {
-        if (languageModel_.hasUnigrams(variant)) return true;
+    if (ContainsTonelessSyllable(key)) {
+      for (const auto& expanded : GetTonelessExpansions(key)) {
+        if (expanded == key) continue;
+        if (languageModel_.hasUnigrams(expanded)) return true;
       }
     }
     if (ReadingTrie::containsAbbreviatedSyllable(key)) {
