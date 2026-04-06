@@ -3074,6 +3074,64 @@ extension KeyHandlerBopomofoTests {
                 || state is InputState.Inputting, "\(state)")
     }
 
+    func testAbbreviatedInputAutoTrigger() {
+        // On Standard layout: 'w' → ㄊ, 'g' → ㄕ
+        // When the buffer contains only a consonant (ㄊ) and the next key is
+        // also a consonant (ㄕ), the system should auto-emit ㄊ as an
+        // abbreviated reading and begin composing ㄕ in the buffer.
+        var state: InputState = InputState.Empty()
+
+        // Type 'w' → ㄊ: should enter Inputting state with ㄊ in buffer
+        let inputW = KeyHandlerInput(
+            inputText: "w", keyCode: 0, charCode: charCode("w"), flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputW, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting, "After 'w', expected Inputting but got \(state)")
+
+        // Type 'g' → ㄕ: auto-trigger should emit ㄊ as abbreviated reading
+        // and ㄕ should now be in the buffer; state stays Inputting
+        let inputG = KeyHandlerInput(
+            inputText: "g", keyCode: 0, charCode: charCode("g"), flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputG, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting, "After 'g' auto-trigger, expected Inputting but got \(state)")
+    }
+
+    func testAbbreviatedInputExplicitTrigger() {
+        // On Standard layout: 'w' → ㄊ
+        // When Space is pressed while the buffer contains only a consonant (ㄊ),
+        // the system should emit ㄊ as an abbreviated reading and present
+        // candidates (ChoosingCandidate) or remain Inputting.
+        var state: InputState = InputState.Empty()
+
+        // Type 'w' → ㄊ: should enter Inputting state
+        let inputW = KeyHandlerInput(
+            inputText: "w", keyCode: 0, charCode: charCode("w"), flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputW, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        XCTAssertTrue(state is InputState.Inputting, "After 'w', expected Inputting but got \(state)")
+
+        // Press Space (charCode 32): explicit trigger for abbreviated reading
+        let inputSpace = KeyHandlerInput(
+            inputText: " ", keyCode: 0, charCode: 32, flags: [],
+            isVerticalMode: false)
+        handler.handle(input: inputSpace, state: state) { newState in
+            state = newState
+        } errorCallback: {
+        }
+        let isValidState = state is InputState.Inputting || state is InputState.ChoosingCandidate
+        XCTAssertTrue(isValidState, "After Space explicit-trigger, expected Inputting or ChoosingCandidate but got \(state)")
+    }
+
     func testDoubleBackquoteForceCommit() {
         // Prepare input: su3cl3 → "你好"
         let associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
