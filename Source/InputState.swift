@@ -104,14 +104,21 @@ class InputState: NSObject {
     @objc(InputStateCommitting)
     class Committing: InputState {
         @objc private(set) var poppedText: String = ""
+        @objc private(set) var reading: String = ""
 
         @objc convenience init(poppedText: String) {
             self.init()
             self.poppedText = poppedText
         }
 
+        @objc convenience init(poppedText: String, reading: String) {
+            self.init()
+            self.poppedText = poppedText
+            self.reading = reading
+        }
+
         override var description: String {
-            "<InputState.Committing poppedText:\(poppedText)>"
+            "<InputState.Committing poppedText:\(poppedText), reading:\(reading)>"
         }
     }
 
