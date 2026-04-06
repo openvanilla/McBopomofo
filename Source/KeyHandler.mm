@@ -31,6 +31,7 @@
 #import "reading_grid.h"
 
 #import <algorithm>
+#import <limits>
 #import <optional>
 #import <sstream>
 #import <string>
@@ -470,10 +471,48 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
                 bool newKeyIsConsonant = !testBuffer.isEmpty() && testBuffer.syllable().isConsonantOnly();
                 if (newKeyIsConsonant) {
                     std::string reading = currentSyllable.composedString();
-                    if (_languageModel->hasUnigrams(reading)) {
-                        _grid->insertReading(reading);
-                        [self _walk];
-                        _bpmfReadingBuffer->clear();
+                    bool committed = false;
+
+                    // For syllables with vowels but no tone, try all tone variants
+                    // and insert the one with the highest-scoring unigram.
+                    if (bufferHasBody && !currentSyllable.hasToneMarker()) {
+                        using BPMF = Formosa::Mandarin::BopomofoSyllable;
+                        BPMF::Component baseBits = currentSyllable.consonantComponent()
+                            | currentSyllable.middleVowelComponent()
+                            | currentSyllable.vowelComponent();
+                        BPMF::Component tones[] = {
+                            BPMF::Tone1, BPMF::Tone2, BPMF::Tone3,
+                            BPMF::Tone4, BPMF::Tone5
+                        };
+                        std::string bestReading;
+                        double bestScore = -std::numeric_limits<double>::infinity();
+                        for (auto tone : tones) {
+                            BPMF candidate(baseBits | tone);
+                            std::string r = candidate.composedString();
+                            if (_languageModel->hasUnigrams(r)) {
+                                auto unigrams = _languageModel->getUnigrams(r);
+                                for (const auto& u : unigrams) {
+                                    if (u.score() > bestScore) {
+                                        bestScore = u.score();
+                                        bestReading = r;
+                                    }
+                                }
+                            }
+                        }
+                        if (!bestReading.empty()) {
+                            _grid->insertReading(bestReading);
+                            [self _walk];
+                            _bpmfReadingBuffer->clear();
+                            committed = true;
+                        }
+                    }
+
+                    if (!committed) {
+                        if (bufferHasBody || _languageModel->hasUnigrams(reading)) {
+                            _grid->insertReading(reading);
+                            [self _walk];
+                            _bpmfReadingBuffer->clear();
+                        }
                     }
                 }
             }
