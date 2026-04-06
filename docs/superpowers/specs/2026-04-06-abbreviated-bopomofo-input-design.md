@@ -132,7 +132,7 @@ The display updates to the selected text only after the user confirms a candidat
 | Associated phrases (聯想詞) | Unaffected; triggered by confirmed text, independent of input method |
 | Backspace on abbreviated reading | Normal deletion from the grid, same as full readings |
 | Punctuation and special keys | Not part of abbreviated logic; existing behavior preserved |
-| No candidates found for abbreviation | The consonant remains in the grid; user can continue typing vowel/tone to complete the syllable |
+| No candidates found for abbreviation | The consonant remains in the grid as a reading with no unigram matches. The user can Backspace to remove it from the grid (returning it to the reading buffer), then re-type the full syllable. Alternatively, the Viterbi walk treats it as an unknown single-character reading. |
 
 ## Performance
 
