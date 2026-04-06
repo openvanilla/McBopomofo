@@ -101,6 +101,8 @@
 		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 		D4F0BBE4279B08900071253C /* BundleTranslocate.m in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE3279B08900071253C /* BundleTranslocate.m */; };
 		D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D4F0BBE9279B14C20071253C /* Credits.rtf */; };
+		D4A000012F0000000000AA01 /* InputLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A000002F0000000000AA00 /* InputLogger.swift */; };
+		D4A000032F0000000000AA03 /* InputLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A000022F0000000000AA02 /* InputLoggerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -255,6 +257,8 @@
 		D4E791782B52CDCF00676A68 /* ChineseNumbers */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ChineseNumbers; path = Packages/ChineseNumbers; sourceTree = "<group>"; };
 		D4EE67572B39685F00F062DE /* DictionaryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryServiceTests.swift; sourceTree = "<group>"; };
 		D4EE67592B39968900F062DE /* dictionary_service.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dictionary_service.json; sourceTree = "<group>"; };
+		D4A000002F0000000000AA00 /* InputLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputLogger.swift; sourceTree = "<group>"; };
+		D4A000022F0000000000AA02 /* InputLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputLoggerTests.swift; sourceTree = "<group>"; };
 		D4F0BBDE279AF1AF0071253C /* ArchiveUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveUtil.swift; sourceTree = "<group>"; };
 		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D4F0BBE2279B08900071253C /* BundleTranslocate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BundleTranslocate.h; sourceTree = "<group>"; };
@@ -339,6 +343,7 @@
 				D4E569DA27A34CC100AC2CEF /* KeyHandler.h */,
 				D4E569DB27A34CC100AC2CEF /* KeyHandler.mm */,
 				D43FC40A2B23788400ED5A1C /* InputMacro.swift */,
+				D4A000002F0000000000AA00 /* InputLogger.swift */,
 				D4CB1A5A2B3891FB006EA984 /* DictionaryService.swift */,
 				D456576D279E4F7B00DF6BC9 /* KeyHandlerInput.swift */,
 				D461B791279DAC010070E734 /* InputState.swift */,
@@ -521,6 +526,7 @@
 				D449AD5E2B393C00000C5812 /* InputMacroTests.swift */,
 				D449AD602B39506D000C5812 /* ServiceProviderTests.swift */,
 				D4EE67572B39685F00F062DE /* DictionaryServiceTests.swift */,
+				D4A000022F0000000000AA02 /* InputLoggerTests.swift */,
 				D4C2A9862B4309D700113711 /* UTF8HelperTest.mm */,
 				D4C2A9852B4309D600113711 /* McBopomofoTests-Bridging-Header.h */,
 			);
@@ -782,6 +788,7 @@
 				D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */,
 				D43737C92DF9C35800D9707C /* InputMethodController+KeyHandlerDelegate.swift in Sources */,
 				D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */,
+				D4A000012F0000000000AA01 /* InputLogger.swift in Sources */,
 				6ADF5B1A2BA513E000577D98 /* MemoryMappedFile.cpp in Sources */,
 				B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */,
 				6ADF5B192BA513E000577D98 /* AssociatedPhrasesV2.cpp in Sources */,
@@ -813,6 +820,7 @@
 				D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */,
 				D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */,
 				D4EE67582B39685F00F062DE /* DictionaryServiceTests.swift in Sources */,
+				D4A000032F0000000000AA03 /* InputLoggerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
