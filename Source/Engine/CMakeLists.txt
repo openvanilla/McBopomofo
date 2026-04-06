@@ -29,7 +29,11 @@ add_library(McBopomofoLMLib
         UserPhrasesLM.h
         UserPhrasesLM.cpp
         VariantAnnotator.h
-        VariantAnnotator.cpp)
+        VariantAnnotator.cpp
+        ReadingTrie.h
+        ReadingTrie.cpp)
+
+target_link_libraries(McBopomofoLMLib MandarinLib gramambular2_lib)
 
 if (ENABLE_CLANG_TIDY)
     set_target_properties(McBopomofoLMLib PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
@@ -94,7 +98,8 @@ if (ENABLE_TEST)
                 UTF8HelperTest.cpp
                 UserOverrideModelTest.cpp
                 UserPhrasesLMTest.cpp
-                VariantAnnotatorTest.cpp)
+                VariantAnnotatorTest.cpp
+                ReadingTrieTest.cpp)
         target_link_libraries(McBopomofoLMLibTest GTest::gtest_main McBopomofoLMLib gramambular2_lib)
         include(GoogleTest)
         gtest_discover_tests(McBopomofoLMLibTest)
