@@ -24,10 +24,10 @@
 #ifndef SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_
 #define SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_
 
-#include <array>
 #include <cassert>
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -47,12 +47,17 @@ namespace Formosa::Gramambular2 {
 // While we use the terminology from hidden Markov model (HMM), the actual
 // implementation is a much simpler Bayesian inference, since the underlying
 // language model consists of only unigrams. Once we have put all plausible
-// unigrams as nodes on the grid, a simple DAG shortest-path walk will give us
+// unigrams as nodes on the grid, a simple DAG longest-path walk will give us
 // the maximum likelihood estimation (MLE) for the hidden values.
 class ReadingGrid {
  public:
+  static constexpr size_t kDefaultMaxSpanLength = 8;
+
   explicit ReadingGrid(std::shared_ptr<LanguageModel> lm)
-      : lm_(std::move(lm)) {}
+      : lm_(std::move(lm)) {
+    size_t lmMax = lm_.maxKeyLength();
+    maxSpanLength_ = lmMax > 0 ? lmMax : kDefaultMaxSpanLength;
+  }
 
   void clear();
 
@@ -75,8 +80,9 @@ class ReadingGrid {
   // Delete the reading after the cursor, like Del. Cursor is unmoved.
   bool deleteReadingAfterCursor();
 
-  static constexpr size_t kMaximumSpanLength = 8;
   static constexpr char kDefaultSeparator[] = "-";
+
+  [[nodiscard]] size_t maxSpanLength() const { return maxSpanLength_; }
 
   // A Node consists of a set of unigrams, a reading, and a spanning length.
   // The spanning length denotes the length of the node in the grid. The grid
@@ -180,6 +186,16 @@ class ReadingGrid {
     std::vector<std::string> readingsAsStrings() const;
   };
 
+  // Set the walk strategy. Default is ViterbiStrategy.
+  void setWalkStrategy(std::shared_ptr<class WalkStrategy> strategy);
+
+  // Fix a span at the given position to the given node. The walk will be
+  // constrained to go through this node. Last-write-wins: fixing at a position
+  // that overlaps an existing fix clears the overlapping fix.
+  void fixSpan(size_t position, NodePtr node);
+
+  void clearFixedSpans();
+
   WalkResult walk();
 
   struct Candidate {
@@ -220,7 +236,7 @@ class ReadingGrid {
     [[nodiscard]] size_t maxLength() const { return maxLength_; }
 
    protected:
-    std::array<NodePtr, kMaximumSpanLength> nodes_;
+    std::vector<NodePtr> nodes_;
     size_t maxLength_ = 0;
   };
 
@@ -233,6 +249,7 @@ class ReadingGrid {
     }
     std::vector<Unigram> getUnigrams(const std::string& reading) override;
     bool hasUnigrams(const std::string& reading) override;
+    size_t maxKeyLength() const override { return lm_->maxKeyLength(); }
 
    protected:
     std::shared_ptr<LanguageModel> lm_;
@@ -246,10 +263,13 @@ class ReadingGrid {
 
  protected:
   size_t cursor_ = 0;
+  size_t maxSpanLength_;
   std::string separator_ = kDefaultSeparator;
   std::vector<std::string> readings_;
   std::vector<Span> spans_;
   ScoreRankedLanguageModel lm_;
+  std::shared_ptr<class WalkStrategy> walkStrategy_;
+  std::map<size_t, NodePtr> fixedSpans_;
 
   // Internal methods for maintaining the grid.
 
