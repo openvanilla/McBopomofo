@@ -28,6 +28,8 @@ import Testing
 
 @Suite("Test the service provider", .serialized)
 final class ServiceProviderTests {
+    var helper = ServiceProviderInputHelper()
+
     private func makeService() -> McBopomofoService {
         McBopomofoService()
     }
@@ -39,7 +41,7 @@ final class ServiceProviderTests {
 
     private func makeProviderWithHelper() -> (ServiceProvider, McBopomofoService) {
         let service = makeService()
-        let helper = ServiceProviderInputHelper()
+        helper = ServiceProviderInputHelper()
         if let helper = helper as? McBopomofoServiceDelegate {
             service.delegate = helper
             helper.mcBopomofoServiceDidRequestReset(service)
