@@ -66,7 +66,7 @@ class McBopomofoService: NSObject {
             while drop < substringCount {
                 let candidate = String(substring.dropLast(drop))
                 if let converted = OpenCCBridge.shared.convertToTraditional(candidate),
-                   let match = LanguageModelManager.reading(for: converted)
+                    let match = LanguageModelManager.reading(for: converted)
                 {
                     // append the match and skip over the matched portion
                     matches.append(match)
@@ -87,7 +87,7 @@ class McBopomofoService: NSObject {
     }
 
     func addUserPhrase(named name: String) -> Bool {
-        guard !name.isEmpty else {
+        guard name.count >= 2, name.count <= 8 else {
             return false
         }
 
@@ -170,7 +170,7 @@ class McBopomofoService: NSObject {
                         output.append(" ")
                     } else if (!previousTokenType.contains(.isCJWordMask)
                         && previousToken[previousToken.index(before: previousToken.endIndex)]
-                        .isASCII)
+                            .isASCII)
                         && type.contains(.isCJWordMask)
                     {
                         output.append(" ")

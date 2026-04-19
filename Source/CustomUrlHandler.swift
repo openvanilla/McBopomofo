@@ -36,9 +36,9 @@ final class CustomUrlHandler {
         }
 
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              components.host == "add_phrase",
-              let fileValue = components.queryItems?.first(where: { $0.name == "file" })?.value,
-              let fileURL = phraseFileURL(from: fileValue)
+            components.host == "add_phrase",
+            let fileValue = components.queryItems?.first(where: { $0.name == "file" })?.value,
+            let fileURL = phraseFileURL(from: fileValue)
         else {
             return
         }
@@ -47,29 +47,37 @@ final class CustomUrlHandler {
     }
 
     private func phraseFileURL(from value: String) -> URL? {
-        let decodedValue = value.removingPercentEncoding ?? value
-
-        if decodedValue.hasPrefix("/") {
-            return URL(fileURLWithPath: decodedValue)
+        let fileURL: URL
+        if value.hasPrefix("/") {
+            fileURL = URL(fileURLWithPath: value)
+        } else if let url = URL(string: value), url.isFileURL {
+            fileURL = url
+        } else {
+            return nil
         }
-
-        if let fileURL = URL(string: decodedValue), fileURL.isFileURL {
-            return fileURL
+        let tempDir = FileManager.default.temporaryDirectory.standardizedFileURL
+        let standardizedURL = fileURL.standardizedFileURL
+        guard standardizedURL.path.hasPrefix(tempDir.path) else {
+            return nil
         }
-
-        if let fileURL = URL(string: value), fileURL.isFileURL {
-            return fileURL
-        }
-
-        return nil
+        return standardizedURL
     }
 
     private func importUserPhrases(from fileURL: URL) {
+        let maxFileSize = 1024 * 1024  // 1MB limit
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path),
+            let fileSize = attributes[.size] as? Int,
+            fileSize <= maxFileSize
+        else {
+            return
+        }
+
         guard let content = try? String(contentsOf: fileURL, encoding: .utf8) else {
             return
         }
 
-        let names = content
+        let names =
+            content
             .components(separatedBy: .newlines)
             .filter { line in
                 let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -92,7 +100,8 @@ final class CustomUrlHandler {
             return
         }
 
-        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
+        LanguageModelManager.loadUserPhrases(
+            enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
     }
 }
