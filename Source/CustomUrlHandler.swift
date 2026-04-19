@@ -76,7 +76,7 @@ final class CustomUrlHandler {
             return
         }
 
-        let names =
+        let phrases =
             content
             .components(separatedBy: .newlines)
             .filter { line in
@@ -89,12 +89,13 @@ final class CustomUrlHandler {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
 
-        if names.isEmpty {
+        if phrases.isEmpty {
             return
         }
 
-        let uniqueNames = Array(Set(names)).sorted()
-        let added = uniqueNames.filter { service.addUserPhrase(named: $0) }
+        // Note: Set a maximum number.
+        let uniquePhrases = Array(Set(phrases)).sorted().prefix(1000)
+        let added = uniquePhrases.filter { service.addUserPhrase(named: $0) }
 
         if added.isEmpty {
             return
