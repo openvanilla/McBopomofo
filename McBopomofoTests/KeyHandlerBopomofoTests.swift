@@ -3003,7 +3003,10 @@ extension KeyHandlerBopomofoTests {
             state = newState
         } errorCallback: {
         }
-        XCTAssertTrue(state is InputState.Empty, "\(state)")
+        XCTAssertTrue(
+            state is InputState.EmptyIgnoringPreviousState,
+            "\(state)"
+        )
     }
 
     func testBacktickThenBackspace() {
@@ -3027,7 +3030,10 @@ extension KeyHandlerBopomofoTests {
             state = newState
         } errorCallback: {
         }
-        XCTAssertTrue(state is InputState.Empty, "\(state)")
+        XCTAssertTrue(
+            state is InputState.EmptyIgnoringPreviousState,
+            "\(state)"
+        )
     }
 
     func testBacktickThenBacktick() {
