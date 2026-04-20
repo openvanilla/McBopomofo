@@ -1649,8 +1649,10 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             } else {
                 _grid->deleteReadingBeforeCursor();
             }
+
             if (_grid->length() == 0) {
-                InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+                [self clear];
+                InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
                 stateCallback(empty);
             } else {
                 [self _walk];
