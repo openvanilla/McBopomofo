@@ -34,7 +34,7 @@
 }
 @end
 
-@interface ServiceProviderInputHelper(ServiceProviderDelegate) <ServiceProviderDelegate>
+@interface ServiceProviderInputHelper(McBopomofoServiceDelegate) <McBopomofoServiceDelegate>
 @end
 
 @implementation ServiceProviderInputHelper
@@ -56,7 +56,7 @@
 
 @end
 
-@implementation ServiceProviderInputHelper(ServiceProviderDelegate)
+@implementation ServiceProviderInputHelper(McBopomofoServiceDelegate)
 
 - (void)reset
 {
@@ -64,12 +64,12 @@
 }
 
 
-- (void)serviceProvider:(ServiceProvider * _Nonnull)provider didRequestInsertReading:(NSString * _Nonnull)didRequestInsertReading 
+- (void)mcBopomofoService:(McBopomofoService * _Nonnull)service didRequestInsertReading:(NSString * _Nonnull)didRequestInsertReading
 {
     _grid->insertReading(didRequestInsertReading.UTF8String);
 }
 
-- (NSString * _Nonnull)serviceProviderDidRequestCommitting:(ServiceProvider * _Nonnull)provider 
+- (NSString * _Nonnull)mcBopomofoServiceDidRequestCommitting:(McBopomofoService * _Nonnull)service
 {
     Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk = _grid->walk();
     std::string output;
@@ -80,12 +80,12 @@
     return [NSString stringWithUTF8String:output.c_str()];
 }
 
-- (void)serviceProviderDidRequestReset:(ServiceProvider * _Nonnull)provider
+- (void)mcBopomofoServiceDidRequestReset:(McBopomofoService * _Nonnull)service
 {
     [self reset];
 }
 
-- (NSString * _Nonnull)service:(ServiceProvider * _Nonnull)provider didRequestConvertReadingToHanyuPinyin:(NSString * _Nonnull)input
+- (NSString * _Nonnull)mcBopomofoService:(McBopomofoService * _Nonnull)service didRequestConvertReadingToHanyuPinyin:(NSString * _Nonnull)input
 {
     std::string reading = std::string([input UTF8String]);
     Formosa::Mandarin::BopomofoSyllable syllable = Formosa::Mandarin::BopomofoSyllable::FromComposedString(reading);

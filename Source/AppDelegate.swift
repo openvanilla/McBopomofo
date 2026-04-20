@@ -150,8 +150,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
     private var fsStreamHelper: FSEventStreamHelper?
-    private var serviceProvider = ServiceProvider()
+    private var mcBopomofoService = McBopomofoService()
     private var serviceProviderHelper = ServiceProviderInputHelper()
+    private lazy var serviceProvider = ServiceProvider(service: mcBopomofoService)
+    private lazy var customUrlHandler = CustomUrlHandler(service: mcBopomofoService)
 
     func updateUserPhrases() {
         LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
@@ -182,12 +184,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
             self.updateUserPhrases()
         }
 
-        serviceProvider.delegate = (serviceProviderHelper as! any ServiceProviderDelegate)
+        mcBopomofoService.delegate = (serviceProviderHelper as! any McBopomofoServiceDelegate)
+        (serviceProviderHelper as? any McBopomofoServiceDelegate)?
+            .mcBopomofoServiceDidRequestReset(mcBopomofoService)
         NSApp.servicesProvider = serviceProvider
 
         enableBopomofoFontAnnotationSupportMenuItemIfRelevantFontsInstalled()
 
         checkForUpdate()
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls {
+            customUrlHandler.handle(url)
+        }
     }
 
     @objc func showPreferences() {
