@@ -137,9 +137,10 @@ TEST(VariantAnnotatorTest, AnnotateCharactersWithMismatchedArguments) {
   GTEST_SKIP();
 #endif
   auto annotator = CreateLoadedAnnotator();
-  EXPECT_DEATH((annotator->annotate({"個", "人", "一", "個", "人", "一", "個"},
-                                    {"ㄍㄜˋ", "ㄖㄣˊ"})),
-               "values.+readings");
+  EXPECT_DEATH(
+      (static_cast<void>(annotator->annotate(
+          {"個", "人", "一", "個", "人", "一", "個"}, {"ㄍㄜˋ", "ㄖㄣˊ"}))),
+      "values.+readings");
 }
 
 TEST(VariantAnnotatorTest, AnnotateCharactersWithAllDefaults) {
