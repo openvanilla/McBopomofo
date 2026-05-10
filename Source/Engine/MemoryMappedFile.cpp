@@ -68,10 +68,11 @@ bool MemoryMappedFile::open(const char* path) {
   length_ = static_cast<size_t>(sb.st_size);
 
   data_ = mmap(nullptr, length_, PROT_READ, MAP_SHARED, fd_, 0);
-  if (data_ == nullptr) {
+  if (data_ == MAP_FAILED) {
     ::close(fd_);
     fd_ = -1;
     length_ = 0;
+    data_ = nullptr;
     return false;
   }
 
