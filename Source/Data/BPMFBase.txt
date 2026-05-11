@@ -2316,6 +2316,7 @@
 鄸 ㄇㄥˊ meng2 a/6 big5
 饛 ㄇㄥˊ meng2 a/6 big5
 鸏 ㄇㄥˊ meng2 a/6 big5
+獴 ㄇㄥˊ meng2 a/6 utf8
 滿 ㄇㄢˇ man3 a03 big5
 屘 ㄇㄢˇ man3 a03 big5
 矕 ㄇㄢˇ man3 a03 big5
