@@ -26,7 +26,7 @@
 
 namespace McBopomofo {
 
-constexpr std::string_view kTestVariantsData =
+static const auto* kTestVariantsData =
     u8"# format org.openvanilla.mcbopomofo.sorted\n"
     u8"一-na 一\U000E01E0\n"
     u8"一-ㄧ 一\n"
@@ -37,17 +37,20 @@ constexpr std::string_view kTestVariantsData =
     u8"個-ㄍㄜˋ 個\n"
     u8"個-ㄍㄜ˙ 個\U000E01E1";
 
-constexpr std::string_view kTestPUAData =
+static const auto* kTestPUAData =
     u8"# format org.openvanilla.mcbopomofo.sorted\n"
     u8"ㄍㄚˋ \uF145\n"
     u8"ㄧㄚˊ \uF4BB";
 
 static std::unique_ptr<VariantAnnotator> CreateLoadedAnnotator() {
   auto annotator = std::make_unique<VariantAnnotator>();
-  annotator->loadVariantsMap(ParselessPhraseDB::CreateValidatedDB(
-      kTestVariantsData.data(), kTestVariantsData.length()));
-  annotator->loadPUAMap(ParselessPhraseDB::CreateValidatedDB(
-      kTestPUAData.data(), kTestPUAData.length()));
+
+  const char* variantsData = reinterpret_cast<const char*>(kTestVariantsData);
+  const char* puaData = reinterpret_cast<const char*>(kTestPUAData);
+  annotator->loadVariantsMap(
+      ParselessPhraseDB::CreateValidatedDB(variantsData, strlen(variantsData)));
+  annotator->loadPUAMap(
+      ParselessPhraseDB::CreateValidatedDB(puaData, strlen(puaData)));
   EXPECT_TRUE(annotator->loaded());
   return annotator;
 }
@@ -82,7 +85,8 @@ TEST(VariantAnnotatorTest, SingleCharacterAnnotationWithVariantSelector) {
   auto annotator = CreateLoadedAnnotator();
   VariantAnnotator::Result result =
       annotator->annotateSingleCharacter("個", "ㄍㄜ˙");
-  EXPECT_EQ(result.annotatedString, u8"個\U000E01E1");
+  EXPECT_EQ(result.annotatedString,
+            reinterpret_cast<const char*>(u8"個\U000E01E1"));
   EXPECT_TRUE(result.hasVariantSelectors);
   EXPECT_FALSE(result.hasPUACodePoints);
 }
@@ -91,7 +95,8 @@ TEST(VariantAnnotatorTest, SingleCharacterAnnotationWithVariant0AndPUA) {
   auto annotator = CreateLoadedAnnotator();
   VariantAnnotator::Result result =
       annotator->annotateSingleCharacter("個", "ㄍㄚˋ");
-  EXPECT_EQ(result.annotatedString, u8"個\U000E01E0\uF145");
+  EXPECT_EQ(result.annotatedString,
+            reinterpret_cast<const char*>(u8"個\U000E01E0\uF145"));
   EXPECT_TRUE(result.hasVariantSelectors);
   EXPECT_TRUE(result.hasPUACodePoints);
 }
@@ -100,7 +105,8 @@ TEST(VariantAnnotatorTest, SingleCharacterAnnotationWithVariant0AndNoPUA) {
   auto annotator = CreateLoadedAnnotator();
   VariantAnnotator::Result result =
       annotator->annotateSingleCharacter("個", "ㄍ");
-  EXPECT_EQ(result.annotatedString, u8"個\U000E01E0");
+  EXPECT_EQ(result.annotatedString,
+            reinterpret_cast<const char*>(u8"個\U000E01E0"));
   EXPECT_TRUE(result.hasVariantSelectors);
   EXPECT_FALSE(result.hasPUACodePoints);
 }
@@ -109,7 +115,7 @@ TEST(VariantAnnotatorTest, SingleCharacterAnnotationWithUnknownCharacter) {
   auto annotator = CreateLoadedAnnotator();
   VariantAnnotator::Result result =
       annotator->annotateSingleCharacter("人", "ㄖㄣˊ");
-  EXPECT_EQ(result.annotatedString, u8"人");
+  EXPECT_EQ(result.annotatedString, reinterpret_cast<const char*>(u8"人"));
   EXPECT_FALSE(result.hasVariantSelectors);
   EXPECT_FALSE(result.hasPUACodePoints);
 }
@@ -120,15 +126,19 @@ TEST(VariantAnnotatorTest, AnnotateCharacters) {
       {"個", "人", "一", "個", "人", "一", "個"},
       {"ㄍㄜˋ", "ㄖㄣˊ", "ㄧˊ", "ㄍㄜ˙", "ㄖㄣˊ", "ㄧ", "ㄍㄚˋ"});
   EXPECT_EQ(result.annotatedString,
-            u8"個人一\U000E01E1個\U000E01E1人一個\U000E01E0\uF145");
+            reinterpret_cast<const char*>(
+                u8"個人一\U000E01E1個\U000E01E1人一個\U000E01E0\uF145"));
   EXPECT_TRUE(result.hasVariantSelectors);
   EXPECT_TRUE(result.hasPUACodePoints);
   EXPECT_EQ(result.accumulatedStringLength.size(), 8);
   EXPECT_EQ(result.accumulatedStringLength[0], 0);
-  EXPECT_EQ(result.accumulatedStringLength[1], strlen(u8"個"));
-  EXPECT_EQ(result.accumulatedStringLength[3], strlen(u8"個人一\U000E01E1"));
+  EXPECT_EQ(result.accumulatedStringLength[1],
+            strlen(reinterpret_cast<const char*>(u8"個")));
+  EXPECT_EQ(result.accumulatedStringLength[3],
+            strlen(reinterpret_cast<const char*>(u8"個人一\U000E01E1")));
   EXPECT_EQ(result.accumulatedStringLength[6],
-            strlen(u8"個人一\U000E01E1個\U000E01E1人一"));
+            strlen(reinterpret_cast<const char*>(
+                u8"個人一\U000E01E1個\U000E01E1人一")));
   EXPECT_EQ(result.accumulatedStringLength[7], result.annotatedString.size());
 }
 
@@ -158,7 +168,8 @@ TEST(VariantAnnotatorTest, AnnotateCharactersWithVariant0AndPUA) {
   VariantAnnotator::CombinedResult result = annotator->annotate(
       {"個", "人", "一", "個", "人", "一", "個"},
       {"ㄍㄜˋ", "ㄖㄣˊ", "ㄧ", "ㄍㄜˋ", "ㄖㄣˊ", "ㄧ", "ㄍㄚˋ"});
-  EXPECT_EQ(result.annotatedString, u8"個人一個人一個\U000E01E0\uF145");
+  EXPECT_EQ(result.annotatedString,
+            reinterpret_cast<const char*>(u8"個人一個人一個\U000E01E0\uF145"));
   EXPECT_TRUE(result.hasVariantSelectors);
   EXPECT_TRUE(result.hasPUACodePoints);
 }
@@ -168,7 +179,8 @@ TEST(VariantAnnotatorTest, AnnotateCharactersWithVariant0ButNoPUA) {
   VariantAnnotator::CombinedResult result = annotator->annotate(
       {"個", "人", "一", "個", "人", "一", "個"},
       {"ㄍㄜˋ", "ㄖㄣˊ", "ㄧ", "ㄍㄜˋ", "ㄖㄣˊ", "ㄧ", "ㄍ"});
-  EXPECT_EQ(result.annotatedString, u8"個人一個人一個\U000E01E0");
+  EXPECT_EQ(result.annotatedString,
+            reinterpret_cast<const char*>(u8"個人一個人一個\U000E01E0"));
   EXPECT_TRUE(result.hasVariantSelectors);
   EXPECT_FALSE(result.hasPUACodePoints);
 }

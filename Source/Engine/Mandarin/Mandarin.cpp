@@ -268,7 +268,8 @@ const BPMF BPMF::FromHanyuPinyin(const std::string& str) {
   } else if (PinyinParseHelper::ConsumePrefix(pinyin, "ue")) {
     secondComponent = BPMF::UE;
     thirdComponent = BPMF::E;
-  } else if (PinyinParseHelper::ConsumePrefix(pinyin, u8"ü")) {
+  } else if (PinyinParseHelper::ConsumePrefix(
+                 pinyin, reinterpret_cast<const char*>(u8"ü"))) {
     secondComponent = BPMF::UE;
   }
 
@@ -646,47 +647,47 @@ const BopomofoCharacterMap& BopomofoCharacterMap::SharedInstance() {
 }
 
 BopomofoCharacterMap::BopomofoCharacterMap() {
-  characterToComponent[u8"ㄅ"] = BPMF::B;
-  characterToComponent[u8"ㄆ"] = BPMF::P;
-  characterToComponent[u8"ㄇ"] = BPMF::M;
-  characterToComponent[u8"ㄈ"] = BPMF::F;
-  characterToComponent[u8"ㄉ"] = BPMF::D;
-  characterToComponent[u8"ㄊ"] = BPMF::T;
-  characterToComponent[u8"ㄋ"] = BPMF::N;
-  characterToComponent[u8"ㄌ"] = BPMF::L;
-  characterToComponent[u8"ㄎ"] = BPMF::K;
-  characterToComponent[u8"ㄍ"] = BPMF::G;
-  characterToComponent[u8"ㄏ"] = BPMF::H;
-  characterToComponent[u8"ㄐ"] = BPMF::J;
-  characterToComponent[u8"ㄑ"] = BPMF::Q;
-  characterToComponent[u8"ㄒ"] = BPMF::X;
-  characterToComponent[u8"ㄓ"] = BPMF::ZH;
-  characterToComponent[u8"ㄔ"] = BPMF::CH;
-  characterToComponent[u8"ㄕ"] = BPMF::SH;
-  characterToComponent[u8"ㄖ"] = BPMF::R;
-  characterToComponent[u8"ㄗ"] = BPMF::Z;
-  characterToComponent[u8"ㄘ"] = BPMF::C;
-  characterToComponent[u8"ㄙ"] = BPMF::S;
-  characterToComponent[u8"ㄧ"] = BPMF::I;
-  characterToComponent[u8"ㄨ"] = BPMF::U;
-  characterToComponent[u8"ㄩ"] = BPMF::UE;
-  characterToComponent[u8"ㄚ"] = BPMF::A;
-  characterToComponent[u8"ㄛ"] = BPMF::O;
-  characterToComponent[u8"ㄜ"] = BPMF::ER;
-  characterToComponent[u8"ㄝ"] = BPMF::E;
-  characterToComponent[u8"ㄞ"] = BPMF::AI;
-  characterToComponent[u8"ㄟ"] = BPMF::EI;
-  characterToComponent[u8"ㄠ"] = BPMF::AO;
-  characterToComponent[u8"ㄡ"] = BPMF::OU;
-  characterToComponent[u8"ㄢ"] = BPMF::AN;
-  characterToComponent[u8"ㄣ"] = BPMF::EN;
-  characterToComponent[u8"ㄤ"] = BPMF::ANG;
-  characterToComponent[u8"ㄥ"] = BPMF::ENG;
-  characterToComponent[u8"ㄦ"] = BPMF::ERR;
-  characterToComponent[u8"ˊ"] = BPMF::Tone2;
-  characterToComponent[u8"ˇ"] = BPMF::Tone3;
-  characterToComponent[u8"ˋ"] = BPMF::Tone4;
-  characterToComponent[u8"˙"] = BPMF::Tone5;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄅ")] = BPMF::B;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄆ")] = BPMF::P;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄇ")] = BPMF::M;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄈ")] = BPMF::F;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄉ")] = BPMF::D;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄊ")] = BPMF::T;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄋ")] = BPMF::N;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄌ")] = BPMF::L;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄎ")] = BPMF::K;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄍ")] = BPMF::G;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄏ")] = BPMF::H;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄐ")] = BPMF::J;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄑ")] = BPMF::Q;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄒ")] = BPMF::X;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄓ")] = BPMF::ZH;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄔ")] = BPMF::CH;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄕ")] = BPMF::SH;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄖ")] = BPMF::R;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄗ")] = BPMF::Z;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄘ")] = BPMF::C;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄙ")] = BPMF::S;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄧ")] = BPMF::I;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄨ")] = BPMF::U;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄩ")] = BPMF::UE;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄚ")] = BPMF::A;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄛ")] = BPMF::O;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄜ")] = BPMF::ER;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄝ")] = BPMF::E;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄞ")] = BPMF::AI;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄟ")] = BPMF::EI;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄠ")] = BPMF::AO;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄡ")] = BPMF::OU;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄢ")] = BPMF::AN;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄣ")] = BPMF::EN;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄤ")] = BPMF::ANG;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄥ")] = BPMF::ENG;
+  characterToComponent[reinterpret_cast<const char*>(u8"ㄦ")] = BPMF::ERR;
+  characterToComponent[reinterpret_cast<const char*>(u8"ˊ")] = BPMF::Tone2;
+  characterToComponent[reinterpret_cast<const char*>(u8"ˇ")] = BPMF::Tone3;
+  characterToComponent[reinterpret_cast<const char*>(u8"ˋ")] = BPMF::Tone4;
+  characterToComponent[reinterpret_cast<const char*>(u8"˙")] = BPMF::Tone5;
 
   for (const auto& [character, component] : characterToComponent) {
     componentToCharacter[component] = character;
