@@ -47,10 +47,11 @@ TEST(ByteBlockBackedDictionaryTest, Simple2) {
 }
 
 TEST(ByteBlockBackedDictionaryTest, EncodingAgnostic1) {
-  constexpr char data[] = u8"smile 😊";
+  const auto *data = u8"smile 😊";
+  const char *charData = reinterpret_cast<const char*>(data);
   ByteBlockBackedDictionary dict;
-  ASSERT_TRUE(dict.parse(data, sizeof(data)));
-  ASSERT_EQ(dict.getValues("smile").at(0), u8"😊");
+  ASSERT_TRUE(dict.parse(charData, strlen(charData)));
+  ASSERT_EQ(dict.getValues("smile").at(0), reinterpret_cast<const char*>(u8"😊"));
 }
 
 TEST(ByteBlockBackedDictionaryTest, EncodingAgnostic2) {
