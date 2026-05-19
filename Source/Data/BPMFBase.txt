@@ -4107,6 +4107,7 @@
 惃 ㄎㄨㄣ kun djp big5
 猑 ㄎㄨㄣ kun djp big5
 堃 ㄎㄨㄣ kun djp big5e
+崐 ㄎㄨㄣ kun djp utf8
 捆 ㄎㄨㄣˇ kun3 djp3 big5
 綑 ㄎㄨㄣˇ kun3 djp3 big5
 悃 ㄎㄨㄣˇ kun3 djp3 big5
