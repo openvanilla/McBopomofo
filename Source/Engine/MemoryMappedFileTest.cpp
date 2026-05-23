@@ -124,4 +124,43 @@ TEST(MemoryMappedFileTest, BasicFunctionalities) {
   EXPECT_EQ(mf5.data(), nullptr);
 }
 
+TEST(MemoryMappedFileTest, EmptyFile) {
+  std::filesystem::path tmp_file_path =
+      std::filesystem::temp_directory_path() /
+      "org.openvanilla.mcbopomofo.memorymappedfiletest-empty-file";
+  std::filesystem::remove(tmp_file_path);
+  std::ofstream out(tmp_file_path, std::ios::binary);
+  out.close();
+
+  MemoryMappedFile mf;
+  EXPECT_FALSE(mf.open(tmp_file_path.c_str()));
+  EXPECT_EQ(mf.length(), 0);
+  EXPECT_EQ(mf.data(), nullptr);
+
+  mf.close();
+  EXPECT_EQ(mf.length(), 0);
+  EXPECT_EQ(mf.data(), nullptr);
+
+  std::filesystem::remove(tmp_file_path);
+}
+
+TEST(MemoryMappedFileTest, MmapFailure) {
+  std::filesystem::path tmp_dir_path =
+      std::filesystem::temp_directory_path() /
+      "org.openvanilla.mcbopomofo.memorymappedfiletest-mmap-failure";
+  std::filesystem::remove_all(tmp_dir_path);
+  ASSERT_TRUE(std::filesystem::create_directory(tmp_dir_path));
+
+  MemoryMappedFile mf;
+  EXPECT_FALSE(mf.open(tmp_dir_path.c_str()));
+  EXPECT_EQ(mf.length(), 0);
+  EXPECT_EQ(mf.data(), nullptr);
+
+  mf.close();
+  EXPECT_EQ(mf.length(), 0);
+  EXPECT_EQ(mf.data(), nullptr);
+
+  std::filesystem::remove_all(tmp_dir_path);
+}
+
 }  // namespace McBopomofo
