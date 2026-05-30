@@ -216,7 +216,7 @@ class ReadingGrid {
     void clear();
     void add(const NodePtr& node);
     void removeNodesOfOrLongerThan(size_t length);
-    [[nodiscard]] NodePtr nodeOf(size_t length) const;
+    [[nodiscard]] const NodePtr& nodeOf(size_t length) const;
     [[nodiscard]] size_t maxLength() const { return maxLength_; }
 
    protected:
