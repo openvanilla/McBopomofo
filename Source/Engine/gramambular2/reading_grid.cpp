@@ -577,7 +577,7 @@ void ReadingGrid::Span::removeNodesOfOrLongerThan(size_t length) {
   }
 }
 
-ReadingGrid::NodePtr ReadingGrid::Span::nodeOf(size_t length) const {
+const ReadingGrid::NodePtr& ReadingGrid::Span::nodeOf(size_t length) const {
   assert(length > 0 && length <= kMaximumSpanLength);
   return nodes_[length - 1];
 }
