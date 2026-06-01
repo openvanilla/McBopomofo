@@ -44,6 +44,8 @@ _deploy: _install
 	@rsync -avx data.txt data-plain-bpmf.txt $(RHOST):"Library/Input\ Methods/McBopomofo.app/Contents/Resources/"
 	@test "$(RHOST)" && ssh $(RHOST) "pkill -HUP -f McBopomofo || echo McBopomofo is not running" || true
 
+sort: SHELL:=/bin/bash
+sort: export LC_ALL=C
 sort:
 	@env LC_ALL=C sort -k1 phrase.occ | uniq | grep -v '^$$' > tmp
 	@mv tmp phrase.occ
@@ -64,7 +66,7 @@ check:
 	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
 	@awk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | awk '/一/'
 	@diff -u <(awk '{print $$1}' BPMFMappings.txt|sort -u) \
-                 <(awk 'length($$1)>3{print $$1}' phrase.occ|sort -u)
+                 <(awk 'length($$1)>4{print $$1}' phrase.occ|sort -u)
 
 tidy:
 	@sed -i '' -e 's/ //g' phrase.occ
