@@ -2912,6 +2912,7 @@
 髶 ㄖㄨㄥˊ rong2 bj/6 big5
 鰫 ㄖㄨㄥˊ rong2 bj/6 big5
 鷛 ㄖㄨㄥˊ rong2 bj/6 big5
+嫆 ㄖㄨㄥˊ rong2 bj/6 big5
 軟 ㄖㄨㄢˇ ruan3 bj03 big5
 阮 ㄖㄨㄢˇ ruan3 bj03 big5
 蠕 ㄖㄨㄢˇ ruan3 bj03 big5
@@ -11148,6 +11149,10 @@
 燢 ㄒㄩㄝˊ xue2 vm,6 big5
 澩 ㄒㄩㄝˊ xue2 vm,6 big5
 壆 ㄒㄩㄝˊ xue2 vm,6 big5
+斈 ㄒㄩㄝˊ xue2 vm,6 big5
+𢻯 ㄒㄩㄝˊ xue2 vm,6 big5
+斅 ㄒㄩㄝˊ xue2 vm,6 big5
+斆 ㄒㄩㄝˊ xue2 vm,6 big5
 兄 ㄒㄩㄥ xiong vm/ big5
 兇 ㄒㄩㄥ xiong vm/ big5
 胸 ㄒㄩㄥ xiong vm/ big5
