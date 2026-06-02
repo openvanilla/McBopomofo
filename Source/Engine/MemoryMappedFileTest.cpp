@@ -90,14 +90,19 @@ TEST(MemoryMappedFileTest, BasicFunctionalities) {
   MemoryMappedFile mf2;
   open_result = mf2.open(tmp_file_path.c_str());
   EXPECT_TRUE(open_result);
+  EXPECT_EQ(mf2.length(), kBufSize);
   EXPECT_TRUE(mf2.data() != nullptr);
 
   MemoryMappedFile mf3(std::move(mf2));
+  EXPECT_EQ(mf2.length(), 0);
   EXPECT_TRUE(mf2.data() == nullptr);
+  EXPECT_EQ(mf3.length(), kBufSize);
   EXPECT_TRUE(mf3.data() != nullptr);
 
   MemoryMappedFile mf4 = std::move(mf3);
+  EXPECT_EQ(mf3.length(), 0);
   EXPECT_TRUE(mf3.data() == nullptr);
+  EXPECT_EQ(mf4.length(), kBufSize);
   EXPECT_TRUE(mf4.data() != nullptr);
 
   // Flip a byte of the underlying file. The map should reflect that.
