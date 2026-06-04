@@ -48,6 +48,8 @@ class MemoryMappedFile {
   bool open(const char* path);
   void close();
 
+  bool isOpen() const { return fd_ != -1; }
+
   [[nodiscard]] const char* data() const {
     return static_cast<const char*>(data_);
   }

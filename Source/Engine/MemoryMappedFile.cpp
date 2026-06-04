@@ -49,7 +49,7 @@ MemoryMappedFile& MemoryMappedFile::operator=(
 MemoryMappedFile::~MemoryMappedFile() { close(); }
 
 bool MemoryMappedFile::open(const char* path) {
-  if (data_) {
+  if (fd_ != -1) {
     return false;
   }
 
@@ -67,6 +67,7 @@ bool MemoryMappedFile::open(const char* path) {
 
   length_ = static_cast<size_t>(sb.st_size);
 
+  // No need to check if length_ is 0; mmmap fails on empty files.
   data_ = mmap(nullptr, length_, PROT_READ, MAP_SHARED, fd_, 0);
   if (data_ == MAP_FAILED) {
     ::close(fd_);
@@ -80,7 +81,7 @@ bool MemoryMappedFile::open(const char* path) {
 }
 
 void MemoryMappedFile::close() {
-  if (data_ == nullptr) {
+  if (fd_ == -1) {
     return;
   }
   munmap(data_, length_);
