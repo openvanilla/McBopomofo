@@ -79,6 +79,7 @@
 		D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* PreferencesWindowController.swift */; };
 		D47F7DD0278C0897002F9DD7 /* NonModalAlertWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */; };
 		D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */; };
+		D47F7DD4278C1263002F9DE1 /* ContextualUserModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DD6278C1263002F9DE1 /* ContextualUserModel.cpp */; };
 		D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3B82796A8A000657FF3 /* PreferencesTests.swift */; };
 		D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */; };
 		D48F853E2EACDB6C00C2FDAB /* RomanNumbers in Frameworks */ = {isa = PBXBuildFile; productRef = D48F853D2EACDB6C00C2FDAB /* RomanNumbers */; };
@@ -229,6 +230,8 @@
 		D47F7DCF278C0897002F9DD7 /* NonModalAlertWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonModalAlertWindowController.swift; sourceTree = "<group>"; };
 		D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserOverrideModel.h; sourceTree = "<group>"; };
 		D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserOverrideModel.cpp; sourceTree = "<group>"; };
+		D47F7DD5278C1263002F9DE1 /* ContextualUserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContextualUserModel.h; sourceTree = "<group>"; };
+		D47F7DD6278C1263002F9DE1 /* ContextualUserModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextualUserModel.cpp; sourceTree = "<group>"; };
 		D485D3B62796A8A000657FF3 /* McBopomofoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = McBopomofoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D485D3B82796A8A000657FF3 /* PreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTests.swift; sourceTree = "<group>"; };
 		D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionUpdateTests.swift; sourceTree = "<group>"; };
@@ -385,6 +388,8 @@
 				6ACC3D412793701600F1B140 /* ParselessPhraseDB.h */,
 				D44FB74B2792189A003C80A6 /* PhraseReplacementMap.cpp */,
 				D44FB74C2792189A003C80A6 /* PhraseReplacementMap.h */,
+				D47F7DD6278C1263002F9DE1 /* ContextualUserModel.cpp */,
+				D47F7DD5278C1263002F9DE1 /* ContextualUserModel.h */,
 				D47F7DD2278C1263002F9DD7 /* UserOverrideModel.cpp */,
 				D47F7DD1278C1263002F9DD7 /* UserOverrideModel.h */,
 				D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */,
@@ -768,6 +773,7 @@
 				D47F7DCE278BFB57002F9DD7 /* PreferencesWindowController.swift in Sources */,
 				D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */,
 				D47F7DD3278C1263002F9DD7 /* UserOverrideModel.cpp in Sources */,
+				D47F7DD4278C1263002F9DE1 /* ContextualUserModel.cpp in Sources */,
 				6A0D4F4515FC0EB100ABF4B3 /* Mandarin.cpp in Sources */,
 				6ACC3D452793701600F1B140 /* ParselessLM.cpp in Sources */,
 				D4CB1A5B2B389B78006EA984 /* DictionaryService.swift in Sources */,
