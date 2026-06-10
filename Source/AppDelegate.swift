@@ -167,6 +167,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     func applicationDidFinishLaunching(_ notification: Notification) {
         LanguageModelManager.setupDataModelValueConverter()
         updateUserPhrases()
+        LanguageModelManager.loadContextualUserModel()
 
         if UserDefaults.standard.object(forKey: kCheckUpdateAutomatically) == nil {
             UserDefaults.standard.set(true, forKey: kCheckUpdateAutomatically)
