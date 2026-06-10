@@ -24,7 +24,6 @@
 #ifndef SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_
 #define SRC_ENGINE_GRAMAMBULAR2_READING_GRID_H_
 
-#include <array>
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -51,8 +50,11 @@ namespace Formosa::Gramambular2 {
 // the maximum likelihood estimation (MLE) for the hidden values.
 class ReadingGrid {
  public:
-  explicit ReadingGrid(std::shared_ptr<LanguageModel> lm)
-      : lm_(std::move(lm)) {}
+  explicit ReadingGrid(std::shared_ptr<LanguageModel> lm) : lm_(std::move(lm)) {
+    size_t lmMaxKeyLength = lm_.maxKeyLength();
+    maxSpanLength_ =
+        lmMaxKeyLength > 0 ? lmMaxKeyLength : kDefaultMaxSpanLength;
+  }
 
   void clear();
 
@@ -75,8 +77,13 @@ class ReadingGrid {
   // Delete the reading after the cursor, like Del. Cursor is unmoved.
   bool deleteReadingAfterCursor();
 
-  static constexpr size_t kMaximumSpanLength = 8;
+  static constexpr size_t kDefaultMaxSpanLength = 8;
   static constexpr char kDefaultSeparator[] = "-";
+
+  // The maximum span length used by this grid. Derived from the language
+  // model's maxKeyLength(), or kDefaultMaxSpanLength if the model does not
+  // report one.
+  [[nodiscard]] size_t maxSpanLength() const { return maxSpanLength_; }
 
   // A Node consists of a set of unigrams, a reading, and a spanning length.
   // The spanning length denotes the length of the node in the grid. The grid
@@ -220,7 +227,7 @@ class ReadingGrid {
     [[nodiscard]] size_t maxLength() const { return maxLength_; }
 
    protected:
-    std::array<NodePtr, kMaximumSpanLength> nodes_;
+    std::vector<NodePtr> nodes_;
     size_t maxLength_ = 0;
   };
 
@@ -233,6 +240,7 @@ class ReadingGrid {
     }
     std::vector<Unigram> getUnigrams(const std::string& reading) override;
     bool hasUnigrams(const std::string& reading) override;
+    size_t maxKeyLength() const override { return lm_->maxKeyLength(); }
 
    protected:
     std::shared_ptr<LanguageModel> lm_;
@@ -246,6 +254,7 @@ class ReadingGrid {
 
  protected:
   size_t cursor_ = 0;
+  size_t maxSpanLength_ = kDefaultMaxSpanLength;
   std::string separator_ = kDefaultSeparator;
   std::vector<std::string> readings_;
   std::vector<Span> spans_;
