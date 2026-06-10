@@ -8,7 +8,11 @@ let package = Package(
     products: [
         .library(
             name: "CandidateUI",
-            targets: ["CandidateUI"])
+            targets: ["CandidateUI"]),
+        .executable(
+            name: "CandidatePreview",
+            targets: ["CandidatePreview"]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -20,6 +24,10 @@ let package = Package(
         .target(
             name: "CandidateUI",
             dependencies: []),
+        .executableTarget(
+            name: "CandidatePreview",
+            dependencies: ["CandidateUI"]
+        ),
         .testTarget(
             name: "CandidateUITests",
             dependencies: ["CandidateUI"]),
