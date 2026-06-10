@@ -35,8 +35,21 @@ static const double kObservedOverrideHalflife = 5400.0; // 1.5 hr.
 
 static McBopomofo::McBopomofoLM gLanguageModelMcBopomofo;
 static McBopomofo::McBopomofoLM gLanguageModelPlainBopomofo;
-static McBopomofo::UserOverrideModel gUserOverrideModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
+static McBopomofo::ContextualUserModel gContextualUserModel(kUserOverrideModelCapacity, kObservedOverrideHalflife);
 static McBopomofo::VariantAnnotator gVariantAnnotator;
+
+// All file I/O of the contextual user model happens on this serial queue so
+// saves never block the main (input handling) thread, and load/save never
+// interleave.
+static dispatch_queue_t LTContextualUserModelQueue(void)
+{
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("org.openvanilla.mcbopomofo.ContextualUserModel", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
+}
 
 static NSString *const kUserDataTemplateName = @"template-data";
 static NSString *const kUserDataPlainBopomofoTemplateName = @"template-data-plain-bpmf";
@@ -140,6 +153,37 @@ static void LTLoadVariantAnnotatorData()
 + (void)loadUserPhraseReplacement
 {
     gLanguageModelMcBopomofo.loadPhraseReplacementMap([self phraseReplacementDataPathMcBopomofo].UTF8String);
+}
+
++ (void)loadContextualUserModel
+{
+    NSString *path = [self contextualUserModelDataPath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return;
+    }
+    auto stats = gContextualUserModel.loadFromFile(path.UTF8String);
+    if (!stats.has_value()) {
+        NSLog(@"Error: Could not read contextual user model from %@", path);
+        return;
+    }
+    if (stats->skipped > 0) {
+        NSLog(@"Warning: Skipped %zu malformed lines while loading contextual user model from %@", stats->skipped, path);
+    }
+}
+
++ (void)saveContextualUserModel
+{
+    // Snapshot on the calling thread (the model is not thread-safe), then
+    // write on the serial queue so saves never block input handling.
+    std::string snapshot = gContextualUserModel.serialize();
+    NSString *path = [self contextualUserModelDataPath];
+    dispatch_async(LTContextualUserModelQueue(), ^{
+        NSData *data = [NSData dataWithBytes:snapshot.data() length:snapshot.size()];
+        NSError *error = nil;
+        if (![data writeToFile:path options:NSDataWritingAtomic error:&error]) {
+            NSLog(@"Error: Could not save contextual user model to %@: %@", path, error);
+        }
+    });
 }
 
 + (void)setupDataModelValueConverter
@@ -450,6 +494,11 @@ static void LTLoadVariantAnnotatorData()
     return [[self dataFolderPath] stringByAppendingPathComponent:@"phrases-replacement.txt"];
 }
 
++ (NSString *)contextualUserModelDataPath
+{
+    return [[self dataFolderPath] stringByAppendingPathComponent:@"contextual-user-model.txt"];
+}
+
 + (McBopomofo::McBopomofoLM *)languageModelMcBopomofo
 {
     return &gLanguageModelMcBopomofo;
@@ -460,9 +509,9 @@ static void LTLoadVariantAnnotatorData()
     return &gLanguageModelPlainBopomofo;
 }
 
-+ (McBopomofo::UserOverrideModel *)userOverrideModel
++ (McBopomofo::ContextualUserModel *)contextualUserModel
 {
-    return &gUserOverrideModel;
+    return &gContextualUserModel;
 }
 
 + (McBopomofo::VariantAnnotator *)variantAnnotator

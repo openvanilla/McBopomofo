@@ -21,9 +21,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+#import "ContextualUserModel.h"
 #import "LanguageModelManager.h"
 #import "McBopomofoLM.h"
-#import "UserOverrideModel.h"
 #import "VariantAnnotator.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface LanguageModelManager ()
 @property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelMcBopomofo;
 @property (class, readonly, nonatomic) McBopomofo::McBopomofoLM *languageModelPlainBopomofo;
-@property (class, readonly, nonatomic) McBopomofo::UserOverrideModel *userOverrideModel;
+@property (class, readonly, nonatomic) McBopomofo::ContextualUserModel *contextualUserModel;
 @property (class, readonly, nonatomic) McBopomofo::VariantAnnotator *variantAnnotator;
 @end
 

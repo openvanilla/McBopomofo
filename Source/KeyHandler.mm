@@ -27,7 +27,7 @@
 #import "McBopomofo-Swift.h"
 #import "McBopomofoLM.h"
 #import "UTF8Helper.h"
-#import "UserOverrideModel.h"
+#import "ContextualUserModel.h"
 #import "reading_grid.h"
 
 #import <algorithm>
@@ -58,7 +58,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     McBopomofo::McBopomofoLM *_languageModel;
 
     // user override model
-    McBopomofo::UserOverrideModel *_userOverrideModel;
+    McBopomofo::ContextualUserModel *_contextualUserModel;
 
     Formosa::Gramambular2::ReadingGrid *_grid;
     Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk;
@@ -127,7 +127,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         // create the lattice builder
         _languageModel = [LanguageModelManager languageModelMcBopomofo];
         _languageModel->setPhraseReplacementEnabled(Preferences.phraseReplacementEnabled);
-        _userOverrideModel = [LanguageModelManager userOverrideModel];
+        _contextualUserModel = [LanguageModelManager contextualUserModel];
 
         // This returns a shared_ptr that in turn points to an unmanaged object.
         std::shared_ptr<Formosa::Gramambular2::LanguageModel> lm(_emptySharedPtr, _languageModel);
@@ -186,8 +186,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return;
     }
     Formosa::Gramambular2::ReadingGrid::NodePtr currentNode = *nodeIter;
-    if (currentNode != nullptr && currentNode->currentUnigram().score() > -8) {
-        _userOverrideModel->observe(prevWalk, _latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
+    if (currentNode != nullptr && currentNode->currentUnigram().score() > -8 && _inputMode != InputModePlainBopomofo) {
+        // The contextual user model persists across sessions, so single-
+        // character selections in Plain Bopomofo must not pollute it.
+        _contextualUserModel->observe(prevWalk, _latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
+        [LanguageModelManager saveContextualUserModel];
     }
 
     if (currentNode != nullptr && flag && Preferences.moveCursorAfterSelectingCandidate) {
@@ -527,9 +530,9 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         _grid->insertReading(reading);
         [self _walk];
 
-        // get user override model suggestion
+        // get contextual user model suggestion
         if (_inputMode != InputModePlainBopomofo) {
-            McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
+            McBopomofo::ContextualUserModel::Suggestion suggestion = _contextualUserModel->suggest(_latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
             if (!suggestion.empty()) {
                 Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = suggestion.forceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
                 _grid->overrideCandidate(self.actualCandidateCursorIndex, suggestion.candidate, type);
@@ -2524,7 +2527,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 {
     // If the cursor is at the end, always return cursor - 1. Even though
     // ReadingGrid already handles this edge case, we want to use this value
-    // consistently. UserOverrideModel also requires the cursor to be this
+    // consistently. ContextualUserModel also requires the cursor to be this
     // correct value.
     if (cursor == _grid->length() && cursor > 0) {
         return cursor - 1;

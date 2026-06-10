@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadDataModel:(InputMode)mode;
 + (void)loadUserPhrasesWithPlainBopomofoEnabled:(BOOL)userPhraseForPlainBopomofo NS_SWIFT_NAME(loadUserPhrases(enableForPlainBopomofo:));
 + (void)loadUserPhraseReplacement;
++ (void)loadContextualUserModel;
++ (void)saveContextualUserModel;
 + (void)setupDataModelValueConverter;
 + (BOOL)checkIfUserLanguageModelFilesExist;
 
@@ -46,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathMcBopomofo;
 @property (class, readonly, nonatomic) NSString *excludedPhrasesDataPathPlainBopomofo;
 @property (class, readonly, nonatomic) NSString *phraseReplacementDataPathMcBopomofo;
+@property (class, readonly, nonatomic) NSString *contextualUserModelDataPath;
 @property (class, assign, nonatomic) BOOL phraseReplacementEnabled;
 
 @end
