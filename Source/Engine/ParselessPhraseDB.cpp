@@ -48,8 +48,10 @@ int LastNonZeroLane16(uint8x16_t value) {
   // value must be a comparison mask whose lanes are either 0x00 or 0xff.
   // Reducing indexed lanes avoids a scalar loop that compilers may expand into
   // up to 16 umov and cbnz branch pairs.
-  const uint8x16_t laneIndices = {1, 2,  3,  4,  5,  6,  7,  8,
-                                  9, 10, 11, 12, 13, 14, 15, 16};
+  alignas(16) static constexpr uint8_t kLaneIndices[16] = {
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  };
+  const uint8x16_t laneIndices = vld1q_u8(kLaneIndices);
   return static_cast<int>(vmaxvq_u8(vandq_u8(value, laneIndices))) - 1;
 }
 
