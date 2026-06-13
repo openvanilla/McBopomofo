@@ -28,7 +28,60 @@
 #include <string>
 #include <vector>
 
+#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
+#if defined(__ARM_NEON)
+#include <arm_neon.h>
+
+#include <cstdint>
+#else
+#error ARM NEON support required
+#endif
+#endif
+
 namespace McBopomofo {
+
+namespace {
+
+#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
+
+int LastNonZeroLane16(uint8x16_t value) {
+  // value must be a comparison mask whose lanes are either 0x00 or 0xff.
+  // Reducing indexed lanes avoids a scalar loop that compilers may expand into
+  // up to 16 umov and cbnz branch pairs.
+  const uint8x16_t laneIndices = {1, 2,  3,  4,  5,  6,  7,  8,
+                                  9, 10, 11, 12, 13, 14, 15, 16};
+  return static_cast<int>(vmaxvq_u8(vandq_u8(value, laneIndices))) - 1;
+}
+
+#endif
+
+const char* FindLineStart(const char* begin, const char* position) {
+  const char* cursor = position;
+
+#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
+  const uint8x16_t linefeeds = vdupq_n_u8(static_cast<uint8_t>('\n'));
+  while (cursor - begin >= 16) {
+    const char* blockStart = cursor - 16;
+    const uint8x16_t block =
+        vld1q_u8(reinterpret_cast<const uint8_t*>(blockStart));
+    const int positionInBlock = LastNonZeroLane16(vceqq_u8(block, linefeeds));
+    if (positionInBlock >= 0) {
+      return blockStart + positionInBlock + 1;
+    }
+    cursor = blockStart;
+  }
+#endif
+
+  while (cursor != begin) {
+    --cursor;
+    if (*cursor == '\n') {
+      return cursor + 1;
+    }
+  }
+  return begin;
+}
+
+}  // namespace
 
 bool ParselessPhraseDB::ValidatePragma(const char* buf, size_t length) {
   if (length < SORTED_PRAGMA_HEADER.length()) {
@@ -114,20 +167,11 @@ const char* ParselessPhraseDB::findFirstMatchingLine(
 
   while (top < bottom) {
     const char* mid = top + ((bottom - top) / 2);
-    const char* ptr = mid;
-
-    if (ptr != begin_) {
-      --ptr;
-    }
-
-    while (ptr != begin_ && *ptr != '\n') {
-      --ptr;
-    }
+    const char* ptr = FindLineStart(begin_, mid);
 
     const char* prev = nullptr;
-    if (*ptr == '\n') {
-      prev = ptr;
-      ++ptr;
+    if (ptr != begin_) {
+      prev = ptr - 1;
     }
 
     // ptr is now in the "current" line we're interested in.
@@ -153,15 +197,7 @@ const char* ParselessPhraseDB::findFirstMatchingLine(
     }
 
     // Move the prev so that it reaches the previous line.
-    if (prev != begin_) {
-      --prev;
-    }
-    while (prev != begin_ && *prev != '\n') {
-      --prev;
-    }
-    if (*prev == '\n') {
-      ++prev;
-    }
+    prev = FindLineStart(begin_, prev);
 
     int prev_cmp = memcmp(prev, key.data(), key.length());
 

@@ -143,5 +143,15 @@ if (ENABLE_TEST)
                     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/ParselessLMBenchmark
             )
             add_dependencies(runParselessLMBenchmark ParselessLMBenchmark)
+
+            add_executable(ParselessPhraseDBBenchmark
+                    ParselessPhraseDBBenchmark.cpp)
+            target_link_libraries(ParselessPhraseDBBenchmark McBopomofoLMLib benchmark::benchmark)
+
+            add_custom_target(
+                    runParselessPhraseDBBenchmark
+                    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/ParselessPhraseDBBenchmark
+            )
+            add_dependencies(runParselessPhraseDBBenchmark ParselessPhraseDBBenchmark)
         endif ()
 endif ()
