@@ -13,11 +13,19 @@ jobs:
   build:
     name: Build phrase database
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Install dependencies and configure locale
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gawk locales
+          sudo locale-gen en_US.UTF-8
       - name: Test data files
         run: make check
         working-directory: Source/Data

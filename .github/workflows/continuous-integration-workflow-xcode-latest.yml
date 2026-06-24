@@ -88,6 +88,8 @@ jobs:
         run: xcodebuild -scheme McBopomofo -configuration Release build
       - name: Build McBopomofoInstaller
         run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
+      - name: Install gawk
+        run: brew install gawk
       - name: Test data files
         run: make check
         working-directory: Source/Data
