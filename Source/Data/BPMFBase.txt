@@ -726,6 +726,8 @@
 臏 ㄅㄧㄣˋ bin4 1up4 big5
 髕 ㄅㄧㄣˋ bin4 1up4 big5
 鶣 ㄅㄧㄣˋ bin4 1up4 big5
+𰻞 ㄅㄧㄤˊ biang2 11u;6 utf8
+𰻝 ㄅㄧㄤˊ biang2 11u;6 utf8
 ㄉ ㄉ d 2 big5
 都 ㄉㄡ dou 2. big5
 兜 ㄉㄡ dou 2. big5
