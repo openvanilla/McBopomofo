@@ -61,13 +61,9 @@ sort:
 	@mv tmp exclusion.txt
 
 check: SHELL:=/bin/bash
-check: export LC_ALL=en_US.UTF-8
+check: export LC_ALL=C
 check:
-# 	@brew install gawk
-	@gawk 'length($$1)!=NF-1' BPMFMappings.txt
-	@gawk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | gawk '/一/'
-	@diff -u <(gawk 'length($$1)>1{print $$1}' BPMFMappings.txt|sort -u) \
-                 <(gawk 'length($$1)>1{print $$1}' phrase.occ|sort -u)
+	@python3 scripts/check.py
 
 tidy:
 	@sed -i '' -e 's/ //g' phrase.occ
