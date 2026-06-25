@@ -294,7 +294,7 @@ void ReadingGrid::removeAffectedNodes(size_t loc) {
   if (spans_.empty()) {
     return;
   }
-  size_t affectedLength = kMaximumSpanLength - 1;
+  size_t affectedLength = maxSpanLength_ - 1;
   size_t begin = loc <= affectedLength ? 0 : loc - affectedLength;
   size_t end = loc >= 1 ? loc - 1 : 0;
   for (size_t i = begin; i <= end; ++i) {
@@ -334,13 +334,12 @@ bool ReadingGrid::hasNodeAt(size_t loc, size_t readingLen,
 }
 
 void ReadingGrid::update() {
-  size_t begin =
-      (cursor_ <= kMaximumSpanLength) ? 0 : cursor_ - kMaximumSpanLength;
-  size_t end = cursor_ + kMaximumSpanLength;
+  size_t begin = (cursor_ <= maxSpanLength_) ? 0 : cursor_ - maxSpanLength_;
+  size_t end = cursor_ + maxSpanLength_;
   end = std::min(end, readings_.size());
 
   for (size_t pos = begin; pos < end; pos++) {
-    for (size_t len = 1; len <= kMaximumSpanLength && pos + len <= end; len++) {
+    for (size_t len = 1; len <= maxSpanLength_ && pos + len <= end; len++) {
       std::string combinedReading =
           combineReading(readings_.begin() + static_cast<ptrdiff_t>(pos),
                          readings_.begin() + static_cast<ptrdiff_t>(pos + len));
@@ -419,7 +418,7 @@ std::vector<ReadingGrid::NodeInSpan> ReadingGrid::overlappingNodesAt(
     }
   }
 
-  size_t begin = loc - std::min(loc, kMaximumSpanLength - 1);
+  size_t begin = loc - std::min(loc, maxSpanLength_ - 1);
   for (size_t i = begin; i < loc; ++i) {
     size_t beginLen = loc - i + 1;
     size_t endLen = spans_[i].maxLength();
@@ -541,28 +540,31 @@ std::vector<std::string> ReadingGrid::WalkResult::readingsAsStrings() const {
 }
 
 void ReadingGrid::Span::clear() {
-  nodes_.fill(nullptr);
+  nodes_.clear();
   maxLength_ = 0;
 }
 
 void ReadingGrid::Span::add(const ReadingGrid::NodePtr& node) {
-  assert(node->spanningLength() > 0 &&
-         node->spanningLength() <= kMaximumSpanLength);
-  nodes_[node->spanningLength() - 1] = node;
+  assert(node->spanningLength() > 0);
+  size_t index = node->spanningLength() - 1;
+  if (index >= nodes_.size()) {
+    nodes_.resize(index + 1);
+  }
+  nodes_[index] = node;
   maxLength_ = std::max(maxLength_, node->spanningLength());
 }
 
 void ReadingGrid::Span::removeNodesOfOrLongerThan(size_t length) {
-  assert(length > 0 && length <= kMaximumSpanLength);
-  for (size_t i = length - 1; i < kMaximumSpanLength; ++i) {
+  assert(length > 0);
+  for (size_t i = length - 1; i < nodes_.size(); ++i) {
     nodes_[i] = nullptr;
   }
   maxLength_ = 0;
-  if (length == 1) {
+  if (length == 1 || nodes_.empty()) {
     return;
   }
 
-  size_t i = length - 2;
+  size_t i = std::min(length - 2, nodes_.size() - 1);
   while (true) {
     if (nodes_[i] != nullptr) {
       maxLength_ = i + 1;
@@ -578,7 +580,11 @@ void ReadingGrid::Span::removeNodesOfOrLongerThan(size_t length) {
 }
 
 const ReadingGrid::NodePtr& ReadingGrid::Span::nodeOf(size_t length) const {
-  assert(length > 0 && length <= kMaximumSpanLength);
+  assert(length > 0);
+  static const NodePtr kNullNode = nullptr;
+  if (length - 1 >= nodes_.size()) {
+    return kNullNode;
+  }
   return nodes_[length - 1];
 }
 
