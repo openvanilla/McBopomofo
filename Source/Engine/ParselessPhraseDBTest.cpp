@@ -120,6 +120,21 @@ TEST(ParselessPhraseDBTest, FindFirstMatchingLineLongerExample) {
   EXPECT_EQ(first, nullptr);
 }
 
+TEST(ParselessPhraseDBTest, FindFirstMatchingLineWithLongRows) {
+  // Use long rows to verify line-start lookup across multiple 16-byte blocks
+  std::string data = "a " + std::string(127, 'a') + "\n";
+  const size_t firstBOffset = data.size();
+  data += "b " + std::string(255, 'b') + "\n";
+  data += "b " + std::string(63, 'c') + "\n";
+  const size_t cOffset = data.size();
+  data += "c " + std::string(511, 'd');
+  ParselessPhraseDB db(data.c_str(), data.length());
+
+  EXPECT_EQ(db.findFirstMatchingLine("b"), data.data() + firstBOffset);
+  EXPECT_EQ(db.findFirstMatchingLine("c"), data.data() + cOffset);
+  EXPECT_EQ(db.findFirstMatchingLine("d"), nullptr);
+}
+
 TEST(ParselessPhraseDBTest, InvalidConstructorArguments) {
 #ifdef NDEBUG
   GTEST_SKIP();
