@@ -100,6 +100,16 @@ void BM_ParselessPhraseDBFindFirstMatchingLine(benchmark::State& state) {
 }
 BENCHMARK(BM_ParselessPhraseDBFindFirstMatchingLine);
 
+void BM_ParselessPhraseDBReverseFindRows(benchmark::State& state) {
+  const BenchmarkDataset dataset;
+  const auto& database = dataset.database();
+
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(database.reverseFindRows("missing"));
+  }
+}
+BENCHMARK(BM_ParselessPhraseDBReverseFindRows);
+
 }  // namespace
 
 BENCHMARK_MAIN();
