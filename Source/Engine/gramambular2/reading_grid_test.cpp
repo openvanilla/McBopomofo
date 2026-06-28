@@ -269,6 +269,70 @@ TEST(ReadingGridTest, BasicOperations) {
   ASSERT_EQ(grid.spans().size(), 0);
 }
 
+TEST(ReadingGridTest, StandalonePhrasePrefersWholeInputPhrase) {
+  class TestLM : public LanguageModel {
+   public:
+    std::vector<Unigram> getUnigrams(const std::string& reading) override {
+      if (reading == "zi") {
+        return {Unigram("自", -2.75471392), Unigram("字", -3.40268807)};
+      }
+      if (reading == "hui") {
+        return {Unigram("會", -2.42504751), Unigram("彙", -4.69631935)};
+      }
+      if (reading == "zi-hui") {
+        return {Unigram("字彙", -5.86892118)};
+      }
+      return {};
+    }
+
+    bool hasUnigrams(const std::string& reading) override {
+      return reading == "zi" || reading == "hui" || reading == "zi-hui";
+    }
+  };
+
+  ReadingGrid grid(std::make_shared<TestLM>());
+  ASSERT_TRUE(grid.insertReading("zi"));
+  ASSERT_TRUE(grid.insertReading("hui"));
+
+  ReadingGrid::WalkResult result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"字彙"}));
+}
+
+TEST(ReadingGridTest, StandalonePhraseDoesNotBoostPrefixInLongerInput) {
+  class TestLM : public LanguageModel {
+   public:
+    std::vector<Unigram> getUnigrams(const std::string& reading) override {
+      if (reading == "zi") {
+        return {Unigram("自", -2.75471392), Unigram("字", -3.40268807)};
+      }
+      if (reading == "hui") {
+        return {Unigram("會", -2.42504751), Unigram("彙", -4.69631935)};
+      }
+      if (reading == "zai") {
+        return {Unigram("在", -1.0)};
+      }
+      if (reading == "zi-hui") {
+        return {Unigram("字彙", -5.86892118)};
+      }
+      return {};
+    }
+
+    bool hasUnigrams(const std::string& reading) override {
+      return reading == "zi" || reading == "hui" || reading == "zai" ||
+             reading == "zi-hui";
+    }
+  };
+
+  ReadingGrid grid(std::make_shared<TestLM>());
+  ASSERT_TRUE(grid.insertReading("zi"));
+  ASSERT_TRUE(grid.insertReading("hui"));
+  ASSERT_TRUE(grid.insertReading("zai"));
+
+  ReadingGrid::WalkResult result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(),
+            (std::vector<std::string>{"自", "會", "在"}));
+}
+
 TEST(ReadingGridTest, InvalidOperations) {
   class TestLM : public LanguageModel {
    public:

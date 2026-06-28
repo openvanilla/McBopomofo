@@ -199,6 +199,20 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   assert(totalReadingLen == readingLen);
   result.totalReadings = totalReadingLen;
 
+  const bool hasOverriddenNode = std::any_of(
+      result.nodes.begin(), result.nodes.end(),
+      [](const ReadingGrid::NodePtr& node) { return node->isOverridden(); });
+  // When the whole composing buffer is itself a known phrase, prefer that
+  // phrase. Once the same phrase is only part of a longer buffer, normal lattice
+  // scoring applies. Explicit user overrides still take precedence.
+  if (!hasOverriddenNode && readingLen > 1 && readingLen <= kMaximumSpanLength) {
+    const ReadingGrid::NodePtr& standalonePhrase = spans_[0].nodeOf(readingLen);
+    if (standalonePhrase != nullptr) {
+      result.nodes = {standalonePhrase};
+      result.totalReadings = standalonePhrase->spanningLength();
+    }
+  }
+
   result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
   return result;
 }
