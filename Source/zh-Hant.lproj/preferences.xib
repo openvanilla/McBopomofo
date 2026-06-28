@@ -286,7 +286,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <binding destination="32" name="value" keyPath="values.StandalonePhraseBoundaryEnabled" id="Pdx-tH-DyY"/>
+                        <binding destination="32" name="value" keyPath="values.PreferExactPhraseMatchForFullInput" id="Pdx-tH-DyY"/>
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="hvF-32-Zw1">

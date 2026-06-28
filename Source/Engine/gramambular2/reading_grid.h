@@ -66,12 +66,12 @@ class ReadingGrid {
 
   void setReadingSeparator(const std::string& separator);
 
-  [[nodiscard]] bool standalonePhraseBoundaryEnabled() const {
-    return standalonePhraseBoundaryEnabled_;
+  [[nodiscard]] bool preferExactPhraseMatchForFullInput() const {
+    return preferExactPhraseMatchForFullInput_;
   }
 
-  void setStandalonePhraseBoundaryEnabled(bool enabled) {
-    standalonePhraseBoundaryEnabled_ = enabled;
+  void setPreferExactPhraseMatchForFullInput(bool enabled) {
+    preferExactPhraseMatchForFullInput_ = enabled;
   }
 
   bool insertReading(const std::string& reading);
@@ -258,7 +258,7 @@ class ReadingGrid {
   std::vector<std::string> readings_;
   std::vector<Span> spans_;
   ScoreRankedLanguageModel lm_;
-  bool standalonePhraseBoundaryEnabled_ = false;
+  bool preferExactPhraseMatchForFullInput_ = false;
 
   // Internal methods for maintaining the grid.
 

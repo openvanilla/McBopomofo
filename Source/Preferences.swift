@@ -49,7 +49,7 @@ private let kAllowMovingCursorWhenChoosingCandidates = "AllowMovingCursorWhenCho
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
-private let kStandalonePhraseBoundaryEnabledKey = "StandalonePhraseBoundaryEnabled"
+private let kPreferExactPhraseMatchForFullInputKey = "PreferExactPhraseMatchForFullInput"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
 private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
@@ -231,7 +231,7 @@ class Preferences: NSObject {
             kPhraseReplacementEnabledKey,
             kChineseConversionStyleKey,
             kAssociatedPhrasesEnabledKey,
-            kStandalonePhraseBoundaryEnabledKey,
+            kPreferExactPhraseMatchForFullInputKey,
             kControlEnterOutputKey,
             kShiftEnterEnabledKey,
             kRepeatedPunctuationToSelectCandidateEnabledKey,
@@ -257,7 +257,7 @@ class Preferences: NSObject {
         Preferences.chineseConversionStyle = Preferences.chineseConversionStyle
         Preferences.phraseReplacementEnabled = Preferences.phraseReplacementEnabled
         Preferences.associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
-        Preferences.standalonePhraseBoundaryEnabled = Preferences.standalonePhraseBoundaryEnabled
+        Preferences.preferExactPhraseMatchForFullInput = Preferences.preferExactPhraseMatchForFullInput
         Preferences.letterBehavior = Preferences.letterBehavior
         Preferences.controlEnterOutput = Preferences.controlEnterOutput
         Preferences.shiftEnterEnabled = Preferences.shiftEnterEnabled
@@ -447,8 +447,8 @@ extension Preferences {
     @UserDefault(key: kAssociatedPhrasesEnabledKey, defaultValue: false)
     @objc static var associatedPhrasesEnabled: Bool
 
-    @UserDefault(key: kStandalonePhraseBoundaryEnabledKey, defaultValue: false)
-    @objc static var standalonePhraseBoundaryEnabled: Bool
+    @UserDefault(key: kPreferExactPhraseMatchForFullInputKey, defaultValue: false)
+    @objc static var preferExactPhraseMatchForFullInput: Bool
 
     @objc static func toggleAssociatedPhrasesEnabled() -> Bool {
         associatedPhrasesEnabled = !associatedPhrasesEnabled
@@ -653,7 +653,7 @@ extension Preferences {
             "  - Associated Phrases (McBopomofo): \(Preferences.associatedPhrasesEnabled ? "Enabled" : "Disabled")"
         )
         lines.append(
-            "  - Standalone Phrase Boundary: \(Preferences.standalonePhraseBoundaryEnabled ? "Enabled" : "Disabled")"
+            "  - Prefer Exact Phrase Match for Full Input: \(Preferences.preferExactPhraseMatchForFullInput ? "Enabled" : "Disabled")"
         )
         lines.append(
             "  - Associated Phrases (Plain Bopomofo): \(Preferences.enableUserPhrasesInPlainBopomofo ? "Enabled" : "Disabled")"

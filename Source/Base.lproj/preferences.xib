@@ -315,7 +315,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <binding destination="32" name="value" keyPath="values.StandalonePhraseBoundaryEnabled" id="D2F-z6-bYt"/>
+                        <binding destination="32" name="value" keyPath="values.PreferExactPhraseMatchForFullInput" id="D2F-z6-bYt"/>
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PLL-ab-6cC">

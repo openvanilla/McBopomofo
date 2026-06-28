@@ -269,7 +269,7 @@ TEST(ReadingGridTest, BasicOperations) {
   ASSERT_EQ(grid.spans().size(), 0);
 }
 
-TEST(ReadingGridTest, StandalonePhrasePrefersWholeInputPhrase) {
+TEST(ReadingGridTest, PreferExactPhraseMatchForFullInput) {
   class TestLM : public LanguageModel {
    public:
     std::vector<Unigram> getUnigrams(const std::string& reading) override {
@@ -291,7 +291,7 @@ TEST(ReadingGridTest, StandalonePhrasePrefersWholeInputPhrase) {
   };
 
   ReadingGrid grid(std::make_shared<TestLM>());
-  grid.setStandalonePhraseBoundaryEnabled(true);
+  grid.setPreferExactPhraseMatchForFullInput(true);
   ASSERT_TRUE(grid.insertReading("zi"));
   ASSERT_TRUE(grid.insertReading("hui"));
 
@@ -299,7 +299,7 @@ TEST(ReadingGridTest, StandalonePhrasePrefersWholeInputPhrase) {
   ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"字彙"}));
 }
 
-TEST(ReadingGridTest, StandalonePhraseBoundaryCanBeDisabled) {
+TEST(ReadingGridTest, PreferExactPhraseMatchForFullInputCanBeDisabled) {
   class TestLM : public LanguageModel {
    public:
     std::vector<Unigram> getUnigrams(const std::string& reading) override {
@@ -321,7 +321,7 @@ TEST(ReadingGridTest, StandalonePhraseBoundaryCanBeDisabled) {
   };
 
   ReadingGrid grid(std::make_shared<TestLM>());
-  ASSERT_FALSE(grid.standalonePhraseBoundaryEnabled());
+  ASSERT_FALSE(grid.preferExactPhraseMatchForFullInput());
   ASSERT_TRUE(grid.insertReading("zi"));
   ASSERT_TRUE(grid.insertReading("hui"));
 
@@ -329,7 +329,7 @@ TEST(ReadingGridTest, StandalonePhraseBoundaryCanBeDisabled) {
   ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"自", "會"}));
 }
 
-TEST(ReadingGridTest, StandalonePhraseDoesNotBoostPrefixInLongerInput) {
+TEST(ReadingGridTest, ExactPhraseMatchDoesNotBoostPrefixInLongerInput) {
   class TestLM : public LanguageModel {
    public:
     std::vector<Unigram> getUnigrams(const std::string& reading) override {
@@ -355,7 +355,7 @@ TEST(ReadingGridTest, StandalonePhraseDoesNotBoostPrefixInLongerInput) {
   };
 
   ReadingGrid grid(std::make_shared<TestLM>());
-  grid.setStandalonePhraseBoundaryEnabled(true);
+  grid.setPreferExactPhraseMatchForFullInput(true);
   ASSERT_TRUE(grid.insertReading("zi"));
   ASSERT_TRUE(grid.insertReading("hui"));
   ASSERT_TRUE(grid.insertReading("zai"));
