@@ -205,8 +205,8 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   // When the whole composing buffer is itself a known phrase, prefer that
   // phrase. Once the same phrase is only part of a longer buffer, normal lattice
   // scoring applies. Explicit user overrides still take precedence.
-  if (preferExactPhraseMatchForFullInput_ && !hasOverriddenNode && readingLen > 1 &&
-      readingLen <= kMaximumSpanLength) {
+  if (preferExactPhraseMatchForFullInput_ && !hasOverriddenNode &&
+      readingLen > 1 && readingLen <= kMaximumSpanLength) {
     const ReadingGrid::NodePtr& fullInputPhrase = spans_[0].nodeOf(readingLen);
     if (fullInputPhrase != nullptr) {
       result.nodes = {fullInputPhrase};

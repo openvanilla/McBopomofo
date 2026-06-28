@@ -2484,7 +2484,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (void)_walk
 {
-    _grid->setPreferExactPhraseMatchForFullInput(Preferences.preferExactPhraseMatchForFullInput);
+    _grid->setPreferExactPhraseMatchForFullInput(
+        Preferences.preferExactPhraseMatchForFullInput);
     _latestWalk = _grid->walk();
 }
 
