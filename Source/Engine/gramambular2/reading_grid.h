@@ -66,6 +66,14 @@ class ReadingGrid {
 
   void setReadingSeparator(const std::string& separator);
 
+  [[nodiscard]] bool standalonePhraseBoundaryEnabled() const {
+    return standalonePhraseBoundaryEnabled_;
+  }
+
+  void setStandalonePhraseBoundaryEnabled(bool enabled) {
+    standalonePhraseBoundaryEnabled_ = enabled;
+  }
+
   bool insertReading(const std::string& reading);
 
   // Delete the reading before the cursor, like Backspace. Cursor will decrement
@@ -250,6 +258,7 @@ class ReadingGrid {
   std::vector<std::string> readings_;
   std::vector<Span> spans_;
   ScoreRankedLanguageModel lm_;
+  bool standalonePhraseBoundaryEnabled_ = false;
 
   // Internal methods for maintaining the grid.
 

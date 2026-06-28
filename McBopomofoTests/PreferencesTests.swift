@@ -193,6 +193,13 @@ final class PreferencesTests {
         #expect(Preferences.phraseReplacementEnabled == true)
     }
 
+    @Test("Test standalone phrase boundary toggle")
+    func testStandalonePhraseBoundaryEnabledKey() {
+        #expect(Preferences.standalonePhraseBoundaryEnabled == false)
+        Preferences.standalonePhraseBoundaryEnabled = true
+        #expect(Preferences.standalonePhraseBoundaryEnabled == true)
+    }
+
     @Test("Test Chinese conversion style setting")
     func testChineseConversionStyle() {
         #expect(Preferences.chineseConversionStyle == .output)

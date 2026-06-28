@@ -49,6 +49,7 @@ private let kAllowMovingCursorWhenChoosingCandidates = "AllowMovingCursorWhenCho
 private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
+private let kStandalonePhraseBoundaryEnabledKey = "StandalonePhraseBoundaryEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
 private let kControlEnterOutputKey = "ControlEnterOutput"
 private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
@@ -230,6 +231,7 @@ class Preferences: NSObject {
             kPhraseReplacementEnabledKey,
             kChineseConversionStyleKey,
             kAssociatedPhrasesEnabledKey,
+            kStandalonePhraseBoundaryEnabledKey,
             kControlEnterOutputKey,
             kShiftEnterEnabledKey,
             kRepeatedPunctuationToSelectCandidateEnabledKey,
@@ -255,6 +257,7 @@ class Preferences: NSObject {
         Preferences.chineseConversionStyle = Preferences.chineseConversionStyle
         Preferences.phraseReplacementEnabled = Preferences.phraseReplacementEnabled
         Preferences.associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
+        Preferences.standalonePhraseBoundaryEnabled = Preferences.standalonePhraseBoundaryEnabled
         Preferences.letterBehavior = Preferences.letterBehavior
         Preferences.controlEnterOutput = Preferences.controlEnterOutput
         Preferences.shiftEnterEnabled = Preferences.shiftEnterEnabled
@@ -443,6 +446,9 @@ extension Preferences {
 
     @UserDefault(key: kAssociatedPhrasesEnabledKey, defaultValue: false)
     @objc static var associatedPhrasesEnabled: Bool
+
+    @UserDefault(key: kStandalonePhraseBoundaryEnabledKey, defaultValue: false)
+    @objc static var standalonePhraseBoundaryEnabled: Bool
 
     @objc static func toggleAssociatedPhrasesEnabled() -> Bool {
         associatedPhrasesEnabled = !associatedPhrasesEnabled
@@ -645,6 +651,9 @@ extension Preferences {
         )
         lines.append(
             "  - Associated Phrases (McBopomofo): \(Preferences.associatedPhrasesEnabled ? "Enabled" : "Disabled")"
+        )
+        lines.append(
+            "  - Standalone Phrase Boundary: \(Preferences.standalonePhraseBoundaryEnabled ? "Enabled" : "Disabled")"
         )
         lines.append(
             "  - Associated Phrases (Plain Bopomofo): \(Preferences.enableUserPhrasesInPlainBopomofo ? "Enabled" : "Disabled")"
