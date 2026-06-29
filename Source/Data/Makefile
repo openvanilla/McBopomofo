@@ -63,10 +63,7 @@ sort:
 check: SHELL:=/bin/bash
 check: export LC_ALL=C
 check:
-	@awk 'length($$1)/3!=NF-1' BPMFMappings.txt
-	@awk '{print $$2,$$3,$$4,$$5,$$6,$$7}' BPMFMappings.txt | awk '/一/'
-	@diff -u <(awk '{print $$1}' BPMFMappings.txt|sort -u) \
-                 <(awk 'length($$1)>4{print $$1}' phrase.occ|sort -u)
+	@python3 scripts/check.py
 
 tidy:
 	@sed -i '' -e 's/ //g' phrase.occ
