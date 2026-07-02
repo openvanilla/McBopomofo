@@ -242,4 +242,17 @@ TEST(ParselessPhraseDBTest, LookUpByValue) {
   ASSERT_TRUE(rows.empty());
 }
 
+TEST(ParselessPhraseDBTest, LookUpByValueWithLongRows) {
+  std::string data = "a " + std::string(127, 'a') + "\n";
+  data += "b   target " + std::string(255, 'b') + "\n";
+  data += "c " + std::string(511, 'c');
+  ParselessPhraseDB db(data.c_str(), data.length());
+
+  EXPECT_EQ(db.reverseFindRows("target"),
+            (std::vector<std::string>{
+                "b   target " + std::string(255, 'b'),
+            }));
+  EXPECT_TRUE(db.reverseFindRows("missing").empty());
+}
+
 }  // namespace McBopomofo
