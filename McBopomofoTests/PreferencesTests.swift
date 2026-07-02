@@ -193,6 +193,13 @@ final class PreferencesTests {
         #expect(Preferences.phraseReplacementEnabled == true)
     }
 
+    @Test("Test prefer exact phrase match for full input toggle")
+    func testPreferExactPhraseMatchForFullInputKey() {
+        #expect(Preferences.preferExactPhraseMatchForFullInput == false)
+        Preferences.preferExactPhraseMatchForFullInput = true
+        #expect(Preferences.preferExactPhraseMatchForFullInput == true)
+    }
+
     @Test("Test Chinese conversion style setting")
     func testChineseConversionStyle() {
         #expect(Preferences.chineseConversionStyle == .output)
