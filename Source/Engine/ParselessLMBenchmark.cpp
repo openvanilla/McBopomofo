@@ -25,6 +25,9 @@
 
 #include <cassert>
 #include <filesystem>
+#include <fstream>
+#include <string>
+#include <vector>
 
 #include "ParselessLM.h"
 
@@ -34,6 +37,23 @@ using ParselessLM = McBopomofo::ParselessLM;
 
 static const char* kDataPath = "data.txt";
 static const char* kUnigramSearchKey = "ㄕˋ-ㄕˊ";
+
+std::vector<std::string> LoadRealKeys() {
+  std::ifstream input(kDataPath);
+  assert(input.is_open());
+
+  std::vector<std::string> keys;
+  std::string line;
+  std::getline(input, line);
+  while (std::getline(input, line)) {
+    const size_t separator = line.find(' ');
+    if (separator != std::string::npos) {
+      keys.emplace_back(line.substr(0, separator));
+    }
+  }
+  assert(!keys.empty());
+  return keys;
+}
 
 static void BM_ParselessLMOpenClose(benchmark::State& state) {
   assert(std::filesystem::exists(kDataPath));
@@ -55,6 +75,49 @@ static void BM_ParselessLMFindUnigrams(benchmark::State& state) {
   lm.close();
 }
 BENCHMARK(BM_ParselessLMFindUnigrams);
+
+static void BM_ParselessLMHasUnigramsRealKeys(benchmark::State& state) {
+  assert(std::filesystem::exists(kDataPath));
+  ParselessLM lm;
+  lm.open(kDataPath);
+  const std::vector<std::string> keys = LoadRealKeys();
+  auto key = keys.begin();
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(lm.hasUnigrams(*key));
+    if (++key == keys.end()) {
+      key = keys.begin();
+    }
+  }
+  lm.close();
+}
+BENCHMARK(BM_ParselessLMHasUnigramsRealKeys);
+
+static void BM_ParselessLMFindUnigramsRealKeys(benchmark::State& state) {
+  assert(std::filesystem::exists(kDataPath));
+  ParselessLM lm;
+  lm.open(kDataPath);
+  const std::vector<std::string> keys = LoadRealKeys();
+  auto key = keys.begin();
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(lm.getUnigrams(*key));
+    if (++key == keys.end()) {
+      key = keys.begin();
+    }
+  }
+  lm.close();
+}
+BENCHMARK(BM_ParselessLMFindUnigramsRealKeys);
+
+static void BM_ParselessLMGetReadingsMissingValue(benchmark::State& state) {
+  assert(std::filesystem::exists(kDataPath));
+  ParselessLM lm;
+  lm.open(kDataPath);
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(lm.getReadings("missing"));
+  }
+  lm.close();
+}
+BENCHMARK(BM_ParselessLMGetReadingsMissingValue);
 
 };  // namespace
 

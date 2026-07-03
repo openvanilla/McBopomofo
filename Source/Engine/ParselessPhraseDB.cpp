@@ -44,10 +44,22 @@ namespace {
 
 #ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
 
+int FirstNonZeroLane16(uint8x16_t value) {
+  // value must be a comparison mask whose lanes are either 0x00 or 0xff.
+  // Taking the maximum across the reversed masked lane indices locates the
+  // first matching lane and avoids a scalar loop.
+  alignas(16) static constexpr uint8_t kReverseLaneIndices[16] = {
+      16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+  };
+  const uint8x16_t laneIndices = vld1q_u8(kReverseLaneIndices);
+  return 16 - static_cast<int>(vmaxvq_u8(vandq_u8(value, laneIndices)));
+}
+
 int LastNonZeroLane16(uint8x16_t value) {
   // value must be a comparison mask whose lanes are either 0x00 or 0xff.
-  // Reducing indexed lanes avoids a scalar loop that compilers may expand into
-  // up to 16 umov and cbnz branch pairs.
+  // Taking the maximum across the masked lane indices locates the last matching
+  // lane and avoids a scalar loop that compilers may expand into up to 16 umov
+  // and cbnz branch pairs.
   alignas(16) static constexpr uint8_t kLaneIndices[16] = {
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
   };
@@ -56,6 +68,28 @@ int LastNonZeroLane16(uint8x16_t value) {
 }
 
 #endif
+
+const char* FindNextCharacter(const char* position, const char* end,
+                              char character) {
+  const char* cursor = position;
+
+#ifdef ENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON
+  const uint8x16_t characters = vdupq_n_u8(static_cast<uint8_t>(character));
+  while (end - cursor >= 16) {
+    const uint8x16_t block = vld1q_u8(reinterpret_cast<const uint8_t*>(cursor));
+    const int positionInBlock = FirstNonZeroLane16(vceqq_u8(block, characters));
+    if (positionInBlock != 16) {
+      return cursor + positionInBlock;
+    }
+    cursor += 16;
+  }
+#endif
+
+  while (cursor != end && *cursor != character) {
+    ++cursor;
+  }
+  return cursor;
+}
 
 const char* FindLineStart(const char* begin, const char* position) {
   const char* cursor = position;
@@ -135,11 +169,7 @@ std::vector<std::string_view> ParselessPhraseDB::findRows(
 
   while (ptr + key.length() <= end_ &&
          memcmp(ptr, key.data(), key.length()) == 0) {
-    const char* eol = ptr;
-
-    while (eol != end_ && *eol != '\n') {
-      ++eol;
-    }
+    const char* eol = FindNextCharacter(ptr, end_, '\n');
 
     rows.emplace_back(ptr, eol - ptr);
     if (eol == end_) {
@@ -225,9 +255,7 @@ std::vector<std::string> ParselessPhraseDB::reverseFindRows(
     const char* ptr = recordBegin;
 
     // skip over the key to find the field separator
-    while (ptr < end_ && *ptr != ' ') {
-      ++ptr;
-    }
+    ptr = FindNextCharacter(ptr, end_, ' ');
     // skip over the field separator. there should be just one, but loop just in
     // case.
     while (ptr < end_ && *ptr == ' ') {
@@ -235,10 +263,7 @@ std::vector<std::string> ParselessPhraseDB::reverseFindRows(
     }
 
     // now walk to the end of this record
-    const char* recordEnd = ptr;
-    while (recordEnd < end_ && *recordEnd != '\n') {
-      ++recordEnd;
-    }
+    const char* recordEnd = FindNextCharacter(ptr, end_, '\n');
 
     if (ptr + value.length() < end_ &&
         memcmp(ptr, value.data(), value.length()) == 0) {
