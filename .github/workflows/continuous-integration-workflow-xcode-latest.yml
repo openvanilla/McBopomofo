@@ -40,24 +40,18 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "^26.1.1"
-      - name: Build McBopomofoLMLibTest
-        run: cmake -DENABLE_TEST=1 -S . -B build
-        working-directory: Source/Engine
-      - name: Run McBopomofoLMLibTest
-        run: make runMcBopomofoLMLibTest
-        working-directory: Source/Engine/build
-      - name: Build MandarinTest
-        run: cmake -DENABLE_TEST=1 -S . -B build
-        working-directory: Source/Engine/Mandarin
-      - name: Run MandarinTest
-        run: make runMandarinTest
-        working-directory: Source/Engine/Mandarin/build
-      - name: Build Gramambular2Test
-        run: cmake -DENABLE_TEST=1 -S . -B build
-        working-directory: Source/Engine/gramambular2
-      - name: Run Gramambular2Test
-        run: make runGramambular2Test
-        working-directory: Source/Engine/gramambular2/build
+      - name: Build McBopomofo Engine
+        run: cmake -DENABLE_TEST=1 -S . -B build && cmake --build build -j
+        working-directory: Source
+      - name: Test McBopomofo Engine
+        run: ctest --output-on-failure
+        working-directory: Source/build
+      - name: Build McBopomofo Engine (SIMD)
+        run: cmake -DENABLE_TEST=1 -DENABLE_EXPERIMENTAL_SIMD_SUPPORT_NEON=1 -S . -B build-simd && cmake --build build-simd -j
+        working-directory: Source
+      - name: Test McBopomofo Engine (SIMD) 
+        run: ctest --output-on-failure
+        working-directory: Source/build-simd
       - name: Test CandidateUI
         run: swift test --enable-code-coverage
         working-directory: Packages/CandidateUI
@@ -76,18 +70,10 @@ jobs:
       - name: Test RomanNumbers
         run: swift test --enable-code-coverage
         working-directory: Packages/RomanNumbers
-      - name: Clean McBopomofo for testing
-        run: xcodebuild -scheme McBopomofo -configuration Debug clean
       - name: Test McBopomofo
-        run: xcodebuild -scheme McBopomofo -configuration Debug test
-      - name: Clean McBopomofo
-        run: xcodebuild -scheme McBopomofo -configuration Release clean
-      - name: Clean McBopomofoInstaller
-        run: xcodebuild -scheme McBopomofoInstaller -configuration Release clean
-      - name: Build McBopomofo
-        run: xcodebuild -scheme McBopomofo -configuration Release build
-      - name: Build McBopomofoInstaller
-        run: xcodebuild -scheme McBopomofoInstaller -configuration Release build
+        run: xcodebuild -scheme McBopomofo -configuration Debug clean test
+      - name: Build McBopomofo and McBopomofoInstaller 
+        run: xcodebuild -scheme McBopomofoInstaller -configuration Release clean build
       - name: Test data files
         run: make check
         working-directory: Source/Data
