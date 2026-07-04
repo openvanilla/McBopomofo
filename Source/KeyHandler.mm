@@ -525,15 +525,45 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
 
         _grid->insertReading(reading);
-        [self _walk];
 
-        // get user override model suggestion
-        if (_inputMode != InputModePlainBopomofo) {
-            McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
+        BOOL shouldCheckUserOverrideModel = _inputMode != InputModePlainBopomofo;
+        BOOL shouldUseExactPhraseMatchForFullInput = Preferences.preferExactPhraseMatchForFullInput;
+        if (shouldCheckUserOverrideModel && shouldUseExactPhraseMatchForFullInput) {
+            _grid->setPreferExactPhraseMatchForFullInput(true);
+            Formosa::Gramambular2::ReadingGrid::WalkResult exactMatchWalk = _grid->walk();
+
+            _grid->setPreferExactPhraseMatchForFullInput(false);
+            Formosa::Gramambular2::ReadingGrid::WalkResult viterbiWalk = _grid->walk();
+
+            double timestamp = [NSDate date].timeIntervalSince1970;
+            // Try the exact path first for same-reading phrase replacements,
+            // then fall back to the Viterbi path for split-word corrections.
+            McBopomofo::UserOverrideModel::Suggestion suggestion =
+                _userOverrideModel->suggest(exactMatchWalk, self.actualCandidateCursorIndex, timestamp);
+            BOOL suggestionFromExactMatchWalk = !suggestion.empty();
+            if (suggestion.empty()) {
+                suggestion = _userOverrideModel->suggest(viterbiWalk, self.actualCandidateCursorIndex, timestamp);
+            }
+
             if (!suggestion.empty()) {
-                Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = suggestion.forceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
+                // An exact-path suggestion disables the exact shortcut once it
+                // becomes an override, so it needs to survive Viterbi scoring.
+                BOOL shouldForceHighScoreOverride = suggestion.forceHighScoreOverride || suggestionFromExactMatchWalk;
+                Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = shouldForceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
                 _grid->overrideCandidate(self.actualCandidateCursorIndex, suggestion.candidate, type);
-                [self _walk];
+            }
+            [self _walk];
+        } else {
+            [self _walk];
+
+            // get user override model suggestion
+            if (shouldCheckUserOverrideModel) {
+                McBopomofo::UserOverrideModel::Suggestion suggestion = _userOverrideModel->suggest(_latestWalk, self.actualCandidateCursorIndex, [NSDate date].timeIntervalSince1970);
+                if (!suggestion.empty()) {
+                    Formosa::Gramambular2::ReadingGrid::Node::OverrideType type = suggestion.forceHighScoreOverride ? Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithHighScore : Formosa::Gramambular2::ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram;
+                    _grid->overrideCandidate(self.actualCandidateCursorIndex, suggestion.candidate, type);
+                    [self _walk];
+                }
             }
         }
 

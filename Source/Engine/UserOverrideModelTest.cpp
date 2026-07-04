@@ -21,7 +21,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "UserOverrideModel.h"
 #include "gtest/gtest.h"
@@ -117,6 +119,57 @@ TEST(UserOverrideModelTest, LRUBehavior) {
   // def evicted.
   v = uom.suggest("def", kFakeNow + kHalflife * 7);
   ASSERT_TRUE(v.empty());
+}
+
+TEST(UserOverrideModelTest, RemembersExactPhraseReplacement) {
+  class TestLM : public Formosa::Gramambular2::LanguageModel {
+   public:
+    std::vector<Unigram> getUnigrams(const std::string& reading) override {
+      if (reading == "zi") {
+        return {Unigram("自", -2.75471392), Unigram("字", -3.40268807)};
+      }
+      if (reading == "hui") {
+        return {Unigram("會", -2.42504751), Unigram("彙", -4.69631935)};
+      }
+      if (reading == "zi-hui") {
+        return {Unigram("字彙", -5.86913810),
+                Unigram("自會", -6.48892685)};
+      }
+      return {};
+    }
+
+    bool hasUnigrams(const std::string& reading) override {
+      return reading == "zi" || reading == "hui" || reading == "zi-hui";
+    }
+  };
+
+  using Formosa::Gramambular2::ReadingGrid;
+
+  UserOverrideModel uom(kCapacity, kHalflife);
+  auto languageModel = std::make_shared<TestLM>();
+
+  ReadingGrid observedGrid(languageModel);
+  observedGrid.setPreferExactPhraseMatchForFullInput(true);
+  ASSERT_TRUE(observedGrid.insertReading("zi"));
+  ASSERT_TRUE(observedGrid.insertReading("hui"));
+  ReadingGrid::WalkResult beforeOverride = observedGrid.walk();
+  ASSERT_EQ(beforeOverride.valuesAsStrings(), (std::vector<std::string>{"字彙"}));
+
+  ASSERT_TRUE(observedGrid.overrideCandidate(
+      1, ReadingGrid::Candidate("zi-hui", "自會")));
+  ReadingGrid::WalkResult afterOverride = observedGrid.walk();
+  ASSERT_EQ(afterOverride.valuesAsStrings(), (std::vector<std::string>{"自會"}));
+  uom.observe(beforeOverride, afterOverride, 1, kFakeNow);
+
+  ReadingGrid queryGrid(languageModel);
+  queryGrid.setPreferExactPhraseMatchForFullInput(true);
+  ASSERT_TRUE(queryGrid.insertReading("zi"));
+  ASSERT_TRUE(queryGrid.insertReading("hui"));
+  ReadingGrid::WalkResult exactWalk = queryGrid.walk();
+  ASSERT_EQ(exactWalk.valuesAsStrings(), (std::vector<std::string>{"字彙"}));
+
+  UserOverrideModel::Suggestion suggestion = uom.suggest(exactWalk, 1, kFakeNow);
+  ASSERT_EQ(suggestion.candidate, "自會");
 }
 
 }  // namespace McBopomofo
