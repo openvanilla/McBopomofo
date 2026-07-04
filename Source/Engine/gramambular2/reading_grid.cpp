@@ -120,6 +120,19 @@ int64_t GetEpochNowInMicroseconds() {
   return timestamp;
 }
 
+bool HasOverriddenNode(const std::vector<ReadingGrid::Span>& spans) {
+  for (const ReadingGrid::Span& span : spans) {
+    const size_t maxSpanLen = span.maxLength();
+    for (size_t spanLen = 1; spanLen <= maxSpanLen; ++spanLen) {
+      const ReadingGrid::NodePtr& node = span.nodeOf(spanLen);
+      if (node != nullptr && node->isOverridden()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 // Find the weightiest path in the grid graph. The path represents the most
@@ -137,6 +150,22 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   }
   int64_t start = GetEpochNowInMicroseconds();
 
+  const size_t readingLen = readings_.size();
+  // When the whole composing buffer is itself a known phrase, prefer that
+  // phrase before running Viterbi. Once the same phrase is only part of a
+  // longer buffer, normal lattice scoring applies. Explicit user overrides
+  // still take precedence.
+  if (preferExactPhraseMatchForFullInput_ && readingLen > 1 &&
+      readingLen <= kMaximumSpanLength) {
+    const ReadingGrid::NodePtr& fullInputPhrase = spans_[0].nodeOf(readingLen);
+    if (fullInputPhrase != nullptr && !HasOverriddenNode(spans_)) {
+      result.nodes = {fullInputPhrase};
+      result.totalReadings = fullInputPhrase->spanningLength();
+      result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
+      return result;
+    }
+  }
+
   // Defines a state in the DP table. This structure tracks the maximum
   // accumulated score and the back-pointer required for path reconstruction in
   // the Viterbi algorithm.
@@ -146,7 +175,6 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
     double maxScore = -std::numeric_limits<double>::infinity();
   };
 
-  const size_t readingLen = readings_.size();
   std::vector<State> viterbi(readingLen + 1);
   viterbi[0].maxScore = 0.0;
 
@@ -198,21 +226,6 @@ ReadingGrid::WalkResult ReadingGrid::walk() {
   std::reverse(result.nodes.begin(), result.nodes.end());
   assert(totalReadingLen == readingLen);
   result.totalReadings = totalReadingLen;
-
-  const bool hasOverriddenNode = std::any_of(
-      result.nodes.begin(), result.nodes.end(),
-      [](const ReadingGrid::NodePtr& node) { return node->isOverridden(); });
-  // When the whole composing buffer is itself a known phrase, prefer that
-  // phrase. Once the same phrase is only part of a longer buffer, normal lattice
-  // scoring applies. Explicit user overrides still take precedence.
-  if (preferExactPhraseMatchForFullInput_ && !hasOverriddenNode &&
-      readingLen > 1 && readingLen <= kMaximumSpanLength) {
-    const ReadingGrid::NodePtr& fullInputPhrase = spans_[0].nodeOf(readingLen);
-    if (fullInputPhrase != nullptr) {
-      result.nodes = {fullInputPhrase};
-      result.totalReadings = fullInputPhrase->spanningLength();
-    }
-  }
 
   result.elapsedMicroseconds = GetEpochNowInMicroseconds() - start;
   return result;

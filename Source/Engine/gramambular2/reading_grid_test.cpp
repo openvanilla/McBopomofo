@@ -280,7 +280,7 @@ TEST(ReadingGridTest, PreferExactPhraseMatchForFullInput) {
         return {Unigram("會", -2.42504751), Unigram("彙", -4.69631935)};
       }
       if (reading == "zi-hui") {
-        return {Unigram("字彙", -5.86892118)};
+        return {Unigram("字彙", -5.86913810)};
       }
       return {};
     }
@@ -310,7 +310,7 @@ TEST(ReadingGridTest, PreferExactPhraseMatchForFullInputCanBeDisabled) {
         return {Unigram("會", -2.42504751), Unigram("彙", -4.69631935)};
       }
       if (reading == "zi-hui") {
-        return {Unigram("字彙", -5.86892118)};
+        return {Unigram("字彙", -5.86913810)};
       }
       return {};
     }
@@ -343,7 +343,7 @@ TEST(ReadingGridTest, ExactPhraseMatchDoesNotBoostPrefixInLongerInput) {
         return {Unigram("在", -1.0)};
       }
       if (reading == "zi-hui") {
-        return {Unigram("字彙", -5.86892118)};
+        return {Unigram("字彙", -5.86913810)};
       }
       return {};
     }
@@ -363,6 +363,40 @@ TEST(ReadingGridTest, ExactPhraseMatchDoesNotBoostPrefixInLongerInput) {
   ReadingGrid::WalkResult result = grid.walk();
   ASSERT_EQ(result.valuesAsStrings(),
             (std::vector<std::string>{"自", "會", "在"}));
+}
+
+TEST(ReadingGridTest, PreferExactPhraseMatchForFullInputRespectsOverride) {
+  class TestLM : public LanguageModel {
+   public:
+    std::vector<Unigram> getUnigrams(const std::string& reading) override {
+      if (reading == "zi") {
+        return {Unigram("自", -2.75471392), Unigram("字", -3.40268807)};
+      }
+      if (reading == "hui") {
+        return {Unigram("會", -2.42504751), Unigram("彙", -4.69631935)};
+      }
+      if (reading == "zi-hui") {
+        return {Unigram("字彙", -5.86913810),
+                Unigram("自會", -6.48892685)};
+      }
+      return {};
+    }
+
+    bool hasUnigrams(const std::string& reading) override {
+      return reading == "zi" || reading == "hui" || reading == "zi-hui";
+    }
+  };
+
+  ReadingGrid grid(std::make_shared<TestLM>());
+  grid.setPreferExactPhraseMatchForFullInput(true);
+  ASSERT_TRUE(grid.insertReading("zi"));
+  ASSERT_TRUE(grid.insertReading("hui"));
+  ASSERT_TRUE(grid.overrideCandidate(
+      0, ReadingGrid::Candidate("zi-hui", "自會"),
+      ReadingGrid::Node::OverrideType::kOverrideValueWithScoreFromTopUnigram));
+
+  ReadingGrid::WalkResult result = grid.walk();
+  ASSERT_EQ(result.valuesAsStrings(), (std::vector<std::string>{"自", "會"}));
 }
 
 TEST(ReadingGridTest, InvalidOperations) {
