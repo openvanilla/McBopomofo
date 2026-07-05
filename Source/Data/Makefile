@@ -59,6 +59,8 @@ sort:
 	@mv tmp heterophony3.list
 	@env LC_ALL=C sort -k1 exclusion.txt|uniq>tmp
 	@mv tmp exclusion.txt
+	@env LC_ALL=C sort -k1 Symbols.txt | uniq | grep -v '^$$' > tmp
+	@mv tmp Symbols.txt
 
 check: SHELL:=/bin/bash
 check: export LC_ALL=C
