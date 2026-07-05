@@ -148,6 +148,26 @@ final class ServiceProviderTests {
         #expect(output == expected, "\(output)")
     }
 
+    @Test("Test Unicode Taiwanese Braille service respects exact phrase preference")
+    func testConvertUnicodeBrailleToChineseRespectsExactPhrasePreference() {
+        LanguageModelManager.loadDataModels()
+        let previousValue = Preferences.preferExactPhraseMatchForFullInput
+        defer {
+            Preferences.preferExactPhraseMatchForFullInput = previousValue
+        }
+
+        let provider = ServiceProvider()
+        let helper = ServiceProviderInputHelper()
+        provider.delegate = helper as? any ServiceProviderDelegate
+        let input = provider.convertToUnicodeBraille(string: "字彙")
+
+        Preferences.preferExactPhraseMatchForFullInput = false
+        #expect(provider.convertUnicodeBrailleToChineseText(string: input) == "自會")
+
+        Preferences.preferExactPhraseMatchForFullInput = true
+        #expect(provider.convertUnicodeBrailleToChineseText(string: input) == "字彙")
+    }
+
     @Test(
         "Test coverting Chinese to Unicode Taiwanese Braille, then coverting it back",
         arguments: [

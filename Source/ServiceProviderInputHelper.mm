@@ -71,6 +71,8 @@
 
 - (NSString * _Nonnull)serviceProviderDidRequestCommitting:(ServiceProvider * _Nonnull)provider 
 {
+    _grid->setPreferExactPhraseMatchForFullInput(
+        Preferences.preferExactPhraseMatchForFullInput);
     Formosa::Gramambular2::ReadingGrid::WalkResult _latestWalk = _grid->walk();
     std::string output;
     for (const auto& node : _latestWalk.nodes) {
