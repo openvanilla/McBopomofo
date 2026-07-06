@@ -6,14 +6,21 @@ data = [ln.strip().split(' ') for ln in lines[1:] if not ln.startswith('_')]
 data = [(d[0].split('-'), d[1], float(d[2])) for d in data]
 
 unigram_1char = {}
+unigram_emoji = {}
 value_to_score = {}
 
 unigram_1char_count = 0
 unigram_multichar_count = 0
+emoji_count = 0
 
 for (r, v, s) in data:
     # Skip emojis.
     if s == -8:
+        emoji_count += 1
+        key = '-'.join(r)
+        current = unigram_emoji.get(key, [])
+        current.append(v)
+        unigram_emoji[key] = current
         continue
 
     if v in value_to_score:
@@ -38,6 +45,7 @@ faulty = []
 indifferents = []
 insufficients = []
 competing_unigrams = []
+phrase_readings = set()
 
 for (r, v, s) in data:
     if len(r) < 2:
@@ -46,6 +54,8 @@ for (r, v, s) in data:
     # Skip all emojis.
     if s == -8:
         continue
+
+    phrase_readings.add("-".join(r))
 
     comp = []
     ts = 0
@@ -84,6 +94,7 @@ separator = '-' * 72
 print(separator)
 print('%6d unigrams with one character' % unigram_1char_count)
 print('%6d unigrams with multiple characters' % unigram_multichar_count)
+print("%6d emojis" % emoji_count)
 
 print(separator)
 print('summary for unigrams with scores lower than their competing characters:')
@@ -126,3 +137,11 @@ if faulty:
     print('The following unigrams cannot be typed:')
     for f in faulty:
         print(f)
+
+
+keys = unigram_emoji.keys() - unigram_1char.keys() - phrase_readings
+if len(keys) > 0:
+    print(separator)
+    print('The following emojis are not typed by any unigrams or phrases:')
+    for k in keys:
+        print(k, unigram_emoji[k])
