@@ -23,6 +23,7 @@
 
 import Cocoa
 import NSStringUtils
+import SystemCharacterInfo
 
 @objc protocol CandidateProvider: NSObjectProtocol {
     @objc var candidateCount: Int { get }
@@ -771,7 +772,7 @@ class InputState: NSObject {
                 }.joined(separator: " ")
             }
 
-            self.menuTitleValueMapping = [
+            var menuTitleValueMapping = [
                 buildItem(
                     prefix: "UTF-8 HEX", selectedString: selectedPhrase,
                     builder: { string in
@@ -807,6 +808,51 @@ class InputState: NSObject {
                         getCharCode(string: string, encoding: 0x0A01)
                     }),
             ]
+            if selectedString.count == 1 {
+                do {
+                    let dictionary = try UnihanDictionary()
+                    let result = try dictionary.read(string: selectedString)
+                    if !result.name.isEmpty {
+                        menuTitleValueMapping.append(("Unicode Name: \(result.name)", result.name))
+                    }
+                    if !result.phonetic.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Phoenetic: \(result.phonetic)", result.phonetic))
+                    }
+                    if !result.pinyinRoc.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Pinyin: \(result.pinyinRoc)", result.pinyinRoc))
+                    }
+                    if !result.canjie.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Canjie: \(result.canjie)", result.canjie))
+                    }
+                    if !result.canjieKeys.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Canjie Keys: \(result.canjieKeys)", result.canjieKeys))
+                    }
+                    if !result.japanese.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Japanese: \(result.japanese)", result.japanese))
+                    }
+                    if !result.japaneseKun.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Japanese Kun: \(result.japaneseKun)", result.japaneseKun))
+                    }
+                    if !result.japaneseOn.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Japanese On: \(result.japaneseOn)", result.japaneseOn))
+                    }
+                    if !result.korean.isEmpty {
+                        menuTitleValueMapping
+                            .append(("Korean: \(result.korean)", result.korean))
+                    }
+
+                } catch {
+
+                }
+            }
+            self.menuTitleValueMapping = menuTitleValueMapping
             self.menu = menuTitleValueMapping.map { $0.0 }
             super.init(
                 composingBuffer: previousState.composingBuffer,
