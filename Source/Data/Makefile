@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: sort clean
+.PHONY: sort clean format typecheck analyze
 
 all: data.txt data-plain-bpmf.txt associated-phrases-v2.txt
 
@@ -114,10 +114,22 @@ _mycodecheck:
 
 format:
 	black \
+		curation/analyzers/find_cover_issues.py \
 		curation/mandarin/*.py \
 		curation/compilers/postprocess.py \
+		curation/utils/lmreader.py \
 		tests/*.py
 
 typecheck:
 	mypy \
+		curation/analyzers/find_cover_issues.py \
 		curation/compilers/postprocess.py
+
+
+ANALYZE_LIMIT = 50
+
+analyze: curation/analyzers/find_cover_issues.py data.txt
+	$(PYTHON) -m curation.analyzers.find_cover_issues \
+		--input data.txt \
+		--limit $(ANALYZE_LIMIT)
+
