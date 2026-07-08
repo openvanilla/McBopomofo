@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass
+from typing import Optional, Union
 
 
 @dataclass
@@ -12,7 +13,7 @@ class Node:
 @dataclass
 class State:
     from_column: int = 0
-    from_node: Node | None = None
+    from_node: Optional[Node] = None
     max_score: float = -math.inf
 
 
@@ -21,14 +22,14 @@ MAX_SPAN_LEN = 8
 
 def most_plausible_walk(
     readings: list[str],
-    langmodel: dict[str, list[tuple[str, str | float]]],
+    langmodel: dict[str, list[tuple[str, Union[str, float]]]],
     separator: str = "-",
 ) -> list[Node]:
 
     rlen = len(readings)
 
     # Build a grid of rlen columns, each column having MAX_SPAN_LEN spans.
-    grid: list[list[Node | None]] = [
+    grid: list[list[Optional[Node]]] = [
         [None for _ in range(MAX_SPAN_LEN)] for _ in range(rlen)
     ]
 
