@@ -6,7 +6,7 @@
 
 - macOS 26 或更高版本
 - Xcode 26 或更高版本
-- Python 3.14 (使用 Xcode 安裝後內附的就可以，也可使用 homebrew 等方式安裝)
+- Python 3.9 (使用 Xcode 安裝後內附的就可以，也可使用 homebrew 等方式安裝)
 
 ## 開發流程
 
