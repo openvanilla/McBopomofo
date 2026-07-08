@@ -101,12 +101,55 @@ TEST(MandarinTest, ETen26Layout) {
   ASSERT_EQ(buf.composedString(), "ㄗㄢˋ");
 }
 
+TEST(MandarinTest, ETen26LayoutOutOfOrderEquivalentSequence) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::ETen26Layout());
+  buf.combineKey('q');
+  buf.combineKey('a');
+  ASSERT_EQ(buf.composedString(), "ㄗㄚ");
+
+  buf.clear();
+  buf.combineKey('a');  // ㄚ first
+  buf.combineKey('q');  // even if q can be ㄟ, a vowel is already in place
+  ASSERT_EQ(buf.composedString(), "ㄗㄚ");
+
+  buf.clear();
+  buf.combineKey('q');
+  buf.combineKey('i');
+  ASSERT_EQ(buf.composedString(), "ㄗㄞ");
+
+  buf.clear();
+  buf.combineKey('i');
+  buf.combineKey('q');
+  ASSERT_EQ(buf.composedString(), "ㄗㄞ");
+}
 TEST(MandarinTest, HsuLayout) {
   BopomofoReadingBuffer buf(BopomofoKeyboardLayout::HsuLayout());
   buf.combineKey('f');
   buf.combineKey('a');  // EI when in the vowel state
   buf.combineKey('f');  // Tone 3 when in the tone state
   ASSERT_EQ(buf.composedString(), "ㄈㄟˇ");
+}
+
+TEST(MandarinTest, HsuLayoutOutOfOrderEquivalentSequence) {
+  BopomofoReadingBuffer buf(BopomofoKeyboardLayout::HsuLayout());
+  buf.combineKey('a');
+  buf.combineKey('i');
+  ASSERT_EQ(buf.composedString(), "ㄘㄞ");
+
+  buf.clear();
+  buf.combineKey('i');  // ㄞ first
+  buf.combineKey('a');  // even if a can be ㄟ, a vowel is already in place
+  ASSERT_EQ(buf.composedString(), "ㄘㄞ");
+
+  buf.clear();
+  buf.combineKey('a');
+  buf.combineKey('y');
+  ASSERT_EQ(buf.composedString(), "ㄘㄚ");
+
+  buf.clear();
+  buf.combineKey('y');
+  buf.combineKey('a');
+  ASSERT_EQ(buf.composedString(), "ㄘㄚ");
 }
 
 TEST(MandarinTest, IBMLayout) {
