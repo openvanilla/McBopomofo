@@ -12,9 +12,15 @@ value_to_score = {}
 unigram_1char_count = 0
 unigram_multichar_count = 0
 emoji_count = 0
+macro_count = 0
 
 for (r, v, s) in data:
     # Skip emojis.
+
+    if v.startswith('MACRO@'):
+        macro_count += 1
+        continue
+
     if s == -8:
         emoji_count += 1
         key = '-'.join(r)
@@ -95,7 +101,7 @@ print(separator)
 print('%6d unigrams with one character' % unigram_1char_count)
 print('%6d unigrams with multiple characters' % unigram_multichar_count)
 print("%6d emojis" % emoji_count)
-
+print("%6d macros" % macro_count)
 print(separator)
 print('summary for unigrams with scores lower than their competing characters:')
 print('%6d unigrams that are indifferent since the characters are the same' %
