@@ -44,7 +44,7 @@ PhraseFreq.txt: curation/builders/frequency_builder.py phrase.occ exclusion.txt
 	$(PYTHON) -m curation.builders.frequency_builder
 
 clean:
-	rm -f data.txt data-plain-bpmf.txt phrase.list
+	rm -f data.txt data-raw.txt data-plain-bpmf.txt phrase.list
 
 # FOR INTERNAL USE
 _install: tidy sort check all
