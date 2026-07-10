@@ -381,9 +381,9 @@ class BopomofoReadingBuffer {
 
   void setKeyboardLayout(const BopomofoKeyboardLayout* layout) {
     layout_ = layout;
+    pinyin_mode_ = layout == BopomofoKeyboardLayout::HanyuPinyinLayout();
 
-    if (layout == BopomofoKeyboardLayout::HanyuPinyinLayout()) {
-      pinyin_mode_ = true;
+    if (pinyin_mode_) {
       pinyin_sequence_ = "";
     }
   }
