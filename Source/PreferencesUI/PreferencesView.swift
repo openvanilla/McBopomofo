@@ -487,7 +487,6 @@ private struct AdvancedPreferencesView: View {
                     }
                 }
                 .labelsHidden()
-                .frame(width: 220)
             }
 
             PreferenceRow(localized("Ctrl + ` Key:")) {
