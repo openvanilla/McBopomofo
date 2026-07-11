@@ -180,3 +180,13 @@
 "Cannot add new phrases when Bopomofo annotation is on" = "Cannot add new phrases when Bopomofo annotation is on";
 
 "Add Variant Annotation (Need BPMF IVS Font Support)" = "Add Variant Annotation (Need BPMF IVS Font Support)";
+
+"Unicode Name" = "Unicode Name";
+"Phoenetic" = "Phoenetic";
+"Pinyin" = "Pinyin";
+"Canjie" = "Canjie";
+"Canjie Keys" = "Canjie Keys";
+"Japanese" = "Japanese";
+"Japanese Kun" = "Japanese Kun";
+"Japanese On" = "Japanese On";
+"Korean" = "Korean";

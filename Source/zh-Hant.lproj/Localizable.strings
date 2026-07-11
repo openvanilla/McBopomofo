@@ -178,3 +178,13 @@
 "Cannot add new phrases when Bopomofo annotation is on" = "注音字型破音字標記模式開啟時，不能增加新詞";
 
 "Add Variant Annotation (Need BPMF IVS Font Support)" = "加上破音字標記 (需要使用注音字體)";
+
+"Unicode Name" = "Unicode 名稱";
+"Phoenetic" = "注音";
+"Pinyin" = "拼音";
+"Canjie" = "倉頡字根";
+"Canjie Keys" = "倉頡按鍵";
+"Japanese" = "日文";
+"Japanese Kun" = "日文訓讀";
+"Japanese On" = "日文音讀";
+"Korean" = "韓文";
