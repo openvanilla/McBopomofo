@@ -134,7 +134,7 @@ class InputState: NSObject {
                 {
                     .IcuTransform(string: "", candidates: [])
                 }
-            )
+            ),
         ]
 
         override var description: String {
@@ -624,14 +624,15 @@ class InputState: NSObject {
 
         @objc
         func toggle(autoTriggered: Bool) -> AssociatedPhrases {
-            AssociatedPhrases(previousState: previousState,
-                              prefixCursorIndex: prefixCursorIndex,
-                              prefixReading: prefixReading,
-                              prefixValue: prefixValue,
-                              selectedIndex: selectedIndex,
-                              candidates: candidates,
-                              useVerticalMode: useVerticalMode,
-                              autoTriggered: autoTriggered)
+            AssociatedPhrases(
+                previousState: previousState,
+                prefixCursorIndex: prefixCursorIndex,
+                prefixReading: prefixReading,
+                prefixValue: prefixValue,
+                selectedIndex: selectedIndex,
+                candidates: candidates,
+                useVerticalMode: useVerticalMode,
+                autoTriggered: autoTriggered)
         }
 
     }

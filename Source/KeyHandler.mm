@@ -1703,8 +1703,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
 
         if ([state isKindOfClass:[InputStateIcuTransform class]]) {
-            InputStateIcuTransform *kanaState = (InputStateIcuTransform *)state;
-            NSString *candidate = [kanaState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
+            InputStateIcuTransform *transformState = (InputStateIcuTransform *)state;
+            NSString *candidate = [transformState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -1936,7 +1936,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL useInputTextIgnoringModifiers = NO;
     if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]] ||
-        [state isKindOfClass:[InputStateNumber class]]) {
+        [state isKindOfClass:[InputStateNumber class]] ||
+        [state isKindOfClass:[InputStateIcuTransform class]]) {
         useInputTextIgnoringModifiers = YES;
     } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         useInputTextIgnoringModifiers = [(InputStateAssociatedPhrases *)state autoTriggered];
@@ -2055,10 +2056,12 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         NSStringTransformLatinToHiragana,
         NSStringTransformLatinToKatakana,
         NSStringTransformLatinToHangul,
-        NSStringTransformLatinToArabic,
-        NSStringTransformLatinToHebrew,
         NSStringTransformLatinToThai,
         NSStringTransformLatinToGreek,
+        @"Latin-Cyrillic",
+        NSStringTransformLatinToArabic,
+        NSStringTransformLatinToHebrew,
+        @"Latin-Devanagari",
     ];
 
     NSMutableArray *array = [[NSMutableArray alloc] init];
@@ -2071,7 +2074,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     return array;
 }
-
 
 
 - (BOOL)_handleNumberState:(InputState *)state
@@ -2164,12 +2166,28 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    if (input.isShiftHold) {
+        NSString* match = input.inputTextIgnoringModifiers;
+        VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+        NSInteger index = NSNotFound;
+
+        for (NSUInteger j = 0, c = gCurrentCandidateController.keyLabels.count; j < c; j++) {
+            VTCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
+            if ([match compare:label.key options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+                index = j;
+                break;
+            }
+        }
+        if (index != NSNotFound) {
+            return NO;
+        }
+    }
+
     if (isprint(charCode)) {
         if (icuTransformState.string.length > 100) {
             errorCallback();
             return YES;
         }
-
         NSString *appended = [NSString stringWithFormat:@"%@%c",
                               icuTransformState.string,
                               charCode];
