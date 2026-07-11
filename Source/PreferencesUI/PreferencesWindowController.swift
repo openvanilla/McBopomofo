@@ -53,16 +53,20 @@ final class PreferencesWindowController: NSWindowController {
         let rootView = PreferencesView()
             .environmentObject(preferences)
         let hostingController = NSHostingController(rootView: rootView)
+        hostingController.view.layoutSubtreeIfNeeded()
+        let initialContentHeight = hostingController.view.fittingSize.height
+        if #available(macOS 13.0, *) {
+            hostingController.sizingOptions = []
+        }
         let window = NSWindow(contentViewController: hostingController)
 
         window.title = NSLocalizedString("McBopomofo Preferences", comment: "")
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.isReleasedWhenClosed = false
-        window.contentMinSize = NSSize(width: 478, height: 318)
-        window.contentMaxSize = NSSize(width: 478, height: 565)
-        window.setContentSize(NSSize(
-            width: preferencesWindowWidth,
-            height: preferencesInitialContentHeight))
+        window.setContentSize(
+            NSSize(
+                width: preferencesWindowWidth,
+                height: initialContentHeight))
 
         super.init(window: window)
         shouldCascadeWindows = false

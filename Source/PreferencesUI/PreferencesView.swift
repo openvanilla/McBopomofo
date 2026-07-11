@@ -23,9 +23,7 @@
 
 import SwiftUI
 
-private let leftRowWidth: CGFloat = 214
-let preferencesWindowWidth: CGFloat = 478
-let preferencesInitialContentHeight: CGFloat = 585
+let preferencesWindowWidth: CGFloat = 480
 
 private func localized(_ key: String) -> String {
     NSLocalizedString(key, comment: "")
@@ -34,13 +32,58 @@ private func localized(_ key: String) -> String {
 struct PreferencesView: View {
     @EnvironmentObject private var preferences: PreferencesViewModel
     @State private var selectedTab: PreferencesTab = .basic
+    @State private var measuredContentHeight: PreferencesContentHeight?
 
     var body: some View {
         selectedTab.contentView
-        .environmentObject(preferences)
-        .frame(width: preferencesWindowWidth, height: selectedTab.contentHeight)
-        .background(Color(nsColor: .windowBackgroundColor))
-        .background(WindowToolbarConfigurator(selectedTab: $selectedTab))
+            .environmentObject(preferences)
+            .frame(width: preferencesWindowWidth, alignment: .topLeading)
+            .fixedSize(horizontal: false, vertical: true)
+            .background {
+                GeometryReader { geometry in
+                    Color.clear.preference(
+                        key: PreferencesContentHeightKey.self,
+                        value: PreferencesContentHeight(
+                            tab: selectedTab, height: geometry.size.height))
+                }
+            }
+            .background(Color(nsColor: .windowBackgroundColor))
+            .onPreferenceChange(PreferencesContentHeightKey.self) { measurement in
+                guard let measurement else {
+                    return
+                }
+                guard measuredContentHeight != measurement else {
+                    return
+                }
+                measuredContentHeight = measurement
+            }
+            .background(
+                WindowToolbarConfigurator(
+                    selectedTab: $selectedTab,
+                    contentHeight: selectedContentHeight))
+    }
+
+    private var selectedContentHeight: CGFloat? {
+        guard measuredContentHeight?.tab == selectedTab else {
+            return nil
+        }
+        return measuredContentHeight?.height
+    }
+}
+
+private struct PreferencesContentHeight: Equatable {
+    let tab: PreferencesTab
+    let height: CGFloat
+}
+
+private struct PreferencesContentHeightKey: PreferenceKey {
+    static var defaultValue: PreferencesContentHeight?
+
+    static func reduce(
+        value: inout PreferencesContentHeight?,
+        nextValue: () -> PreferencesContentHeight?
+    ) {
+        value = nextValue() ?? value
     }
 }
 
@@ -52,7 +95,6 @@ enum PreferencesTab: CaseIterable, Identifiable {
     var id: Self { self }
     var title: String { localized(configuration.title) }
     var imageName: String { configuration.imageName }
-    var contentHeight: CGFloat { configuration.contentHeight }
 
     @ViewBuilder
     var contentView: some View {
@@ -66,23 +108,27 @@ enum PreferencesTab: CaseIterable, Identifiable {
         }
     }
 
-    private var configuration: (title: String, imageName: String, contentHeight: CGFloat) {
+    private var configuration: (title: String, imageName: String) {
         switch self {
-        case .basic: ("Basic", "switch.2", preferencesInitialContentHeight)
-        case .userPhrases: ("User Phrases", "folder", 318)
-        case .advanced: ("Advanced", "gearshape", 390)
+        case .basic: ("Basic", "switch.2")
+        case .userPhrases: ("User Phrases", "folder")
+        case .advanced: ("Advanced", "gearshape")
         }
     }
 }
 
 private struct WindowToolbarConfigurator: NSViewRepresentable {
     @Binding var selectedTab: PreferencesTab
+    let contentHeight: CGFloat?
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView(frame: .zero)
         DispatchQueue.main.async {
             if let window = view.window {
-                context.coordinator.configure(window: window, selectedTab: selectedTab)
+                context.coordinator.configure(
+                    window: window,
+                    selectedTab: selectedTab,
+                    contentHeight: contentHeight)
             }
         }
         return view
@@ -92,7 +138,10 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
         context.coordinator.selectedTab = selectedTab
         DispatchQueue.main.async {
             if let window = nsView.window {
-                context.coordinator.configure(window: window, selectedTab: selectedTab)
+                context.coordinator.configure(
+                    window: window,
+                    selectedTab: selectedTab,
+                    contentHeight: contentHeight)
             }
         }
     }
@@ -111,13 +160,21 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
 
         @Binding var selectedTab: PreferencesTab
         private weak var window: NSWindow?
-        private var appliedTab: PreferencesTab?
+        private var hasAppliedContentHeight = false
+        private var pendingTab: PreferencesTab?
+        private var resizingTransitionGeneration: Int?
+        private var transitionStartFrame: NSRect?
+        private var transitionGeneration = 0
 
         init(selectedTab: Binding<PreferencesTab>) {
             _selectedTab = selectedTab
         }
 
-        func configure(window: NSWindow, selectedTab: PreferencesTab) {
+        func configure(
+            window: NSWindow,
+            selectedTab: PreferencesTab,
+            contentHeight: CGFloat?
+        ) {
             self.window = window
 
             if window.toolbar?.identifier != Self.toolbarIdentifier {
@@ -132,10 +189,22 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
                 window.toolbarStyle = .preference
             }
 
-            window.title = selectedTab.title
-            window.toolbar?.selectedItemIdentifier = Self.identifier(for: selectedTab)
-            resize(window: window, for: selectedTab, animate: appliedTab != nil)
-            appliedTab = selectedTab
+            let toolbarTab = pendingTab ?? selectedTab
+            window.title = toolbarTab.title
+            window.toolbar?.selectedItemIdentifier = Self.identifier(for: toolbarTab)
+            if let contentHeight {
+                if pendingTab == selectedTab {
+                    resizeForPendingTransition(
+                        window: window,
+                        contentHeight: contentHeight)
+                } else {
+                    resize(
+                        window: window,
+                        contentHeight: contentHeight,
+                        animate: hasAppliedContentHeight)
+                }
+                hasAppliedContentHeight = true
+            }
         }
 
         func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -178,23 +247,110 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
             guard let tab = Self.tab(for: sender.itemIdentifier) else {
                 return
             }
-            selectedTab = tab
+
+            transitionGeneration += 1
+            let generation = transitionGeneration
             sender.toolbar?.selectedItemIdentifier = sender.itemIdentifier
             window?.title = tab.title
-            if let window {
-                resize(window: window, for: tab, animate: true)
+
+            if tab == selectedTab {
+                pendingTab = nil
+                resizingTransitionGeneration = nil
+                transitionStartFrame = nil
+                restoreContentVisibility(generation: generation)
+                return
             }
-            appliedTab = tab
+
+            pendingTab = tab
+            guard
+                let window,
+                window.isVisible,
+                let contentView = window.contentView
+            else {
+                selectedTab = tab
+                pendingTab = nil
+                return
+            }
+            transitionStartFrame = window.frame
+
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.05
+                contentView.animator().alphaValue = 0
+            } completionHandler: { [weak self] in
+                guard let self, generation == self.transitionGeneration else {
+                    return
+                }
+                self.selectedTab = tab
+            }
         }
 
-        private func resize(window: NSWindow, for tab: PreferencesTab, animate: Bool) {
-            let targetContentSize = NSSize(width: 478, height: tab.contentHeight)
+        private func resizeForPendingTransition(window: NSWindow, contentHeight: CGFloat) {
+            let generation = transitionGeneration
+            guard resizingTransitionGeneration != generation else {
+                return
+            }
+            resizingTransitionGeneration = generation
+            if let transitionStartFrame {
+                window.setFrame(transitionStartFrame, display: true, animate: false)
+            }
+
+            resize(
+                window: window,
+                contentHeight: contentHeight,
+                animate: true
+            ) { [weak self, weak window] in
+                guard
+                    let self,
+                    let window,
+                    generation == self.transitionGeneration
+                else {
+                    return
+                }
+                self.pendingTab = nil
+                self.resizingTransitionGeneration = nil
+                self.transitionStartFrame = nil
+                guard let contentView = window.contentView else {
+                    return
+                }
+                contentView.alphaValue = 0
+                NSAnimationContext.runAnimationGroup { context in
+                    context.duration = 0.05
+                    contentView.animator().alphaValue = 1
+                }
+            }
+        }
+
+        private func restoreContentVisibility(generation: Int) {
+            guard let contentView = window?.contentView else {
+                return
+            }
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.05
+                contentView.animator().alphaValue = 1
+            } completionHandler: { [weak self] in
+                guard let self, generation == self.transitionGeneration else {
+                    return
+                }
+                self.resizingTransitionGeneration = nil
+            }
+        }
+
+        private func resize(
+            window: NSWindow,
+            contentHeight: CGFloat,
+            animate: Bool,
+            completion: @escaping () -> Void = {}
+        ) {
+            let targetContentSize = NSSize(
+                width: preferencesWindowWidth,
+                height: contentHeight)
             let currentContentSize = window.contentView?.frame.size ?? .zero
 
             guard
                 abs(currentContentSize.width - targetContentSize.width) > 0.5
                     || abs(currentContentSize.height - targetContentSize.height) > 0.5
             else {
+                completion()
                 return
             }
 
@@ -202,7 +358,18 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
                 forContentRect: NSRect(origin: .zero, size: targetContentSize))
             frame.origin.x = window.frame.origin.x
             frame.origin.y = window.frame.maxY - frame.height
-            window.setFrame(frame, display: true, animate: animate)
+            guard animate else {
+                window.setFrame(frame, display: true, animate: false)
+                completion()
+                return
+            }
+
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.1
+                window.animator().setFrame(frame, display: true)
+            } completionHandler: {
+                completion()
+            }
         }
 
         private static func identifier(for tab: PreferencesTab) -> NSToolbarItem.Identifier {
@@ -235,7 +402,7 @@ private struct BasicPreferencesView: View {
     @EnvironmentObject private var preferences: PreferencesViewModel
 
     var body: some View {
-        FormBody(height: 565) {
+        FormBody {
             PreferenceRow(localized("Bopomofo Keyboard Layout:")) {
                 Picker("", selection: $preferences.keyboardLayout) {
                     ForEach(KeyboardLayout.allCasesForPreferences, id: \.rawValue) { layout in
@@ -243,6 +410,7 @@ private struct BasicPreferencesView: View {
                     }
                 }
                 .labelsHidden()
+                .fixedSize()
             }
 
             PreferenceRow(localized("Alphanumeric Keyboard Layout:")) {
@@ -252,9 +420,11 @@ private struct BasicPreferencesView: View {
                     }
                 }
                 .labelsHidden()
+                .fixedSize()
             }
 
             Divider()
+                .padding(.vertical, 5)
 
             PreferenceRow(localized("Selection Keys:")) {
                 ComboBoxTextField(
@@ -264,30 +434,23 @@ private struct BasicPreferencesView: View {
                 .frame(width: 220)
             }
 
-            PreferenceRow("") {
+            PreferenceRow {
                 Toggle(
                     localized("Space key chooses candidate"),
                     isOn: $preferences.chooseCandidateUsingSpace)
             }
 
             PreferenceRow(localized("Show Candidate Phrase:")) {
-                VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(
-                        title: localized("Before the cursor (like Hanin)"),
-                        isSelected: !preferences.selectPhraseAfterCursorAsCandidate
-                    ) {
-                        preferences.selectPhraseAfterCursorAsCandidate = false
-                    }
-                    RadioButton(
-                        title: localized("After the cursor (like MS IME)"),
-                        isSelected: preferences.selectPhraseAfterCursorAsCandidate
-                    ) {
-                        preferences.selectPhraseAfterCursorAsCandidate = true
-                    }
+                Picker("", selection: $preferences.selectPhraseAfterCursorAsCandidate) {
+                    Text(localized("Before the cursor (like Hanin)")).tag(false)
+                    Text(localized("After the cursor (like MS IME)")).tag(true)
                 }
+                .labelsHidden()
+                .pickerStyle(RadioGroupPickerStyle())
+                .fixedSize()
             }
 
-            PreferenceRow("") {
+            PreferenceRow {
                 Toggle(
                     localized("Move cursor after selection"),
                     isOn: $preferences.moveCursorAfterSelectingCandidate)
@@ -300,23 +463,17 @@ private struct BasicPreferencesView: View {
                     Text(localized("HL keys move the cursor")).tag(MovingCursorKey.useHL)
                 }
                 .labelsHidden()
+                .fixedSize()
             }
 
             PreferenceRow(localized("Candidate List Style:")) {
-                VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(
-                        title: localized("Vertical"),
-                        isSelected: !preferences.useHorizontalCandidateList
-                    ) {
-                        preferences.useHorizontalCandidateList = false
-                    }
-                    RadioButton(
-                        title: localized("Horizontal"),
-                        isSelected: preferences.useHorizontalCandidateList
-                    ) {
-                        preferences.useHorizontalCandidateList = true
-                    }
+                Picker("", selection: $preferences.useHorizontalCandidateList) {
+                    Text(localized("Vertical")).tag(false)
+                    Text(localized("Horizontal")).tag(true)
                 }
+                .labelsHidden()
+                .pickerStyle(RadioGroupPickerStyle())
+                .fixedSize()
             }
 
             PreferenceRow(localized("Candidate Text Size:")) {
@@ -326,25 +483,20 @@ private struct BasicPreferencesView: View {
                     }
                 }
                 .labelsHidden()
+                .fixedSize()
             }
 
             Divider()
+                .padding(.vertical, 5)
 
             PreferenceRow(localized("Shift + Letter Keys:")) {
-                VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(
-                        title: localized("Input uppercase letters directly"),
-                        isSelected: preferences.letterBehavior == 0
-                    ) {
-                        preferences.letterBehavior = 0
-                    }
-                    RadioButton(
-                        title: localized("Input lowercased letters to buffer"),
-                        isSelected: preferences.letterBehavior == 1
-                    ) {
-                        preferences.letterBehavior = 1
-                    }
+                Picker("", selection: $preferences.letterBehavior) {
+                    Text(localized("Input uppercase letters directly")).tag(0)
+                    Text(localized("Input lowercased letters to buffer")).tag(1)
                 }
+                .labelsHidden()
+                .pickerStyle(RadioGroupPickerStyle())
+                .fixedSize()
             }
 
             PreferenceRow(localized("Shift + Enter Key:")) {
@@ -358,16 +510,18 @@ private struct BasicPreferencesView: View {
                     isOn: $preferences.escToCleanInputBuffer)
             }
 
-            PreferenceRow("") {
-                VStack(alignment: .leading, spacing: 6) {
-                    Toggle(
-                        localized("Beep upon input error"), isOn: $preferences.beepUponInputError)
-                    Spacer()
-                        .frame(height: 20)
-                    Toggle(
-                        localized("Check for updates automatically"),
-                        isOn: $preferences.checkForUpdatesAutomatically)
-                }
+            Divider()
+                .padding(.vertical, 5)
+
+            PreferenceRow {
+                Toggle(
+                    localized("Beep upon input error"), isOn: $preferences.beepUponInputError)
+            }
+
+            PreferenceRow {
+                Toggle(
+                    localized("Check for updates automatically"),
+                    isOn: $preferences.checkForUpdatesAutomatically)
             }
         }
     }
@@ -377,18 +531,17 @@ private struct UserPhrasesPreferencesView: View {
     @EnvironmentObject private var preferences: PreferencesViewModel
 
     var body: some View {
-        FormBody(height: 318) {
-            VStack(alignment: .leading, spacing: 14) {
+        FormBody {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(localized("User Phrase Location:"))
-                    .font(.headline)
 
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     Picker("", selection: $preferences.useCustomUserPhraseLocation) {
                         Text(localized("Default")).tag(false)
                         Text(localized("Custom")).tag(true)
                     }
                     .labelsHidden()
-                    .frame(width: 96)
+                    .fixedSize()
 
                     TextField(
                         "",
@@ -404,45 +557,45 @@ private struct UserPhrasesPreferencesView: View {
                     } label: {
                         Image(systemName: "folder")
                     }
-                    .buttonStyle(.borderless)
                     .disabled(!preferences.useCustomUserPhraseLocation)
                     .help(localized("Choose folder"))
-
-                    Button {
-                        preferences.openUserPhraseFolder()
-                    } label: {
-                        Image(systemName: "arrow.up.right.square")
-                    }
-                    .buttonStyle(.borderless)
-                    .help(localized("Open folder"))
                 }
 
-                Text(preferences.effectiveUserPhraseLocation)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                Button {
+                    preferences.openUserPhraseFolder()
+                } label: {
+                    Text(preferences.effectiveUserPhraseLocation)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                .buttonStyle(.plain)
+                .controlSize(.small)
+                .font(.caption)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .help(localized("Open folder"))
 
                 Text(
                     localized(
                         "You can specify the folder to store user phrases to the folder of Google Drive, DropBox and so on so you can backup the phrases."
                     )
                 )
-                .font(.callout)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 16)
+                .padding(.top, 8)
             }
 
             Divider()
+                .padding(.vertical, 5)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(localized("After Adding a New Phrase:"))
-                    .font(.headline)
 
                 Toggle(localized("Run a shell script"), isOn: $preferences.addPhraseHookEnabled)
 
                 HStack(spacing: 8) {
                     Text(localized("Path:"))
-                        .font(.headline)
                     TextField("", text: $preferences.addPhraseHookPath)
                 }
 
@@ -451,7 +604,8 @@ private struct UserPhrasesPreferencesView: View {
                         "You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder."
                     )
                 )
-                .font(.callout)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -462,22 +616,15 @@ private struct AdvancedPreferencesView: View {
     @EnvironmentObject private var preferences: PreferencesViewModel
 
     var body: some View {
-        FormBody(height: 330) {
+        FormBody {
             PreferenceRow(localized("Chinese Conversion Style:")) {
-                VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(
-                        title: localized("Convert output"),
-                        isSelected: preferences.chineseConversionStyle == .output
-                    ) {
-                        preferences.chineseConversionStyle = .output
-                    }
-                    RadioButton(
-                        title: localized("Convert models"),
-                        isSelected: preferences.chineseConversionStyle == .model
-                    ) {
-                        preferences.chineseConversionStyle = .model
-                    }
+                Picker("", selection: $preferences.chineseConversionStyle) {
+                    Text(localized("Convert output")).tag(ChineseConversionStyle.output)
+                    Text(localized("Convert models")).tag(ChineseConversionStyle.model)
                 }
+                .labelsHidden()
+                .pickerStyle(RadioGroupPickerStyle())
+                .fixedSize()
             }
 
             PreferenceRow(localized("Ctrl + Enter Key:")) {
@@ -487,6 +634,7 @@ private struct AdvancedPreferencesView: View {
                     }
                 }
                 .labelsHidden()
+                .fixedSize()
             }
 
             PreferenceRow(localized("Ctrl + ` Key:")) {
@@ -494,25 +642,22 @@ private struct AdvancedPreferencesView: View {
             }
 
             PreferenceRow(localized("Punctuation Symbols:")) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Toggle(
-                        localized("Repeated key to next candidate"),
-                        isOn: $preferences.repeatedPunctuationToSelectCandidateEnabled)
-
-                    Text(
-                        localized(
-                            "When enabled, if you type \"Shift+,\" repeatedly with the standard layout, it will produce symbols like < and 《."
-                        )
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(width: 250, alignment: .leading)
-                }
+                Toggle(
+                    localized("Repeated key to next candidate"),
+                    isOn: $preferences.repeatedPunctuationToSelectCandidateEnabled)
             }
 
-            Spacer()
-                .frame(height: 18)
+            PreferenceRow {
+                Text(
+                    localized(
+                        "When enabled, if you type \"Shift+,\" repeatedly with the standard layout, it will produce symbols like < and 《."
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 232, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+            }
 
             PreferenceRow(localized("Bopomofo Font Annotation Support:")) {
                 Toggle(
@@ -521,26 +666,22 @@ private struct AdvancedPreferencesView: View {
             }
 
             Divider()
+                .padding(.vertical, 5)
 
-            HStack(alignment: .top, spacing: 12) {
-                Spacer()
-                    .frame(width: leftRowWidth)
-
+            PreferenceRow {
                 VStack(alignment: .leading, spacing: 8) {
                     Button(localized("Create System Report")) {
                         preferences.openSystemInfoReport()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.secondary)
 
                     Text(
                         localized(
                             "You can create a system report and attach it when filing an issue, so the developers can help you better."
                         )
                     )
-                    .font(.callout)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                    .frame(width: 230, alignment: .leading)
                 }
             }
         }
@@ -548,62 +689,75 @@ private struct AdvancedPreferencesView: View {
 }
 
 private struct FormBody<Content: View>: View {
-    let height: CGFloat
+    @State private var labelWidth: CGFloat = 0
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             content
         }
-        .padding(.horizontal, 22)
-        .padding(.top, 12)
-        .padding(.bottom, 18)
-        .frame(maxWidth: .infinity, minHeight: height, alignment: .topLeading)
+        .environment(\.preferenceLabelWidth, labelWidth)
+        .onPreferenceChange(PreferenceLabelWidthKey.self) { measuredWidth in
+            guard abs(labelWidth - measuredWidth) > 0.5 else {
+                return
+            }
+            labelWidth = measuredWidth
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 }
 
 private struct PreferenceRow<Content: View>: View {
-    private let labelWidth: CGFloat = leftRowWidth
-    private let columnSpacing: CGFloat = 12
+    @Environment(\.preferenceLabelWidth) private var labelWidth
 
-    let title: String
+    let title: String?
     @ViewBuilder let content: Content
 
-    init(_ title: String, @ViewBuilder content: () -> Content) {
+    init(_ title: String? = nil, @ViewBuilder content: () -> Content) {
         self.title = title
         self.content = content()
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: columnSpacing) {
-            Text(title)
-                .font(.headline)
-                .frame(width: labelWidth, alignment: .trailing)
-                .padding(.top, 2)
+        HStack(alignment: .center, spacing: 8) {
+            if let title {
+                Text(title)
+                    .fixedSize()
+                    .background {
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: PreferenceLabelWidthKey.self,
+                                value: geometry.size.width)
+                        }
+                    }
+                    .frame(width: labelWidth, alignment: .trailing)
+            } else {
+                Spacer()
+                    .frame(width: labelWidth)
+            }
             content
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-private struct RadioButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
+private struct PreferenceLabelWidthKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
 
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
-                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary.opacity(0.55))
-                    .font(.system(size: 14))
-                    .frame(width: 14)
-                Text(title)
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+private struct PreferenceLabelWidthEnvironmentKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+extension EnvironmentValues {
+    fileprivate var preferenceLabelWidth: CGFloat {
+        get { self[PreferenceLabelWidthEnvironmentKey.self] }
+        set { self[PreferenceLabelWidthEnvironmentKey.self] = newValue }
     }
 }
 
