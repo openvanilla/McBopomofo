@@ -240,6 +240,94 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    func testIcuTransformAppendsPrintableInputAndBuildsCandidates() {
+        let input = KeyHandlerInput(
+            inputText: "a", keyCode: 0, charCode: charCode("a"), flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "", candidates: [])
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            XCTFail("ICU transform input should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(state is InputState.IcuTransform, "\(state)")
+        guard let state = state as? InputState.IcuTransform else {
+            return
+        }
+        XCTAssertEqual(state.string, "a")
+        XCTAssertTrue(state.candidates.contains("あ"))
+        XCTAssertTrue(state.candidates.contains("ア"))
+        XCTAssertFalse(state.candidates.contains("a"))
+    }
+
+    func testIcuTransformDeletesLastCharacterAndRefreshesCandidates() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "ka", candidates: [])
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            XCTFail("ICU transform delete should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(state is InputState.IcuTransform, "\(state)")
+        guard let state = state as? InputState.IcuTransform else {
+            return
+        }
+        XCTAssertEqual(state.string, "k")
+        XCTAssertTrue(state.candidates.contains("κ"))
+        XCTAssertFalse(state.candidates.contains("か"))
+    }
+
+    func testIcuTransformDeleteEmptyStringReportsError() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "", candidates: [])
+        var didReportError = false
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            didReportError = true
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(didReportError)
+        XCTAssertEqual((state as? InputState.IcuTransform)?.string, "")
+    }
+
+    func testIcuTransformEscapeCancelsInput() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "ka", candidates: [])
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            XCTFail("ICU transform escape should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(state is InputState.Empty, "\(state)")
+    }
+
+    func testIcuTransformIgnoresNonPrintableInput() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "ka", candidates: [])
+        var didChangeState = false
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+            didChangeState = true
+        } errorCallback: {
+            XCTFail("ICU transform non-printable input should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertFalse(didChangeState)
+        XCTAssertEqual((state as? InputState.IcuTransform)?.string, "ka")
+    }
+
     func testIgnoreCapslock() {
         let input = KeyHandlerInput(
             inputText: "A", keyCode: 0, charCode: 0, flags: .capsLock, isVerticalMode: false)
