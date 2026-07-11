@@ -24,7 +24,8 @@
 import SwiftUI
 
 private let leftRowWidth: CGFloat = 214
-private let windowWidth: CGFloat = 478
+let preferencesWindowWidth: CGFloat = 478
+let preferencesInitialContentHeight: CGFloat = 585
 
 private func localized(_ key: String) -> String {
     NSLocalizedString(key, comment: "")
@@ -37,7 +38,7 @@ struct PreferencesView: View {
     var body: some View {
         selectedTab.contentView
         .environmentObject(preferences)
-        .frame(width: windowWidth, height: selectedTab.contentHeight)
+        .frame(width: preferencesWindowWidth, height: selectedTab.contentHeight)
         .background(Color(nsColor: .windowBackgroundColor))
         .background(WindowToolbarConfigurator(selectedTab: $selectedTab))
     }
@@ -67,7 +68,7 @@ enum PreferencesTab: CaseIterable, Identifiable {
 
     private var configuration: (title: String, imageName: String, contentHeight: CGFloat) {
         switch self {
-        case .basic: ("Basic", "switch.2", 585)
+        case .basic: ("Basic", "switch.2", preferencesInitialContentHeight)
         case .userPhrases: ("User Phrases", "folder", 318)
         case .advanced: ("Advanced", "gearshape", 390)
         }
@@ -642,7 +643,7 @@ private struct ComboBoxTextField: NSViewRepresentable {
             updateText(notification)
         }
 
-        func controlTextDidChange(_ notification: Notification) {
+        func controlTextDidEndEditing(_ notification: Notification) {
             updateText(notification)
         }
 

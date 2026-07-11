@@ -60,10 +60,13 @@ final class PreferencesWindowController: NSWindowController {
         window.isReleasedWhenClosed = false
         window.contentMinSize = NSSize(width: 478, height: 318)
         window.contentMaxSize = NSSize(width: 478, height: 565)
-        window.center()
+        window.setContentSize(NSSize(
+            width: preferencesWindowWidth,
+            height: preferencesInitialContentHeight))
 
         super.init(window: window)
         shouldCascadeWindows = false
+        positionWindow(on: NSScreen.main ?? NSScreen.screens.first)
     }
 
     @available(*, unavailable)
@@ -71,9 +74,49 @@ final class PreferencesWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func showWindow(_ sender: Any?) {
+        if window?.isVisible != true {
+            positionWindowNearInputMenuScreen()
+        }
+        super.showWindow(sender)
+        DispatchQueue.main.async { [weak self] in
+            self?.positionWindowNearInputMenuScreen()
+        }
+    }
+
     func showAndActivate() {
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func positionWindowNearInputMenuScreen() {
+        let mouseLocation = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first { screen in
+            screen.frame.contains(mouseLocation)
+        } ?? NSScreen.main ?? NSScreen.screens.first
+
+        positionWindow(on: screen)
+    }
+
+    private func positionWindow(on screen: NSScreen?) {
+        guard let window, let visibleFrame = screen?.visibleFrame else {
+            return
+        }
+
+        let padding: CGFloat = 24
+        var frame = window.frame
+        let preferredX = visibleFrame.maxX - frame.width - padding
+        let preferredY = visibleFrame.maxY - frame.height - padding
+        let minimumX = visibleFrame.minX + padding
+        let minimumY = visibleFrame.minY + padding
+
+        frame.origin.x = preferredX >= minimumX
+            ? preferredX
+            : visibleFrame.minX + max(0, (visibleFrame.width - frame.width) / 2)
+        frame.origin.y = preferredY >= minimumY
+            ? preferredY
+            : visibleFrame.minY + max(0, (visibleFrame.height - frame.height) / 2)
+        window.setFrame(frame, display: false)
     }
 }
