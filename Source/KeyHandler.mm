@@ -327,19 +327,13 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // MARK: Handle Selecting Feature
     if ([state isKindOfClass:[InputStateSelectingFeature class]] ||
-        [state isKindOfClass:[InputStateSelectingDateMacro class]] ||
-        [state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
+        [state isKindOfClass:[InputStateSelectingDateMacro class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Big5 Input
     if ([state isKindOfClass:[InputStateBig5 class]]) {
         return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
-
-    // MARK: Handle Iroha Japanese Kana Input
-    if ([state isKindOfClass:[InputStateIrohaKana class]]) {
-        return [self _handleIrohaKanaState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
     // MARK: Handle Chinese Number Input
@@ -1663,10 +1657,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
-        } else if ([state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
-            [self clear];
-            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
-            stateCallback(empty);
         } else if (_inputMode == InputModePlainBopomofo) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -2239,85 +2229,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appended];
             stateCallback(newState);
         }
-        return YES;
-    }
-
-    errorCallback();
-    return YES;
-}
-
-- (BOOL)_handleIrohaKanaState:(InputState *)state
-                        input:(KeyHandlerInput *)input
-                stateCallback:(void (^)(InputState *))stateCallback
-                errorCallback:(void (^)(void))errorCallback;
-{
-    InputStateIrohaKana *irohaKana = (InputStateIrohaKana *)state;
-    UniChar charCode = input.charCode;
-    BOOL cancelKey = (charCode == 27);
-    if (cancelKey) {
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-        stateCallback(empty);
-        return YES;
-    }
-
-    // Enter or space
-    if (charCode == 13 || charCode == 32) {
-        NSString *code = irohaKana.code;
-        if (code.length == 0) {
-            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-            stateCallback(empty);
-            return YES;
-        }
-
-        std::string key = std::string("_kana_") + std::string([code UTF8String]);
-        if (_languageModel->hasUnigrams(key)) {
-            auto unigrams = _languageModel->getUnigrams(key);
-            if (unigrams.size() == 1) {
-                auto unigram = unigrams[0];
-                auto value = unigram.value();
-                NSString *string = [NSString stringWithUTF8String:value.c_str()];
-                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
-                stateCallback(committing);
-                InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
-                stateCallback(newState);
-            } else {
-                NSMutableArray *candidates = [[NSMutableArray alloc] init];
-                for (auto unigram : unigrams) {
-                    NSString *string = [[NSString alloc] initWithUTF8String:unigram.value().c_str()];
-                    [candidates addObject:string];
-                }
-                InputStateIrohaKanaCandidates *newState = [[InputStateIrohaKanaCandidates alloc] initWithCode:code candidates:candidates];
-                stateCallback(newState);
-            }
-            return YES;
-        }
-        errorCallback();
-        InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
-        stateCallback(newState);
-        return YES;
-    }
-
-    if ((charCode == 8) || input.isDelete) {
-        NSString *code = irohaKana.code;
-        if (code.length == 0) {
-            InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
-            stateCallback(newState);
-            return YES;
-        }
-        code = [code substringToIndex:code.length - 1];
-        InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:code];
-        stateCallback(newState);
-        return YES;
-    }
-
-    if ((charCode >= 'a' && charCode <= 'z') || ((charCode >= 'A' && charCode <= 'Z'))) {
-        if (irohaKana.code.length >= 4) {
-            errorCallback();
-            return YES;
-        }
-        NSString *appended = [NSString stringWithFormat:@"%@%c", irohaKana.code, tolower(charCode)];
-        InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:appended];
-        stateCallback(newState);
         return YES;
     }
 

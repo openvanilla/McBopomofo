@@ -169,12 +169,6 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
             let candidate = state.candidate(at: Int(index))
             let committing = InputState.Committing(poppedText: candidate)
             handle(state: committing, client: client)
-        case let state as InputState.IrohaKanaCandidates:
-            let candidate = state.candidate(at: Int(index))
-            let committing = InputState.Committing(poppedText: candidate)
-            handle(state: committing, client: client)
-            let irohaState = InputState.IrohaKana(code: "")
-            handle(state: irohaState, client: client)
         default:
             break
         }
