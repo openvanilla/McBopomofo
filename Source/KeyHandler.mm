@@ -1694,7 +1694,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         if ([state isKindOfClass:[InputStateNumber class]]) {
             InputStateNumber *numberState = (InputStateNumber *)state;
-            NSString *candidate = [numberState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
+            NSUInteger index = gCurrentCandidateController ? gCurrentCandidateController.selectedCandidateIndex : 0;
+            NSString *candidate = [numberState.candidates objectAtIndex:index];
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -1704,7 +1705,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         if ([state isKindOfClass:[InputStateIcuTransform class]]) {
             InputStateIcuTransform *transformState = (InputStateIcuTransform *)state;
-            NSString *candidate = [transformState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
+            NSUInteger index = gCurrentCandidateController ? gCurrentCandidateController.selectedCandidateIndex : 0;
+            NSString *candidate = [transformState.candidates objectAtIndex:index];
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -2141,7 +2143,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 - (BOOL)_handleIcuTansformState:(InputState *)state
                      input:(KeyHandlerInput *)input
              stateCallback:(void (^)(InputState *))stateCallback
-             errorCallback:(void (^)(void))errorCallback;
+             errorCallback:(void (^)(void))errorCallback
 {
     InputStateIcuTransform *icuTransformState = (InputStateIcuTransform *)state;
     UniChar charCode = input.charCode;
@@ -2183,7 +2185,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
-    if (isprint(charCode)) {
+    if (charCode < 128 && isprint(charCode)) {
         if (icuTransformState.string.length > 100) {
             errorCallback();
             return YES;
