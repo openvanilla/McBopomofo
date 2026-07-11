@@ -24,6 +24,7 @@
 import Carbon
 import Cocoa
 import InfoCollector
+import InputSourceHelper
 
 struct KeyboardLayoutOption: Identifiable, Hashable {
     let id: String
@@ -337,7 +338,7 @@ final class PreferencesViewModel: NSObject, ObservableObject {
     }
 
     private func loadBasisKeyboardLayoutOptions() {
-        let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+        let list = InputSourceHelper.allInstalledInputSources()
         var options: [KeyboardLayoutOption] = []
 
         for source in list {
@@ -369,18 +370,6 @@ final class PreferencesViewModel: NSObject, ObservableObject {
 
             options.append(KeyboardLayoutOption(id: sourceID, localizedName: localizedName))
         }
-
-        if options.isEmpty {
-            options = [
-                KeyboardLayoutOption(
-                    id: "com.apple.keylayout.US",
-                    localizedName: NSLocalizedString("U.S.", comment: "")),
-                KeyboardLayoutOption(
-                    id: "com.apple.keylayout.ABC",
-                    localizedName: NSLocalizedString("ABC", comment: "")),
-            ]
-        }
-
         basisKeyboardLayoutOptions = options
     }
 }
