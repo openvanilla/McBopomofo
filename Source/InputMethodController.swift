@@ -54,7 +54,6 @@ class McBopomofoInputMethodController: IMKInputController {
     var currentClient: Any?
     var keyHandler: KeyHandler = KeyHandler()
     var state: InputState = InputState.Empty()
-    lazy var charInfo: SystemCharacterInfo? = try? SystemCharacterInfo()
 
     // Share the stored issues, so a set of issues is shown as notification only once.
     static var latestUserFileIssues: [String] = []
