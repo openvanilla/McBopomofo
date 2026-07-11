@@ -46,6 +46,8 @@ public enum SystemCharacterInfoError : Error, LocalizedError {
 }
 
 public class SystemCharacterInfo {
+    public static let shared: SystemCharacterInfo? = try? SystemCharacterInfo()
+
     private var db: Connection
 
     public init() throws {

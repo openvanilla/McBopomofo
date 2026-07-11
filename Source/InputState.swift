@@ -23,6 +23,7 @@
 
 import Cocoa
 import NSStringUtils
+import SystemCharacterInfo
 
 @objc protocol CandidateProvider: NSObjectProtocol {
     @objc var candidateCount: Int { get }
@@ -771,7 +772,7 @@ class InputState: NSObject {
                 }.joined(separator: " ")
             }
 
-            self.menuTitleValueMapping = [
+            var menuTitleValueMapping = [
                 buildItem(
                     prefix: "UTF-8 HEX", selectedString: selectedPhrase,
                     builder: { string in
@@ -807,6 +808,30 @@ class InputState: NSObject {
                         getCharCode(string: string, encoding: 0x0A01)
                     }),
             ]
+            if selectedString.count == 1,
+                let dictionary = UnihanDictionary.shared,
+                let result = try? dictionary.read(string: selectedString) {
+                let mapping: [(String, String?)] = [
+                    (NSLocalizedString("Unicode Name", comment:""), result.name),
+                    (NSLocalizedString("Phoenetic", comment:""), result.phonetic),
+                    (NSLocalizedString("Pinyin", comment:""), result.pinyinRoc),
+                    (NSLocalizedString("Canjie", comment:""), result.canjie),
+                    (NSLocalizedString("Canjie Keys", comment:""), result.canjieKeys),
+                    (NSLocalizedString("Japanese", comment:"") , result.japanese),
+                    (NSLocalizedString("Japanese Kun", comment:""), result.japaneseKun),
+                    (NSLocalizedString("Japanese On", comment:""), result.japaneseOn),
+                    (NSLocalizedString("Korean", comment:""), result.korean),
+                ]
+                for entry in mapping {
+                    if let string = entry.1, !string.isEmpty {
+                        let truncated = string.count > 16 ? String(
+                            string[string.startIndex..<string.index(string.startIndex, offsetBy: 16)]
+                        ) + "…" : string
+                        menuTitleValueMapping.append(("\(entry.0): \(truncated)", string))
+                    }
+                }
+            }
+            self.menuTitleValueMapping = menuTitleValueMapping
             self.menu = menuTitleValueMapping.map { $0.0 }
             super.init(
                 composingBuffer: previousState.composingBuffer,
