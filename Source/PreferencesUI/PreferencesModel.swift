@@ -60,7 +60,8 @@ final class PreferencesViewModel: NSObject, ObservableObject {
             return keys
         }
         set {
-            let keys = newValue
+            let keys =
+                newValue
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .lowercased()
             objectWillChange.send()
@@ -184,7 +185,8 @@ final class PreferencesViewModel: NSObject, ObservableObject {
             objectWillChange.send()
             Preferences.useCustomUserPhraseLocation = newValue
             if newValue && Preferences.customUserPhraseLocation.isEmpty {
-                Preferences.customUserPhraseLocation = UserPhraseLocationHelper.defaultUserPhraseLocation
+                Preferences.customUserPhraseLocation =
+                    UserPhraseLocationHelper.defaultUserPhraseLocation
             }
         }
     }
@@ -354,7 +356,9 @@ final class PreferencesViewModel: NSObject, ObservableObject {
                 return nil
             }
 
-            guard getString(kTISPropertyInputSourceCategory) == String(kTISCategoryKeyboardInputSource),
+            guard
+                getString(kTISPropertyInputSourceCategory)
+                    == String(kTISCategoryKeyboardInputSource),
                 getBool(kTISPropertyInputSourceIsASCIICapable) == true,
                 getString(kTISPropertyInputSourceType) == String(kTISTypeKeyboardLayout),
                 let sourceID = getString(kTISPropertyInputSourceID),

@@ -53,34 +53,48 @@ enum VersionUpdateApiError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .connectionError(let message):
-            return String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
+            return String(
+                format: NSLocalizedString(
+                    "There may be no internet connection or the server failed to respond.\n\nError message: %@",
+                    comment: ""), message)
         }
     }
 }
 
 struct VersionUpdateApi {
-    static func check(forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>) -> ()) -> URLSessionTask? {
+    static func check(
+        forced: Bool, callback: @escaping (Result<VersionUpdateApiResult, Error>) -> Void
+    ) -> URLSessionTask? {
         guard let infoDict = Bundle.main.infoDictionary,
-              let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
-              let updateInfoURL = URL(string: (updateInfoURLString + (forced ? "?manual=yes" : ""))) else {
+            let updateInfoURLString = infoDict[kUpdateInfoEndpointKey] as? String,
+            let updateInfoURL = URL(string: (updateInfoURLString + (forced ? "?manual=yes" : "")))
+        else {
             return nil
         }
 
-        let request = URLRequest(url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: kTimeoutInterval)
+        let request = URLRequest(
+            url: updateInfoURL, cachePolicy: .reloadIgnoringLocalCacheData,
+            timeoutInterval: kTimeoutInterval)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async {
-                    forced ?
-                            callback(.failure(VersionUpdateApiError.connectionError(message: error.localizedDescription))) :
-                            callback(.success(.ignored))
+                    forced
+                        ? callback(
+                            .failure(
+                                VersionUpdateApiError.connectionError(
+                                    message: error.localizedDescription)))
+                        : callback(.success(.ignored))
                 }
                 return
             }
 
             do {
-                guard let plist = try PropertyListSerialization.propertyList(from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
-                      let remoteVersion = plist[kCFBundleVersionKey] as? String,
-                      let infoDict = Bundle.main.infoDictionary else {
+                guard
+                    let plist = try PropertyListSerialization.propertyList(
+                        from: data ?? Data(), options: [], format: nil) as? [AnyHashable: Any],
+                    let remoteVersion = plist[kCFBundleVersionKey] as? String,
+                    let infoDict = Bundle.main.infoDictionary
+                else {
                     DispatchQueue.main.async {
                         forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
@@ -91,7 +105,8 @@ struct VersionUpdateApi {
                 // TODO: Use HTML to display change log, need a new key like UpdateInfoChangeLogURL for this
 
                 let currentVersion = infoDict[kCFBundleVersionKey as String] as? String ?? ""
-                let result = currentVersion.compare(remoteVersion, options: .numeric, range: nil, locale: nil)
+                let result = currentVersion.compare(
+                    remoteVersion, options: .numeric, range: nil, locale: nil)
 
                 if result != .orderedAscending {
                     DispatchQueue.main.async {
@@ -101,7 +116,8 @@ struct VersionUpdateApi {
                 }
 
                 guard let siteInfoURLString = plist[kUpdateInfoSiteKey] as? String,
-                      let siteInfoURL = URL(string: siteInfoURLString) else {
+                    let siteInfoURL = URL(string: siteInfoURLString)
+                else {
                     DispatchQueue.main.async {
                         forced ? callback(.success(.noNeedToUpdate)) : callback(.success(.ignored))
                     }
@@ -118,7 +134,9 @@ struct VersionUpdateApi {
                     if let first = preferredTags.first {
                         locale = first
                     }
-                    versionDescription = versionDescriptions[locale] as? String ?? versionDescriptions["en"] as? String ?? ""
+                    versionDescription =
+                        versionDescriptions[locale] as? String ?? versionDescriptions["en"]
+                        as? String ?? ""
                     if !versionDescription.isEmpty {
                         versionDescription = "\n\n" + versionDescription
                     }
@@ -146,7 +164,7 @@ struct VersionUpdateApi {
 class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
 
     @IBOutlet weak var window: NSWindow?
-    private var preferencesWindowController: PreferencesUiWindowController?
+    private var preferencesWindowController: PreferencesWindowController?
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
     private var fsStreamHelper: FSEventStreamHelper?
@@ -154,12 +172,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     private var serviceProviderHelper = ServiceProviderInputHelper()
 
     func updateUserPhrases() {
-        LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
+        LanguageModelManager.loadUserPhrases(
+            enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
         LanguageModelManager.loadUserPhraseReplacement()
 
         fsStreamHelper?.delegate = nil
         fsStreamHelper?.stop()
-        fsStreamHelper = FSEventStreamHelper(path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
+        fsStreamHelper = FSEventStreamHelper(
+            path: LanguageModelManager.dataFolderPath, queue: DispatchQueue(label: "User Phrases"))
         fsStreamHelper?.delegate = self
         _ = fsStreamHelper?.start()
     }
@@ -178,7 +198,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
             UserDefaults.standard.synchronize()
         }
 
-        NotificationCenter.default.addObserver(forName: .userPhraseLocationDidChange, object: nil, queue: OperationQueue.main) { notification in
+        NotificationCenter.default.addObserver(
+            forName: .userPhraseLocationDidChange, object: nil, queue: OperationQueue.main
+        ) { notification in
             self.updateUserPhrases()
         }
 
@@ -193,7 +215,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
     @MainActor
     @objc func showPreferences() {
         if preferencesWindowController == nil {
-            preferencesWindowController = PreferencesUiWindowController()
+            preferencesWindowController = PreferencesWindowController()
         }
         preferencesWindowController?.showAndActivate()
     }
@@ -234,15 +256,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                 switch apiResult {
                 case .shouldUpdate(let report):
                     self.updateNextStepURL = report.siteUrl
-                    let content = String(format: NSLocalizedString("You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@", comment: ""),
-                            report.currentShortVersion,
-                            report.currentVersion,
-                            report.remoteShortVersion,
-                            report.remoteVersion,
-                            report.versionDescription)
-                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("New Version Available", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""), cancelButtonTitle: NSLocalizedString("Not Now", comment: ""), cancelAsDefault: false, delegate: self)
+                    let content = String(
+                        format: NSLocalizedString(
+                            "You're currently using McBopomofo %@ (%@), a new version %@ (%@) is now available. Do you want to visit McBopomofo's website to download the version?%@",
+                            comment: ""),
+                        report.currentShortVersion,
+                        report.currentVersion,
+                        report.remoteShortVersion,
+                        report.remoteVersion,
+                        report.versionDescription)
+                    NonModalAlertWindowController.shared.show(
+                        title: NSLocalizedString("New Version Available", comment: ""),
+                        content: content,
+                        confirmButtonTitle: NSLocalizedString("Visit Website", comment: ""),
+                        cancelButtonTitle: NSLocalizedString("Not Now", comment: ""),
+                        cancelAsDefault: false, delegate: self)
                 case .noNeedToUpdate:
-                    NonModalAlertWindowController.shared.show(title: NSLocalizedString("Check for Update Completed", comment: ""), content: NSLocalizedString("McBopomofo is up to date.", comment: ""), confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: self)
+                    NonModalAlertWindowController.shared.show(
+                        title: NSLocalizedString("Check for Update Completed", comment: ""),
+                        content: NSLocalizedString("McBopomofo is up to date.", comment: ""),
+                        confirmButtonTitle: NSLocalizedString("OK", comment: ""),
+                        cancelButtonTitle: nil, cancelAsDefault: false, delegate: self)
                 case .ignored:
                     break
                 }
@@ -250,9 +284,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
                 switch error {
                 case VersionUpdateApiError.connectionError(let message):
                     let title = NSLocalizedString("Update Check Failed", comment: "")
-                    let content = String(format: NSLocalizedString("There may be no internet connection or the server failed to respond.\n\nError message: %@", comment: ""), message)
+                    let content = String(
+                        format: NSLocalizedString(
+                            "There may be no internet connection or the server failed to respond.\n\nError message: %@",
+                            comment: ""), message)
                     let buttonTitle = NSLocalizedString("Dismiss", comment: "")
-                    NonModalAlertWindowController.shared.show(title: title, content: content, confirmButtonTitle: buttonTitle, cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                    NonModalAlertWindowController.shared.show(
+                        title: title, content: content, confirmButtonTitle: buttonTitle,
+                        cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 default:
                     break
                 }
@@ -275,7 +314,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
 extension AppDelegate: FSEventStreamHelperDelegate {
     func helper(_ helper: FSEventStreamHelper, didReceive events: [FSEventStreamHelper.Event]) {
         DispatchQueue.main.async {
-            LanguageModelManager.loadUserPhrases(enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
+            LanguageModelManager.loadUserPhrases(
+                enableForPlainBopomofo: Preferences.enableUserPhrasesInPlainBopomofo)
             LanguageModelManager.loadUserPhraseReplacement()
         }
     }
@@ -285,8 +325,14 @@ extension AppDelegate {
     private func open(userFileAt path: String) {
         func checkIfUserFilesExist() -> Bool {
             if !LanguageModelManager.checkIfUserLanguageModelFilesExist() {
-                let content = String(format: NSLocalizedString("Please check the permission of the path at \"%@\".", comment: ""), LanguageModelManager.dataFolderPath)
-                NonModalAlertWindowController.shared.show(title: NSLocalizedString("Failed to Create the User Phrase File", comment: ""), content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""), cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
+                let content = String(
+                    format: NSLocalizedString(
+                        "Please check the permission of the path at \"%@\".", comment: ""),
+                    LanguageModelManager.dataFolderPath)
+                NonModalAlertWindowController.shared.show(
+                    title: NSLocalizedString("Failed to Create the User Phrase File", comment: ""),
+                    content: content, confirmButtonTitle: NSLocalizedString("OK", comment: ""),
+                    cancelButtonTitle: nil, cancelAsDefault: false, delegate: nil)
                 return false
             }
             return true

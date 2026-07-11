@@ -1,6 +1,30 @@
+// Copyright (c) 2022 and onwards The McBopomofo Authors.
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 import SwiftUI
 
-let leftRowWidth: CGFloat = 214
+private let leftRowWidth: CGFloat = 214
+private let windowWidth: CGFloat = 478
 
 private func localized(_ key: String) -> String {
     NSLocalizedString(key, comment: "")
@@ -11,18 +35,9 @@ struct PreferencesView: View {
     @State private var selectedTab: PreferencesTab = .basic
 
     var body: some View {
-        Group {
-            switch selectedTab {
-            case .basic:
-                BasicPreferencesView()
-            case .userPhrases:
-                UserPhrasesPreferencesView()
-            case .advanced:
-                AdvancedPreferencesView()
-            }
-        }
+        selectedTab.contentView
         .environmentObject(preferences)
-        .frame(width: 478, height: selectedTab.contentHeight)
+        .frame(width: windowWidth, height: selectedTab.contentHeight)
         .background(Color(nsColor: .windowBackgroundColor))
         .background(WindowToolbarConfigurator(selectedTab: $selectedTab))
     }
@@ -33,47 +48,28 @@ enum PreferencesTab: CaseIterable, Identifiable {
     case userPhrases
     case advanced
 
-    var id: String {
+    var id: Self { self }
+    var title: String { localized(configuration.title) }
+    var imageName: String { configuration.imageName }
+    var contentHeight: CGFloat { configuration.contentHeight }
+
+    @ViewBuilder
+    var contentView: some View {
         switch self {
         case .basic:
-            "basic"
+            BasicPreferencesView()
         case .userPhrases:
-            "userPhrases"
+            UserPhrasesPreferencesView()
         case .advanced:
-            "advanced"
+            AdvancedPreferencesView()
         }
     }
 
-    var title: String {
+    private var configuration: (title: String, imageName: String, contentHeight: CGFloat) {
         switch self {
-        case .basic:
-            localized("Basic")
-        case .userPhrases:
-            localized("User Phrases")
-        case .advanced:
-            localized("Advanced")
-        }
-    }
-
-    var imageName: String {
-        switch self {
-        case .basic:
-            "switch.2"
-        case .userPhrases:
-            "folder"
-        case .advanced:
-            "gearshape"
-        }
-    }
-
-    var contentHeight: CGFloat {
-        switch self {
-        case .basic:
-            585
-        case .userPhrases:
-            318
-        case .advanced:
-            390
+        case .basic: ("Basic", "switch.2", 585)
+        case .userPhrases: ("User Phrases", "folder", 318)
+        case .advanced: ("Advanced", "gearshape", 390)
         }
     }
 }
@@ -170,7 +166,8 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
             item.label = tab.title
             item.paletteLabel = tab.title
             item.toolTip = tab.title
-            item.image = NSImage(systemSymbolName: tab.imageName, accessibilityDescription: tab.title)
+            item.image = NSImage(
+                systemSymbolName: tab.imageName, accessibilityDescription: tab.title)
             item.target = self
             item.action = #selector(selectToolbarItem(_:))
             return item
@@ -193,13 +190,15 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
             let targetContentSize = NSSize(width: 478, height: tab.contentHeight)
             let currentContentSize = window.contentView?.frame.size ?? .zero
 
-            guard abs(currentContentSize.width - targetContentSize.width) > 0.5
-                || abs(currentContentSize.height - targetContentSize.height) > 0.5
+            guard
+                abs(currentContentSize.width - targetContentSize.width) > 0.5
+                    || abs(currentContentSize.height - targetContentSize.height) > 0.5
             else {
                 return
             }
 
-            var frame = window.frameRect(forContentRect: NSRect(origin: .zero, size: targetContentSize))
+            var frame = window.frameRect(
+                forContentRect: NSRect(origin: .zero, size: targetContentSize))
             frame.origin.x = window.frame.origin.x
             frame.origin.y = window.frame.maxY - frame.height
             window.setFrame(frame, display: true, animate: animate)
@@ -257,12 +256,17 @@ private struct BasicPreferencesView: View {
             Divider()
 
             PreferenceRow(localized("Selection Keys:")) {
-                ComboBoxTextField(text: $preferences.candidateKeys, suggestions: Preferences.suggestedCandidateKeys)
-                    .frame(width: 220)
+                ComboBoxTextField(
+                    text: $preferences.candidateKeys,
+                    suggestions: Preferences.suggestedCandidateKeys
+                )
+                .frame(width: 220)
             }
 
             PreferenceRow("") {
-                Toggle(localized("Space key chooses candidate"), isOn: $preferences.chooseCandidateUsingSpace)
+                Toggle(
+                    localized("Space key chooses candidate"),
+                    isOn: $preferences.chooseCandidateUsingSpace)
             }
 
             PreferenceRow(localized("Show Candidate Phrase:")) {
@@ -283,7 +287,9 @@ private struct BasicPreferencesView: View {
             }
 
             PreferenceRow("") {
-                Toggle(localized("Move cursor after selection"), isOn: $preferences.moveCursorAfterSelectingCandidate)
+                Toggle(
+                    localized("Move cursor after selection"),
+                    isOn: $preferences.moveCursorAfterSelectingCandidate)
             }
 
             PreferenceRow(localized("When Selecting Candidates:")) {
@@ -297,10 +303,16 @@ private struct BasicPreferencesView: View {
 
             PreferenceRow(localized("Candidate List Style:")) {
                 VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(title: localized("Vertical"), isSelected: !preferences.useHorizontalCandidateList) {
+                    RadioButton(
+                        title: localized("Vertical"),
+                        isSelected: !preferences.useHorizontalCandidateList
+                    ) {
                         preferences.useHorizontalCandidateList = false
                     }
-                    RadioButton(title: localized("Horizontal"), isSelected: preferences.useHorizontalCandidateList) {
+                    RadioButton(
+                        title: localized("Horizontal"),
+                        isSelected: preferences.useHorizontalCandidateList
+                    ) {
                         preferences.useHorizontalCandidateList = true
                     }
                 }
@@ -319,29 +331,41 @@ private struct BasicPreferencesView: View {
 
             PreferenceRow(localized("Shift + Letter Keys:")) {
                 VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(title: localized("Input uppercase letters directly"), isSelected: preferences.letterBehavior == 0) {
+                    RadioButton(
+                        title: localized("Input uppercase letters directly"),
+                        isSelected: preferences.letterBehavior == 0
+                    ) {
                         preferences.letterBehavior = 0
                     }
-                    RadioButton(title: localized("Input lowercased letters to buffer"), isSelected: preferences.letterBehavior == 1) {
+                    RadioButton(
+                        title: localized("Input lowercased letters to buffer"),
+                        isSelected: preferences.letterBehavior == 1
+                    ) {
                         preferences.letterBehavior = 1
                     }
                 }
             }
 
             PreferenceRow(localized("Shift + Enter Key:")) {
-                Toggle(localized("Trigger associated phrases"), isOn: $preferences.shiftEnterEnabled)
+                Toggle(
+                    localized("Trigger associated phrases"), isOn: $preferences.shiftEnterEnabled)
             }
 
             PreferenceRow(localized("ESC Key:")) {
-                Toggle(localized("ESC key clears entire input buffer"), isOn: $preferences.escToCleanInputBuffer)
+                Toggle(
+                    localized("ESC key clears entire input buffer"),
+                    isOn: $preferences.escToCleanInputBuffer)
             }
 
             PreferenceRow("") {
                 VStack(alignment: .leading, spacing: 6) {
-                    Toggle(localized("Beep upon input error"), isOn: $preferences.beepUponInputError)
+                    Toggle(
+                        localized("Beep upon input error"), isOn: $preferences.beepUponInputError)
                     Spacer()
                         .frame(height: 20)
-                    Toggle(localized("Check for updates automatically"), isOn: $preferences.checkForUpdatesAutomatically)
+                    Toggle(
+                        localized("Check for updates automatically"),
+                        isOn: $preferences.checkForUpdatesAutomatically)
                 }
             }
         }
@@ -365,11 +389,14 @@ private struct UserPhrasesPreferencesView: View {
                     .labelsHidden()
                     .frame(width: 96)
 
-                    TextField("", text: Binding(
-                        get: { preferences.customUserPhraseLocationText },
-                        set: { preferences.customUserPhraseLocation = $0 }
-                    ))
-                        .disabled(!preferences.useCustomUserPhraseLocation)
+                    TextField(
+                        "",
+                        text: Binding(
+                            get: { preferences.customUserPhraseLocationText },
+                            set: { preferences.customUserPhraseLocation = $0 }
+                        )
+                    )
+                    .disabled(!preferences.useCustomUserPhraseLocation)
 
                     Button {
                         preferences.chooseUserPhraseFolder()
@@ -394,10 +421,14 @@ private struct UserPhrasesPreferencesView: View {
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                Text(localized("You can specify the folder to store user phrases to the folder of Google Drive, DropBox and so on so you can backup the phrases."))
-                    .font(.callout)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 16)
+                Text(
+                    localized(
+                        "You can specify the folder to store user phrases to the folder of Google Drive, DropBox and so on so you can backup the phrases."
+                    )
+                )
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 16)
             }
 
             Divider()
@@ -414,9 +445,13 @@ private struct UserPhrasesPreferencesView: View {
                     TextField("", text: $preferences.addPhraseHookPath)
                 }
 
-                Text(localized("You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder."))
-                    .font(.callout)
-                    .fixedSize(horizontal: false, vertical: true)
+                Text(
+                    localized(
+                        "You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder."
+                    )
+                )
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -429,10 +464,16 @@ private struct AdvancedPreferencesView: View {
         FormBody(height: 330) {
             PreferenceRow(localized("Chinese Conversion Style:")) {
                 VStack(alignment: .leading, spacing: 6) {
-                    RadioButton(title: localized("Convert output"), isSelected: preferences.chineseConversionStyle == .output) {
+                    RadioButton(
+                        title: localized("Convert output"),
+                        isSelected: preferences.chineseConversionStyle == .output
+                    ) {
                         preferences.chineseConversionStyle = .output
                     }
-                    RadioButton(title: localized("Convert models"), isSelected: preferences.chineseConversionStyle == .model) {
+                    RadioButton(
+                        title: localized("Convert models"),
+                        isSelected: preferences.chineseConversionStyle == .model
+                    ) {
                         preferences.chineseConversionStyle = .model
                     }
                 }
@@ -454,13 +495,19 @@ private struct AdvancedPreferencesView: View {
 
             PreferenceRow(localized("Punctuation Symbols:")) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Toggle(localized("Repeated key to next candidate"), isOn: $preferences.repeatedPunctuationToSelectCandidateEnabled)
+                    Toggle(
+                        localized("Repeated key to next candidate"),
+                        isOn: $preferences.repeatedPunctuationToSelectCandidateEnabled)
 
-                    Text(localized("When enabled, if you type \"Shift+,\" repeatedly with the standard layout, it will produce symbols like < and 《."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(width: 250, alignment: .leading)
+                    Text(
+                        localized(
+                            "When enabled, if you type \"Shift+,\" repeatedly with the standard layout, it will produce symbols like < and 《."
+                        )
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(width: 250, alignment: .leading)
                 }
             }
 
@@ -468,7 +515,9 @@ private struct AdvancedPreferencesView: View {
                 .frame(height: 18)
 
             PreferenceRow(localized("Bopomofo Font Annotation Support:")) {
-                Toggle(localized("Show toggle in input menu"), isOn: $preferences.showBopomofoFontAnnotationSupportItemInInputMenu)
+                Toggle(
+                    localized("Show toggle in input menu"),
+                    isOn: $preferences.showBopomofoFontAnnotationSupportItemInInputMenu)
             }
 
             Divider()
@@ -484,10 +533,14 @@ private struct AdvancedPreferencesView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.secondary)
 
-                    Text(localized("You can create a system report and attach it when filing an issue, so the developers can help you better."))
-                        .font(.callout)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(width: 230, alignment: .leading)
+                    Text(
+                        localized(
+                            "You can create a system report and attach it when filing an issue, so the developers can help you better."
+                        )
+                    )
+                    .font(.callout)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(width: 230, alignment: .leading)
                 }
             }
         }
@@ -602,14 +655,14 @@ private struct ComboBoxTextField: NSViewRepresentable {
     }
 }
 
-private extension KeyboardLayout {
-    static var allCasesForPreferences: [KeyboardLayout] {
+extension KeyboardLayout {
+    fileprivate static var allCasesForPreferences: [KeyboardLayout] {
         [.standard, .eten, .hsu, .eten26, .hanyuPinyin, .IBM]
     }
 }
 
-private extension ControlEnterOutput {
-    static var allCasesForPreferences: [ControlEnterOutput] {
+extension ControlEnterOutput {
+    fileprivate static var allCasesForPreferences: [ControlEnterOutput] {
         [.off, .bpmfReading, .htmlRuby, .brailleUnicode, .hanyuPinyin, .brailleAscii]
     }
 }
