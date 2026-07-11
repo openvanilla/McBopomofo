@@ -59,6 +59,7 @@ CONFIG_FILE = PROJECT_ROOT / "textpool.rc"
 #   >>> from curation.builders import frequency_builder
 
 __all__ = [
+    "analyzers",
     "builders",
     "compilers",
     "validators",
