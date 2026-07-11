@@ -808,48 +808,27 @@ class InputState: NSObject {
                         getCharCode(string: string, encoding: 0x0A01)
                     }),
             ]
-            if selectedString.count == 1 {
-                do {
-                    let dictionary = try UnihanDictionary()
-                    let result = try dictionary.read(string: selectedString)
-                    if !result.name.isEmpty {
-                        menuTitleValueMapping.append(("Unicode Name: \(result.name)", result.name))
+            if selectedString.count == 1,
+                let dictionary = UnihanDictionary.shared,
+                let result = try? dictionary.read(string: selectedString) {
+                let mapping: [(String, String?)] = [
+                    ("Unicode Name", result.name),
+                    ("Phoenetic", result.phonetic),
+                    ("Pinyin", result.pinyinRoc),
+                    ("Canjie", result.canjie),
+                    ("Canjie Keys", result.canjieKeys),
+                    ("Japanese", result.japanese),
+                    ("Japanese Kun", result.japaneseKun),
+                    ("Japanese On", result.japaneseOn),
+                    ("Korean", result.korean),
+                ]
+                for entry in mapping {
+                    if let string = entry.1, !string.isEmpty {
+                        let truncated = string.count > 16 ? String(
+                            string[string.startIndex..<string.index(string.startIndex, offsetBy: 16)]
+                        ) + "…" : string
+                        menuTitleValueMapping.append(("\(entry.0) \(truncated)", string))
                     }
-                    if !result.phonetic.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Phoenetic: \(result.phonetic)", result.phonetic))
-                    }
-                    if !result.pinyinRoc.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Pinyin: \(result.pinyinRoc)", result.pinyinRoc))
-                    }
-                    if !result.canjie.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Canjie: \(result.canjie)", result.canjie))
-                    }
-                    if !result.canjieKeys.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Canjie Keys: \(result.canjieKeys)", result.canjieKeys))
-                    }
-                    if !result.japanese.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Japanese: \(result.japanese)", result.japanese))
-                    }
-                    if !result.japaneseKun.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Japanese Kun: \(result.japaneseKun)", result.japaneseKun))
-                    }
-                    if !result.japaneseOn.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Japanese On: \(result.japaneseOn)", result.japaneseOn))
-                    }
-                    if !result.korean.isEmpty {
-                        menuTitleValueMapping
-                            .append(("Korean: \(result.korean)", result.korean))
-                    }
-
-                } catch {
-
                 }
             }
             self.menuTitleValueMapping = menuTitleValueMapping

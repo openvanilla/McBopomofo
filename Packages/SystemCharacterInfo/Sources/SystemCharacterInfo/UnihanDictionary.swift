@@ -49,39 +49,29 @@ public struct UnihanEntry {
 }
 
 public class UnihanDictionary {
-    class UnihanEntryParser {
-        static func parseAsComponents(from string: String) -> [String] {
-            var result: [String] = []
-            var buffer = ""
-            for c in string {
-                if c == "|" {
-                    result.append(buffer)
-                    buffer = ""
-                } else {
-                    buffer += String(c)
-                }
-            }
-            result.append(buffer)
-            return result
-        }
+    public static let shared: UnihanDictionary? = try? UnihanDictionary()
 
+    class UnihanEntryParser {
         static func parse(from string: String) -> UnihanEntry {
-            let components = parseAsComponents(from: string)
+            let components = string.split(separator: "|", omittingEmptySubsequences: false)
+            func get(_ index: Int) -> String {
+                return index < components.count ? String(components[index]) : ""
+            }
             return UnihanEntry(
-                name: components[0],
-                japanese: components[1],
-                japaneseKun: components[12],
-                japaneseOn: components[13],
-                korean: components[2],
-                pinyinPrc: components[3],
-                pinyinRoc: components[10],
-                pinyinPrimary: components[14],
-                canjie: components[8],
-                canjieKeys: components[15],
-                components: components[7],
-                phonetic: components[11],
-                wubiXing: components[4],
-                wubiHua: components[5],
+                name: get(0),
+                japanese: get(1),
+                japaneseKun: get(12),
+                japaneseOn: get(13),
+                korean: get(2),
+                pinyinPrc: get(3),
+                pinyinRoc: get(10),
+                pinyinPrimary: get(14),
+                canjie: get(8),
+                canjieKeys: get(15),
+                components: get(7),
+                phonetic: get(11),
+                wubiXing: get(4),
+                wubiHua: get(5)
             )
         }
     }
