@@ -130,6 +130,12 @@ class InputState: NSObject {
                 }
             ),
             (
+                NSLocalizedString("Quick Text Transform", comment: ""),
+                {
+                    .IcuTransform(string: "", candidates: [])
+                }
+            ),
+            (
                 NSLocalizedString("Iroha Kana Input", comment: ""),
                 {
                     .IrohaKana(code: "")
@@ -238,6 +244,36 @@ class InputState: NSObject {
 
         @objc public var composingBuffer: String {
             return "[數字] \(number)"
+        }
+    }
+
+    @objc(InputStateIcuTransform)
+    class IcuTransform: InputState, CandidateProvider {
+        var candidateCount: Int {
+            candidates.count
+        }
+        func candidate(at index: Int) -> String {
+            candidates[index]
+        }
+
+        func reading(at index: Int) -> String? {
+            candidates[index]
+        }
+
+        @objc private(set) var string: String
+        @objc private(set) var candidates: [String]
+
+        @objc init(string: String, candidates: [String]) {
+            self.string = string
+            self.candidates = candidates
+        }
+
+        override var description: String {
+            "<InputState.IcuTransform, string:\(string)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[文字轉換] \(string)"
         }
 
     }

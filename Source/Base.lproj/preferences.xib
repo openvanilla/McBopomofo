@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24765" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24765"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -40,7 +40,7 @@
             <rect key="frame" x="0.0" y="0.0" width="478" height="576"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1UT-Vk-jJp">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1UT-Vk-jJp">
                     <rect key="frame" x="45" y="534" width="176" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Bopomofo Keyboard Layout:" id="VTD-h6-q9r">
                         <font key="font" metaFont="system"/>
@@ -62,7 +62,7 @@
                         <action selector="updateBasisKeyboardLayoutAction:" target="-2" id="mjl-uI-U8T"/>
                     </connections>
                 </popUpButton>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JFW-qA-UTv">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JFW-qA-UTv">
                     <rect key="frame" x="24" y="496" width="197" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Alphanumeric Keyboard Layout:" id="cTl-dv-9gx">
                         <font key="font" metaFont="system"/>
@@ -80,7 +80,7 @@
                         <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpaceKey" id="Z1u-Xj-5q7"/>
                     </connections>
                 </button>
-                <comboBox focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Kb-9o-Czh">
+                <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Kb-9o-Czh">
                     <rect key="frame" x="232" y="435" width="217" height="24"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="217" id="MSj-4R-AdD"/>
@@ -99,7 +99,7 @@
                         <action selector="changeSelectionKeyAction:" target="-2" id="dwv-UP-fcW"/>
                     </connections>
                 </comboBox>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="buv-Na-btc">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="buv-Na-btc">
                     <rect key="frame" x="124" y="443" width="97" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Selection Keys:" id="5RC-uF-JMe">
                         <font key="font" metaFont="system"/>
@@ -137,7 +137,7 @@
                         <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="uBc-h3-Lqq"/>
                     </connections>
                 </button>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Hh-po-xMG">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Hh-po-xMG">
                     <rect key="frame" x="69" y="385" width="152" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Show Candidate Phrase:" id="Old-PI-MEs">
                         <font key="font" metaFont="system"/>
@@ -145,7 +145,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eBz-xC-fkE">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eBz-xC-fkE">
                     <rect key="frame" x="93" y="272" width="129" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Candidate List Style:" id="Xj4-f5-50V">
                         <font key="font" metaFont="system"/>
@@ -153,7 +153,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3oc-Wl-pem">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3oc-Wl-pem">
                     <rect key="frame" x="93" y="224" width="128" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Candidate Text Size:" id="X0q-Fl-zzQ">
                         <font key="font" metaFont="system"/>
@@ -224,7 +224,7 @@
                         <binding destination="32" name="value" keyPath="values.MoveCursorAfterSelectingCandidate" id="Jra-P0-jp5"/>
                     </connections>
                 </button>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sp0-2u-7hi">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sp0-2u-7hi">
                     <rect key="frame" x="101" y="178" width="120" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Shift + Letter Keys:" id="ZFO-C0-adO">
                         <font key="font" metaFont="system"/>
@@ -257,7 +257,7 @@
                         <binding destination="32" name="selectedTag" keyPath="values.LetterBehavior" id="YP4-Tc-T1I"/>
                     </connections>
                 </matrix>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YIg-XJ-f3T">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YIg-XJ-f3T">
                     <rect key="frame" x="162" y="96" width="59" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="ESC Key:" id="Apl-bu-Zdz">
                         <font key="font" metaFont="system"/>
@@ -310,7 +310,7 @@
                         <binding destination="32" name="value" keyPath="values.ShiftEnterEnabled" id="RyW-HU-SUL"/>
                     </connections>
                 </button>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dsc-GH-nO2">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dsc-GH-nO2">
                     <rect key="frame" x="112" y="130" width="109" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Shift + Enter Key:" id="H9E-f1-tBt">
                         <font key="font" metaFont="system"/>
@@ -318,7 +318,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MdX-1s-2eC">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MdX-1s-2eC">
                     <rect key="frame" x="45" y="311" width="175" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="When Selecting Candidates:" id="wkY-8D-tZm">
                         <font key="font" metaFont="system"/>
@@ -436,7 +436,7 @@
             <rect key="frame" x="0.0" y="0.0" width="478" height="340"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wds-Zh-QHP">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wds-Zh-QHP">
                     <rect key="frame" x="74" y="304" width="163" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Chinese Conversion Style:" id="cMO-Ss-Jar">
                         <font key="font" metaFont="system"/>
@@ -489,7 +489,7 @@
                         <binding destination="32" name="value" keyPath="values.ShowBopomofoFontAnnotationSupportItemInInputMenu" id="fGJ-fx-Q4m"/>
                     </connections>
                 </button>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tT1-Uf-Efn">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tT1-Uf-Efn">
                     <rect key="frame" x="134" y="256" width="103" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + Enter Key:" id="lrz-7F-6e5">
                         <font key="font" metaFont="system"/>
@@ -497,7 +497,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxC-Bs-SbF">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxC-Bs-SbF">
                     <rect key="frame" x="156" y="226" width="81" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ctrl + `  Key:" id="F6Q-1k-YTn">
                         <font key="font" metaFont="system"/>
@@ -505,7 +505,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eG4-yu-RXo">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eG4-yu-RXo">
                     <rect key="frame" x="102" y="198" width="136" height="16"/>
                     <constraints>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="132" id="TLl-fl-TAQ"/>
@@ -516,7 +516,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TEf-Fp-HrG">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TEf-Fp-HrG">
                     <rect key="frame" x="18" y="109" width="223" height="16"/>
                     <constraints>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="132" id="Tl9-J4-WMN"/>
@@ -560,7 +560,7 @@
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ioI-j3-NSC">
                     <rect key="frame" x="20" y="98" width="438" height="5"/>
                 </box>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iAT-ur-QK5">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iAT-ur-QK5">
                     <rect key="frame" x="245" y="7" width="219" height="50"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="50" id="zpi-6U-nOU"/>
@@ -581,7 +581,7 @@
                         <action selector="openSystemInfoReport:" target="-2" id="dji-i8-0ce"/>
                     </connections>
                 </button>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3vw-yW-KPa">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3vw-yW-KPa">
                     <rect key="frame" x="245" y="148" width="219" height="42"/>
                     <textFieldCell key="cell" selectable="YES" title="When enabled, if you type &quot;Shift+,&quot; repeatedly with the standard layout, it will produce symbols like 〈 and 《." id="UyS-Xx-V8S">
                         <font key="font" metaFont="smallSystem"/>
@@ -639,7 +639,7 @@
             <rect key="frame" x="0.0" y="0.0" width="478" height="329"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jIf-hP-5m5">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jIf-hP-5m5">
                     <rect key="frame" x="19" y="293" width="137" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="User Phrase Location:" id="Sc6-Rd-pOy">
                         <font key="font" usesAppearanceFont="YES"/>
@@ -667,7 +667,7 @@
                         <action selector="changeCustomUserPhraseLocationEnabledAction:" target="-2" id="fUI-Z1-8Cg"/>
                     </connections>
                 </popUpButton>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEv-3b-PV4">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEv-3b-PV4">
                     <rect key="frame" x="128" y="252" width="290" height="25"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="6kS-fE-Kz7">
                         <font key="font" metaFont="system"/>
@@ -679,7 +679,7 @@
                         <binding destination="32" name="enabled" keyPath="values.UseCustomUserPhraseLocation" id="liS-L1-RTD"/>
                     </connections>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="svr-IJ-6mz">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="svr-IJ-6mz">
                     <rect key="frame" x="20" y="170" width="440" height="28"/>
                     <textFieldCell key="cell" id="Vz3-KS-1rk">
                         <font key="font" metaFont="smallSystem"/>
@@ -712,7 +712,7 @@
                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="5ce-rm-tsn">
                     <rect key="frame" x="21" y="147" width="433" height="5"/>
                 </box>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="HkV-PJ-yTW">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="HkV-PJ-yTW">
                     <rect key="frame" x="19" y="113" width="437" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="After Adding a New Phrase:" id="wGR-0A-cqv">
                         <font key="font" usesAppearanceFont="YES"/>
@@ -730,7 +730,7 @@
                         <binding destination="32" name="value" keyPath="values.AddPhraseHookEnabled" id="DFg-tK-bEf"/>
                     </connections>
                 </button>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FMN-EJ-wzd">
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FMN-EJ-wzd">
                     <rect key="frame" x="62" y="57" width="392" height="24"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Sbq-JE-A4U">
                         <font key="font" usesAppearanceFont="YES"/>
@@ -741,7 +741,7 @@
                         <binding destination="32" name="value" keyPath="values.AddPhraseHookPath" id="IJd-KL-Ytn"/>
                     </connections>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jl3-q4-Fg4">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="133" translatesAutoresizingMaskIntoConstraints="NO" id="jl3-q4-Fg4">
                     <rect key="frame" x="20" y="59" width="36" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Path:" id="ZY3-98-BrK">
                         <font key="font" usesAppearanceFont="YES"/>
@@ -749,7 +749,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="0R5-DI-uXK">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="435" translatesAutoresizingMaskIntoConstraints="NO" id="0R5-DI-uXK">
                     <rect key="frame" x="20" y="20" width="440" height="28"/>
                     <textFieldCell key="cell" title="You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder." id="byk-Br-x2Z">
                         <font key="font" metaFont="smallSystem"/>

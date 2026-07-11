@@ -420,6 +420,8 @@ extension McBopomofoInputMethodController {
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Number:
             handle(state: newState, previous: previous, client: client)
+        case let newState as InputState.IcuTransform:
+            handle(state: newState, previous: previous, client: client)
         case let newState as InputState.Big5:
             handle(state: newState, previous: previous, client: client)
         case let newState as InputState.IrohaKana:
@@ -473,6 +475,7 @@ extension McBopomofoInputMethodController {
             commit(text: previous.composingBuffer, client: client)
         case is InputState.Big5,
             is InputState.Number,
+            is InputState.IcuTransform,
             is InputState.IrohaKana,
             is InputState.IrohaKanaCandidates:
             client.setMarkedText(
@@ -641,8 +644,7 @@ extension McBopomofoInputMethodController {
         handleStateWithSimpleCandidateWindow(state: state, previous: previous, client: client)
     }
 
-    private func handle(state: InputState.Number, previous: InputState, client: Any?) {
-
+    private func handleSpecialInputWithCandidateWindow(state: InputState, composingBuffer: String, candidateCount: Int, client: Any?) {
         gCurrentCandidateController?.visible = false
         hideTooltip()
 
@@ -651,16 +653,25 @@ extension McBopomofoInputMethodController {
         }
 
         client.setMarkedText(
-            state.composingBuffer,
+            composingBuffer,
             selectionRange: NSMakeRange(
-                (state.composingBuffer as NSString).length,
+                (composingBuffer as NSString).length,
                 0
             ),
             replacementRange: NSMakeRange(NSNotFound, NSNotFound)
         )
-        if state.candidateCount > 0 {
+        if candidateCount > 0 {
             show(candidateWindowWith: state, client: client)
         }
+    }
+
+
+    private func handle(state: InputState.Number, previous: InputState, client: Any?) {
+        handleSpecialInputWithCandidateWindow(state: state, composingBuffer: state.composingBuffer, candidateCount: state.candidateCount, client: client)
+    }
+
+    private func handle(state: InputState.IcuTransform, previous: InputState, client: Any?) {
+        handleSpecialInputWithCandidateWindow(state: state, composingBuffer: state.composingBuffer, candidateCount: state.candidateCount, client: client)
     }
 
     private func handle(state: InputState.Big5, previous: InputState, client: Any?) {
@@ -801,7 +812,8 @@ extension McBopomofoInputMethodController {
                 is InputState.SelectingDateMacro,
                 is InputState.SelectingDictionary,
                 is InputState.ShowingCharInfo,
-                is InputState.Number:
+                is InputState.Number,
+                is InputState.IcuTransform:
                 return true
             default:
                 break
@@ -869,7 +881,8 @@ extension McBopomofoInputMethodController {
         case let state as InputState.AssociatedPhrases where state.autoTriggered:
             { _ in "⇧ ⏎" }
         case is InputState.AssociatedPhrasesPlain,
-            is InputState.Number:
+            is InputState.Number,
+            is InputState.IcuTransform:
             { "⇧ " + $0 }
         default:
             { $0 }

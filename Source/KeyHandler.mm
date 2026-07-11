@@ -355,6 +355,18 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    if ([state isKindOfClass:[InputStateIcuTransform class]]) {
+        BOOL result = [self _handleIcuTansformState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+        if (!result) {
+            InputStateIcuTransform *icuTransformState = (InputStateIcuTransform *)state;
+            if (!icuTransformState.candidates.count) {
+                return YES;
+            }
+            [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+        }
+        return YES;
+    }
+
     // if the inputText is empty, it's a function key combination, we ignore it
     if (!input.inputText.length) {
         return NO;
@@ -1700,6 +1712,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             return YES;
         }
 
+        if ([state isKindOfClass:[InputStateIcuTransform class]]) {
+            InputStateIcuTransform *kanaState = (InputStateIcuTransform *)state;
+            NSString *candidate = [kanaState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
+            stateCallback(committing);
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
+            return YES;
+        }
+
         // Find associated phrases from the chosen candidate.
 
         if (Preferences.shiftEnterEnabled &&
@@ -2032,6 +2054,36 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return array;
 }
 
+
+- (NSArray<NSString *> *)_candidatesForIcuTransformString:(NSString *)string
+{
+    if (string.length == 0) {
+        return @[];
+    }
+
+    NSArray *transforms = @[
+        NSStringTransformLatinToHiragana,
+        NSStringTransformLatinToKatakana,
+        NSStringTransformLatinToHangul,
+        NSStringTransformLatinToArabic,
+        NSStringTransformLatinToHebrew,
+        NSStringTransformLatinToThai,
+        NSStringTransformLatinToGreek,
+    ];
+
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    for (NSString *transform in transforms) {
+        NSString *transformed = [string stringByApplyingTransform:transform reverse: NO];
+        if (![transformed isEqualToString:string] && ![array containsObject:transformed ]) {
+            [array addObject:transformed];
+        }
+    }
+
+    return array;
+}
+
+
+
 - (BOOL)_handleNumberState:(InputState *)state
                      input:(KeyHandlerInput *)input
              stateCallback:(void (^)(InputState *))stateCallback
@@ -2088,6 +2140,51 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             charCode];
         NSArray *candidates = [self _candidatesForNumberString:appended];
         InputStateNumber *newState = [[InputStateNumber alloc] initWithNumber:appended candidates:candidates];
+        stateCallback(newState);
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)_handleIcuTansformState:(InputState *)state
+                     input:(KeyHandlerInput *)input
+             stateCallback:(void (^)(InputState *))stateCallback
+             errorCallback:(void (^)(void))errorCallback;
+{
+    InputStateIcuTransform *icuTransformState = (InputStateIcuTransform *)state;
+    UniChar charCode = input.charCode;
+    BOOL cancelKey = (charCode == 27);
+    if (cancelKey) {
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+    if ((charCode == 8) || input.isDelete) {
+        NSString *string = icuTransformState.string;
+        if (string.length > 0) {
+            string = [string substringToIndex:string.length - 1];
+        } else {
+            errorCallback();
+            return YES;
+        }
+
+        NSArray *candidates = [self _candidatesForIcuTransformString:string];
+        InputStateIcuTransform *newState = [[InputStateIcuTransform alloc] initWithString:string candidates:candidates];
+        stateCallback(newState);
+        return YES;
+    }
+
+    if (isprint(charCode)) {
+        if (icuTransformState.string.length > 100) {
+            errorCallback();
+            return YES;
+        }
+
+        NSString *appended = [NSString stringWithFormat:@"%@%c",
+                              icuTransformState.string,
+                              charCode];
+        NSArray *candidates = [self _candidatesForIcuTransformString:appended];
+        InputStateIcuTransform *newState = [[InputStateIcuTransform alloc] initWithString:appended candidates:candidates];
         stateCallback(newState);
         return YES;
     }
