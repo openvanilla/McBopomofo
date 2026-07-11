@@ -146,7 +146,7 @@ struct VersionUpdateApi {
 class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControllerDelegate {
 
     @IBOutlet weak var window: NSWindow?
-    private var preferencesWindowController: PreferencesWindowController?
+    private var preferencesWindowController: PreferencesUiWindowController?
     private var checkTask: URLSessionTask?
     private var updateNextStepURL: URL?
     private var fsStreamHelper: FSEventStreamHelper?
@@ -190,12 +190,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NonModalAlertWindowControlle
         checkForUpdate()
     }
 
+    @MainActor
     @objc func showPreferences() {
         if preferencesWindowController == nil {
-            preferencesWindowController = PreferencesWindowController(windowNibName: "preferences")
+            preferencesWindowController = PreferencesUiWindowController()
         }
-        preferencesWindowController?.window?.center()
-        preferencesWindowController?.window?.orderFront(self)
+        preferencesWindowController?.showAndActivate()
     }
 
     @objc(checkForUpdate)

@@ -44,6 +44,9 @@
 		6AFF97F2253B299E007F1C49 /* NonModalAlertWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF97F0253B299E007F1C49 /* NonModalAlertWindowController.xib */; };
 		B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */; };
 		B0781B352ACA2655003D9F75 /* ServicesMenu.strings in Resources */ = {isa = PBXBuildFile; fileRef = B0781B372ACA2655003D9F75 /* ServicesMenu.strings */; };
+		D402D66A3002779000CF3746 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D402D6673002779000CF3746 /* PreferencesView.swift */; };
+		D402D66C3002779000CF3746 /* PreferencesUiWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D402D6683002779000CF3746 /* PreferencesUiWindowController.swift */; };
+		D402D66D3002779000CF3746 /* PreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D402D6663002779000CF3746 /* PreferencesModel.swift */; };
 		D40EFFA22EB669F900C1728A /* InfoCollector in Frameworks */ = {isa = PBXBuildFile; productRef = D40EFFA12EB669F900C1728A /* InfoCollector */; };
 		D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41355D7278D7409005E5CBD /* LanguageModelManager.mm */; };
 		D41355DB278E6D17005E5CBD /* McBopomofoLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355D9278E6D17005E5CBD /* McBopomofoLM.cpp */; };
@@ -189,6 +192,9 @@
 		B058C5262AC9DF51002EDD66 /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
 		B0781B362ACA2655003D9F75 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ServicesMenu.strings; sourceTree = "<group>"; };
 		B0781B382ACA2659003D9F75 /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/ServicesMenu.strings"; sourceTree = "<group>"; };
+		D402D6663002779000CF3746 /* PreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesModel.swift; sourceTree = "<group>"; };
+		D402D6673002779000CF3746 /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
+		D402D6683002779000CF3746 /* PreferencesUiWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesUiWindowController.swift; sourceTree = "<group>"; };
 		D40EFFA02EB669BB00C1728A /* InfoCollector */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InfoCollector; path = Packages/InfoCollector; sourceTree = "<group>"; };
 		D41355D6278D7409005E5CBD /* LanguageModelManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LanguageModelManager.h; sourceTree = "<group>"; };
 		D41355D7278D7409005E5CBD /* LanguageModelManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LanguageModelManager.mm; sourceTree = "<group>"; };
@@ -321,6 +327,7 @@
 		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				D402D6693002779000CF3746 /* PreferencesUI */,
 				6A38BBDD15FC115800A8A51F /* Data */,
 				6A0D4F1215FC0EB100ABF4B3 /* Engine */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
@@ -474,6 +481,16 @@
 				6A68C1C12EC7F2C0005284A0 /* Localizable.stringsdict */,
 			);
 			path = Installer;
+			sourceTree = "<group>";
+		};
+		D402D6693002779000CF3746 /* PreferencesUI */ = {
+			isa = PBXGroup;
+			children = (
+				D402D6663002779000CF3746 /* PreferencesModel.swift */,
+				D402D6673002779000CF3746 /* PreferencesView.swift */,
+				D402D6683002779000CF3746 /* PreferencesUiWindowController.swift */,
+			);
+			path = PreferencesUI;
 			sourceTree = "<group>";
 		};
 		D427F766278C9CBD004A2160 /* Packages */ = {
@@ -750,6 +767,9 @@
 				D43FC40B2B23788400ED5A1C /* InputMacro.swift in Sources */,
 				6ADF5B1A2BA513E000577D98 /* MemoryMappedFile.cpp in Sources */,
 				B058C5272AC9DF51002EDD66 /* ServiceProvider.swift in Sources */,
+				D402D66A3002779000CF3746 /* PreferencesView.swift in Sources */,
+				D402D66C3002779000CF3746 /* PreferencesUiWindowController.swift in Sources */,
+				D402D66D3002779000CF3746 /* PreferencesModel.swift in Sources */,
 				6ADF5B192BA513E000577D98 /* AssociatedPhrasesV2.cpp in Sources */,
 				6ADF5B1B2BA513E000577D98 /* UTF8Helper.cpp in Sources */,
 				D41355D8278D74B5005E5CBD /* LanguageModelManager.mm in Sources */,
