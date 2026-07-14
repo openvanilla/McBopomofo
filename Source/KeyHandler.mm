@@ -327,8 +327,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     // MARK: Handle Selecting Feature
     if ([state isKindOfClass:[InputStateSelectingFeature class]] ||
-        [state isKindOfClass:[InputStateSelectingDateMacro class]] ||
-        [state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
+        [state isKindOfClass:[InputStateSelectingDateMacro class]]) {
         return [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
@@ -337,17 +336,24 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return [self _handleBig5State:state input:input stateCallback:stateCallback errorCallback:errorCallback];
     }
 
-    // MARK: Handle Iroha Japanese Kana Input
-    if ([state isKindOfClass:[InputStateIrohaKana class]]) {
-        return [self _handleIrohaKanaState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
-    }
-
     // MARK: Handle Chinese Number Input
     if ([state isKindOfClass:[InputStateNumber class]]) {
         BOOL result = [self _handleNumberState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
         if (!result) {
             InputStateNumber *numberState = (InputStateNumber *)state;
             if (!numberState.candidates.count) {
+                return YES;
+            }
+            [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+        }
+        return YES;
+    }
+
+    if ([state isKindOfClass:[InputStateIcuTransform class]]) {
+        BOOL result = [self _handleIcuTansformState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
+        if (!result) {
+            InputStateIcuTransform *icuTransformState = (InputStateIcuTransform *)state;
+            if (!icuTransformState.candidates.count) {
                 return YES;
             }
             [self _handleCandidateState:state input:input stateCallback:stateCallback errorCallback:errorCallback];
@@ -1651,10 +1657,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
             stateCallback(empty);
-        } else if ([state isKindOfClass:[InputStateIrohaKanaCandidates class]]) {
-            [self clear];
-            InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
-            stateCallback(empty);
         } else if (_inputMode == InputModePlainBopomofo) {
             [self clear];
             InputStateEmptyIgnoringPreviousState *empty = [[InputStateEmptyIgnoringPreviousState alloc] init];
@@ -1692,7 +1694,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
         if ([state isKindOfClass:[InputStateNumber class]]) {
             InputStateNumber *numberState = (InputStateNumber *)state;
-            NSString *candidate = [numberState.candidates objectAtIndex:gCurrentCandidateController.selectedCandidateIndex];
+            NSUInteger index = gCurrentCandidateController ? gCurrentCandidateController.selectedCandidateIndex : 0;
+            NSString *candidate = [numberState.candidates objectAtIndex:index];
+            InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
+            stateCallback(committing);
+            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+            stateCallback(empty);
+            return YES;
+        }
+
+        if ([state isKindOfClass:[InputStateIcuTransform class]]) {
+            InputStateIcuTransform *transformState = (InputStateIcuTransform *)state;
+            NSUInteger index = gCurrentCandidateController ? gCurrentCandidateController.selectedCandidateIndex : 0;
+            NSString *candidate = [transformState.candidates objectAtIndex:index];
             InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:candidate];
             stateCallback(committing);
             InputStateEmpty *empty = [[InputStateEmpty alloc] init];
@@ -1924,7 +1938,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     BOOL useInputTextIgnoringModifiers = NO;
     if ([state isKindOfClass:[InputStateAssociatedPhrasesPlain class]] ||
-        [state isKindOfClass:[InputStateNumber class]]) {
+        [state isKindOfClass:[InputStateNumber class]] ||
+        [state isKindOfClass:[InputStateIcuTransform class]]) {
         useInputTextIgnoringModifiers = YES;
     } else if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
         useInputTextIgnoringModifiers = [(InputStateAssociatedPhrases *)state autoTriggered];
@@ -2032,6 +2047,37 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return array;
 }
 
+
+- (NSArray<NSString *> *)_candidatesForIcuTransformString:(NSString *)string
+{
+    if (string.length == 0) {
+        return @[];
+    }
+
+    NSArray *transforms = @[
+        NSStringTransformLatinToHiragana,
+        NSStringTransformLatinToKatakana,
+        NSStringTransformLatinToHangul,
+        NSStringTransformLatinToThai,
+        NSStringTransformLatinToGreek,
+        @"Latin-Cyrillic",
+        NSStringTransformLatinToArabic,
+        NSStringTransformLatinToHebrew,
+        @"Latin-Devanagari",
+    ];
+
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    for (NSString *transform in transforms) {
+        NSString *transformed = [string stringByApplyingTransform:transform reverse:NO];
+        if (transformed && ![transformed isEqualToString:string] && ![array containsObject:transformed ]) {
+            [array addObject:transformed];
+        }
+    }
+
+    return array;
+}
+
+
 - (BOOL)_handleNumberState:(InputState *)state
                      input:(KeyHandlerInput *)input
              stateCallback:(void (^)(InputState *))stateCallback
@@ -2094,6 +2140,79 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     return NO;
 }
 
+- (BOOL)_handleIcuTansformState:(InputState *)state
+                     input:(KeyHandlerInput *)input
+             stateCallback:(void (^)(InputState *))stateCallback
+             errorCallback:(void (^)(void))errorCallback
+{
+    InputStateIcuTransform *icuTransformState = (InputStateIcuTransform *)state;
+    UniChar charCode = input.charCode;
+    BOOL cancelKey = (charCode == 27);
+    if (cancelKey) {
+        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
+        stateCallback(empty);
+        return YES;
+    }
+    if ((charCode == 8) || input.isDelete) {
+        NSString *string = icuTransformState.string;
+        if (string.length > 0) {
+            string = [string substringToIndex:string.length - 1];
+        } else {
+            errorCallback();
+            return YES;
+        }
+
+        NSArray *candidates = [self _candidatesForIcuTransformString:string];
+        InputStateIcuTransform *newState = [[InputStateIcuTransform alloc] initWithString:string candidates:candidates];
+        stateCallback(newState);
+        return YES;
+    }
+
+    // We are determining whether the input is a candidate selection key. For
+    // instance, when a user is inputting "RAMEN", the candidate window may
+    // display:
+    //
+    // - Shift + 1: らねぶ
+    // - Shift + 2: ラマン...
+    //
+    // If the user triggers "Shift + 1" in this context, the method should
+    // return NO and defer handling to
+    // `_handleCandidateState:input:stateCallback:errorCallback:`.
+
+    if (input.isShiftHold) {
+        NSString* match = input.inputTextIgnoringModifiers;
+        VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+        NSInteger index = NSNotFound;
+
+        for (NSUInteger j = 0, c = gCurrentCandidateController.keyLabels.count; j < c; j++) {
+            VTCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
+            if ([match compare:label.key options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+                index = j;
+                break;
+            }
+        }
+        if (index != NSNotFound) {
+            return NO;
+        }
+    }
+
+    // This handler is expected to process ASCII characters only.
+    if (charCode < 128 && isprint(charCode)) {
+        if (icuTransformState.string.length > 100) {
+            errorCallback();
+            return YES;
+        }
+        NSString *appended = [NSString stringWithFormat:@"%@%c",
+                              icuTransformState.string,
+                              charCode];
+        NSArray *candidates = [self _candidatesForIcuTransformString:appended];
+        InputStateIcuTransform *newState = [[InputStateIcuTransform alloc] initWithString:appended candidates:candidates];
+        stateCallback(newState);
+        return YES;
+    }
+    return NO;
+}
+
 - (BOOL)_handleBig5State:(InputState *)state
                    input:(KeyHandlerInput *)input
            stateCallback:(void (^)(InputState *))stateCallback
@@ -2142,85 +2261,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
             InputStateBig5 *newState = [[InputStateBig5 alloc] initWithCode:appended];
             stateCallback(newState);
         }
-        return YES;
-    }
-
-    errorCallback();
-    return YES;
-}
-
-- (BOOL)_handleIrohaKanaState:(InputState *)state
-                        input:(KeyHandlerInput *)input
-                stateCallback:(void (^)(InputState *))stateCallback
-                errorCallback:(void (^)(void))errorCallback;
-{
-    InputStateIrohaKana *irohaKana = (InputStateIrohaKana *)state;
-    UniChar charCode = input.charCode;
-    BOOL cancelKey = (charCode == 27);
-    if (cancelKey) {
-        InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-        stateCallback(empty);
-        return YES;
-    }
-
-    // Enter or space
-    if (charCode == 13 || charCode == 32) {
-        NSString *code = irohaKana.code;
-        if (code.length == 0) {
-            InputStateEmpty *empty = [[InputStateEmpty alloc] init];
-            stateCallback(empty);
-            return YES;
-        }
-
-        std::string key = std::string("_kana_") + std::string([code UTF8String]);
-        if (_languageModel->hasUnigrams(key)) {
-            auto unigrams = _languageModel->getUnigrams(key);
-            if (unigrams.size() == 1) {
-                auto unigram = unigrams[0];
-                auto value = unigram.value();
-                NSString *string = [NSString stringWithUTF8String:value.c_str()];
-                InputStateCommitting *committing = [[InputStateCommitting alloc] initWithPoppedText:string];
-                stateCallback(committing);
-                InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
-                stateCallback(newState);
-            } else {
-                NSMutableArray *candidates = [[NSMutableArray alloc] init];
-                for (auto unigram : unigrams) {
-                    NSString *string = [[NSString alloc] initWithUTF8String:unigram.value().c_str()];
-                    [candidates addObject:string];
-                }
-                InputStateIrohaKanaCandidates *newState = [[InputStateIrohaKanaCandidates alloc] initWithCode:code candidates:candidates];
-                stateCallback(newState);
-            }
-            return YES;
-        }
-        errorCallback();
-        InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
-        stateCallback(newState);
-        return YES;
-    }
-
-    if ((charCode == 8) || input.isDelete) {
-        NSString *code = irohaKana.code;
-        if (code.length == 0) {
-            InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:@""];
-            stateCallback(newState);
-            return YES;
-        }
-        code = [code substringToIndex:code.length - 1];
-        InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:code];
-        stateCallback(newState);
-        return YES;
-    }
-
-    if ((charCode >= 'a' && charCode <= 'z') || ((charCode >= 'A' && charCode <= 'Z'))) {
-        if (irohaKana.code.length >= 4) {
-            errorCallback();
-            return YES;
-        }
-        NSString *appended = [NSString stringWithFormat:@"%@%c", irohaKana.code, tolower(charCode)];
-        InputStateIrohaKana *newState = [[InputStateIrohaKana alloc] initWithCode:appended];
-        stateCallback(newState);
         return YES;
     }
 

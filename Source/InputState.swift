@@ -130,9 +130,9 @@ class InputState: NSObject {
                 }
             ),
             (
-                NSLocalizedString("Iroha Kana Input", comment: ""),
+                NSLocalizedString("Quick Text Transform", comment: ""),
                 {
-                    .IrohaKana(code: "")
+                    .IcuTransform(string: "", candidates: [])
                 }
             ),
         ]
@@ -239,6 +239,36 @@ class InputState: NSObject {
         @objc public var composingBuffer: String {
             return "[數字] \(number)"
         }
+    }
+
+    @objc(InputStateIcuTransform)
+    class IcuTransform: InputState, CandidateProvider {
+        var candidateCount: Int {
+            candidates.count
+        }
+        func candidate(at index: Int) -> String {
+            candidates[index]
+        }
+
+        func reading(at index: Int) -> String? {
+            candidates[index]
+        }
+
+        @objc private(set) var string: String
+        @objc private(set) var candidates: [String]
+
+        @objc init(string: String, candidates: [String]) {
+            self.string = string
+            self.candidates = candidates
+        }
+
+        override var description: String {
+            "<InputState.IcuTransform, string:\(string)>"
+        }
+
+        @objc public var composingBuffer: String {
+            return "[文字轉換] \(string)"
+        }
 
     }
 
@@ -256,55 +286,6 @@ class InputState: NSObject {
 
         @objc public var composingBuffer: String {
             return "[內碼] \(code)"
-        }
-    }
-
-    @objc(InputStateIrohaKana)
-    class IrohaKana: InputState {
-        @objc private(set) var code: String
-
-        @objc init(code: String) {
-            self.code = code
-        }
-
-        override var description: String {
-            "<InputState.IrohaKana, code:\(code)>"
-        }
-
-        @objc public var composingBuffer: String {
-            return "[伊呂波] \(code)"
-        }
-    }
-
-    @objc(InputStateIrohaKanaCandidates)
-    class IrohaKanaCandidates: InputState, CandidateProvider {
-        @objc private(set) var code: String
-
-        @objc private(set) var candidates: [String] = []
-
-        var candidateCount: Int {
-            candidates.count
-        }
-
-        func candidate(at index: Int) -> String {
-            candidates[index]
-        }
-
-        func reading(at index: Int) -> String? {
-            candidates[index]
-        }
-
-        @objc init(code: String, candidates: [String]) {
-            self.code = code
-            self.candidates = candidates
-        }
-
-        override var description: String {
-            "<InputState.IrohaKanaCandidates, code:\(code)>"
-        }
-
-        @objc public var composingBuffer: String {
-            return "[伊呂波] \(code)"
         }
     }
 
@@ -643,14 +624,15 @@ class InputState: NSObject {
 
         @objc
         func toggle(autoTriggered: Bool) -> AssociatedPhrases {
-            AssociatedPhrases(previousState: previousState,
-                              prefixCursorIndex: prefixCursorIndex,
-                              prefixReading: prefixReading,
-                              prefixValue: prefixValue,
-                              selectedIndex: selectedIndex,
-                              candidates: candidates,
-                              useVerticalMode: useVerticalMode,
-                              autoTriggered: autoTriggered)
+            AssociatedPhrases(
+                previousState: previousState,
+                prefixCursorIndex: prefixCursorIndex,
+                prefixReading: prefixReading,
+                prefixValue: prefixValue,
+                selectedIndex: selectedIndex,
+                candidates: candidates,
+                useVerticalMode: useVerticalMode,
+                autoTriggered: autoTriggered)
         }
 
     }
