@@ -2068,8 +2068,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     NSMutableArray *array = [[NSMutableArray alloc] init];
     for (NSString *transform in transforms) {
-        NSString *transformed = [string stringByApplyingTransform:transform reverse: NO];
-        if (![transformed isEqualToString:string] && ![array containsObject:transformed ]) {
+        NSString *transformed = [string stringByApplyingTransform:transform reverse:NO];
+        if (transformed && ![transformed isEqualToString:string] && ![array containsObject:transformed ]) {
             [array addObject:transformed];
         }
     }
@@ -2168,6 +2168,17 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    // We are determining whether the input is a candidate selection key. For
+    // instance, when a user is inputting "RAMEN", the candidate window may
+    // display:
+    //
+    // - Shift + 1: らねぶ
+    // - Shift + 2: ラマン...
+    //
+    // If the user triggers "Shift + 1" in this context, the method should
+    // return NO and defer handling to
+    // `_handleCandidateState:input:stateCallback:errorCallback:`.
+
     if (input.isShiftHold) {
         NSString* match = input.inputTextIgnoringModifiers;
         VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
@@ -2185,6 +2196,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         }
     }
 
+    // This handler is expected to process ASCII characters only.
     if (charCode < 128 && isprint(charCode)) {
         if (icuTransformState.string.length > 100) {
             errorCallback();
