@@ -240,6 +240,94 @@ class KeyHandlerBopomofoTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    func testIcuTransformAppendsPrintableInputAndBuildsCandidates() {
+        let input = KeyHandlerInput(
+            inputText: "a", keyCode: 0, charCode: charCode("a"), flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "", candidates: [])
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            XCTFail("ICU transform input should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(state is InputState.IcuTransform, "\(state)")
+        guard let state = state as? InputState.IcuTransform else {
+            return
+        }
+        XCTAssertEqual(state.string, "a")
+        XCTAssertTrue(state.candidates.contains("あ"))
+        XCTAssertTrue(state.candidates.contains("ア"))
+        XCTAssertFalse(state.candidates.contains("a"))
+    }
+
+    func testIcuTransformDeletesLastCharacterAndRefreshesCandidates() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "ka", candidates: [])
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            XCTFail("ICU transform delete should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(state is InputState.IcuTransform, "\(state)")
+        guard let state = state as? InputState.IcuTransform else {
+            return
+        }
+        XCTAssertEqual(state.string, "k")
+        XCTAssertTrue(state.candidates.contains("κ"))
+        XCTAssertFalse(state.candidates.contains("か"))
+    }
+
+    func testIcuTransformDeleteEmptyStringReportsError() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 8, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "", candidates: [])
+        var didReportError = false
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            didReportError = true
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(didReportError)
+        XCTAssertEqual((state as? InputState.IcuTransform)?.string, "")
+    }
+
+    func testIcuTransformEscapeCancelsInput() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 27, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "ka", candidates: [])
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+        } errorCallback: {
+            XCTFail("ICU transform escape should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertTrue(state is InputState.Empty, "\(state)")
+    }
+
+    func testIcuTransformIgnoresNonPrintableInput() {
+        let input = KeyHandlerInput(
+            inputText: "", keyCode: 0, charCode: 0, flags: [], isVerticalMode: false)
+        var state: InputState = InputState.IcuTransform(string: "ka", candidates: [])
+        var didChangeState = false
+        let result = handler.handle(input: input, state: state) { newState in
+            state = newState
+            didChangeState = true
+        } errorCallback: {
+            XCTFail("ICU transform non-printable input should not fail")
+        }
+
+        XCTAssertTrue(result)
+        XCTAssertFalse(didChangeState)
+        XCTAssertEqual((state as? InputState.IcuTransform)?.string, "ka")
+    }
+
     func testIgnoreCapslock() {
         let input = KeyHandlerInput(
             inputText: "A", keyCode: 0, charCode: 0, flags: .capsLock, isVerticalMode: false)
@@ -2856,96 +2944,6 @@ extension KeyHandlerBopomofoTests {
 }
 
 extension KeyHandlerBopomofoTests {
-
-    func testIrohaKanaInput() {
-        var state: InputState = InputState.IrohaKana(code: "")
-
-        let inputA = KeyHandlerInput(
-            inputText: "a", keyCode: 0, charCode: charCode("a"), flags: [],
-            isVerticalMode: false)
-
-        handler.handle(input: inputA, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-
-        XCTAssertTrue(state is InputState.IrohaKana)
-        if let s = state as? InputState.IrohaKana {
-            XCTAssertEqual(s.code, "a")
-        }
-
-        let inputEnter = KeyHandlerInput(
-            inputText: "\r", keyCode: KeyCode.enter.rawValue, charCode: 13, flags: [],
-            isVerticalMode: false)
-        var irohaCandidate: InputState.IrohaKanaCandidates?
-        handler.handle(input: inputEnter, state: state) { newState in
-            if let s = newState as? InputState.IrohaKanaCandidates {
-                irohaCandidate = s
-            }
-            state = newState
-        } errorCallback: {
-        }
-
-        XCTAssertNotNil(irohaCandidate)
-        XCTAssertEqual(irohaCandidate?.candidate(at: 0), "あ")
-    }
-
-    func testIrohaKanaBackspace() {
-        var state: InputState = InputState.IrohaKana(code: "a")
-        let inputDelete = KeyHandlerInput(
-            inputText: "", keyCode: KeyCode.delete.rawValue, charCode: 8, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: inputDelete, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-        XCTAssertTrue(state is InputState.IrohaKana)
-        if let s = state as? InputState.IrohaKana {
-            XCTAssertEqual(s.code, "")
-        }
-    }
-
-    func testIrohaKanaCancel() {
-        var state: InputState = InputState.IrohaKana(code: "a")
-        let inputEsc = KeyHandlerInput(
-            inputText: "", keyCode: 27, charCode: 27, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: inputEsc, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-        XCTAssertTrue(state is InputState.Empty)
-    }
-
-    func testIrohaKanaCandidateGeneration() {
-        var state: InputState = InputState.IrohaKana(code: "kyou")
-        let inputEnter = KeyHandlerInput(
-            inputText: "\r", keyCode: KeyCode.enter.rawValue, charCode: 13, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: inputEnter, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-        XCTAssertTrue(state is InputState.IrohaKanaCandidates)
-        if let s = state as? InputState.IrohaKanaCandidates {
-            XCTAssertEqual(s.code, "kyou")
-            XCTAssertTrue(s.candidates.contains("今日"))
-            XCTAssertTrue(s.candidates.contains("きょう"))
-        }
-    }
-
-    func testIrohaKanaCandidateCancel() {
-        var state: InputState = InputState.IrohaKanaCandidates(
-            code: "kyou", candidates: ["きょう", "今日"])
-        let inputEsc = KeyHandlerInput(
-            inputText: "", keyCode: 27, charCode: 27, flags: [],
-            isVerticalMode: false)
-        handler.handle(input: inputEsc, state: state) { newState in
-            state = newState
-        } errorCallback: {
-        }
-        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState)
-    }
 
     func testInputBufferThenBacktickThenEsc() {
         // Type something in the buffer, then press ` to enter choosing punctuation list, then ESC to return to inputting state

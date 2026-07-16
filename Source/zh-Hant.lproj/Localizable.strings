@@ -258,5 +258,5 @@
 "Run a shell script" = "執行特定的 Shell Script";
 "Path:" = "路徑：";
 "You can run a script to use git to backup your phrases. The script will run in the folder of your user phrases folder." = "您可以在加詞之後，透過這個 Shell Script 執行指定的工作，像是使用 git 備份詞庫。這個 script 會在你的使用者詞彙資料夾下執行。";
-"U.S." = "美式英文";
-"ABC" = "ABC";
+
+"Quick Text Transform" = "日韓多語拼音轉換";
