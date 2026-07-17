@@ -71,7 +71,7 @@ def replace_score_in_lm(lm, reading, value, new_score):
         uv, us = unigram
         if uv == value:
             if type(us) == str:
-                new_unigrams.append((uv, str(new_score)))
+                new_unigrams.append((uv, "%.8f" % new_score))
             else:
                 new_unigrams.append((uv, new_score))
             has_replacement = True
