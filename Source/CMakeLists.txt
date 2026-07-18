@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.12)
 project(McBopomofoCore VERSION 3.0)
 
 option(ENABLE_TEST "Build Test" On)
+option(ENABLE_ENGINE_PROFILE "Build the engine profiling workload" Off)
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.23.0")
     find_package(GTest)
@@ -34,4 +35,3 @@ if (ENABLE_TEST)
 endif ()
 
 add_subdirectory(Engine)
-
