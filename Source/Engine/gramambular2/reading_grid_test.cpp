@@ -189,13 +189,13 @@ TEST(ReadingGridTest, Span) {
   ASSERT_EQ(span.nodeOf(1), n1);
   ASSERT_EQ(span.nodeOf(2), nullptr);
   ASSERT_EQ(span.nodeOf(3), n3);
-  ASSERT_EQ(span.nodeOf(ReadingGrid::kMaximumSpanLength), nullptr);
+  ASSERT_EQ(span.nodeOf(ReadingGrid::kDefaultMaxSpanLength), nullptr);
   span.clear();
   ASSERT_EQ(span.maxLength(), 0);
   ASSERT_EQ(span.nodeOf(1), nullptr);
   ASSERT_EQ(span.nodeOf(2), nullptr);
   ASSERT_EQ(span.nodeOf(3), nullptr);
-  ASSERT_EQ(span.nodeOf(ReadingGrid::kMaximumSpanLength), nullptr);
+  ASSERT_EQ(span.nodeOf(ReadingGrid::kDefaultMaxSpanLength), nullptr);
 
   span.add(n1);
   span.add(n3);
@@ -208,13 +208,53 @@ TEST(ReadingGridTest, Span) {
   ASSERT_EQ(span.maxLength(), 0);
   ASSERT_EQ(span.nodeOf(1), nullptr);
 
-#ifndef NDEBUG
+  // Spans grow dynamically: lengths beyond kDefaultMaxSpanLength are
+  // supported, and out-of-range lookups return nullptr instead of asserting.
   auto n10 = std::make_shared<ReadingGrid::Node>("", 10, lm.getUnigrams(""));
-  ASSERT_DEATH({ (void)span.add(n10); }, "Assertion");
+  span.add(n10);
+  ASSERT_EQ(span.maxLength(), 10);
+  ASSERT_EQ(span.nodeOf(10), n10);
+  ASSERT_EQ(span.nodeOf(ReadingGrid::kDefaultMaxSpanLength + 1), nullptr);
+  ASSERT_EQ(span.nodeOf(11), nullptr);
+
+#ifndef NDEBUG
   ASSERT_DEATH({ (void)span.nodeOf(0); }, "Assertion");
-  ASSERT_DEATH(
-      { (void)span.nodeOf(ReadingGrid::kMaximumSpanLength + 1); }, "Assertion");
 #endif
+}
+
+TEST(ReadingGridTest, DynamicSpanLength) {
+  class LongKeyLM : public SimpleLM {
+   public:
+    explicit LongKeyLM(const char* input) : SimpleLM(input) {}
+    size_t maxKeyLength() const override { return 10; }
+  };
+
+  constexpr char kLongPhraseData[] = R"(
+ㄧ 一 -2.0
+ㄧ-ㄧ-ㄧ-ㄧ-ㄧ-ㄧ-ㄧ-ㄧ-ㄧ-ㄧ 一一一一一一一一一一 -1.0
+)";
+
+  // A model that reports a 10-syllable maximum key length causes the grid to
+  // accept spans longer than kDefaultMaxSpanLength.
+  ReadingGrid grid(std::make_shared<LongKeyLM>(kLongPhraseData));
+  ASSERT_EQ(grid.maxSpanLength(), 10);
+  for (int i = 0; i < 10; i++) {
+    grid.insertReading("ㄧ");
+  }
+  ReadingGrid::WalkResult result = grid.walk();
+  ASSERT_EQ(result.nodes.size(), 1);
+  ASSERT_EQ(result.nodes[0]->spanningLength(), 10);
+  ASSERT_EQ(result.nodes[0]->value(), "一一一一一一一一一一");
+
+  // A model that does not report a maximum key length gets the default, and
+  // the same input is segmented into shorter nodes.
+  ReadingGrid defaultGrid(std::make_shared<SimpleLM>(kLongPhraseData));
+  ASSERT_EQ(defaultGrid.maxSpanLength(), ReadingGrid::kDefaultMaxSpanLength);
+  for (int i = 0; i < 10; i++) {
+    defaultGrid.insertReading("ㄧ");
+  }
+  ReadingGrid::WalkResult defaultResult = defaultGrid.walk();
+  ASSERT_GT(defaultResult.nodes.size(), 1);
 }
 
 TEST(ReadingGridTest, ScoreRankedLanguageModel) {
