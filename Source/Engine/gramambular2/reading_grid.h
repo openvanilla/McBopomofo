@@ -253,6 +253,11 @@ class ReadingGrid {
 
   // Internal methods for maintaining the grid.
 
+  enum class EditType {
+    kInsertion,
+    kDeletion,
+  };
+
   void expandGridAt(size_t loc);
   void shrinkGridAt(size_t loc);
   void removeAffectedNodes(size_t loc);
@@ -260,7 +265,7 @@ class ReadingGrid {
   std::string combineReading(std::vector<std::string>::const_iterator begin,
                              std::vector<std::string>::const_iterator end);
   bool hasNodeAt(size_t loc, size_t readingLen, const std::string& reading);
-  void update();
+  void update(size_t loc, EditType editType);
 
   // Internal implementation of overrideCandidate, with an optional reading.
   bool overrideCandidate(size_t loc, const std::string* reading,
