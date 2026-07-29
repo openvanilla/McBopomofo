@@ -138,3 +138,12 @@ if (ENABLE_TEST)
             add_dependencies(runParselessPhraseDBBenchmark ParselessPhraseDBBenchmark)
         endif ()
 endif ()
+
+if (ENABLE_ENGINE_PROFILE)
+        add_executable(EngineProfile
+                EngineProfile.cpp)
+        target_link_libraries(EngineProfile
+                McBopomofoLMLib
+                MandarinLib
+                gramambular2_lib)
+endif ()
