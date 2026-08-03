@@ -54,14 +54,18 @@ bool ReadingGrid::insertReading(const std::string& reading) {
     return false;
   }
 
-  if (!lm_.hasUnigrams(reading)) {
+  std::string insertedReading = reading;
+  auto unigrams = lm_.getUnigrams(insertedReading);
+  if (unigrams.empty()) {
     return false;
   }
 
   readings_.insert(readings_.begin() + static_cast<ptrdiff_t>(cursor_),
-                   reading);
+                   std::move(insertedReading));
   expandGridAt(cursor_);
-  update();
+  insert(cursor_,
+         std::make_shared<Node>(readings_[cursor_], 1, std::move(unigrams)));
+  update(cursor_, EditType::kInsertion);
 
   // Cursor must only move after update().
   ++cursor_;
@@ -78,7 +82,7 @@ bool ReadingGrid::deleteReadingBeforeCursor() {
   // Cursor must decrement for grid-shrinking and update to work.
   --cursor_;
   shrinkGridAt(cursor_);
-  update();
+  update(cursor_, EditType::kDeletion);
   return true;
 }
 
@@ -90,7 +94,7 @@ bool ReadingGrid::deleteReadingAfterCursor() {
   readings_.erase(readings_.begin() + static_cast<ptrdiff_t>(cursor_),
                   readings_.begin() + static_cast<ptrdiff_t>(cursor_ + 1));
   shrinkGridAt(cursor_);
-  update();
+  update(cursor_, EditType::kDeletion);
   return true;
 }
 
@@ -291,7 +295,7 @@ void ReadingGrid::removeAffectedNodes(size_t loc) {
   //                XXXXX
   //            XXXXXXXXX
   //
-  if (spans_.empty()) {
+  if (spans_.empty() || loc == 0) {
     return;
   }
   size_t affectedLength = kMaximumSpanLength - 1;
@@ -323,7 +327,7 @@ std::string ReadingGrid::combineReading(
 
 bool ReadingGrid::hasNodeAt(size_t loc, size_t readingLen,
                             const std::string& reading) {
-  if (loc > spans_.size()) {
+  if (loc >= spans_.size()) {
     return false;
   }
   const NodePtr& n = spans_[loc].nodeOf(readingLen);
@@ -333,14 +337,20 @@ bool ReadingGrid::hasNodeAt(size_t loc, size_t readingLen,
   return reading == n->reading();
 }
 
-void ReadingGrid::update() {
-  size_t begin =
-      (cursor_ <= kMaximumSpanLength) ? 0 : cursor_ - kMaximumSpanLength;
-  size_t end = cursor_ + kMaximumSpanLength;
+void ReadingGrid::update(size_t loc, EditType editType) {
+  // Spans that do not cross the edit retain their previous lookup result. A
+  // node means that the lookup succeeded, while a null slot means that the
+  // same reading was already looked up and did not exist. Only spans that
+  // include an insertion or cross a deletion boundary need to be queried.
+  size_t affectedLength = kMaximumSpanLength - 1;
+  size_t begin = loc <= affectedLength ? 0 : loc - affectedLength;
+  size_t end = editType == EditType::kInsertion ? loc + 1 : loc;
   end = std::min(end, readings_.size());
 
   for (size_t pos = begin; pos < end; pos++) {
-    for (size_t len = 1; len <= kMaximumSpanLength && pos + len <= end; len++) {
+    size_t minimumLength = loc - pos + 1;
+    size_t maximumLength = std::min(kMaximumSpanLength, readings_.size() - pos);
+    for (size_t len = minimumLength; len <= maximumLength; len++) {
       std::string combinedReading =
           combineReading(readings_.begin() + static_cast<ptrdiff_t>(pos),
                          readings_.begin() + static_cast<ptrdiff_t>(pos + len));
@@ -351,7 +361,8 @@ void ReadingGrid::update() {
           continue;
         }
 
-        insert(pos, std::make_shared<Node>(combinedReading, len, unigrams));
+        insert(pos, std::make_shared<Node>(std::move(combinedReading), len,
+                                           std::move(unigrams)));
       }
     }
   }
