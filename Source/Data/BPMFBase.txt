@@ -6715,7 +6715,6 @@
 㱒 ㄏㄜ he ck utf8
 抲 ㄏㄜ he ck utf8
 𠿒 ㄏㄜ he ck utf8
-㗿 ㄏㄜˇ he3 ck3 utf8
 賀 ㄏㄜˋ he4 ck4 big5
 和 ㄏㄜˋ he4 ck4 big5
 鶴 ㄏㄜˋ he4 ck4 big5
@@ -6841,6 +6840,7 @@
 𩩲 ㄏㄜˊ he2 ck6 utf8
 㪋 ㄏㄜˇ he3 ck3 utf8
 㰤 ㄏㄜˇ he3 ck3 utf8
+㗿 ㄏㄜˇ he3 ck3 utf8
 蒿 ㄏㄠ hao cl big5
 嚆 ㄏㄠ hao cl big5
 薅 ㄏㄠ hao cl big5
@@ -7967,7 +7967,6 @@
 篐 ㄍㄨ gu ej utf8
 苽 ㄍㄨ gu ej utf8
 軲 ㄍㄨ gu ej utf8
-姑 ㄍㄨ˙ gu5 ej7 big5
 工 ㄍㄨㄥ gong ej/ big5
 公 ㄍㄨㄥ gong ej/ big5
 功 ㄍㄨㄥ gong ej/ big5
@@ -8215,6 +8214,7 @@
 𩿇 ㄍㄨˋ gu4 ej4 utf8
 骨 ㄍㄨˊ gu2 ej6 big5
 鶻 ㄍㄨˊ gu2 ej6 big5
+姑 ㄍㄨ˙ gu5 ej7 big5
 鼓 ㄍㄨ˙ gu5 ej7 big5
 瓜 ㄍㄨㄚ gua ej8 big5
 括 ㄍㄨㄚ gua ej8 big5
@@ -11299,6 +11299,7 @@
 藂 ㄘㄨㄥˋ cong4 hj/4 big5
 謥 ㄘㄨㄥˋ cong4 hj/4 big5
 䈡 ㄘㄨㄥˋ cong4 hj/4 utf8
+衳 ㄘㄨㄥˇ cong3 hj/3 utf8
 幒 ㄘㄨㄥˇ cong3 hj/3 utf8
 從 ㄘㄨㄥˊ cong2 hj/6 big5
 叢 ㄘㄨㄥˊ cong2 hj/6 big5
@@ -11325,7 +11326,6 @@
 誴 ㄘㄨㄥˊ cong2 hj/6 utf8
 賩 ㄘㄨㄥˊ cong2 hj/6 utf8
 𧓏 ㄘㄨㄥˊ cong2 hj/6 utf8
-衳 ㄘㄨㄥˇ cong3 hj/3 utf8
 攛 ㄘㄨㄢ cuan hj0 big5
 躥 ㄘㄨㄢ cuan hj0 big5
 鋑 ㄘㄨㄢ cuan hj0 big5
@@ -16936,7 +16936,6 @@
 瑨 ㄐㄧㄣˋ jin4 rup4 utf8
 馸 ㄐㄧㄣˋ jin4 rup4 utf8
 ㄋ ㄋ n s big5
-㜌 ㄋㄡˇ nou3 s.3 utf8
 耨 ㄋㄡˋ nou4 s.4 big5
 鎒 ㄋㄡˋ nou4 s.4 big5
 嗕 ㄋㄡˋ nou4 s.4 big5
@@ -16951,6 +16950,7 @@
 㳶 ㄋㄡˇ nou3 s.3 utf8
 啂 ㄋㄡˇ nou3 s.3 utf8
 𡝦 ㄋㄡˇ nou3 s.3 utf8
+㜌 ㄋㄡˇ nou3 s.3 utf8
 濘 ㄋㄥˋ neng4 s/4 big5
 能 ㄋㄥˊ neng2 s/6 big5
 薴 ㄋㄥˊ neng2 s/6 big5
@@ -19592,7 +19592,6 @@
 𢩮 ㄧˋ yi4 u4 utf8
 𥹞 ㄧˋ yi4 u4 utf8
 𦨇 ㄧˋ yi4 u4 utf8
-意 ㄧㄜˋ ye4 uk4 big5
 義 ㄧˋ yi4 u4 big5
 易 ㄧˋ yi4 u4 big5
 議 ㄧˋ yi4 u4 big5
@@ -19939,6 +19938,7 @@
 𨯯 ㄧˊ yi2 u6 utf8
 𩼨 ㄧˊ yi2 u6 utf8
 意 ㄧ˙ yi5 u7 big5
+意 ㄧㄜˋ ye4 uk4 big5
 呀 ㄧㄚ ya u8 big5
 壓 ㄧㄚ ya u8 big5
 鴉 ㄧㄚ ya u8 big5
@@ -21129,6 +21129,7 @@
 𧋍 ㄒㄧ xi vu utf8
 𧎴 ㄒㄧ xi vu utf8
 西 ㄒㄧ˙ xi5 vu7 big5
+係 ㄒㄧ˙ xi5 vu7 big5
 些 ㄒㄧㄝ xie vu, big5
 歇 ㄒㄧㄝ xie vu, big5
 蠍 ㄒㄧㄝ xie vu, big5
@@ -21864,7 +21865,6 @@
 齚 ㄒㄧˊ xi2 vu6 utf8
 𢘻 ㄒㄧˊ xi2 vu6 utf8
 𨀙 ㄒㄧˊ xi2 vu6 utf8
-係 ㄒㄧ˙ xi5 vu7 big5
 瞎 ㄒㄧㄚ xia vu8 big5
 蝦 ㄒㄧㄚ xia vu8 big5
 岈 ㄒㄧㄚ xia vu8 big5
@@ -24188,6 +24188,20 @@
 麿 ㄌㄩˇ lv3 xm3 utf8
 𢙲 ㄌㄩˇ lv3 xm3 utf8
 𥶇 ㄌㄩˇ lv3 xm3 utf8
+捋 ㄌㄩˇ lv3 xm3 big5
+㜢 ㄌㄩˇ lv3 xm3 utf8
+侣 ㄌㄩˇ lv3 xm3 utf8
+吕 ㄌㄩˇ lv3 xm3 utf8
+娄 ㄌㄩˇ lv3 xm3 utf8
+寽 ㄌㄩˇ lv3 xm3 utf8
+屡 ㄌㄩˇ lv3 xm3 utf8
+捛 ㄌㄩˇ lv3 xm3 utf8
+稆 ㄌㄩˇ lv3 xm3 utf8
+褛 ㄌㄩˇ lv3 xm3 utf8
+鋶 ㄌㄩˇ lv3 xm3 utf8
+麿 ㄌㄩˇ lv3 xm3 utf8
+𢙲 ㄌㄩˇ lv3 xm3 utf8
+𥶇 ㄌㄩˇ lv3 xm3 utf8
 律 ㄌㄩˋ lv4 xm4 big5
 綠 ㄌㄩˋ lv4 xm4 big5
 率 ㄌㄩˋ lv4 xm4 big5
@@ -24223,20 +24237,6 @@
 曥 ㄌㄩˊ lv2 xm6 utf8
 爈 ㄌㄩˊ lv2 xm6 utf8
 馿 ㄌㄩˊ lv2 xm6 utf8
-捋 ㄌㄩˇ lv3 xm3 big5
-㜢 ㄌㄩˇ lv3 xm3 utf8
-侣 ㄌㄩˇ lv3 xm3 utf8
-吕 ㄌㄩˇ lv3 xm3 utf8
-娄 ㄌㄩˇ lv3 xm3 utf8
-寽 ㄌㄩˇ lv3 xm3 utf8
-屡 ㄌㄩˇ lv3 xm3 utf8
-捛 ㄌㄩˇ lv3 xm3 utf8
-稆 ㄌㄩˇ lv3 xm3 utf8
-褛 ㄌㄩˇ lv3 xm3 utf8
-鋶 ㄌㄩˇ lv3 xm3 utf8
-麿 ㄌㄩˇ lv3 xm3 utf8
-𢙲 ㄌㄩˇ lv3 xm3 utf8
-𥶇 ㄌㄩˇ lv3 xm3 utf8
 勒 ㄌㄟ lei xo big5
 嘞 ㄌㄟ lei xo utf8
 累 ㄌㄟˇ lei3 xo3 big5
