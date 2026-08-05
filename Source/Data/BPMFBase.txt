@@ -7289,6 +7289,7 @@
 軭 ㄎㄨㄤ kuang dj; utf8
 邼 ㄎㄨㄤ kuang dj; utf8
 𨀕 ㄎㄨㄤ kuang dj; utf8
+眶 ㄎㄨㄤ kuang dj; big5
 俇 ㄎㄨㄤˇ kuang3 dj;3 big5
 兤 ㄎㄨㄤˇ kuang3 dj;3 utf8
 況 ㄎㄨㄤˋ kuang4 dj;4 big5
