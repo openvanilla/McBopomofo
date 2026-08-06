@@ -53,7 +53,7 @@ def main():
                 phrases[k] = phrases[k] - phrases[v]
 
     for k in phrases:
-        norm += fscale ** (len(k) / 3 - 1) * phrases[k]
+        norm += fscale ** (len(k) - 1) * phrases[k]
 
     try:
         handle = open('PhraseFreq.txt', "w")
