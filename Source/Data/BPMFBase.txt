@@ -6838,9 +6838,9 @@
 𣿌 ㄏㄜˊ he2 ck6 utf8
 𧳇 ㄏㄜˊ he2 ck6 utf8
 𩩲 ㄏㄜˊ he2 ck6 utf8
+㗿 ㄏㄜˇ he3 ck3 utf8
 㪋 ㄏㄜˇ he3 ck3 utf8
 㰤 ㄏㄜˇ he3 ck3 utf8
-㗿 ㄏㄜˇ he3 ck3 utf8
 蒿 ㄏㄠ hao cl big5
 嚆 ㄏㄠ hao cl big5
 薅 ㄏㄠ hao cl big5
@@ -11299,8 +11299,8 @@
 藂 ㄘㄨㄥˋ cong4 hj/4 big5
 謥 ㄘㄨㄥˋ cong4 hj/4 big5
 䈡 ㄘㄨㄥˋ cong4 hj/4 utf8
-衳 ㄘㄨㄥˇ cong3 hj/3 utf8
 幒 ㄘㄨㄥˇ cong3 hj/3 utf8
+衳 ㄘㄨㄥˇ cong3 hj/3 utf8
 從 ㄘㄨㄥˊ cong2 hj/6 big5
 叢 ㄘㄨㄥˊ cong2 hj/6 big5
 淙 ㄘㄨㄥˊ cong2 hj/6 big5
@@ -16947,10 +16947,10 @@
 鐞 ㄋㄡˋ nou4 s.4 utf8
 羺 ㄋㄡˊ nou2 s.6 big5
 獳 ㄋㄡˊ nou2 s.6 big5
+㜌 ㄋㄡˇ nou3 s.3 utf8
 㳶 ㄋㄡˇ nou3 s.3 utf8
 啂 ㄋㄡˇ nou3 s.3 utf8
 𡝦 ㄋㄡˇ nou3 s.3 utf8
-㜌 ㄋㄡˇ nou3 s.3 utf8
 濘 ㄋㄥˋ neng4 s/4 big5
 能 ㄋㄥˊ neng2 s/6 big5
 薴 ㄋㄥˊ neng2 s/6 big5
