@@ -61,9 +61,9 @@ def main():
         print("({})".format(e))
     for k in phrases:
         if phrases[k] < 1:
-            handle.write('%s %.8f\n' % (k, math.log(fscale ** (len(k) / 3 - 1) * 0.5 / norm, 10)))
+            handle.write('%s %.8f\n' % (k, math.log(fscale ** (len(k) - 1) * 0.5 / norm, 10)))
         else:
-            handle.write('%s %.8f\n' % (k, math.log(fscale ** (len(k) / 3 - 1) * phrases[k] / norm, 10)))
+            handle.write('%s %.8f\n' % (k, math.log(fscale ** (len(k) - 1) * phrases[k] / norm, 10)))
     handle.close()
 
 
