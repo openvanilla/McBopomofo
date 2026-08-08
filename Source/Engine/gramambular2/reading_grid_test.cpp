@@ -936,4 +936,21 @@ TEST(ReadingGridTest, FindInSpan2) {
   ASSERT_EQ(result->get()->value(), "高熱");
 }
 
+TEST(ReadingGridTest, CopyWithFixedNodesMustNotContainDanglingUnigramIter) {
+  Formosa::Gramambular2::ReadingGrid::WalkResult walkBefore;
+  {
+    ReadingGrid grid(std::make_shared<SimpleLM>(kSampleData));
+    grid.insertReading("ㄙ");
+    grid.overrideCandidate(0, "司");
+    walkBefore = grid.walk().copyWithFixedNodes();
+  }
+
+  // Accessing value() dereferences the walkBefore.unigramIter_, which must not
+  // come from the nodes in the grid that is already gone. Failure to do so
+  // causes address sanitizer to report a use-after-free error.
+  std::string val = walkBefore.nodes[0]->value();
+
+  EXPECT_EQ(val, "司");  // should be the overriden one, not the default "斯"
+}
+
 }  // namespace Formosa::Gramambular2

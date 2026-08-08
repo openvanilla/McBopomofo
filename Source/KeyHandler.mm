@@ -170,13 +170,19 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 - (void)fixNodeWithReading:(NSString *)reading value:(NSString *)value originalCursorIndex:(size_t)originalCursorIndex useMoveCursorAfterSelectionSetting:(BOOL)flag
 {
+    // Since WalkResult makes references to the current nodes, we must make a
+    // copy of the walk that *has a copy* of the current nodes to capture the
+    // current state. ReadingGrid::overrideCandidate() changes the state, and
+    // so having a simple copy of latestWalk_ (auto prevWalk = _latestWalk;)
+    // is NOT enough.
+    Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk.copyWithFixedNodes();
+
     size_t actualCursor = self.actualCandidateCursorIndex;
     Formosa::Gramambular2::ReadingGrid::Candidate candidate(reading.UTF8String, value.UTF8String);
     if (!_grid->overrideCandidate(actualCursor, candidate)) {
         return;
     }
 
-    Formosa::Gramambular2::ReadingGrid::WalkResult prevWalk = _latestWalk;
     [self _walk];
 
     // Update the user override model if warranted.
