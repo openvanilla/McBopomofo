@@ -50,7 +50,11 @@ private let kPhraseReplacementEnabledKey = "PhraseReplacementEnabled"
 private let kChineseConversionStyleKey = "ChineseConversionStyle"
 private let kAssociatedPhrasesEnabledKey = "AssociatedPhrasesEnabled"
 private let kLetterBehaviorKey = "LetterBehavior"
+private let kSwitchInputSourceUponShiftLetterKeyComboInputSourceIDKey = "SwitchInputSourceUponShiftLetterKeyComboInputSourceID"
+private let kSwitchInputSourceUponShiftLetterKeyComboEnabledKey = "SwitchInputSourceUponShiftLetterKeyComboEnabled"
 private let kControlEnterOutputKey = "ControlEnterOutput"
+private let kSwitchInputSourceUponCommandKeyPressEnabledKey = "SwitchInputSourceUponCommandKeyPressEnabled"
+private let kSwitchInputSourceUponCommandKeyPressInputSourceIDKey = "SwitchInputSourceUponCommandKeyPressInputSourceID"
 private let kShiftEnterEnabledKey = "ShiftEnterEnabled"
 private let kRepeatedPunctuationToSelectCandidateEnabledKey =
     "RepeatedPunctuationToSelectCandidateEnabled"
@@ -212,6 +216,9 @@ struct CandidateListTextSize {
 class Preferences: NSObject {
     static var allKeys: [String] {
         [
+            kLetterBehaviorKey,
+            kSwitchInputSourceUponShiftLetterKeyComboInputSourceIDKey,
+            kSwitchInputSourceUponShiftLetterKeyComboEnabledKey,
             kKeyboardLayoutPreferenceKey,
             kBasisKeyboardLayoutPreferenceKey,
             kFunctionKeyKeyboardLayoutPreferenceKey,
@@ -231,6 +238,8 @@ class Preferences: NSObject {
             kChineseConversionStyleKey,
             kAssociatedPhrasesEnabledKey,
             kControlEnterOutputKey,
+            kSwitchInputSourceUponCommandKeyPressEnabledKey,
+            kSwitchInputSourceUponCommandKeyPressInputSourceIDKey,
             kShiftEnterEnabledKey,
             kRepeatedPunctuationToSelectCandidateEnabledKey,
             kUseCustomUserPhraseLocation,
@@ -256,7 +265,11 @@ class Preferences: NSObject {
         Preferences.phraseReplacementEnabled = Preferences.phraseReplacementEnabled
         Preferences.associatedPhrasesEnabled = Preferences.associatedPhrasesEnabled
         Preferences.letterBehavior = Preferences.letterBehavior
+        Preferences.switchInputSourceUponShiftLetterKeyComboInputSourceID = Preferences.switchInputSourceUponShiftLetterKeyComboInputSourceID
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = Preferences.switchInputSourceUponShiftLetterKeyComboEnabled
         Preferences.controlEnterOutput = Preferences.controlEnterOutput
+        Preferences.switchInputSourceUponCommandKeyPressEnabled = Preferences.switchInputSourceUponCommandKeyPressEnabled
+        Preferences.switchInputSourceUponCommandKeyPressInputSourceID = Preferences.switchInputSourceUponCommandKeyPressInputSourceID
         Preferences.shiftEnterEnabled = Preferences.shiftEnterEnabled
         Preferences.repeatedPunctuationToSelectCandidateEnabled =
             Preferences.repeatedPunctuationToSelectCandidateEnabled
@@ -486,12 +499,25 @@ extension Preferences {
     @UserDefault(key: kLetterBehaviorKey, defaultValue: 0)
     @objc static var letterBehavior: Int
 
+    /// Terminal-only option that takes precedence over letterBehavior for uppercase letters.
+    @UserDefault(key: kSwitchInputSourceUponShiftLetterKeyComboEnabledKey, defaultValue: false)
+    @objc static var switchInputSourceUponShiftLetterKeyComboEnabled: Bool
+
+    @UserDefault(key: kSwitchInputSourceUponShiftLetterKeyComboInputSourceIDKey, defaultValue: "com.apple.keylayout.ABC")
+    @objc static var switchInputSourceUponShiftLetterKeyComboInputSourceID: String
+
     /// The behavior of pressing Ctrl + Enter.
     ///
     /// - 0: Disabled.
     /// - 1: Output BPMF readings.
     @EnumUserDefault(key: kControlEnterOutputKey, defaultValue: .off)
     @objc static var controlEnterOutput: ControlEnterOutput
+
+    @UserDefault(key: kSwitchInputSourceUponCommandKeyPressEnabledKey, defaultValue: false)
+    static var switchInputSourceUponCommandKeyPressEnabled: Bool
+
+    @UserDefault(key: kSwitchInputSourceUponCommandKeyPressInputSourceIDKey, defaultValue: "com.apple.keylayout.ABC")
+    static var switchInputSourceUponCommandKeyPressInputSourceID: String
 }
 
 @objc class UserPhraseLocationHelper: NSObject {

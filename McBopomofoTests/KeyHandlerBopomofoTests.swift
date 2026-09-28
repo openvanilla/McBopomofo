@@ -36,18 +36,22 @@ class KeyHandlerBopomofoTests: XCTestCase {
     var handler = KeyHandler()
     var savedKeyboardLayout: KeyboardLayout = .standard
     var chineseConversionEnabled: Bool = false
+    var savedSwitchInputSourceUponShiftLetterKeyComboEnabled = false
 
     override func setUpWithError() throws {
         savedKeyboardLayout = Preferences.keyboardLayout
         chineseConversionEnabled = Preferences.chineseConversionEnabled
+        savedSwitchInputSourceUponShiftLetterKeyComboEnabled = Preferences.switchInputSourceUponShiftLetterKeyComboEnabled
         Preferences.chineseConversionEnabled = false
         Preferences.keyboardLayout = .standard
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = false
         LanguageModelManager.loadDataModels()
         handler = KeyHandler()
         handler.inputMode = .bopomofo
     }
 
     override func tearDownWithError() throws {
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = savedSwitchInputSourceUponShiftLetterKeyComboEnabled
         Preferences.chineseConversionEnabled = chineseConversionEnabled
         Preferences.keyboardLayout = savedKeyboardLayout
     }
@@ -538,6 +542,109 @@ class KeyHandlerBopomofoTests: XCTestCase {
         if let state = state as? InputState.Inputting {
             XCTAssertEqual(state.composingBuffer, "一a")
         }
+    }
+
+    func testSwitchInputSourceUponShiftLetterKeyComboRequestsConfiguredSourceAndLeavesEventUnhandled() {
+        let savedSwitchInputSourceUponShiftLetterKeyComboInputSourceID = Preferences.switchInputSourceUponShiftLetterKeyComboInputSourceID
+        defer {
+            Preferences.switchInputSourceUponShiftLetterKeyComboInputSourceID = savedSwitchInputSourceUponShiftLetterKeyComboInputSourceID
+        }
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = true
+        Preferences.switchInputSourceUponShiftLetterKeyComboInputSourceID = "com.apple.keylayout.Vietnamese"
+        var states: [InputState] = []
+        let result = handler.handle(input: KeyHandlerInput(
+            inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift,
+            isVerticalMode: false), state: InputState.Empty()) {
+                states.append($0)
+            } errorCallback: { XCTFail("Unexpected input error") }
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(states.count, 1)
+        XCTAssertEqual((states.first as? InputState.SwitchingInputSource)?.sourceID,
+                       "com.apple.keylayout.Vietnamese")
+    }
+
+    func testSwitchInputSourceUponShiftLetterKeyComboClearsEngineAndPreservesCompositionState() {
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = true
+        var state: InputState = InputState.Empty()
+        for key in ["u", "6"] {
+            _ = handler.handle(input: KeyHandlerInput(
+                inputText: key, keyCode: 0, charCode: charCode(key), flags: [],
+                isVerticalMode: false), state: state) { state = $0 }
+                errorCallback: { XCTFail("Unexpected composition error") }
+        }
+        XCTAssertTrue(state is InputState.Inputting)
+        XCTAssertEqual((state as? InputState.Inputting)?.composingBuffer, "一")
+
+        var states: [InputState] = []
+        let result = handler.handle(input: KeyHandlerInput(
+            inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift,
+            isVerticalMode: false), state: state) { states.append($0) }
+            errorCallback: { XCTFail("Unexpected input error") }
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(states.count, 1)
+        XCTAssertTrue(states.first is InputState.SwitchingInputSource)
+        XCTAssertEqual((state as? InputState.Inputting)?.composingBuffer, "一")
+        XCTAssertEqual((handler.buildInputtingState() as? InputState.Inputting)?.composingBuffer, "")
+    }
+
+    // Deleting the final reading leaves EmptyIgnoringPreviousState, not Empty.
+    func testSwitchInputSourceUponShiftLetterKeyComboAfterDeletingComposition() {
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = true
+        var state: InputState = InputState.Empty()
+        _ = handler.handle(input: KeyHandlerInput(
+            inputText: "u", keyCode: 32, charCode: charCode("u"), flags: [],
+            isVerticalMode: false), state: state) { state = $0 }
+            errorCallback: { XCTFail("Unexpected composition error") }
+        XCTAssertTrue(state is InputState.Inputting)
+
+        _ = handler.handle(input: KeyHandlerInput(
+            inputText: "\u{8}", keyCode: 51, charCode: 8, flags: [],
+            isVerticalMode: false), state: state) { state = $0 }
+            errorCallback: { XCTFail("Unexpected deletion error") }
+        XCTAssertTrue(state is InputState.EmptyIgnoringPreviousState)
+
+        var states: [InputState] = []
+        let result = handler.handle(input: KeyHandlerInput(
+            inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift,
+            isVerticalMode: false), state: state) { states.append($0) }
+            errorCallback: { XCTFail("Unexpected input error") }
+        XCTAssertFalse(result)
+        XCTAssertEqual(states.count, 1)
+        XCTAssertTrue(states.first is InputState.SwitchingInputSource)
+    }
+
+    func testSwitchInputSourceUponShiftLetterKeyComboOverridesUppercaseLetterBehavior() {
+        let savedLetterBehavior = Preferences.letterBehavior
+        defer { Preferences.letterBehavior = savedLetterBehavior }
+        Preferences.letterBehavior = 0
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = true
+        var states: [InputState] = []
+        let result = handler.handle(input: KeyHandlerInput(
+            inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift,
+            isVerticalMode: false), state: InputState.Empty()) { states.append($0) }
+            errorCallback: { XCTFail("Unexpected input error") }
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(states.count, 1)
+        XCTAssertTrue(states.first is InputState.SwitchingInputSource)
+    }
+
+    func testSwitchInputSourceUponShiftLetterKeyComboOverridesLowercaseLetterBehavior() {
+        let savedLetterBehavior = Preferences.letterBehavior
+        defer { Preferences.letterBehavior = savedLetterBehavior }
+        Preferences.letterBehavior = 1
+        Preferences.switchInputSourceUponShiftLetterKeyComboEnabled = true
+        var states: [InputState] = []
+        let result = handler.handle(input: KeyHandlerInput(
+            inputText: "A", keyCode: 0, charCode: charCode("A"), flags: .shift,
+            isVerticalMode: false), state: InputState.Empty()) { states.append($0) }
+        errorCallback: { XCTFail("Unexpected input error") }
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(states.count, 1)
+        XCTAssertTrue(states.first is InputState.SwitchingInputSource)
     }
 
     func testPunctuationTable() {
