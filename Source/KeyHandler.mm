@@ -799,6 +799,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if ((char)charCode >= 'A' && (char)charCode <= 'Z') {
+        if (Preferences.switchInputSourceUponShiftLetterKeyComboEnabled) {
+            [self clear];
+            stateCallback([[InputStateSwitchingInputSource alloc] initWithSourceID:Preferences.switchInputSourceUponShiftLetterKeyComboInputSourceID]);
+            return NO;
+        }
         if (Preferences.letterBehavior == 1) {
             std::string letter = std::string("_letter_") + std::string(1, (char)charCode);
             if ([self _handlePunctuation:letter state:state usingVerticalMode:input.useVerticalMode stateCallback:stateCallback errorCallback:errorCallback]) {

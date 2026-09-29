@@ -58,6 +58,14 @@ public class InputSourceHelper: NSObject {
         inputSource(for: kTISPropertyInputSourceID, stringValue: sourceID)
     }
 
+    public static func selectInputSource(withID sourceID: String) -> Bool {
+        guard let inputSource = inputSource(for: sourceID) else {
+            return false
+        }
+        let status = TISSelectInputSource(inputSource)
+        return status == noErr
+    }
+
     @objc(inputSourceEnabled:)
     public static func inputSourceEnabled(for source: TISInputSource) -> Bool {
         if let valuePts = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsEnabled) {
