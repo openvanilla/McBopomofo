@@ -476,6 +476,12 @@ private struct BasicPreferencesView: View {
                 .fixedSize()
             }
 
+            PreferenceRow {
+                Toggle(
+                    localized("Expandable candidate window"),
+                    isOn: $preferences.useExpandableCandidateWindow)
+            }
+
             PreferenceRow(localized("Candidate Text Size:")) {
                 Picker("", selection: $preferences.candidateListTextSize) {
                     ForEach(preferences.candidateListTextSizeOptions, id: \.self) { size in

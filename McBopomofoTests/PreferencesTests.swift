@@ -126,6 +126,26 @@ final class PreferencesTests {
         #expect(Preferences.selectPhraseAfterCursorAsCandidate == true)
     }
 
+    @Test
+    func testUseExpandableCandidateWindowDefaultsAndPersistence() {
+        #expect(!Preferences.useExpandableCandidateWindow)
+        Preferences.populateDefaults()
+        #expect(!Preferences.useExpandableCandidateWindow)
+        #expect(
+            UserDefaults.standard.object(forKey: "UseExpandableCandidateWindow") as? Bool == false
+        )
+
+        for savedValue in [true, false] {
+            UserDefaults.standard.set(savedValue, forKey: "UseExpandableCandidateWindow")
+            #expect(Preferences.useExpandableCandidateWindow == savedValue)
+            Preferences.populateDefaults()
+            #expect(Preferences.useExpandableCandidateWindow == savedValue)
+            #expect(
+                UserDefaults.standard.object(forKey: "UseExpandableCandidateWindow") as? Bool
+                    == savedValue)
+        }
+    }
+
     @Test("Test horizontal candidate list preference")
     func testUseHorizontalCandidateList() {
         #expect(Preferences.useHorizontalCandidateList == false)
