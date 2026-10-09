@@ -204,6 +204,7 @@
 		D427A9BF25ED28CC005D43E0 /* McBopomofo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "McBopomofo-Bridging-Header.h"; sourceTree = "<group>"; };
 		D427F768278C9D0D004A2160 /* CandidateUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateUI; path = Packages/CandidateUI; sourceTree = "<group>"; };
 		D427F76B278CA1BA004A2160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D427F77AEFBEAC26503AA661 /* CandidateKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CandidateKit; path = Packages/CandidateKit; sourceTree = "<group>"; };
 		D427F7A727905E43004A2160 /* TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TooltipUI; path = Packages/TooltipUI; sourceTree = "<group>"; };
 		D427F7AC27907B7E004A2160 /* NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = NotifierUI; path = Packages/NotifierUI; sourceTree = "<group>"; };
 		D427F7B2279086B5004A2160 /* InputSourceHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InputSourceHelper; path = Packages/InputSourceHelper; sourceTree = "<group>"; };
@@ -495,6 +496,7 @@
 				D4E791782B52CDCF00676A68 /* ChineseNumbers */,
 				D48F853C2EACCDE900C2FDAB /* RomanNumbers */,
 				D427F768278C9D0D004A2160 /* CandidateUI */,
+				D427F77AEFBEAC26503AA661 /* CandidateKit */,
 				D427F7A727905E43004A2160 /* TooltipUI */,
 				D427F7AC27907B7E004A2160 /* NotifierUI */,
 				D427F7B2279086B5004A2160 /* InputSourceHelper */,
