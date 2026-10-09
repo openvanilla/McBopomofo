@@ -55,6 +55,9 @@ jobs:
       - name: Test CandidateUI
         run: swift test --enable-code-coverage
         working-directory: Packages/CandidateUI
+      - name: Test CandidateKit
+        run: swift test --enable-code-coverage
+        working-directory: Packages/CandidateKit
       - name: Test OpenCCBridge
         run: swift test --enable-code-coverage
         working-directory: Packages/OpenCCBridge
