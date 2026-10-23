@@ -164,7 +164,7 @@ final class CandidateAccessibilityTests: XCTestCase {
         XCTAssertTrue(controller.keyLabels.isEmpty)
         XCTAssertEqual(controller.renderer[0]?.detailText, "⇧ ⏎")
         XCTAssertEqual(controller.accessibilityItems[0].accessibilityLabel(), "中間的中")
-        XCTAssertEqual(controller.accessibilityItems[0].accessibilityHelp(), "ㄓㄨㄥ")
+        XCTAssertEqual(controller.accessibilityItems[0].accessibilityHelp(), "中")
     }
 
 }

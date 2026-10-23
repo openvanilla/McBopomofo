@@ -23,9 +23,17 @@
 
 import AppKit
 
+// Describes the frame and opacity endpoints for one candidate or control view
+// during an expand/collapse transition, without holding an AppKit view itself.
+// A candidate that wraps into another row or column can have two tracks:
+// one for its outgoing compact representation and one for its expanded representation.
 internal struct CandidateAnimationTrack {
     var item: CandidateLayoutItem?
     var control: CandidateControlLayout?
+    // True binds to the persistent view already rendered in the transition's target
+    // layout. False asks CandidateRenderer to create a temporary view from item or
+    // control and remove it after the transition. The target is the expanded layout
+    // when expanding and the compact layout when collapsing.
     var usesDestinationView: Bool
     var initialFrame: NSRect
     var finalFrame: NSRect
@@ -42,12 +50,23 @@ internal struct CandidateAnimationTrack {
 
 internal enum CandidateAnimationPlanner {
     // A canonical compact-to-expanded scene is reversible; views are bound by the renderer.
+    // Returns per-view frame and opacity endpoints for expansion, or swaps those
+    // endpoints for collapse. CandidateRenderer.bind attaches the tracks to views;
+    // the controller drives their progress alongside the window's resizing.
     static func tracks(
         compact: CandidatePanelLayout,
         expanded: CandidatePanelLayout,
         orientation: CandidateOrientation,
         expanding: Bool
     ) -> [CandidateAnimationTrack] {
+        // Keep candidates shared with the first expanded row (horizontal) or column
+        // (vertical) visible as they move directly to their new frames. Candidates
+        // that wrap into later rows or columns use two representations: the compact
+        // one slides out and fades, while the expanded one slides in and appears.
+        // This avoids dragging a single view diagonally across neighboring candidates.
+        // Candidates absent from the compact layout are revealed by the growing clip,
+        // and the expand control follows the panel's right edge while fading out.
+        // Collapse plays these motions backward, with views bound to the compact target.
         let compactItems = Dictionary(
             uniqueKeysWithValues: compact.items.map { ($0.candidateIndex, $0) })
         let firstBand = Set(expanded.rows.first?.candidateIndexes ?? [])
@@ -81,6 +100,10 @@ internal enum CandidateAnimationPlanner {
                     finalFrame: destination.frame,
                     initialOpacity: 0, finalOpacity: 1))
             // The visible panel before the transition supplies the outgoing or returning edge.
+            // Move the compact representation just beyond that edge so it can leave
+            // (or return to) the visible strip while its expanded counterpart takes
+            // over in another row or column. Using the starting viewport keeps this
+            // handoff at the visible edge even when the two layouts differ in size.
             let viewport = expanding ? compact.viewportSize : expanded.viewportSize
             let boundary = orientation.itemInterval(
                 NSRect(origin: .zero, size: viewport)

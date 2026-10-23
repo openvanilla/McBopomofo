@@ -1333,6 +1333,11 @@ open class CandidateController: NSWindowController {
                 self?.frameTransitionDriver = nil
                 self?.isFrameTransitionActive = false
                 if let self, self.deferredMeasurementRefresh {
+                    // Measurements completed during this transition must wait until
+                    // its layout settles. Normal completion may animate any resulting
+                    // width growth. finishFrameTransition() instead promises to settle
+                    // immediately, so its completion must apply that growth without
+                    // starting another animation before the caller continues.
                     self.applyCompletedMeasurements(animated: !self.finishesTransitionSynchronously)
                 }
             }

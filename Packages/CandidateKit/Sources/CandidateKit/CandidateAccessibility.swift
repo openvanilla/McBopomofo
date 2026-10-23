@@ -82,13 +82,14 @@ internal final class CandidateAccessibilityItem: NSAccessibilityElement {
     }
     override func isAccessibilityFocused() -> Bool { isAccessibilitySelected() }
 
+    // Combines the selection label and candidate text with a period and space, for example "1. 台".
+    // Empty parts are omitted, so a candidate without a selection label may return just "台".
     override func accessibilityHelp() -> String? {
         accessibilityUI(self) { element in
             guard let controller = element.controller else { return nil }
             let label = controller.renderer[element.index]?.indexText ?? ""
-            return [
-                label, element.candidate.accessibilityReading ?? element.candidate.detail ?? "",
-            ].filter { !$0.isEmpty }.joined(separator: ", ")
+            return [label, element.candidate.displayString]
+                .filter { !$0.isEmpty }.joined(separator: ". ")
         }
     }
 

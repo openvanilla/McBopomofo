@@ -40,6 +40,11 @@ internal final class CandidateRenderer {
     var itemViews: some Sequence<CandidateItemView> { bindings.values.lazy.map(\.view) }
     subscript(index: Int) -> CandidateItemView? { bindings[index]?.view }
 
+    // Reconciles the persistent canvas views with a layout: reuses matching candidate
+    // views, replaces changed ones, removes absent ones, and updates the control and
+    // decorations. Here "synchronize" means matching views to layout data; it does
+    // not finish an animation or refer to the controller's synchronous completion flag.
+    // Before a transition, this installs the target views that bind() will animate.
     func synchronize(
         layout: CandidatePanelLayout, candidates: [Candidate], metrics: CandidateMetrics,
         selection: Int, colors: CandidateSelectionColors, canvas: CandidateCanvasView,
@@ -84,6 +89,10 @@ internal final class CandidateRenderer {
         canvas.separatorRects = layout.separatorRects
     }
 
+    // Attaches animation tracks to the target views installed by synchronize(), or
+    // to temporary outgoing views made by the supplied factories. Finishes previous
+    // motions first, then places all bound views at progress zero. The controller
+    // advances them with applyMotions(); finishMotions() removes temporary views.
     func bind(
         tracks: [CandidateAnimationTrack], canvas: NSView,
         makeItem: (CandidateLayoutItem) -> CandidateItemView,
