@@ -38,7 +38,7 @@
 #import <utility>
 #import <vector>
 
-@import CandidateUI;
+@import CandidateKit;
 @import NSStringUtils;
 @import OpenCCBridge;
 @import ChineseNumbers;
@@ -1398,7 +1398,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 {
     NSString *inputText = input.inputText;
     UniChar charCode = input.charCode;
-    VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+    CKCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
 
     if ([state isKindOfClass:[InputStateAssociatedPhrases class]] &&
         [(InputStateAssociatedPhrases *)state autoTriggered]
@@ -1701,6 +1701,16 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
+    if (gCurrentCandidateController && input.isTab &&
+        !input.isControlHold && !input.isOptionHold && !input.isCommandHold) {
+        CKCandidateNavigation navigation = input.isShiftHold
+            ? CKCandidateNavigationItemBackward : CKCandidateNavigationItemForward;
+        if (![gCurrentCandidateController navigateCandidates:navigation wrapping:YES]) {
+            errorCallback();
+        }
+        return YES;
+    }
+
     if (charCode == 13 || input.isEnter) {
 
         if ([state isKindOfClass:[InputStateNumber class]]) {
@@ -1764,17 +1774,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return YES;
     }
 
-    // Handle space key
-    if (charCode == 32 && [state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-        if ([(InputStateAssociatedPhrases *)state autoTriggered]) {
-            return NO;
-        }
-    }
-
-    BOOL isPageDown = NO;
-    BOOL isPageUp = NO;
-    isPageDown = charCode == 32 || input.isPageDown || input.emacsKey == McBopomofoEmacsKeyNextPage;
-    isPageUp = input.isPageUp;
+    BOOL isPageDown = charCode == 32 || input.isPageDown || input.emacsKey == McBopomofoEmacsKeyNextPage;
+    BOOL isPageUp = input.isPageUp;
     switch (Preferences.allowMovingCursorWhenChoosingCandidates) {
     case MovingCursorKeyUseJK:
         isPageDown = isPageDown || [input.inputText isEqualToString:@"l"];
@@ -1789,10 +1790,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (isPageDown) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]] && [(InputStateAssociatedPhrases *)state autoTriggered]) {
-            return NO;
-        }
-
         BOOL updated = [gCurrentCandidateController showNextPage];
         if (!updated) {
             errorCallback();
@@ -1801,10 +1798,6 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (isPageUp) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]] && [(InputStateAssociatedPhrases *)state autoTriggered]) {
-            return NO;
-        }
-
         BOOL updated = [gCurrentCandidateController showPreviousPage];
         if (!updated) {
             errorCallback();
@@ -1819,22 +1812,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 
     if (input.isLeft) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-            if ([(InputStateAssociatedPhrases *)state autoTriggered] ) {
-                if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                    if (gCurrentCandidateController.selectedCandidateIndex == 0) {
-                        return NO;
-                    }
-                } else {
-                    return NO;
-                }
-                if (input.isShiftHold) {
-                    return NO;
-                }
-            }
-        }
-
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+        if (gCurrentCandidateController.isHorizontal) {
             BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
             if (!updated) {
                 errorCallback();
@@ -1857,22 +1835,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isRight) {
-        if ([state isKindOfClass:[InputStateAssociatedPhrases class]]) {
-            if ([(InputStateAssociatedPhrases *)state autoTriggered] ) {
-                if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
-                    if (gCurrentCandidateController.selectedCandidateIndex == candidateCount - 1) {
-                        return NO;
-                    }
-                } else {
-                    return NO;
-                }
-                if (input.isShiftHold) {
-                    return NO;
-                }
-            }
-        }
-
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+        if (gCurrentCandidateController.isHorizontal) {
             BOOL updated = [gCurrentCandidateController highlightNextCandidate];
             if (!updated) {
                 errorCallback();
@@ -1895,7 +1858,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isUp) {
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+        if (gCurrentCandidateController.isHorizontal) {
             BOOL updated = [gCurrentCandidateController showPreviousPage];
             if (!updated) {
                 errorCallback();
@@ -1910,7 +1873,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isDown) {
-        if ([gCurrentCandidateController isKindOfClass:[VTHorizontalCandidateController class]]) {
+        if (gCurrentCandidateController.isHorizontal) {
             BOOL updated = [gCurrentCandidateController showNextPage];
             if (!updated) {
                 errorCallback();
@@ -1925,7 +1888,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isHome || input.emacsKey == McBopomofoEmacsKeyHome) {
-        if (gCurrentCandidateController.selectedCandidateIndex == 0) {
+        if (gCurrentCandidateController.allowsExpansion) {
+            if (![gCurrentCandidateController navigateCandidates:CKCandidateNavigationHome wrapping:NO]) {
+                errorCallback();
+            }
+        } else if (gCurrentCandidateController.selectedCandidateIndex == 0) {
             errorCallback();
         } else {
             gCurrentCandidateController.selectedCandidateIndex = 0;
@@ -1939,7 +1906,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if ((input.isEnd || input.emacsKey == McBopomofoEmacsKeyEnd) && candidateCount > 0) {
-        if (gCurrentCandidateController.selectedCandidateIndex == candidateCount - 1) {
+        if (gCurrentCandidateController.allowsExpansion) {
+            if (![gCurrentCandidateController navigateCandidates:CKCandidateNavigationEnd wrapping:NO]) {
+                errorCallback();
+            }
+        } else if (gCurrentCandidateController.selectedCandidateIndex == candidateCount - 1) {
             errorCallback();
         } else {
             gCurrentCandidateController.selectedCandidateIndex = candidateCount - 1;
@@ -1972,7 +1943,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     for (NSUInteger j = 0, c = gCurrentCandidateController.keyLabels.count; j < c; j++) {
-        VTCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
+        CKCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
         if ([match compare:label.key options:NSCaseInsensitiveSearch] == NSOrderedSame) {
             index = j;
             break;
@@ -2192,11 +2163,11 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
     if (input.isShiftHold) {
         NSString* match = input.inputTextIgnoringModifiers;
-        VTCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
+        CKCandidateController *gCurrentCandidateController = [self.delegate candidateControllerForKeyHandler:self];
         NSInteger index = NSNotFound;
 
         for (NSUInteger j = 0, c = gCurrentCandidateController.keyLabels.count; j < c; j++) {
-            VTCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
+            CKCandidateKeyLabel *label = gCurrentCandidateController.keyLabels[j];
             if ([match compare:label.key options:NSCaseInsensitiveSearch] == NSOrderedSame) {
                 index = j;
                 break;

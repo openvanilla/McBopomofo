@@ -52,7 +52,7 @@
 		D41355DE278EA3ED005E5CBD /* UserPhrasesLM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D41355DC278EA3ED005E5CBD /* UserPhrasesLM.cpp */; };
 		D41B626C2B86EAE900583148 /* BopomofoBraille in Frameworks */ = {isa = PBXBuildFile; productRef = D41B626B2B86EAE900583148 /* BopomofoBraille */; };
 		D41B626F2B87B5C100583148 /* ServiceProviderInputHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41B626E2B87B5C100583148 /* ServiceProviderInputHelper.mm */; };
-		D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F769278C9E29004A2160 /* CandidateUI */; };
+		3D85F105B84881D4B815C021 /* CandidateKit in Frameworks */ = {isa = PBXBuildFile; productRef = E6DD753B963D16D71FE37A0B /* CandidateKit */; };
 		D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegate.swift */; };
 		D427F7A927905E90004A2160 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7A827905E90004A2160 /* TooltipUI */; };
 		D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = D427F7AD27907B8A004A2160 /* NotifierUI */; };
@@ -100,6 +100,7 @@
 		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 		D4F0BBE4279B08900071253C /* BundleTranslocate.m in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE3279B08900071253C /* BundleTranslocate.m */; };
 		D4F0BBE7279B14C20071253C /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D4F0BBE9279B14C20071253C /* Credits.rtf */; };
+		965E1A951ECD6347BA8891E8 /* KeyHandlerCandidateKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C63CB4B832C723B1421C71 /* KeyHandlerCandidateKitTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -259,6 +260,7 @@
 		D4F0BBE8279B14C20071253C /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Base; path = Base.lproj/Credits.rtf; sourceTree = "<group>"; };
 		D4F0BBEA279B14CB0071253C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		D4F0BBEB279B14D00071253C /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "zh-Hant"; path = "zh-Hant.lproj/Credits.rtf"; sourceTree = "<group>"; };
+		16C63CB4B832C723B1421C71 /* KeyHandlerCandidateKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyHandlerCandidateKitTests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -273,7 +275,7 @@
 				D47D73C327A7200500255A50 /* FSEventStreamHelper in Frameworks */,
 				D48F853E2EACDB6C00C2FDAB /* RomanNumbers in Frameworks */,
 				D4E7917A2B52CDE500676A68 /* ChineseNumbers in Frameworks */,
-				D427F76A278C9E29004A2160 /* CandidateUI in Frameworks */,
+				3D85F105B84881D4B815C021 /* CandidateKit in Frameworks */,
 				D40EFFA22EB669F900C1728A /* InfoCollector in Frameworks */,
 				D4C9CAB127AAC9690058DFEA /* NSStringUtils in Frameworks */,
 				D427F7AE27907B8A004A2160 /* NotifierUI in Frameworks */,
@@ -519,6 +521,7 @@
 			children = (
 				D436E23E2CD20B9E00C6155D /* AssociatedPhrasesTests.swift */,
 				D47D73A327A5D43900255A50 /* KeyHandlerBopomofoTests.swift */,
+				16C63CB4B832C723B1421C71 /* KeyHandlerCandidateKitTests.swift */,
 				D4A8E43527A9E982002F7A07 /* KeyHandlerPlainBopomofoTests.swift */,
 				D485D3B82796A8A000657FF3 /* PreferencesTests.swift */,
 				D485D3BF2796CE3200657FF3 /* VersionUpdateTests.swift */,
@@ -566,7 +569,7 @@
 			);
 			name = McBopomofo;
 			packageProductDependencies = (
-				D427F769278C9E29004A2160 /* CandidateUI */,
+				E6DD753B963D16D71FE37A0B /* CandidateKit */,
 				D427F7A827905E90004A2160 /* TooltipUI */,
 				D427F7AD27907B8A004A2160 /* NotifierUI */,
 				D427F7B3279086DC004A2160 /* InputSourceHelper */,
@@ -788,6 +791,7 @@
 				D449AD5F2B393C00000C5812 /* InputMacroTests.swift in Sources */,
 				D4C2A9872B4309D700113711 /* UTF8HelperTest.mm in Sources */,
 				D47D73A427A5D43900255A50 /* KeyHandlerBopomofoTests.swift in Sources */,
+				965E1A951ECD6347BA8891E8 /* KeyHandlerCandidateKitTests.swift in Sources */,
 				D485D3B92796A8A000657FF3 /* PreferencesTests.swift in Sources */,
 				D449AD612B39506D000C5812 /* ServiceProviderTests.swift in Sources */,
 				D485D3C02796CE3200657FF3 /* VersionUpdateTests.swift in Sources */,
@@ -1468,9 +1472,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = BopomofoBraille;
 		};
-		D427F769278C9E29004A2160 /* CandidateUI */ = {
+		E6DD753B963D16D71FE37A0B /* CandidateKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = CandidateUI;
+			productName = CandidateKit;
 		};
 		D427F7A827905E90004A2160 /* TooltipUI */ = {
 			isa = XCSwiftPackageProductDependency;

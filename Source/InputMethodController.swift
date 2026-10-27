@@ -21,7 +21,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import CandidateUI
+import CandidateKit
 import Carbon
 import Cocoa
 import InputMethodKit
@@ -38,14 +38,29 @@ extension Bool {
 }
 
 private let kMinKeyLabelSize: CGFloat = 10
+private let kCandidateWindowAnchorGap: CGFloat = 4
 
-internal var gCurrentCandidateController: CandidateController?
+private struct CandidateTextAnchorContext {
+    let lineHeightRect: NSRect
+    let usesVerticalText: Bool
+    let compositionLeadingX: CGFloat
+    let compositionTrailingXProvider: () -> CGFloat
+}
+
+@MainActor internal var gCurrentCandidateController: CandidateController?
 
 extension CandidateController {
     static let horizontal = HorizontalCandidateController()
     static let vertical = VerticalCandidateController()
+
+    @objc var isHorizontal: Bool { configuration.orientation == .horizontal }
+    @objc var allowsExpansion: Bool { configuration.allowsExpansion }
+    @objc func navigateCandidates(_ navigation: CandidateNavigation, wrapping: Bool) -> Bool {
+        navigate(navigation, wrapping: wrapping)
+    }
 }
 
+@MainActor
 @objc(McBopomofoInputMethodController)
 class McBopomofoInputMethodController: IMKInputController {
 
@@ -824,29 +839,26 @@ extension McBopomofoInputMethodController {
             if useVerticalMode == true {
                 return true
             }
-            candidates.sort {
-                return $0.displayText.count > $1.displayText.count
-            }
             // If there is a candidate which is too long, we use the vertical
             // candidate list window automatically.
-            if candidates.first?.displayText.count ?? 0 > 8 {
-                return true
-            }
-            return false
+            return candidates.contains { $0.displayText.count > 8 }
         }()
 
         gCurrentCandidateController?.delegate = nil
         gCurrentCandidateController?.visible = false
 
+        let candidateController: CandidateController
         if useVerticalMode {
-            gCurrentCandidateController = .vertical
+            candidateController = .vertical
         } else if Preferences.useHorizontalCandidateList {
-            gCurrentCandidateController = .horizontal
+            candidateController = .horizontal
         } else {
-            gCurrentCandidateController = .vertical
+            candidateController = .vertical
         }
+        gCurrentCandidateController = candidateController
+        currentClient = client
 
-        gCurrentCandidateController?.tooltip =
+        candidateController.tooltip =
             switch state {
             case let state as InputState.SelectingDictionary:
                 String(format: NSLocalizedString("Look up %@", comment: ""), state.selectedPhrase)
@@ -869,64 +881,152 @@ extension McBopomofoInputMethodController {
             return NSFont.systemFont(ofSize: size)
         }
 
-        gCurrentCandidateController?.keyLabelFont = font(
+        let candidateKeys: String = {
+            let preferredKeys = Preferences.candidateKeys
+            do {
+                try Preferences.validate(candidateKeys: preferredKeys)
+                _ = try CandidateConfiguration(
+                    indexLabels: preferredKeys, pageSize: preferredKeys.count)
+                return preferredKeys
+            } catch {
+                return Preferences.defaultCandidateKeys
+            }
+        }()
+        let keyLabels = Array(candidateKeys)
+        let isAutoAssociatedPhrase = (state as? InputState.AssociatedPhrases)?.autoTriggered == true
+        let usesShiftedKeys =
+            state is InputState.AssociatedPhrasesPlain
+            || state is InputState.Number || state is InputState.IcuTransform
+
+        var configuration = candidateController.configuration
+        configuration.allowsExpansion =
+            Preferences.useExpandableCandidateWindow
+            && !(state is InputState.Number || state is InputState.IcuTransform)
+        configuration.candidateFontSize = textSize
+        configuration.indexLabels = isAutoAssociatedPhrase ? "" : candidateKeys
+        configuration.showsKeyLabelsAsDetails = usesShiftedKeys
+        configuration.pageSize = keyLabels.count
+        do {
+            try candidateController.apply(configuration: configuration)
+        } catch {
+            assertionFailure("Validated candidate configuration was rejected: \(error)")
+            return
+        }
+
+        candidateController.synchronizeTheme(
+            clientAppearance: NSApp.effectiveAppearance,
+            clientBundleIdentifier: NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+        )
+        candidateController.keyLabelFont = font(
             name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
-        gCurrentCandidateController?.candidateFont = font(
+        candidateController.candidateFont = font(
             name: Preferences.candidateTextFontName, size: textSize)
 
-        let candidateKeys = Preferences.candidateKeys
-        let keyLabels =
-            candidateKeys.count >= 4
-            ? Array(candidateKeys) : Array(Preferences.defaultCandidateKeys)
+        candidateController.keyLabels =
+            isAutoAssociatedPhrase
+            ? []
+            : keyLabels.map {
+                CandidateKeyLabel(
+                    key: String($0),
+                    displayedText: usesShiftedKeys ? "⇧ " + String($0) : String($0))
+            }
 
-        let keyLabelFormat: (String)->String = switch state {
-        case let state as InputState.AssociatedPhrases where state.autoTriggered:
-            { _ in "⇧ ⏎" }
-        case is InputState.AssociatedPhrasesPlain,
-            is InputState.Number,
-            is InputState.IcuTransform:
-            { "⇧ " + $0 }
-        default:
-            { $0 }
+        candidateController.delegate = self
+        candidateController.reloadData()
+
+        guard let textClient = client as? IMKTextInput else {
+            return
         }
-        gCurrentCandidateController?.keyLabels = keyLabels.map {
-            CandidateKeyLabel(key: String($0), displayedText: keyLabelFormat(String($0)))
+        let anchorContext = candidateTextAnchorContext(for: state, client: textClient)
+
+        if anchorContext.usesVerticalText {
+            candidateController.set(
+                windowTopLeftPoint: NSMakePoint(
+                    anchorContext.lineHeightRect.maxX + kCandidateWindowAnchorGap,
+                    anchorContext.lineHeightRect.origin.y - kCandidateWindowAnchorGap),
+                bottomOutOfScreenAdjustmentHeight:
+                    anchorContext.lineHeightRect.size.height + kCandidateWindowAnchorGap)
+            candidateController.visible = true
+        } else {
+            candidateController.show(
+                near: anchorContext.lineHeightRect,
+                compositionLeadingX: anchorContext.compositionLeadingX,
+                compositionTrailingXProvider: anchorContext.compositionTrailingXProvider
+            )
         }
+    }
 
-        gCurrentCandidateController?.delegate = self
-        gCurrentCandidateController?.reloadData()
-        currentClient = client
-
-        var lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
-        var cursor: Int = 0
-
+    private func candidateTextAnchorContext(
+        for state: InputState,
+        client: IMKTextInput
+    ) -> CandidateTextAnchorContext {
+        var cursor = 0
+        var composingBuffer: String?
         if let state = state as? InputState.NotEmpty {
-            cursor = Int(state.cursorIndex)
-            if cursor == state.composingBuffer.count && cursor != 0 {
+            composingBuffer = state.composingBuffer
+            let bufferLength = (state.composingBuffer as NSString).length
+            cursor = min(Int(state.cursorIndex), bufferLength)
+            if cursor == bufferLength && cursor != 0 {
                 cursor -= 1
             }
         }
 
-        while lineHeightRect.origin.x == 0 && lineHeightRect.origin.y == 0 && cursor >= 0 {
-            (client as? IMKTextInput)?.attributes(
-                forCharacterIndex: cursor, lineHeightRectangle: &lineHeightRect)
+        var lineHeightRect = NSRect.zero
+        var usesVerticalText = false
+        while cursor >= 0 {
+            var measuredRect = NSRect.zero
+            let attributes = client.attributes(
+                forCharacterIndex: cursor, lineHeightRectangle: &measuredRect)
+            if measuredRect != .zero {
+                lineHeightRect = measuredRect
+                usesVerticalText = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0
+                break
+            }
             cursor -= 1
         }
-
-        if useVerticalMode {
-            gCurrentCandidateController?.set(
-                windowTopLeftPoint: NSMakePoint(
-                    lineHeightRect.origin.x + lineHeightRect.size.width + 4.0,
-                    lineHeightRect.origin.y - 4.0),
-                bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
-        } else {
-            gCurrentCandidateController?.set(
-                windowTopLeftPoint: NSMakePoint(
-                    lineHeightRect.origin.x, lineHeightRect.origin.y - 4.0),
-                bottomOutOfScreenAdjustmentHeight: lineHeightRect.size.height + 4.0)
+        if lineHeightRect == .zero {
+            lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
         }
 
-        gCurrentCandidateController?.visible = true
+        var compositionLeadingX = lineHeightRect.minX
+        var compositionTrailingX = lineHeightRect.maxX
+        var compositionTrailingIndex: Int?
+        if let composingBuffer {
+            let bufferLength = (composingBuffer as NSString).length
+            if bufferLength > 0 {
+                if let leadingFrame = candidateTextFrame(at: 0, client: client) {
+                    compositionLeadingX = leadingFrame.minX
+                }
+                compositionTrailingIndex = bufferLength - 1
+                if let trailingFrame = candidateTextFrame(at: bufferLength - 1, client: client) {
+                    compositionTrailingX = trailingFrame.maxX
+                }
+            }
+        }
+
+        let trailingXProvider = { [weak self] in
+            guard let self,
+                let compositionTrailingIndex,
+                let currentClient = currentClient as? IMKTextInput,
+                let trailingFrame = candidateTextFrame(
+                    at: compositionTrailingIndex, client: currentClient)
+            else {
+                return compositionTrailingX
+            }
+            return trailingFrame.maxX
+        }
+        return CandidateTextAnchorContext(
+            lineHeightRect: lineHeightRect,
+            usesVerticalText: usesVerticalText,
+            compositionLeadingX: compositionLeadingX,
+            compositionTrailingXProvider: trailingXProvider
+        )
+    }
+
+    private func candidateTextFrame(at index: Int, client: IMKTextInput) -> NSRect? {
+        var frame = NSRect.zero
+        client.attributes(forCharacterIndex: index, lineHeightRectangle: &frame)
+        return frame == .zero ? nil : frame
     }
 
     private func show(tooltip: String, composingBuffer: String, cursorIndex: UInt, client: Any!) {
