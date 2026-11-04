@@ -113,6 +113,14 @@ final class PreferencesViewModel: NSObject, ObservableObject {
         }
     }
 
+    var useExpandableCandidateWindow: Bool {
+        get { Preferences.useExpandableCandidateWindow }
+        set {
+            objectWillChange.send()
+            Preferences.useExpandableCandidateWindow = newValue
+        }
+    }
+
     var useHorizontalCandidateList: Bool {
         get { Preferences.useHorizontalCandidateList }
         set {

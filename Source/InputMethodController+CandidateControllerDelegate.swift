@@ -21,13 +21,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import CandidateUI
+import CandidateKit
 import Cocoa
 import InputMethodKit
 import NotifierUI
 import SystemCharacterInfo
 
-extension McBopomofoInputMethodController: CandidateControllerDelegate {
+extension McBopomofoInputMethodController: @MainActor CandidateControllerDelegate {
 
     func candidateCountForController(_ controller: CandidateController) -> UInt {
         if let state = state as? CandidateProvider {
@@ -178,12 +178,17 @@ extension McBopomofoInputMethodController: CandidateControllerDelegate {
         }
     }
 
-    func candidateController(_ controller: CandidateController, readingAtIndex index: UInt) -> String? {
-        if let state = state as? CandidateProvider {
-            state.reading(at: Int(index))
-        } else {
-            nil
-        }
+    func candidateController(
+        _ controller: CandidateController, readingAtIndex index: UInt
+    ) -> String? {
+        // Action hints occupy the detail area; readings remain available to VoiceOver.
+        (state as? InputState.AssociatedPhrases)?.autoTriggered == true ? "⇧ ⏎" : nil
+    }
+
+    func candidateController(
+        _ controller: CandidateController, accessibilityReadingAtIndex index: UInt
+    ) -> String? {
+        (state as? CandidateProvider)?.reading(at: Int(index))
     }
 
     func candidateController(_ controller: CandidateController, requestExplanationFor candidate: String, reading: String) -> String? {

@@ -21,11 +21,44 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-import CandidateUI
+import CandidateKit
 import Cocoa
 import InputMethodKit
 
-extension McBopomofoInputMethodController: KeyHandlerDelegate {
+// CandidateKit integration added @MainActor to McBopomofoInputMethodController.
+// Keep this helper at file scope so it does not inherit main actor isolation
+// as a nested function would. The background queue must be able to call it
+// synchronously because waitUntilExit() must not block the main thread.
+private func runUserPhraseHookProcess(_ script: String, arguments: [String]) {
+    let process = Process()
+    process.launchPath = script
+    process.arguments = arguments
+    // Some user may sign the git commits with gpg, and gpg is often
+    // installed by homebrew, so we add the path of homebrew here.
+    process.environment = ["PATH": "/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin"]
+
+    let path = LanguageModelManager.dataFolderPath
+    if #available(macOS 10.13, *) {
+        process.currentDirectoryURL = URL(fileURLWithPath: path)
+    } else {
+        FileManager.default.changeCurrentDirectoryPath(path)
+    }
+
+    #if DEBUG
+        let pipe = Pipe()
+        process.standardError = pipe
+    #endif
+    process.launch()
+    process.waitUntilExit()
+    #if DEBUG
+        let read = pipe.fileHandleForReading
+        let data = read.readDataToEndOfFile()
+        let s = String(data: data, encoding: .utf8)
+        NSLog("result \(String(describing: s))")
+    #endif
+}
+
+extension McBopomofoInputMethodController: @MainActor KeyHandlerDelegate {
     func candidateController(for keyHandler: KeyHandler) -> Any {
         gCurrentCandidateController ?? .vertical
     }
@@ -47,39 +80,10 @@ extension McBopomofoInputMethodController: KeyHandlerDelegate {
             return
         }
 
-        func run(_ script: String, arguments: [String]) {
-            let process = Process()
-            process.launchPath = script
-            process.arguments = arguments
-            // Some user may sign the git commits with gpg, and gpg is often
-            // installed by homebrew, so we add the path of homebrew here.
-            process.environment = ["PATH": "/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin"]
-
-            let path = LanguageModelManager.dataFolderPath
-            if #available(macOS 10.13, *) {
-                process.currentDirectoryURL = URL(fileURLWithPath: path)
-            } else {
-                FileManager.default.changeCurrentDirectoryPath(path)
-            }
-
-            #if DEBUG
-                let pipe = Pipe()
-                process.standardError = pipe
-            #endif
-            process.launch()
-            process.waitUntilExit()
-            #if DEBUG
-                let read = pipe.fileHandleForReading
-                let data = read.readDataToEndOfFile()
-                let s = String(data: data, encoding: .utf8)
-                NSLog("result \(String(describing: s))")
-            #endif
-        }
-
         let script = Preferences.addPhraseHookPath
 
         DispatchQueue.global().async {
-            run("/bin/sh", arguments: [script, text])
+            runUserPhraseHookProcess("/bin/sh", arguments: [script, text])
         }
     }
 
