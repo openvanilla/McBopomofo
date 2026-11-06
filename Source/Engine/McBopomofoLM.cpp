@@ -24,6 +24,7 @@
 #include "McBopomofoLM.h"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <string>
