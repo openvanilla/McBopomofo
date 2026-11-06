@@ -15,7 +15,7 @@ __doc__ = """
    in a text pool file, given a list of phrases."""
 
 config = configparser.ConfigParser()
-config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1]) + '/textpool.rc')
+config.read('/'.join(os.path.abspath(sys.argv[0]).split('/')[:-1]) + '/../textpool.rc')
 corpus_path = config.get('data', 'corpus_path')
 if corpus_path[0] == '~':
     corpus_path = os.path.expanduser(corpus_path)
@@ -85,6 +85,6 @@ if __name__ == '__main__':
     results = pool.map_async(count_string, allstrings).get(9999999)
     outputs = [(phrase, count) for phrase, count, state in results if state is True]
     for phrase, count in outputs:
-        outstring = u'%s	%d' % (phrase, count)
+        outstring = u'%s %d' % (phrase, count)
         print(outstring)
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
