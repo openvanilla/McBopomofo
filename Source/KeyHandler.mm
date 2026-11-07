@@ -1705,7 +1705,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         !input.isControlHold && !input.isOptionHold && !input.isCommandHold) {
         CKCandidateNavigation navigation = input.isShiftHold
             ? CKCandidateNavigationItemBackward : CKCandidateNavigationItemForward;
-        if (![gCurrentCandidateController navigateCandidates:navigation wrapping:YES]) {
+        if (![gCurrentCandidateController navigate:navigation]) {
             errorCallback();
         }
         return YES;
@@ -1888,14 +1888,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isHome || input.emacsKey == McBopomofoEmacsKeyHome) {
-        if (gCurrentCandidateController.allowsExpansion) {
-            if (![gCurrentCandidateController navigateCandidates:CKCandidateNavigationHome wrapping:NO]) {
-                errorCallback();
-            }
-        } else if (gCurrentCandidateController.selectedCandidateIndex == 0) {
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationHome]) {
             errorCallback();
-        } else {
-            gCurrentCandidateController.selectedCandidateIndex = 0;
         }
 
         return YES;
@@ -1906,14 +1900,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if ((input.isEnd || input.emacsKey == McBopomofoEmacsKeyEnd) && candidateCount > 0) {
-        if (gCurrentCandidateController.allowsExpansion) {
-            if (![gCurrentCandidateController navigateCandidates:CKCandidateNavigationEnd wrapping:NO]) {
-                errorCallback();
-            }
-        } else if (gCurrentCandidateController.selectedCandidateIndex == candidateCount - 1) {
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationEnd]) {
             errorCallback();
-        } else {
-            gCurrentCandidateController.selectedCandidateIndex = candidateCount - 1;
         }
         return YES;
     }

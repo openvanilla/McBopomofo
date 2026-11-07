@@ -25,31 +25,33 @@ import AppKit
 
 @MainActor
 internal final class CandidateRenderer {
-    private struct ItemBinding {
-        var view: CandidateItemView
+    // What a view captures when it is created. A change to any of these needs a new view;
+    // the frame, index label, selection, and colors are updated in place.
+    private struct ItemInputs: Equatable {
         var identity: ObjectIdentifier
-        var layout: CandidateLayoutItem
         var fonts: [NSFont]
         var keyLabelsAsDetails: Bool
+        var reservesIndexSlot: Bool
+        var showsDetail: Bool
+        var alignedCandidateWidth: CGFloat?
+    }
+    private struct ItemBinding {
+        var view: CandidateItemView
+        var inputs: ItemInputs
     }
     private var bindings: [Int: ItemBinding] = [:]
-    private var activeMotions: [(CandidateAnimationTrack, NSView)] = []
-    private var temporaryViews: [NSView] = []
-    private(set) var control: CandidateControlView?
-    var temporaryViewCount: Int { temporaryViews.count }
     var itemViews: some Sequence<CandidateItemView> { bindings.values.lazy.map(\.view) }
     subscript(index: Int) -> CandidateItemView? { bindings[index]?.view }
 
     // Reconciles the persistent canvas views with a layout: reuses matching candidate
-    // views, replaces changed ones, removes absent ones, and updates the control and
-    // decorations. Here "synchronize" means matching views to layout data; it does
-    // not finish an animation or refer to the controller's synchronous completion flag.
-    // Before a transition, this installs the target views that bind() will animate.
+    // views, replaces changed ones, removes absent ones, and updates decorations.
+    // Here "synchronize" means matching views to layout data; it does
+    // not finish an animation.
     func synchronize(
         layout: CandidatePanelLayout, candidates: [Candidate], metrics: CandidateMetrics,
+        reservesIndexSlot: Bool,
         selection: Int, colors: CandidateSelectionColors, canvas: CandidateCanvasView,
-        makeItem: (CandidateLayoutItem) -> CandidateItemView,
-        makeControl: (CandidateControlLayout) -> CandidateControlView
+        makeItem: (CandidateLayoutItem) -> CandidateItemView
     ) {
         canvas.frame = NSRect(origin: .zero, size: layout.documentSize)
         let fonts = [metrics.candidateFont, metrics.indexFont, metrics.detailFont]
@@ -58,78 +60,30 @@ internal final class CandidateRenderer {
             bindings.removeValue(forKey: index)?.view.removeFromSuperview()
         }
         for item in layout.items {
-            let identity = ObjectIdentifier(candidates[item.candidateIndex])
+            let inputs = ItemInputs(
+                identity: ObjectIdentifier(candidates[item.candidateIndex]), fonts: fonts,
+                keyLabelsAsDetails: metrics.keyLabelDetailWidth != nil,
+                reservesIndexSlot: reservesIndexSlot, showsDetail: item.showsDetail,
+                alignedCandidateWidth: item.alignedCandidateWidth)
             let old = bindings[item.candidateIndex]
             let view: CandidateItemView
-            if let old, old.identity == identity, old.layout == item, old.fonts == fonts,
-                old.keyLabelsAsDetails == (metrics.keyLabelDetailWidth != nil)
-            {
+            if let old, old.inputs == inputs {
                 view = old.view
             } else {
                 old?.view.removeFromSuperview()
                 view = makeItem(item)
                 canvas.addSubview(view)
-                bindings[item.candidateIndex] = ItemBinding(
-                    view: view, identity: identity, layout: item, fonts: fonts,
-                    keyLabelsAsDetails: metrics.keyLabelDetailWidth != nil)
+                bindings[item.candidateIndex] = ItemBinding(view: view, inputs: inputs)
             }
             view.frame = item.frame
-            view.alphaValue = 1
             view.indexText = item.indexText
             view.showsIndexText = item.showsIndexText
             view.selected = item.candidateIndex == selection
             view.selectionColors = colors
             view.outerCornerRadius = layout.cornerRadius
         }
-        control?.removeFromSuperview()
-        control = layout.control.map(makeControl)
-        if let control { canvas.addSubview(control) }
         canvas.rowWashRect = layout.rowWashRect
         canvas.rowWashAlpha = 1
         canvas.separatorRects = layout.separatorRects
-    }
-
-    // Attaches animation tracks to the target views installed by synchronize(), or
-    // to temporary outgoing views made by the supplied factories. Finishes previous
-    // motions first, then places all bound views at progress zero. The controller
-    // advances them with applyMotions(); finishMotions() removes temporary views.
-    func bind(
-        tracks: [CandidateAnimationTrack], canvas: NSView,
-        makeItem: (CandidateLayoutItem) -> CandidateItemView,
-        makeControl: (CandidateControlLayout) -> CandidateControlView
-    ) {
-        finishMotions()
-        for track in tracks {
-            let view: NSView?
-            if track.usesDestinationView {
-                view = track.item.flatMap { self[$0.candidateIndex] } ?? control
-            } else {
-                view = track.item.map(makeItem) ?? track.control.map(makeControl)
-                if let view {
-                    canvas.addSubview(view)
-                    temporaryViews.append(view)
-                }
-            }
-            if let view { activeMotions.append((track, view)) }
-        }
-        applyMotions(progress: 0)
-    }
-
-    func applyMotions(progress: CGFloat) {
-        for (track, view) in activeMotions {
-            view.frame = .interpolated(
-                from: track.initialFrame, to: track.finalFrame, progress: progress)
-            view.alphaValue =
-                track.initialOpacity + (track.finalOpacity - track.initialOpacity) * progress
-        }
-    }
-
-    func finishMotions() {
-        applyMotions(progress: 1)
-        for view in temporaryViews {
-            view.removeFromSuperview()
-        }
-        temporaryViews.removeAll()
-        activeMotions.removeAll()
     }
 }

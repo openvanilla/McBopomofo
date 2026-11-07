@@ -5,12 +5,11 @@ import XCTest
 
 @MainActor
 final class CandidateInteractionTests: XCTestCase {
-    func testDragUsesConfiguredEuclideanThresholdAndSuppressesMouseUp() {
+    func testDragUsesEuclideanThresholdAndSuppressesMouseUp() {
         var tracker = CandidatePanelDragTracker()
         tracker.begin(
             pointerLocation: NSPoint(x: 100, y: 100),
-            windowOrigin: NSPoint(x: 50, y: 60),
-            activationDistance: 3
+            windowOrigin: NSPoint(x: 50, y: 60)
         )
 
         XCTAssertNil(tracker.updatedWindowOrigin(pointerLocation: NSPoint(x: 103, y: 100)))
@@ -57,44 +56,22 @@ final class CandidateInteractionTests: XCTestCase {
     }
 
     func testFrameTransitionSuppressesCandidateActions() throws {
-        let controller = CandidateController()
+        let controller = CandidateController(
+            configuration: CandidateConfiguration(orientation: .vertical, animationDuration: 10))
         controller.replaceCandidates(uniformCandidates(20), initialSelectedIndex: 0)
         controller.visible = true
-        let view = try XCTUnwrap(controller.renderer[1])
+        defer { controller.visible = false }
         var confirmations: [Int] = []
-        controller.onConfirmation = { _, index, _ in confirmations.append(index) }
+        controller.onConfirmation = { index, _ in confirmations.append(index) }
 
-        controller.isFrameTransitionActive = true
+        XCTAssertTrue(controller.navigate(.right))
+        XCTAssertTrue(controller.isFrameTransitionActive)
+        let view = try XCTUnwrap(controller.renderer[1])
         view.onSelect?(1)
         view.onConfirm?(1)
 
         XCTAssertEqual(controller.selectionIndex, 0)
         XCTAssertTrue(confirmations.isEmpty)
-        controller.visible = false
-    }
-
-    func testExpandedPageKeysMoveOneRowWithoutScrollingVisibleSelection() throws {
-        let controller = CandidateController()
-        controller.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 7)
-        controller.visible = true
-        XCTAssertTrue(controller.navigate(.down))
-        XCTAssertTrue(controller.isExpanded)
-        XCTAssertEqual(
-            controller.currentLayout.rows.firstIndex { $0.candidateIndexes.contains(7) }, 1)
-
-        XCTAssertTrue(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 121, modifiers: [], characters: "\u{F72D}"))))
-
-        XCTAssertEqual(controller.selectionIndex, 13)
-        XCTAssertEqual(controller.scrollView.contentView.bounds.minY, 0)
-
-        XCTAssertTrue(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 116, modifiers: [], characters: "\u{F72C}"))))
-        XCTAssertEqual(controller.selectionIndex, 7)
-        XCTAssertEqual(controller.scrollView.contentView.bounds.minY, 0)
-        controller.visible = false
     }
 
     func testVerticalPageNavigationPreservesOffsetAndRelativeCommitUsesAnchor() {
@@ -105,14 +82,27 @@ final class CandidateInteractionTests: XCTestCase {
         controller.replaceCandidates(uniformCandidates(30), initialSelectedIndex: 3)
         controller.visible = true
         var confirmedIndex: Int?
-        controller.onConfirmation = { _, index, _ in confirmedIndex = index }
+        controller.onConfirmation = { index, _ in confirmedIndex = index }
+        var observedViewport: (index: Int, minY: CGFloat, anchor: Int)?
+        controller.onSelectionChange = { [weak controller] index, _ in
+            guard let controller else { return }
+            observedViewport = (
+                index, controller.scrollView.contentView.bounds.minY,
+                controller.verticalNumberingAnchor
+            )
+        }
 
         XCTAssertTrue(controller.navigate(.pageDown))
+        // The selection callback already sees the scrolled viewport and its numbering.
+        XCTAssertEqual(observedViewport?.index, 12)
+        XCTAssertEqual(observedViewport?.minY, 9 * 29)
+        XCTAssertEqual(observedViewport?.anchor, 9)
+        controller.onSelectionChange = nil
         XCTAssertEqual(controller.verticalNumberingAnchor, 9)
         XCTAssertEqual(controller.selectionIndex, 12)
         XCTAssertEqual(controller.scrollView.contentView.bounds.minY, 9 * 29)
         XCTAssertEqual(controller.candidateIndexAtKeyLabelIndex(0), 9)
-        XCTAssertTrue(controller.commitCandidate(atRelativeIndex: 2))
+        XCTAssertTrue(controller.commitCandidate(matchingIndexLabel: "3"))
         XCTAssertEqual(confirmedIndex, 11)
 
         controller.scrollVertical(toAnchor: 5)
@@ -140,71 +130,18 @@ final class CandidateInteractionTests: XCTestCase {
         XCTAssertEqual(controller.verticalNumberingAnchor, 1)
         XCTAssertEqual(controller.candidateIndexAtKeyLabelIndex(0), 1)
         var confirmedIndex: Int?
-        controller.onConfirmation = { _, index, _ in confirmedIndex = index }
-        XCTAssertTrue(controller.commitCandidate(atRelativeIndex: 0))
+        controller.onConfirmation = { index, _ in confirmedIndex = index }
+        XCTAssertTrue(controller.commitCandidate(matchingIndexLabel: "1"))
         XCTAssertEqual(confirmedIndex, 1)
 
         controller.scrollVertical(toAnchor: 18)
         let finalItem = try XCTUnwrap(controller.currentLayout.item(for: 19))
-        XCTAssertEqual(
-            controller.verticalMinimumDocumentHeight,
-            controller.naturalVerticalDocumentHeight
-        )
         XCTAssertEqual(controller.scrollView.contentView.bounds.maxY, finalItem.frame.maxY)
         XCTAssertEqual(controller.verticalNumberingAnchor, 11)
 
         controller.scrollView.contentView.scroll(to: .zero)
         controller.scrollBoundsDidChange()
-        XCTAssertEqual(
-            controller.verticalMinimumDocumentHeight,
-            controller.naturalVerticalDocumentHeight
-        )
-        controller.visible = false
-    }
-
-    func testSuspendedConfirmationPrecedesVisibilityGuard() {
-        let controller = CandidateController()
-        controller.replaceCandidates(uniformCandidates(3), initialSelectedIndex: -1)
-        var confirmations: [(String, Int, Candidate?)] = []
-        controller.onConfirmation = { confirmations.append(($0, $1, $2)) }
-
-        controller.confirmSelectedCandidate()
-
-        XCTAssertEqual(confirmations.count, 1)
-        XCTAssertEqual(confirmations[0].0, "")
-        XCTAssertEqual(confirmations[0].1, -1)
-        XCTAssertNil(confirmations[0].2)
-
-        controller.selectedCandidateIndex = 0
-        controller.confirmSelectedCandidate()
-        XCTAssertEqual(confirmations.count, 1)
-    }
-
-    func testTabAndShiftTabWrapSequentialSelection() throws {
-        let controller = CandidateController()
-        controller.replaceCandidates(uniformCandidates(3), initialSelectedIndex: 2)
-        controller.visible = true
-
-        XCTAssertTrue(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 48, modifiers: [], characters: "\t"))
-            )
-        )
-        XCTAssertEqual(controller.selectionIndex, 0)
-
-        XCTAssertTrue(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 48, modifiers: .shift, characters: "\t"))
-            )
-        )
-        XCTAssertEqual(controller.selectionIndex, 2)
-
-        XCTAssertFalse(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 48, modifiers: .option, characters: "\t"))
-            )
-        )
-        XCTAssertEqual(controller.selectionIndex, 2)
+        XCTAssertEqual(controller.verticalNumberingAnchor, 0)
         controller.visible = false
     }
 
@@ -234,25 +171,6 @@ final class CandidateInteractionTests: XCTestCase {
             eventNumber: 0,
             clickCount: clickCount,
             pressure: 0
-        )
-    }
-
-    private func keyEvent(
-        keyCode: UInt16,
-        modifiers: NSEvent.ModifierFlags,
-        characters: String = "\u{F703}"
-    ) -> NSEvent? {
-        NSEvent.keyEvent(
-            with: .keyDown,
-            location: .zero,
-            modifierFlags: modifiers,
-            timestamp: 0,
-            windowNumber: 0,
-            context: nil,
-            characters: characters,
-            charactersIgnoringModifiers: characters,
-            isARepeat: false,
-            keyCode: keyCode
         )
     }
 }

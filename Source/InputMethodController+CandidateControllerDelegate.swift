@@ -179,7 +179,7 @@ extension McBopomofoInputMethodController: @MainActor CandidateControllerDelegat
     }
 
     func candidateController(
-        _ controller: CandidateController, readingAtIndex index: UInt
+        _ controller: CandidateController, detailAtIndex index: UInt
     ) -> String? {
         // Action hints occupy the detail area; readings remain available to VoiceOver.
         (state as? InputState.AssociatedPhrases)?.autoTriggered == true ? "⇧ ⏎" : nil

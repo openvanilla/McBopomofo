@@ -467,19 +467,22 @@ private struct BasicPreferencesView: View {
             }
 
             PreferenceRow(localized("Candidate List Style:")) {
-                Picker("", selection: $preferences.useHorizontalCandidateList) {
-                    Text(localized("Vertical")).tag(false)
-                    Text(localized("Horizontal")).tag(true)
-                }
-                .labelsHidden()
-                .pickerStyle(RadioGroupPickerStyle())
-                .fixedSize()
-            }
+                HStack(alignment: .top, spacing: 12) {
+                    Picker("", selection: $preferences.useHorizontalCandidateList) {
+                        Text(localized("Vertical")).tag(false)
+                        Text(localized("Horizontal")).tag(true)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(RadioGroupPickerStyle())
+                    .fixedSize()
 
-            PreferenceRow {
-                Toggle(
-                    localized("Expandable candidate window"),
-                    isOn: $preferences.useExpandableCandidateWindow)
+                    Toggle(
+                        localized("Expandable"),
+                        isOn: $preferences.useExpandableCandidateWindow
+                    )
+                    .disabled(preferences.useHorizontalCandidateList)
+                    .fixedSize()
+                }
             }
 
             PreferenceRow(localized("Candidate Text Size:")) {

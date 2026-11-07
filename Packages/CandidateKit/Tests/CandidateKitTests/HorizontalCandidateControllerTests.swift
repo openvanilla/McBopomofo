@@ -18,23 +18,15 @@ final class HorizontalCandidateControllerTests: XCTestCase {
         )
 
         XCTAssertEqual(metrics.itemHeight, 28)
-        XCTAssertEqual(metrics.leadingPadding, 4)
-        XCTAssertEqual(metrics.indexSlotWidth, 11)
-        XCTAssertEqual(metrics.indexCandidateGap, 2)
-        XCTAssertEqual(metrics.candidateDetailGap, 11)
-        XCTAssertEqual(metrics.trailingPadding, 9)
-        XCTAssertEqual(metrics.baseCellWidth, 42)
-        XCTAssertEqual(metrics.detailFont.pointSize, 12)
-        XCTAssertEqual(metrics.cornerRadius, 6)
-        XCTAssertEqual(metrics.dragActivationDistance, 3)
+        XCTAssertEqual(metrics.baseCellWidth(showsIndexColumn: true), 42)
     }
 
-    func testEmptyIndexLabelsRemoveTheReservedColumn() throws {
-        let configuration = try CandidateConfiguration(indexLabels: "")
+    func testEmptyIndexLabelsRemoveTheReservedColumn() {
         let candidates = (0..<9).map { _ in Candidate(displayString: "永") }
         let pages = HorizontalCandidateLayoutEngine.packedPages(
             candidates: candidates,
-            configuration: configuration,
+            keyLabels: [],
+            configuration: .default,
             metrics: defaultMetrics
         )
 
@@ -43,137 +35,45 @@ final class HorizontalCandidateControllerTests: XCTestCase {
         XCTAssertEqual(pages[0].items.map(\.frame.width), Array(repeating: 34, count: 9))
     }
 
-    func testExpandableConfigurationDistributesOnlyFirstPageAndKeepsFollowingPagesNatural() throws {
-        let configuration = CandidateConfiguration.default
-        let pages = HorizontalCandidateLayoutEngine.packedPages(
-            candidates: screenshotCandidates,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-        XCTAssertGreaterThan(pages.count, 2)
-
-        let firstPage = pages[0]
-        let firstLayout = HorizontalCandidateLayoutEngine.pagedLayout(
-            pages: pages,
-            pageIndex: 0,
-            keyLabels: defaultKeyLabels,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-        let firstNaturalWidth = try XCTUnwrap(firstPage.items.last).frame.maxX
-        let distributedWidth =
-            (firstLayout.windowSize.width - firstNaturalWidth)
-            / CGFloat(firstPage.items.count)
-
-        XCTAssertLessThanOrEqual(firstPage.items.count, configuration.pageSize)
-        XCTAssertEqual(firstLayout.windowSize.width, max(firstNaturalWidth, 384))
-        XCTAssertEqual(
-            try XCTUnwrap(firstLayout.items.last).frame.maxX, firstLayout.windowSize.width,
-            accuracy: 0.000_001)
-        for (index, pair) in zip(firstPage.items, firstLayout.items).enumerated() {
-            XCTAssertEqual(
-                pair.1.frame.width,
-                pair.0.frame.width + distributedWidth,
-                accuracy: 0.000_001
-            )
-            XCTAssertEqual(
-                pair.1.frame.minX,
-                pair.0.frame.minX + CGFloat(index) * distributedWidth,
-                accuracy: 0.000_001
-            )
-        }
-
-        let middlePage = pages[1]
-        let middleLayout = HorizontalCandidateLayoutEngine.pagedLayout(
-            pages: pages,
-            pageIndex: 1,
-            keyLabels: defaultKeyLabels,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-        XCTAssertEqual(middleLayout.windowSize.width, 384)
-        XCTAssertEqual(middleLayout.items.map(\.frame), middlePage.items.map(\.frame))
-
-        let finalPageIndex = pages.index(before: pages.endIndex)
-        let finalPage = pages[finalPageIndex]
-        let finalLayout = HorizontalCandidateLayoutEngine.pagedLayout(
-            pages: pages,
-            pageIndex: finalPageIndex,
-            keyLabels: defaultKeyLabels,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-
-        XCTAssertEqual(finalLayout.items.map(\.frame), finalPage.items.map(\.frame))
-        XCTAssertEqual(
-            finalLayout.windowSize.width,
-            384
-        )
-        XCTAssertLessThan(
-            try XCTUnwrap(finalLayout.items.last).frame.maxX,
-            finalLayout.windowSize.width
-        )
-    }
-
-    func testNonexpandingPagesUseNaturalWidthsWithoutDistribution() throws {
-        for pageSize in [4, 9] {
-            let configuration = try CandidateConfiguration(
-                allowsExpansion: false, pageSize: pageSize)
-            let pages = HorizontalCandidateLayoutEngine.packedPages(
-                candidates: screenshotCandidates,
-                configuration: configuration,
-                metrics: defaultMetrics
-            )
-            XCTAssertGreaterThan(pages.count, 2)
-            var widths: [CGFloat] = []
-            for pageIndex in pages.indices {
-                let page = pages[pageIndex]
-                let layout = HorizontalCandidateLayoutEngine.pagedLayout(
-                    pages: pages,
-                    pageIndex: pageIndex,
-                    keyLabels: defaultKeyLabels,
-                    configuration: configuration,
-                    metrics: defaultMetrics
-                )
-                let naturalWidth = try XCTUnwrap(page.items.last).frame.maxX
-                XCTAssertEqual(layout.items.map(\.frame), page.items.map(\.frame))
-                XCTAssertEqual(layout.windowSize.width, naturalWidth)
-                XCTAssertEqual(layout.documentSize.width, naturalWidth)
-                widths.append(naturalWidth)
-            }
-            XCTAssertLessThan(try XCTUnwrap(widths.last), try XCTUnwrap(widths.first))
-        }
-    }
-
     func testOneOversizedCandidateAlwaysOccupiesOnePage() {
         let candidates = [Candidate(displayString: String(repeating: "永", count: 100))]
         let pages = HorizontalCandidateLayoutEngine.packedPages(
             candidates: candidates,
+            keyLabels: defaultKeyLabels,
             configuration: .default,
-            metrics: defaultMetrics
+            metrics: defaultMetrics,
+            maximumWidth: 1024
         )
 
         XCTAssertEqual(pages.count, 1)
         XCTAssertEqual(pages[0].items.count, 1)
-        XCTAssertEqual(pages[0].items[0].frame.width, 384)
+        XCTAssertEqual(pages[0].items[0].frame.width, 1024)
     }
 
-    func testNonexpandingLongListAt24PointsFitsAvailableScreenWidth() throws {
-        let configuration = try CandidateConfiguration(
-            allowsExpansion: false, candidateFontSize: 24)
+    func testLongCandidateUsesNaturalWidthWhenItFitsTheScreen() throws {
+        let candidate = Candidate(displayString: String(repeating: "永", count: 40))
+        let metrics = defaultMetrics
+        let pages = HorizontalCandidateLayoutEngine.packedPages(
+            candidates: [candidate], keyLabels: defaultKeyLabels, configuration: .default,
+            metrics: metrics, maximumWidth: 1024)
+        let item = try XCTUnwrap(pages.first?.items.first)
+        XCTAssertEqual(
+            item.frame.width, metrics.intrinsicWidth(for: candidate, showsIndexColumn: true))
+    }
+
+    func testLongListAt24PointsFitsAvailableWidth() throws {
+        let configuration = CandidateConfiguration.default
         let candidates = (1...201).map { Candidate(displayString: "選字\($0)", detail: "說明") }
-        let unconstrainedMetrics = CandidateMetrics(
+        let metrics = CandidateMetrics(
             requestedCandidateFont: .systemFont(ofSize: 24),
             requestedIndexFont: .systemFont(ofSize: 12))
         let firstEightWidth = candidates.prefix(8).reduce(CGFloat.zero) {
-            $0 + unconstrainedMetrics.intrinsicWidth(for: $1, showsIndexColumn: true)
+            $0 + metrics.intrinsicWidth(for: $1, showsIndexColumn: true)
         }
         for availableWidth in [320, 1024, firstEightWidth, 1920] {
-            let metrics = CandidateMetrics(
-                requestedCandidateFont: .systemFont(ofSize: 24),
-                requestedIndexFont: .systemFont(ofSize: 12), availableWidth: availableWidth)
             let pages = HorizontalCandidateLayoutEngine.packedPages(
-                candidates: candidates, configuration: configuration, metrics: metrics)
+                candidates: candidates, keyLabels: defaultKeyLabels,
+                configuration: configuration, metrics: metrics, maximumWidth: availableWidth)
             XCTAssertEqual(pages.flatMap(\.candidateIndexes), Array(candidates.indices))
             if availableWidth == firstEightWidth {
                 XCTAssertEqual(pages[0].items.count, 8)
@@ -182,21 +82,27 @@ final class HorizontalCandidateControllerTests: XCTestCase {
             for pageIndex in pages.indices {
                 let layout = HorizontalCandidateLayoutEngine.pagedLayout(
                     pages: pages, pageIndex: pageIndex, keyLabels: defaultKeyLabels,
-                    configuration: configuration, metrics: metrics)
+                    metrics: metrics)
                 XCTAssertLessThanOrEqual(layout.items.count, configuration.pageSize)
                 XCTAssertLessThanOrEqual(layout.windowSize.width, availableWidth)
                 XCTAssertEqual(layout.windowSize.width, try XCTUnwrap(layout.items.last).frame.maxX)
+                XCTAssertEqual(layout.documentSize.width, layout.windowSize.width)
                 XCTAssertEqual(layout.items.map(\.frame), pages[pageIndex].items.map(\.frame))
             }
+            // Pages keep their natural widths, so the short last page is narrower than the first.
+            let pageWidths = pages.map { $0.items.last?.frame.maxX ?? 0 }
+            XCTAssertLessThan(try XCTUnwrap(pageWidths.last), try XCTUnwrap(pageWidths.first))
         }
     }
 
-    func testNonexpandingPagesHonorConfiguredSelectionKeyCount() throws {
+    func testPagesHonorConfiguredSelectionKeyCount() throws {
         for keys in ["asdf", "123456789", "123456789abcdef"] {
-            let configuration = try CandidateConfiguration(
-                allowsExpansion: false,
-                indexLabels: keys, pageSize: keys.count, animationDuration: 0)
+            let configuration = CandidateConfiguration(
+                pageSize: keys.count, animationDuration: 0)
             let controller = CandidateController(configuration: configuration)
+            controller.keyLabels = keys.map {
+                CandidateKeyLabel(key: String($0), displayedText: String($0))
+            }
             let candidates = (0..<(keys.count * 2 + 1)).map {
                 Candidate(displayString: String(repeating: "字", count: $0 % 4 + 1))
             }
@@ -226,34 +132,31 @@ final class HorizontalCandidateControllerTests: XCTestCase {
         }
     }
 
-    func testConfigurationValidation() throws {
-        XCTAssertThrowsError(try CandidateConfiguration(pageSize: 0))
-        XCTAssertNoThrow(try CandidateConfiguration(pageSize: 15))
-        XCTAssertThrowsError(try CandidateConfiguration(pageSize: 16))
-        XCTAssertThrowsError(try CandidateConfiguration(indexLabels: "１２３"))
-        XCTAssertNoThrow(try CandidateConfiguration(indexLabels: ""))
-        XCTAssertNoThrow(try CandidateConfiguration(indexLabels: "1 1"))
-
-        var mutatedConfiguration = CandidateConfiguration.default
-        mutatedConfiguration.pageSize = 0
-        XCTAssertThrowsError(try mutatedConfiguration.validate())
+    func testConfigurationValidation() {
+        XCTAssertThrowsError(try CandidateConfiguration(pageSize: 0).validate())
+        XCTAssertNoThrow(try CandidateConfiguration(pageSize: 15).validate())
+        XCTAssertThrowsError(try CandidateConfiguration(pageSize: 16).validate())
+        XCTAssertThrowsError(
+            try CandidateConfiguration(verticalMaximumVisibleColumns: 0).validate())
+        XCTAssertThrowsError(
+            try CandidateController().apply(configuration: CandidateConfiguration(pageSize: 0)))
     }
 
     func testPagedNavigationSelectsFirstCandidateOfEachPage() {
-        let controller = HorizontalCandidateController(expandable: false)
+        let controller = HorizontalCandidateController()
         controller.replaceCandidates(screenshotCandidates, initialSelectedIndex: 6)
         controller.visible = true
         defer { controller.visible = false }
 
         XCTAssertEqual(controller.candidates[controller.selectionIndex].displayString, "殷")
         XCTAssertTrue(controller.navigate(.down))
-        XCTAssertEqual(controller.currentPageIndex, 1)
+        XCTAssertEqual(controller.currentLayout.items.first?.candidateIndex, 9)
         XCTAssertEqual(controller.selectionIndex, 9)
         XCTAssertEqual(controller.candidates[controller.selectionIndex].displayString, "氤")
         XCTAssertEqual(controller.currentLayout.item(for: 9)?.indexText, "1")
 
         XCTAssertTrue(controller.navigate(.up))
-        XCTAssertEqual(controller.currentPageIndex, 0)
+        XCTAssertEqual(controller.currentLayout.items.first?.candidateIndex, 0)
         XCTAssertEqual(controller.selectionIndex, 0)
     }
 
@@ -269,5 +172,4 @@ final class HorizontalCandidateControllerTests: XCTestCase {
             CandidateKeyLabel(key: String($0), displayedText: String($0))
         }
     }
-
 }

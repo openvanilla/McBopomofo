@@ -26,15 +26,6 @@ import AppKit
 @MainActor
 @objc(CKVerticalCandidateController)
 public final class VerticalCandidateController: CandidateController {
-    @objc public var expandable: Bool {
-        get { configuration.allowsExpansion }
-        set {
-            var updatedConfiguration = configuration
-            updatedConfiguration.allowsExpansion = newValue
-            try? apply(configuration: updatedConfiguration)
-        }
-    }
-
     @objc public convenience init() {
         self.init(expandable: true)
     }

@@ -48,15 +48,17 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         installKeyReceiverWindow()
         installEventMonitor()
         application.activate(ignoringOtherApps: true)
-        controller.onSelectionChange = { text, index, _ in
-            print("Highlighted \(index): \(text)")
+        controller.onSelectionChange = { index, candidate in
+            print("Highlighted \(index): \(candidate.displayString)")
         }
-        controller.onConfirmation = { text, index, _ in print("Confirmed \(index): \(text)") }
+        controller.onConfirmation = { index, candidate in
+            print("Confirmed \(index): \(candidate.displayString)")
+        }
         configureFromArguments()
         print("CandidatePreview controls:")
         print("  Arrows, Page Up/Down, Home/End, Tab/Shift-Tab: navigate")
         print("  Selection keys and Return: confirm; action samples use the displayed Shift hints")
-        print("  Command-1/2: horizontal/vertical; Command-3/4: expandable/paged")
+        print("  Command-1/2: horizontal/vertical; Command-3/4: vertical expandable/paged")
         print(
             "  Command-0: center; Command-5/6/7: above/left/right placement; Command-8: hide guides"
         )
@@ -86,9 +88,9 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
     }
 
     @objc private func selectFontSize(_ sender: NSMenuItem) {
-        var configuration = controller.configuration
-        configuration.candidateFontSize = fontSizes[sender.tag]
-        apply(configuration)
+        controller.candidateFont = .systemFont(ofSize: fontSizes[sender.tag])
+        centerCandidateWindow()
+        reportCandidateWindow()
     }
 
     @objc private func selectKeys(_ sender: NSMenuItem) {
@@ -102,9 +104,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
     }
 
     private func apply(_ configuration: CandidateConfiguration) {
-        let labels = controller.keyLabels
         try! controller.apply(configuration: configuration)
-        controller.keyLabels = labels
         centerCandidateWindow()
         controller.visible = true
         reportCandidateWindow()
@@ -112,14 +112,12 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
 
     private func reloadSample(initialSelectedIndex: Int = 0) {
         var configuration = controller.configuration
-        configuration.indexLabels = sample == .associated ? "" : selectionKeys
         configuration.pageSize = selectionKeys.count
         configuration.showsKeyLabelsAsDetails = sample.usesShiftedKeys
-        configuration.hostHandlesIndexLabelKeys = !sample.usesShiftedKeys
+        configuration.handlesIndexLabelKeys = !sample.usesShiftedKeys
         controller.tooltip = sample.header
-        try! controller.replaceCandidates(
-            sample.entries, initialSelectedIndex: initialSelectedIndex,
-            applying: configuration)
+        try! controller.apply(configuration: configuration)
+        controller.replaceCandidates(sample.entries, initialSelectedIndex: initialSelectedIndex)
         controller.keyLabels =
             sample == .associated
             ? []
@@ -307,14 +305,14 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
             let size = Double(value.dropFirst("--font-size=".count)),
             fontSizes.contains(CGFloat(size))
         {
-            configuration.candidateFontSize = CGFloat(size)
+            controller.candidateFont = .systemFont(ofSize: CGFloat(size))
         }
         try! controller.apply(configuration: configuration)
         synchronizePreviewTheme()
         reloadSample(
             initialSelectedIndex: arguments.contains("--last") ? sample.entries.count - 1 : 0)
-        if arguments.contains("--expanded") {
-            _ = controller.navigate(configuration.orientation == .vertical ? .right : .down)
+        if arguments.contains("--expanded"), configuration.orientation == .vertical {
+            _ = controller.navigate(.right)
         }
         if arguments.contains("--tooltip") { controller.tooltip = "聯想詞" }
         if arguments.contains("--black-background") { showBackground(2) }
@@ -329,7 +327,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         case #selector(selectDisplayMode):
             selected = item.tag == (controller.configuration.allowsExpansion ? 0 : 1)
         case #selector(selectFontSize):
-            selected = fontSizes[item.tag] == controller.configuration.candidateFontSize
+            selected = fontSizes[item.tag] == controller.candidateFont.pointSize
         case #selector(selectKeys): selected = keySets[item.tag] == selectionKeys
         case #selector(selectSample): selected = PreviewSample.allCases[item.tag] == sample
         case #selector(selectAppearance):
@@ -340,6 +338,9 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         default: return true
         }
         item.state = selected ? .on : .off
+        if item.action == #selector(selectDisplayMode), item.tag == 0 {
+            return controller.configuration.orientation == .vertical
+        }
         return true
     }
 
@@ -370,7 +371,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
             "Orientation", to: layout, action: #selector(selectOrientation),
             choices: ["Horizontal", "Vertical"], keys: ["1", "2"])
         addMenu(
-            "Display Mode", to: layout, action: #selector(selectDisplayMode),
+            "Vertical Display Mode", to: layout, action: #selector(selectDisplayMode),
             choices: ["Expandable", "Paged"], keys: ["3", "4"])
         layout.addItem(.separator())
         addMenu(

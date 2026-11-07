@@ -5,6 +5,45 @@ import XCTest
 
 @MainActor
 final class CandidatePlacementTests: XCTestCase {
+    func testPlacementReservesExpandedHeightIncludingHeaderAndLegacyScroller() throws {
+        let bounds = try XCTUnwrap(NSScreen.main?.visibleFrame)
+        for title in ["", "候選字提示"] {
+            let configuration = CandidateConfiguration(
+                orientation: .vertical, animationDuration: 10)
+            let controller = CandidateController(configuration: configuration)
+            controller.scrollView.scrollerStyle = .legacy
+            controller.replaceCandidates(
+                (0..<54).map { _ in Candidate(displayString: "字") }, initialSelectedIndex: 0)
+            controller.tooltip = title
+            controller.centerOnMainScreen()
+            controller.visible = true
+            defer { controller.visible = false }
+            let compactSize = controller.currentLayout.windowSize
+            let expandedHeight =
+                controller.expandedLayout.windowSize.height + controller.currentLayout.headerHeight
+            XCTAssertGreaterThan(expandedHeight, compactSize.height + 1)
+            let anchor = NSRect(
+                x: bounds.midX, y: bounds.minY + compactSize.height + 6, width: 10, height: 20)
+            XCTAssertGreaterThanOrEqual(anchor.minY - 5 - compactSize.height, bounds.minY)
+            XCTAssertLessThan(anchor.maxY + 5 + expandedHeight, bounds.maxY)
+
+            controller.show(near: anchor)
+            XCTAssertEqual(controller.placementSide, .above)
+            let compactFrame = try XCTUnwrap(controller.window?.frame)
+            XCTAssertEqual(compactFrame.minY, anchor.maxY + 5, accuracy: 1)
+            XCTAssertTrue(controller.navigate(.right))
+            XCTAssertEqual(controller.placementSide, .above)
+            XCTAssertTrue(controller.isFrameTransitionActive)
+            controller.finishFrameTransition()
+            XCTAssertEqual(controller.window?.frame.minY, compactFrame.minY)
+            XCTAssertTrue(controller.navigate(.left))
+            XCTAssertEqual(controller.placementSide, .above)
+            XCTAssertTrue(controller.isFrameTransitionActive)
+            controller.finishFrameTransition()
+            XCTAssertEqual(controller.window?.frame, compactFrame)
+        }
+    }
+
     private let screen = CandidateScreenGeometry(
         frame: NSRect(x: 0, y: 0, width: 1000, height: 800),
         visibleFrame: NSRect(x: 0, y: 20, width: 1000, height: 760)
@@ -25,9 +64,10 @@ final class CandidatePlacementTests: XCTestCase {
             ),
             left
         )
+        // The origin lies below both screens, and the rectangle overlaps the right one more.
         XCTAssertEqual(
             CandidatePlacementEngine.screen(
-                for: NSRect(x: 990, y: 100, width: 40, height: 20),
+                for: NSRect(x: -10, y: -10, width: 40, height: 30),
                 screens: [left, right],
                 fallback: nil
             ),
@@ -92,59 +132,10 @@ final class CandidatePlacementTests: XCTestCase {
         XCTAssertEqual(result.topLeft.y, 765)
     }
 
-    func testShowNearAnchorSnapsAtThresholdAndRetargetsActiveMovement() throws {
-        var configuration = CandidateConfiguration.default
-        configuration.animationDuration = 10
-        let controller = CandidateController(configuration: configuration)
-        controller.replaceCandidates(uniformCandidates(20), initialSelectedIndex: 0)
-        let visibleFrame = try XCTUnwrap(NSScreen.main?.visibleFrame)
-        let firstAnchor = NSRect(
-            x: visibleFrame.midX - 200,
-            y: visibleFrame.midY,
-            width: 20,
-            height: 20
-        )
-
-        controller.show(near: firstAnchor)
-        XCTAssertEqual(controller.placementSide, .below)
-        XCTAssertNil(controller.frameTransitionDriver)
-
-        controller.show(near: firstAnchor.offsetBy(dx: 28, dy: 0))
-        XCTAssertNil(controller.frameTransitionDriver)
-
-        controller.show(near: firstAnchor.offsetBy(dx: 57, dy: 0))
-        let activeDriver = try XCTUnwrap(controller.frameTransitionDriver)
-        XCTAssertTrue(controller.isFrameTransitionActive)
-
-        let latestAnchor = firstAnchor.offsetBy(dx: 100, dy: 0)
-        controller.show(near: latestAnchor)
-        let retargetedDriver = try XCTUnwrap(controller.frameTransitionDriver)
-        XCTAssertFalse(retargetedDriver === activeDriver)
-        XCTAssertTrue(controller.isWindowMovementTransitionActive)
-
-        controller.finishFrameTransition()
-        XCTAssertFalse(controller.isFrameTransitionActive)
-        XCTAssertFalse(controller.isWindowMovementTransitionActive)
-        XCTAssertNil(controller.frameTransitionDriver)
-        let expected = controller.placementResult(
-            for: controller.currentLayout.windowSize,
-            context: try XCTUnwrap(controller.lastPlacementContext)
-        )
-        let finalFrame = try XCTUnwrap(controller.window?.frame)
-        XCTAssertEqual(finalFrame.minX, expected.topLeft.x, accuracy: 0.5)
-        XCTAssertEqual(finalFrame.maxY, expected.topLeft.y, accuracy: 0.5)
-        XCTAssertEqual(finalFrame.size, controller.currentLayout.windowSize)
-
-        let frameAtLatestTarget = controller.window?.frame
-        activeDriver.finish()
-        XCTAssertEqual(controller.window?.frame, frameAtLatestTarget)
-        controller.visible = false
-    }
-
-    func testExpansionStaysOnScreenForAnchoredLegacyAndDraggedPlacement() throws {
+    func testNavigationStaysOnScreenForAnchoredAndDraggedPlacement() throws {
         let bounds = try XCTUnwrap(NSScreen.main?.visibleFrame)
         for orientation in [CandidateOrientation.horizontal, .vertical] {
-            for placement in 0..<3 {
+            for anchored in [true, false] {
                 for duration in [0.0, 0.2] {
                     var configuration = CandidateConfiguration.default
                     configuration.orientation = orientation
@@ -154,15 +145,9 @@ final class CandidatePlacementTests: XCTestCase {
                         (0..<80).map { _ in Candidate(displayString: "字") }, initialSelectedIndex: 0
                     )
                     let anchor = NSRect(x: bounds.maxX - 20, y: bounds.midY, width: 10, height: 20)
-                    switch placement {
-                    case 0:
+                    if anchored {
                         controller.show(near: anchor)
-                    case 1:
-                        controller.set(
-                            windowTopLeftPoint: NSPoint(x: anchor.maxX, y: anchor.minY),
-                            bottomOutOfScreenAdjustmentHeight: anchor.height)
-                        controller.visible = true
-                    default:
+                    } else {
                         controller.centerOnMainScreen()
                         let size = try XCTUnwrap(controller.window?.frame.size)
                         controller.movePanelManually(
@@ -187,58 +172,63 @@ final class CandidatePlacementTests: XCTestCase {
         }
     }
 
-    func testBackgroundMeasurementWidensWithoutScrollingOrMovingTopLeft() async throws {
-        let configuration = try CandidateConfiguration(
+    func testSidePlacementReservesExpandedWidthForBothTextOrientations() throws {
+        let bounds = try XCTUnwrap(NSScreen.main?.visibleFrame)
+        for usesVerticalText in [false, true] {
+            for style: NSScroller.Style in [.overlay, .legacy] {
+                let configuration = CandidateConfiguration(
+                    orientation: .vertical, animationDuration: 10,
+                    verticalMaximumVisibleColumns: 2)
+                let controller = CandidateController(configuration: configuration)
+                controller.candidateFont = .systemFont(ofSize: floor(bounds.height / 22))
+                controller.scrollView.scrollerStyle = style
+                controller.replaceCandidates(
+                    (0..<30).map { _ in Candidate(displayString: "字") }, initialSelectedIndex: 0)
+                controller.centerOnMainScreen()
+                controller.visible = true
+                defer { controller.visible = false }
+                let compactSize = controller.currentLayout.windowSize
+                let anchor = NSRect(
+                    x: bounds.minX + compactSize.width + 10, y: bounds.midY,
+                    width: 10, height: 20)
+                XCTAssertGreaterThan(compactSize.height, bounds.height / 2)
+                XCTAssertGreaterThan(
+                    controller.expandedLayout.windowSize.width, anchor.minX - bounds.minX)
+                XCTAssertLessThan(
+                    anchor.maxX + 5 + controller.expandedLayout.windowSize.width, bounds.maxX)
+
+                controller.show(near: anchor, usesVerticalText: usesVerticalText)
+                XCTAssertEqual(controller.placementSide, .right)
+                let compactFrame = try XCTUnwrap(controller.window?.frame)
+                XCTAssertTrue(controller.navigate(.right))
+                XCTAssertEqual(controller.placementSide, .right)
+                XCTAssertTrue(controller.isFrameTransitionActive)
+                controller.finishFrameTransition()
+                XCTAssertEqual(controller.window?.frame.minX, compactFrame.minX)
+
+                XCTAssertTrue(controller.navigate(.left))
+                XCTAssertEqual(controller.placementSide, .right)
+                XCTAssertTrue(controller.isFrameTransitionActive)
+                controller.finishFrameTransition()
+                XCTAssertEqual(controller.window?.frame, compactFrame)
+            }
+        }
+    }
+
+    func testInitialWidthFitsCandidatesBeyondFirstPage() throws {
+        let configuration = CandidateConfiguration(
             orientation: .vertical, allowsExpansion: false, pageSize: 1)
         let candidates = (0..<20).map { Candidate(displayString: $0 == 19 ? "ＷＷＷＷ" : "iiii") }
         let controller = CandidateController(configuration: configuration)
         controller.replaceCandidates(candidates, initialSelectedIndex: 0)
         controller.show(near: NSRect(x: 400, y: 500, width: 20, height: 20))
-        let before = try XCTUnwrap(controller.window?.frame)
-        for _ in 0..<300 where !controller.textMeasurements.isComplete {
-            try await Task.sleep(for: .milliseconds(10))
-        }
-        XCTAssertTrue(controller.textMeasurements.isComplete)
-        controller.finishFrameTransition()
-        XCTAssertGreaterThan(controller.window!.frame.width, before.width)
-        XCTAssertEqual(controller.window!.frame.minX, before.minX)
-        XCTAssertEqual(controller.window!.frame.maxY, before.maxY)
-        XCTAssertEqual(controller.scrollView.contentView.bounds.minY, 0)
-        controller.visible = false
-    }
-
-    func testNonexpandingLongListPagesStayOnScreenAt24Points() throws {
-        let bounds = try XCTUnwrap(NSScreen.main?.visibleFrame)
-        let configuration = try CandidateConfiguration(
-            allowsExpansion: false,
-            candidateFontSize: 24, animationDuration: 0)
-        let controller = CandidateController(configuration: configuration)
-        controller.replaceCandidates(
-            (1...201).map { Candidate(displayString: "選字\($0)", detail: "說明") },
-            initialSelectedIndex: 0)
-        controller.show(near: NSRect(x: bounds.maxX - 20, y: bounds.midY, width: 10, height: 20))
         defer { controller.visible = false }
-        var visited: [Int] = []
-        repeat {
-            let frame = try XCTUnwrap(controller.window?.frame)
-            XCTAssertGreaterThanOrEqual(frame.minX, bounds.minX - 1)
-            XCTAssertLessThanOrEqual(frame.maxX, bounds.maxX + 1)
-            let indexes = controller.currentLayout.items.map(\.candidateIndex)
-            XCTAssertEqual(controller.selectedCandidateIndex, UInt(try XCTUnwrap(indexes.first)))
-            for (slot, index) in indexes.enumerated() {
-                XCTAssertEqual(controller.candidateIndexAtKeyLabelIndex(UInt(slot)), UInt(index))
-            }
-            if indexes.count < configuration.pageSize {
-                XCTAssertEqual(
-                    controller.candidateIndexAtKeyLabelIndex(UInt(indexes.count)), UInt.max)
-            }
-            visited.append(contentsOf: indexes)
-        } while controller.showNextPage()
-        XCTAssertEqual(visited, Array(0..<201))
-        XCTAssertTrue(controller.showPreviousPage())
-        XCTAssertEqual(
-            controller.selectedCandidateIndex,
-            UInt(try XCTUnwrap(controller.currentLayout.items.first).candidateIndex))
+
+        let metrics = controller.metrics
+        let widest = try XCTUnwrap(controller.currentLayout.item(for: 19))
+        XCTAssertGreaterThan(
+            widest.frame.width, ceil(metrics.width(of: "ＷＷＷＷ", font: metrics.candidateFont)))
+        XCTAssertEqual(controller.window?.frame.size, controller.currentLayout.windowSize)
     }
 
     private func place(anchor: NSRect) -> CandidatePlacementResult {
@@ -249,9 +239,5 @@ final class CandidatePlacementTests: XCTestCase {
             compositionLeadingX: anchor.minX,
             compositionTrailingX: { anchor.maxX }
         )
-    }
-
-    private func uniformCandidates(_ count: Int) -> [Candidate] {
-        (0..<count).map { Candidate(displayString: "\($0)") }
     }
 }
