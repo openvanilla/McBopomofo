@@ -35,21 +35,19 @@ internal final class CandidateRenderer {
     private var bindings: [Int: ItemBinding] = [:]
     private var activeMotions: [(CandidateAnimationTrack, NSView)] = []
     private var temporaryViews: [NSView] = []
-    private(set) var control: CandidateControlView?
     var temporaryViewCount: Int { temporaryViews.count }
     var itemViews: some Sequence<CandidateItemView> { bindings.values.lazy.map(\.view) }
     subscript(index: Int) -> CandidateItemView? { bindings[index]?.view }
 
     // Reconciles the persistent canvas views with a layout: reuses matching candidate
-    // views, replaces changed ones, removes absent ones, and updates the control and
-    // decorations. Here "synchronize" means matching views to layout data; it does
+    // views, replaces changed ones, removes absent ones, and updates decorations.
+    // Here "synchronize" means matching views to layout data; it does
     // not finish an animation or refer to the controller's synchronous completion flag.
     // Before a transition, this installs the target views that bind() will animate.
     func synchronize(
         layout: CandidatePanelLayout, candidates: [Candidate], metrics: CandidateMetrics,
         selection: Int, colors: CandidateSelectionColors, canvas: CandidateCanvasView,
-        makeItem: (CandidateLayoutItem) -> CandidateItemView,
-        makeControl: (CandidateControlLayout) -> CandidateControlView
+        makeItem: (CandidateLayoutItem) -> CandidateItemView
     ) {
         canvas.frame = NSRect(origin: .zero, size: layout.documentSize)
         let fonts = [metrics.candidateFont, metrics.indexFont, metrics.detailFont]
@@ -74,41 +72,35 @@ internal final class CandidateRenderer {
                     keyLabelsAsDetails: metrics.keyLabelDetailWidth != nil)
             }
             view.frame = item.frame
-            view.alphaValue = 1
             view.indexText = item.indexText
             view.showsIndexText = item.showsIndexText
             view.selected = item.candidateIndex == selection
             view.selectionColors = colors
             view.outerCornerRadius = layout.cornerRadius
         }
-        control?.removeFromSuperview()
-        control = layout.control.map(makeControl)
-        if let control { canvas.addSubview(control) }
         canvas.rowWashRect = layout.rowWashRect
         canvas.rowWashAlpha = 1
         canvas.separatorRects = layout.separatorRects
     }
 
     // Attaches animation tracks to the target views installed by synchronize(), or
-    // to temporary outgoing views made by the supplied factories. Finishes previous
+    // to temporary outgoing views made by the supplied factory. Finishes previous
     // motions first, then places all bound views at progress zero. The controller
     // advances them with applyMotions(); finishMotions() removes temporary views.
     func bind(
         tracks: [CandidateAnimationTrack], canvas: NSView,
-        makeItem: (CandidateLayoutItem) -> CandidateItemView,
-        makeControl: (CandidateControlLayout) -> CandidateControlView
+        makeItem: (CandidateLayoutItem) -> CandidateItemView
     ) {
         finishMotions()
         for track in tracks {
             let view: NSView?
             if track.usesDestinationView {
-                view = track.item.flatMap { self[$0.candidateIndex] } ?? control
+                view = self[track.item.candidateIndex]
             } else {
-                view = track.item.map(makeItem) ?? track.control.map(makeControl)
-                if let view {
-                    canvas.addSubview(view)
-                    temporaryViews.append(view)
-                }
+                let temporaryView = makeItem(track.item)
+                canvas.addSubview(temporaryView)
+                temporaryViews.append(temporaryView)
+                view = temporaryView
             }
             if let view { activeMotions.append((track, view)) }
         }
@@ -119,8 +111,6 @@ internal final class CandidateRenderer {
         for (track, view) in activeMotions {
             view.frame = .interpolated(
                 from: track.initialFrame, to: track.finalFrame, progress: progress)
-            view.alphaValue =
-                track.initialOpacity + (track.finalOpacity - track.initialOpacity) * progress
         }
     }
 

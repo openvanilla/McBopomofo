@@ -23,9 +23,9 @@ final class HorizontalCandidateControllerTests: XCTestCase {
         XCTAssertEqual(metrics.indexCandidateGap, 2)
         XCTAssertEqual(metrics.candidateDetailGap, 11)
         XCTAssertEqual(metrics.trailingPadding, 9)
-        XCTAssertEqual(metrics.baseCellWidth, 42)
+        XCTAssertEqual(metrics.baseCellWidth(showsIndexColumn: true), 42)
         XCTAssertEqual(metrics.detailFont.pointSize, 12)
-        XCTAssertEqual(metrics.cornerRadius, 6)
+        XCTAssertEqual(metrics.cornerRadius, 8)
         XCTAssertEqual(metrics.dragActivationDistance, 3)
     }
 
@@ -41,78 +41,6 @@ final class HorizontalCandidateControllerTests: XCTestCase {
         XCTAssertEqual(defaultMetrics.baseCellWidth(showsIndexColumn: false), 34)
         XCTAssertEqual(pages.count, 1)
         XCTAssertEqual(pages[0].items.map(\.frame.width), Array(repeating: 34, count: 9))
-    }
-
-    func testExpandableConfigurationDistributesOnlyFirstPageAndKeepsFollowingPagesNatural() throws {
-        let configuration = CandidateConfiguration.default
-        let pages = HorizontalCandidateLayoutEngine.packedPages(
-            candidates: screenshotCandidates,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-        XCTAssertGreaterThan(pages.count, 2)
-
-        let firstPage = pages[0]
-        let firstLayout = HorizontalCandidateLayoutEngine.pagedLayout(
-            pages: pages,
-            pageIndex: 0,
-            keyLabels: defaultKeyLabels,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-        let firstNaturalWidth = try XCTUnwrap(firstPage.items.last).frame.maxX
-        let distributedWidth =
-            (firstLayout.windowSize.width - firstNaturalWidth)
-            / CGFloat(firstPage.items.count)
-
-        XCTAssertLessThanOrEqual(firstPage.items.count, configuration.pageSize)
-        XCTAssertEqual(firstLayout.windowSize.width, max(firstNaturalWidth, 384))
-        XCTAssertEqual(
-            try XCTUnwrap(firstLayout.items.last).frame.maxX, firstLayout.windowSize.width,
-            accuracy: 0.000_001)
-        for (index, pair) in zip(firstPage.items, firstLayout.items).enumerated() {
-            XCTAssertEqual(
-                pair.1.frame.width,
-                pair.0.frame.width + distributedWidth,
-                accuracy: 0.000_001
-            )
-            XCTAssertEqual(
-                pair.1.frame.minX,
-                pair.0.frame.minX + CGFloat(index) * distributedWidth,
-                accuracy: 0.000_001
-            )
-        }
-
-        let middlePage = pages[1]
-        let middleLayout = HorizontalCandidateLayoutEngine.pagedLayout(
-            pages: pages,
-            pageIndex: 1,
-            keyLabels: defaultKeyLabels,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-        XCTAssertEqual(middleLayout.windowSize.width, 384)
-        XCTAssertEqual(middleLayout.items.map(\.frame), middlePage.items.map(\.frame))
-
-        let finalPageIndex = pages.index(before: pages.endIndex)
-        let finalPage = pages[finalPageIndex]
-        let finalLayout = HorizontalCandidateLayoutEngine.pagedLayout(
-            pages: pages,
-            pageIndex: finalPageIndex,
-            keyLabels: defaultKeyLabels,
-            configuration: configuration,
-            metrics: defaultMetrics
-        )
-
-        XCTAssertEqual(finalLayout.items.map(\.frame), finalPage.items.map(\.frame))
-        XCTAssertEqual(
-            finalLayout.windowSize.width,
-            384
-        )
-        XCTAssertLessThan(
-            try XCTUnwrap(finalLayout.items.last).frame.maxX,
-            finalLayout.windowSize.width
-        )
     }
 
     func testNonexpandingPagesUseNaturalWidthsWithoutDistribution() throws {
@@ -132,7 +60,6 @@ final class HorizontalCandidateControllerTests: XCTestCase {
                     pages: pages,
                     pageIndex: pageIndex,
                     keyLabels: defaultKeyLabels,
-                    configuration: configuration,
                     metrics: defaultMetrics
                 )
                 let naturalWidth = try XCTUnwrap(page.items.last).frame.maxX
@@ -182,7 +109,7 @@ final class HorizontalCandidateControllerTests: XCTestCase {
             for pageIndex in pages.indices {
                 let layout = HorizontalCandidateLayoutEngine.pagedLayout(
                     pages: pages, pageIndex: pageIndex, keyLabels: defaultKeyLabels,
-                    configuration: configuration, metrics: metrics)
+                    metrics: metrics)
                 XCTAssertLessThanOrEqual(layout.items.count, configuration.pageSize)
                 XCTAssertLessThanOrEqual(layout.windowSize.width, availableWidth)
                 XCTAssertEqual(layout.windowSize.width, try XCTUnwrap(layout.items.last).frame.maxX)
@@ -240,7 +167,7 @@ final class HorizontalCandidateControllerTests: XCTestCase {
     }
 
     func testPagedNavigationSelectsFirstCandidateOfEachPage() {
-        let controller = HorizontalCandidateController(expandable: false)
+        let controller = HorizontalCandidateController()
         controller.replaceCandidates(screenshotCandidates, initialSelectedIndex: 6)
         controller.visible = true
         defer { controller.visible = false }
@@ -269,5 +196,4 @@ final class HorizontalCandidateControllerTests: XCTestCase {
             CandidateKeyLabel(key: String($0), displayedText: String($0))
         }
     }
-
 }

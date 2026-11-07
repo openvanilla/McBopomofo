@@ -69,7 +69,7 @@ final class CandidateAccessibilityTests: XCTestCase {
                 }
 
                 controller.selectedCandidateIndex = 0
-                if controller.isExpanded { controller.collapseExpandable() }
+                if controller.isExpanded { controller.collapse() }
                 controller.finishFrameTransition()
                 controller.tooltip = ""
                 XCTAssertTrue(controller.contentView.titleView.isHidden)
@@ -135,7 +135,6 @@ final class CandidateAccessibilityTests: XCTestCase {
             })
         XCTAssertTrue(actions[0].handler?() == true)
         XCTAssertTrue(controller.isExpanded)
-        XCTAssertNil(controller.renderedControlView)
         XCTAssertEqual(controller.canvasView.accessibilityChildren()?.count, 100)
         XCTAssertLessThan(
             try XCTUnwrap(controller.canvasView.accessibilityVisibleChildren()).count, 100)
@@ -166,7 +165,6 @@ final class CandidateAccessibilityTests: XCTestCase {
         XCTAssertEqual(controller.accessibilityItems[0].accessibilityLabel(), "中間的中")
         XCTAssertEqual(controller.accessibilityItems[0].accessibilityHelp(), "中")
     }
-
 }
 
 @MainActor

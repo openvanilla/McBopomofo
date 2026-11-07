@@ -24,7 +24,6 @@
 import AppKit
 
 internal enum CandidatePanelKind {
-    case horizontalExpandable
     case horizontalPaged
     case verticalExpandable
     case vertical
@@ -32,15 +31,11 @@ internal enum CandidatePanelKind {
     static func resolve(configuration: CandidateConfiguration) -> CandidatePanelKind {
         switch configuration.orientation {
         case .horizontal:
-            configuration.allowsExpansion ? .horizontalExpandable : .horizontalPaged
+            .horizontalPaged
         case .vertical:
             configuration.allowsExpansion ? .verticalExpandable : .vertical
         }
     }
-}
-
-internal struct CandidateControlLayout {
-    var frame: NSRect
 }
 
 internal struct CandidateLayoutItem: Equatable {
@@ -63,25 +58,11 @@ internal struct CandidateLayoutRow {
         items.first { $0.candidateIndex == candidateIndex }
     }
 
-    func candidatePreservingInterval(
-        _ source: ClosedRange<CGFloat>?,
-        movingBackward: Bool,
-        orientation: CandidateOrientation = .horizontal
-    ) -> Int? {
+    func candidatePreservingInterval(_ source: ClosedRange<CGFloat>?) -> Int? {
         guard let source else { return items.first?.candidateIndex }
-        var leadingMatch: Int?
-        for item in items {
-            let interval = orientation.itemInterval(item.frame)
-            guard interval.lowerBound < source.upperBound,
-                source.lowerBound < interval.upperBound
-            else { continue }
-            if leadingMatch != nil { return item.candidateIndex }
-            if !movingBackward || interval.lowerBound >= source.lowerBound {
-                return item.candidateIndex
-            }
-            leadingMatch = item.candidateIndex
-        }
-        return leadingMatch ?? items.last?.candidateIndex
+        return items.first {
+            $0.frame.minY < source.upperBound && source.lowerBound < $0.frame.maxY
+        }?.candidateIndex ?? items.last?.candidateIndex
     }
 }
 
@@ -92,7 +73,6 @@ internal struct CandidatePanelLayout {
     var rows: [CandidateLayoutRow]
     var separatorRects: [NSRect]
     var rowWashRect: NSRect?
-    var control: CandidateControlLayout?
     var hasVerticalScroller: Bool
     var cornerRadius: CGFloat
     var hasHorizontalScroller = false
@@ -108,7 +88,7 @@ internal struct CandidatePanelLayout {
         guard height > 0, !hasHorizontalScroller else { return }
         let extraWidth = max(0, minimumWidth - windowSize.width)
         guard extraWidth > 0 else { return }
-        let trailingEdge = control?.frame.minX ?? documentSize.width
+        let trailingEdge = documentSize.width
         func widened(_ item: CandidateLayoutItem) -> CandidateLayoutItem {
             var item = item
             if abs(item.frame.maxX - trailingEdge) < 0.5 { item.frame.size.width += extraWidth }
@@ -120,7 +100,6 @@ internal struct CandidatePanelLayout {
             NSRect(x: $0.minX, y: $0.minY, width: $0.width + extraWidth, height: $0.height)
         }
         if rowWashRect?.maxX == documentSize.width { rowWashRect?.size.width += extraWidth }
-        control?.frame.origin.x += extraWidth
         documentSize.width += extraWidth
         windowSize.width += extraWidth
     }
@@ -141,7 +120,6 @@ internal struct CandidatePanelLayout {
         rows: [],
         separatorRects: [],
         rowWashRect: nil,
-        control: nil,
         hasVerticalScroller: false,
         cornerRadius: CandidateStyle.Decoration.defaultCornerRadius
     )
@@ -153,7 +131,6 @@ internal struct CandidatePanelLayout {
     func row(containing candidateIndex: Int) -> CandidateLayoutRow? {
         rows.first { $0.candidateIndexes.contains(candidateIndex) }
     }
-
 }
 
 @MainActor
@@ -171,7 +148,6 @@ internal struct CandidateMetrics {
     let trailingPadding: CGFloat
     let verticalPadding: CGFloat
     let itemHeight: CGFloat
-    let cornerRadius: CGFloat
     let dragActivationDistance: CGFloat
     let auxiliaryScale: CGFloat
 
@@ -199,7 +175,6 @@ internal struct CandidateMetrics {
         trailingPadding = (unit * CandidateStyle.Spacing.trailingUnits).rounded()
         verticalPadding = (unit * CandidateStyle.Spacing.verticalUnits).rounded()
         itemHeight = effectiveSize + verticalPadding
-        cornerRadius = CandidateStyle.Decoration.defaultCornerRadius
         dragActivationDistance = CandidateStyle.Interaction.dragActivationDistance
         auxiliaryScale =
             (rawCandidateFontSize ?? requestedCandidateFont.pointSize)
@@ -213,11 +188,10 @@ internal struct CandidateMetrics {
                         ?? Self.textWidth($0, font: hintFont))
             }.max() ?? 0
         }
-
     }
 
-    var baseCellWidth: CGFloat {
-        baseCellWidth(showsIndexColumn: true)
+    var cornerRadius: CGFloat {
+        return (CandidateStyle.Decoration.defaultCornerRadius * sqrt(auxiliaryScale)).rounded()
     }
 
     func baseCellWidth(showsIndexColumn: Bool) -> CGFloat {
@@ -271,20 +245,16 @@ internal enum HorizontalCandidateLayoutEngine {
         guard !candidates.isEmpty else {
             return []
         }
-        let budget = horizontalBudget(configuration: configuration, metrics: metrics)
-        let pageWidth =
-            configuration.allowsExpansion ? budget : max(1, floor(metrics.availableWidth))
+        let budget = horizontalBudget(metrics: metrics)
+        let pageWidth = max(1, floor(metrics.availableWidth))
         let showsIndex = !configuration.indexLabels.isEmpty
-        let baseCellWidth = metrics.baseCellWidth(showsIndexColumn: showsIndex)
         var rows: [CandidateLayoutRow] = []
         var rowItems: [CandidateLayoutItem] = []
         var x: CGFloat = 0
 
         for (index, candidate) in candidates.enumerated() {
             let width = min(
-                max(
-                    metrics.intrinsicWidth(for: candidate, showsIndexColumn: showsIndex),
-                    baseCellWidth),
+                metrics.intrinsicWidth(for: candidate, showsIndexColumn: showsIndex),
                 budget
             )
             let exceedsCount = rowItems.count >= configuration.pageSize
@@ -312,102 +282,22 @@ internal enum HorizontalCandidateLayoutEngine {
         return rows
     }
 
-    static func collapsedRow(
-        candidates: [Candidate],
-        configuration: CandidateConfiguration,
-        metrics: CandidateMetrics
-    ) -> CandidateLayoutRow {
-        packedPages(candidates: candidates, configuration: configuration, metrics: metrics).first
-            ?? CandidateLayoutRow(items: [])
-    }
-
-    static func expandedRows(
-        candidates: [Candidate],
-        configuration: CandidateConfiguration,
-        metrics: CandidateMetrics
-    ) -> [CandidateLayoutRow] {
-        guard !candidates.isEmpty else {
-            return []
-        }
-        let budget = horizontalBudget(configuration: configuration, metrics: metrics)
-        let targetCellWidth =
-            metrics.candidateFont.pointSize
-            * (configuration.usesWideExpandedCells
-                ? CandidateStyle.Layout.wideCellEm : CandidateStyle.Layout.regularCellEm)
-        let columnCount = min(
-            configuration.pageSize, max(1, Int((budget / targetCellWidth).rounded())))
-        let columnWidth = budget / CGFloat(columnCount)
-        let showsIndex = !configuration.indexLabels.isEmpty
-        let spans = candidates.map {
-            min(
-                columnCount,
-                max(
-                    1,
-                    Int(
-                        ceil(
-                            metrics.intrinsicWidth(for: $0, showsIndexColumn: showsIndex)
-                                / columnWidth))))
-        }
-        let breaks = CandidateLineBreaker.partition(
-            spans: spans, capacity: columnCount, itemLimit: configuration.pageSize)
-        let rows = breaks.map { range in
-            var occupied = 0
-            return CandidateLayoutRow(
-                items: range.map { index in
-                    defer { occupied += spans[index] }
-                    return CandidateLayoutItem(
-                        candidateIndex: index,
-                        frame: NSRect(
-                            x: CGFloat(occupied) * columnWidth, y: 0,
-                            width: CGFloat(spans[index]) * columnWidth, height: metrics.itemHeight),
-                        indexText: "", showsIndexText: showsIndex,
-                        showsDetail: configuration.showsKeyLabelsAsDetails
-                            || candidates[index].detail != nil, alignedCandidateWidth: nil)
-                })
-        }
-        return rows
-    }
-
     static func pagedLayout(
         pages: [CandidateLayoutRow],
         pageIndex: Int,
         keyLabels: [CandidateKeyLabel],
-        configuration: CandidateConfiguration,
         metrics: CandidateMetrics
     ) -> CandidatePanelLayout {
         guard pages.indices.contains(pageIndex) else {
             return .empty
         }
-        let showsIndex = !configuration.indexLabels.isEmpty
         var row = pages[pageIndex]
         for index in row.items.indices {
             row.items[index].indexText =
                 keyLabels.indices.contains(index) ? keyLabels[index].displayedText : ""
-            row.items[index].showsIndexText = showsIndex
-        }
-        let naturalWidth = row.items.last?.frame.maxX ?? 0
-        let isFinalPage = pageIndex == pages.index(before: pages.endIndex)
-        let candidateWidth =
-            configuration.allowsExpansion && pages.count > 1
-            ? max(naturalWidth, horizontalBudget(configuration: configuration, metrics: metrics))
-            : naturalWidth
-        if configuration.allowsExpansion, pageIndex == pages.startIndex, !isFinalPage,
-            !row.items.isEmpty
-        {
-            let distributedWidth = max(0, candidateWidth - naturalWidth) / CGFloat(row.items.count)
-            var x: CGFloat = 0
-            for index in row.items.indices {
-                row.items[index].frame.origin.x = x
-                row.items[index].frame.size.width += distributedWidth
-                x = row.items[index].frame.maxX
-            }
-            if let lastIndex = row.items.indices.last {
-                row.items[lastIndex].frame.size.width +=
-                    candidateWidth - row.items[lastIndex].frame.maxX
-            }
         }
         let windowSize = NSSize(
-            width: candidateWidth,
+            width: row.items.last?.frame.maxX ?? 0,
             height: metrics.itemHeight
         )
         return CandidatePanelLayout(
@@ -417,156 +307,17 @@ internal enum HorizontalCandidateLayoutEngine {
             rows: [row],
             separatorRects: [],
             rowWashRect: nil,
-            control: nil,
             hasVerticalScroller: false,
-            cornerRadius: CandidateStyle.Decoration.horizontalCornerRadius
+            cornerRadius: metrics.cornerRadius
         )
     }
 
-    static func expandableLayout(
-        candidates: [Candidate],
-        keyLabels: [CandidateKeyLabel],
-        configuration: CandidateConfiguration,
-        metrics: CandidateMetrics,
-        selectedIndex: Int,
-        expanded: Bool,
-        scrollerStyle: NSScroller.Style
-    ) -> CandidatePanelLayout {
-        guard !candidates.isEmpty else {
-            return .empty
-        }
-        if !expanded {
-            let packed = packedPages(
-                candidates: candidates,
-                configuration: configuration,
-                metrics: metrics
-            )
-            var row = packed[0]
-            let showsIndex = !configuration.indexLabels.isEmpty
-            for index in row.items.indices {
-                row.items[index].indexText =
-                    keyLabels.indices.contains(index) ? keyLabels[index].displayedText : ""
-                row.items[index].showsIndexText = showsIndex
-            }
-            let naturalWidth = row.items.last?.frame.maxX ?? 0
-            let hasOverflow = packed.count > 1
-            let controlWidth = expandControlWidth(metrics: metrics)
-            let windowSize = NSSize(
-                width: naturalWidth + (hasOverflow ? controlWidth : 0),
-                height: metrics.itemHeight
-            )
-            let control =
-                hasOverflow
-                ? CandidateControlLayout(
-                    frame: NSRect(
-                        x: naturalWidth,
-                        y: 0,
-                        width: controlWidth,
-                        height: metrics.itemHeight
-                    )
-                )
-                : nil
-            return CandidatePanelLayout(
-                windowSize: windowSize,
-                documentSize: windowSize,
-                items: row.items,
-                rows: [row],
-                separatorRects: [],
-                rowWashRect: nil,
-                control: control,
-                hasVerticalScroller: false,
-                cornerRadius: CandidateStyle.Decoration.horizontalCornerRadius
-            )
-        }
-
-        var rows = expandedRows(
-            candidates: candidates,
-            configuration: configuration,
-            metrics: metrics
-        )
-        let selectedRow = rows.firstIndex { $0.candidateIndexes.contains(selectedIndex) }
-        let showsIndex = !configuration.indexLabels.isEmpty
-        for rowIndex in rows.indices {
-            for itemIndex in rows[rowIndex].items.indices {
-                let relativeIndex = itemIndex
-                rows[rowIndex].items[itemIndex].frame.origin.y =
-                    CGFloat(rowIndex) * (metrics.itemHeight + 1)
-                rows[rowIndex].items[itemIndex].indexText =
-                    keyLabels.indices.contains(relativeIndex)
-                    ? keyLabels[relativeIndex].displayedText
-                    : ""
-                rows[rowIndex].items[itemIndex].showsIndexText =
-                    showsIndex && rowIndex == selectedRow
-            }
-        }
-
-        let width = horizontalBudget(configuration: configuration, metrics: metrics)
-        let naturalHeight =
-            CGFloat(rows.count) * metrics.itemHeight + CGFloat(max(rows.count - 1, 0))
-        let maximumHeight =
-            (CGFloat(configuration.horizontalMaximumVisibleRows)
-                + CandidateStyle.Layout.partialNextBandFraction)
-            * metrics.itemHeight
-            + CGFloat(configuration.horizontalMaximumVisibleRows - 1)
-        let hasScroller = naturalHeight > maximumHeight
-        let scrollerWidth =
-            hasScroller && scrollerStyle == .legacy
-            ? NSScroller.scrollerWidth(
-                for: .regular, scrollerStyle: scrollerStyle)
-            : 0
-        let windowHeight = hasScroller ? maximumHeight : naturalHeight
-        let documentHeight = naturalHeight
-        let separators = CandidatePanelLayout.horizontalSeparators(
-            rowCount: rows.count, itemHeight: metrics.itemHeight, width: width
-        )
-        let rowWash = selectedRow.map { rowIndex in
-            NSRect(
-                x: 0,
-                y: CGFloat(rowIndex) * (metrics.itemHeight + 1),
-                width: width,
-                height: metrics.itemHeight
-            )
-        }
-        let items = rows.flatMap(\.items)
-        return CandidatePanelLayout(
-            windowSize: NSSize(width: width + scrollerWidth, height: windowHeight),
-            documentSize: NSSize(width: width, height: documentHeight),
-            items: items,
-            rows: rows,
-            separatorRects: separators,
-            rowWashRect: rowWash,
-            control: nil,
-            hasVerticalScroller: hasScroller,
-            cornerRadius: CandidateStyle.Decoration.horizontalCornerRadius
-        )
-    }
-
-    static func horizontalBudget(
-        configuration: CandidateConfiguration,
-        metrics: CandidateMetrics
-    ) -> CGFloat {
-        max(
+    static func horizontalBudget(metrics: CandidateMetrics) -> CGFloat {
+        return max(
             1,
             min(
                 CandidateStyle.Layout.horizontalWidthEm * metrics.candidateFont.pointSize,
-                metrics.availableWidth - horizontalWidthReserve(metrics: metrics)))
-    }
-
-    static func horizontalWidthReserve(metrics: CandidateMetrics) -> CGFloat {
-        // Keep the established packing allowance, including independent rounding at small sizes.
-        let packingReserve =
-            CandidateStyle.Decoration.separator
-            + metrics.scaledAuxiliary(CandidateStyle.Layout.packingLeadingReserve)
-            + metrics.scaledAuxiliary(CandidateStyle.Controls.imageBox)
-            + metrics.scaledAuxiliary(CandidateStyle.Layout.packingTrailingReserve)
-        return max(packingReserve, expandControlWidth(metrics: metrics))
-    }
-
-    static func expandControlWidth(metrics: CandidateMetrics) -> CGFloat {
-        CandidateStyle.Decoration.separator
-            + metrics.scaledAuxiliary(CandidateStyle.Controls.expandLeading)
-            + metrics.scaledAuxiliary(CandidateStyle.Controls.imageBox)
-            + metrics.scaledAuxiliary(CandidateStyle.Controls.expandTrailing)
+                metrics.availableWidth))
     }
 }
 
@@ -647,7 +398,6 @@ internal enum VerticalCandidateLayoutEngine {
             rows: columns,
             separatorRects: separators,
             rowWashRect: wash,
-            control: nil,
             hasVerticalScroller: false,
             cornerRadius: metrics.cornerRadius,
             hasHorizontalScroller: hasScroller
@@ -785,10 +535,8 @@ internal enum VerticalCandidateLayoutEngine {
             rows: rows,
             separatorRects: separators,
             rowWashRect: nil,
-            control: nil,
             hasVerticalScroller: overflowing,
             cornerRadius: metrics.cornerRadius
         )
     }
-
 }

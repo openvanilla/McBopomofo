@@ -27,7 +27,6 @@ final class CandidateAcceptanceTests: XCTestCase {
 
         XCTAssertEqual(controller.selectionIndex, 0)
         XCTAssertEqual(notifications, [0])
-        XCTAssertNil(controller.currentLayout.control)
         XCTAssertFalse(controller.currentLayout.hasVerticalScroller)
         XCTAssertEqual(controller.currentLayout.cornerRadius, 8)
         XCTAssertEqual(
@@ -56,14 +55,12 @@ final class CandidateAcceptanceTests: XCTestCase {
                 pages: pages,
                 pageIndex: 0,
                 keyLabels: [CandidateKeyLabel(key: "1", displayedText: "1")],
-                configuration: configuration,
                 metrics: defaultMetrics
             )
 
             XCTAssertEqual(pages[0].items.count, pageSize)
             XCTAssertEqual(
                 HorizontalCandidateLayoutEngine.horizontalBudget(
-                    configuration: configuration,
                     metrics: defaultMetrics
                 ),
                 384
@@ -134,28 +131,6 @@ final class CandidateAcceptanceTests: XCTestCase {
         XCTAssertFalse(noFit.items[0].showsDetail)
     }
 
-    func testExpansionAndPageUpCollapseBoundary() throws {
-        var stationaryConfiguration = CandidateConfiguration.default
-        stationaryConfiguration.animationDuration = 0
-        let stationary = CandidateController(configuration: stationaryConfiguration)
-        stationary.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 0)
-        stationary.visible = true
-        XCTAssertTrue(stationary.navigate(.down))
-        XCTAssertEqual(stationary.selectionIndex, 0)
-        stationary.visible = false
-
-        let collapsing = CandidateController(configuration: stationaryConfiguration)
-        collapsing.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 0)
-        collapsing.visible = true
-        XCTAssertTrue(collapsing.navigate(.down))
-        collapsing.finishFrameTransition()
-        collapsing.scrollExpanded(toTopRow: 1)
-
-        XCTAssertTrue(collapsing.navigate(.pageUp))
-        XCTAssertFalse(collapsing.isExpanded)
-        collapsing.visible = false
-    }
-
     func testNavigationBoundariesAndWrappingAcrossPanelKinds() throws {
         var pagedConfiguration = try CandidateConfiguration(pageSize: 3)
         pagedConfiguration.allowsExpansion = false
@@ -196,18 +171,6 @@ final class CandidateAcceptanceTests: XCTestCase {
         XCTAssertTrue(vertical.navigate(.down, wrapping: true))
         XCTAssertEqual(vertical.selectionIndex, 0)
         vertical.visible = false
-
-        var expandableConfiguration = CandidateConfiguration.default
-        expandableConfiguration.animationDuration = 0
-        let expandable = CandidateController(configuration: expandableConfiguration)
-        expandable.replaceCandidates(uniformCandidates(20), initialSelectedIndex: 0)
-        expandable.visible = true
-        XCTAssertTrue(expandable.navigate(.down))
-        XCTAssertTrue(expandable.isExpanded)
-        XCTAssertTrue(expandable.navigate(.left, wrapping: true))
-        XCTAssertEqual(expandable.selectionIndex, 19)
-        XCTAssertTrue(expandable.isExpanded)
-        expandable.visible = false
     }
 
     func testSuspendedPageHomeAndEndResultsMatchEachPanel() {
@@ -223,29 +186,6 @@ final class CandidateAcceptanceTests: XCTestCase {
         ] {
             let result = suspendedResult(
                 configuration: pagedConfiguration,
-                navigation: navigation
-            )
-            XCTAssertEqual(result.selectionIndex, expectedIndex)
-        }
-
-        var expandableConfiguration = CandidateConfiguration.default
-        expandableConfiguration.animationDuration = 0
-        for navigation in [CandidateNavigation.pageDown, .pageForward] {
-            let result = suspendedResult(
-                configuration: expandableConfiguration,
-                navigation: navigation
-            )
-            XCTAssertEqual(result.selectionIndex, 0)
-            XCTAssertTrue(result.isExpanded)
-        }
-        for (navigation, expectedIndex) in [
-            (CandidateNavigation.pageUp, 0),
-            (.pageBackward, 0),
-            (.home, 0),
-            (.end, 8),
-        ] {
-            let result = suspendedResult(
-                configuration: expandableConfiguration,
                 navigation: navigation
             )
             XCTAssertEqual(result.selectionIndex, expectedIndex)
