@@ -31,35 +31,27 @@ internal struct CandidatePresentationState {
     var minimumDocumentHeight: CGFloat = 0
 }
 
-internal enum CandidateViewportRequest {
-    case verticalAnchor(Int)
-}
-
 internal struct CandidateNavigationDecision {
     var selection: Int
-    var page: Int?
     var expanded: Bool?
-    var viewport: CandidateViewportRequest?
+    var verticalAnchor: Int?
     var ensuresSelectionVisible = false
 }
 
 internal struct CandidateNavigationContext {
     var state: CandidatePresentationState
     var kind: CandidatePanelKind
-    var orientation: CandidateOrientation
     var count: Int
     var pageSize: Int
     var bands: [CandidateLayoutRow]
     var expandedBands: [CandidateLayoutRow]
 
-    func projected(in bands: [CandidateLayoutRow], band: Int, movingBackward: Bool) -> Int? {
+    func projected(in bands: [CandidateLayoutRow], band: Int) -> Int? {
         guard bands.indices.contains(band) else { return nil }
         let sourceIndex = max(state.selection, 0)
         let source = bands.lazy.compactMap { $0.item(for: sourceIndex) }.first
         return bands[band].candidatePreservingInterval(
-            source.map { orientation.itemInterval($0.frame) },
-            movingBackward: movingBackward,
-            orientation: orientation
+            source.map { $0.frame.minY...$0.frame.maxY }
         )
     }
 }
@@ -74,7 +66,7 @@ internal enum CandidateNavigationReducer {
             .up, .down, .left, .right, .itemForward, .itemBackward,
         ]
         if c.state.selection < 0, arrows.contains(input),
-            !(c.orientation == .vertical && (input == .left || input == .right))
+            c.kind == .horizontalPaged || (input != .left && input != .right)
         {
             return CandidateNavigationDecision(selection: 0)
         }
@@ -82,9 +74,7 @@ internal enum CandidateNavigationReducer {
         switch c.kind {
         case .vertical: result = vertical(input, wrapping: wrapping, c)
         case .horizontalPaged: result = paged(input, wrapping: wrapping, c)
-        case .horizontalExpandable, .verticalExpandable:
-            let intent = c.orientation.expandableNavigation(input)
-            result = expandable(intent, wrapping: wrapping, c)
+        case .verticalExpandable: result = expandable(input, wrapping: wrapping, c)
         }
         return result ?? (c.state.selection < 0 ? CandidateNavigationDecision(selection: 0) : nil)
     }
@@ -118,7 +108,7 @@ internal enum CandidateNavigationReducer {
         let targetBand = c.bands[page].candidateIndexes
         let target =
             sequential ? (delta > 0 ? targetBand.first : targetBand.last) : targetBand.first
-        return target.map { .init(selection: $0, page: page) }
+        return target.map { .init(selection: $0) }
     }
 
     private static func vertical(
@@ -126,7 +116,7 @@ internal enum CandidateNavigationReducer {
         _ c: CandidateNavigationContext
     ) -> CandidateNavigationDecision? {
         let current = max(c.state.selection, 0)
-        if input == .home { return .init(selection: 0, viewport: .verticalAnchor(0)) }
+        if input == .home { return .init(selection: 0, verticalAnchor: 0) }
         if input == .end { return .init(selection: c.count - 1, ensuresSelectionVisible: true) }
         let backward = [.up, .itemBackward, .left, .pageUp, .pageBackward].contains(input)
         let delta = backward ? -1 : 1
@@ -140,7 +130,7 @@ internal enum CandidateNavigationReducer {
             wrapping && !(0..<c.count).contains(requested)
             ? (backward ? c.count - 1 : 0) : bounded(requested, count: c.count, wrapping: false)
         guard index != c.state.selection || wrapping else { return nil }
-        return .init(selection: index, viewport: index == 0 ? .verticalAnchor(0) : nil)
+        return .init(selection: index, verticalAnchor: index == 0 ? 0 : nil)
     }
 
     private static func expandable(
@@ -164,7 +154,7 @@ internal enum CandidateNavigationReducer {
                 ? bands[currentBand].candidateIndexes : compact
             return (input == .home ? indexes.first : indexes.last).map { .init(selection: $0) }
         }
-        if [.left, .right, .itemBackward, .itemForward].contains(input) {
+        if [.up, .down, .itemBackward, .itemForward].contains(input) {
             if c.state.expanded, current == 0, backward, !wrapping {
                 return .init(selection: 0, expanded: false)
             }
@@ -177,7 +167,7 @@ internal enum CandidateNavigationReducer {
             if backward {
                 guard wrapping else { return nil }
                 return .init(
-                    selection: c.projected(in: bands, band: bands.count - 1, movingBackward: true)
+                    selection: c.projected(in: bands, band: bands.count - 1)
                         ?? current,
                     expanded: true)
             }
@@ -186,7 +176,7 @@ internal enum CandidateNavigationReducer {
         if backward, currentBand == 0, !wrapping {
             return .init(selection: min(current, compact.last ?? current), expanded: false)
         }
-        // Page keys and host page actions advance one row or column in expanded layouts.
+        // Page keys and host page actions advance one column in expanded layouts.
         let requested = currentBand + delta
         // Crossing either end wraps to the boundary band, not the modulo remainder.
         let targetBand =
@@ -194,7 +184,7 @@ internal enum CandidateNavigationReducer {
             ? (backward ? bands.count - 1 : 0)
             : bounded(requested, count: bands.count, wrapping: false)
         guard wrapping || targetBand != currentBand,
-            let index = c.projected(in: bands, band: targetBand, movingBackward: backward)
+            let index = c.projected(in: bands, band: targetBand)
         else { return nil }
         return .init(selection: index)
     }

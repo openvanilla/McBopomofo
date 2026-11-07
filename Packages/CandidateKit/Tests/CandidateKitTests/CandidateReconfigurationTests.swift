@@ -223,8 +223,6 @@ final class CandidateReconfigurationTests: XCTestCase {
 
         var configuration = controller.configuration
         configuration.pageSize = 3
-        configuration.usesWideExpandedCells = false
-        configuration.horizontalMaximumVisibleRows = 2
         configuration.verticalMinimumVisibleRows = 4
         configuration.hostHandlesNavigationKeys = false
         configuration.hostHandlesIndexLabelKeys = false

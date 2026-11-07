@@ -26,26 +26,9 @@ import AppKit
 @MainActor
 @objc(CKHorizontalCandidateController)
 public final class HorizontalCandidateController: CandidateController {
-    @objc public var expandable: Bool {
-        get { configuration.allowsExpansion }
-        set {
-            guard newValue != configuration.allowsExpansion else {
-                return
-            }
-            var updatedConfiguration = configuration
-            updatedConfiguration.allowsExpansion = newValue
-            try? apply(configuration: updatedConfiguration)
-        }
-    }
-
-    @objc public convenience init() {
-        self.init(expandable: true)
-    }
-
-    @objc public init(expandable: Bool) {
+    @objc public init() {
         var configuration = CandidateConfiguration.default
         configuration.orientation = .horizontal
-        configuration.allowsExpansion = expandable
         super.init(configuration: configuration)
     }
 

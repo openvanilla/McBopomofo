@@ -46,12 +46,16 @@ internal struct CandidatePlacementResult: Equatable {
 
 internal struct CandidatePlacementContext {
     var anchorRect: NSRect
+    var usesVerticalText: Bool
+    var compositionRect: NSRect?
     var compositionLeadingX: CGFloat?
     var compositionTrailingXProvider: (() -> CGFloat)?
 
     func clearingCompositionEdges() -> CandidatePlacementContext {
         CandidatePlacementContext(
             anchorRect: anchorRect,
+            usesVerticalText: usesVerticalText,
+            compositionRect: nil,
             compositionLeadingX: nil,
             compositionTrailingXProvider: nil
         )
@@ -82,29 +86,44 @@ internal enum CandidatePlacementEngine {
 
     static func place(
         windowSize: NSSize,
+        requiredWidth: CGFloat? = nil,
         anchorRect: NSRect,
         screen: CandidateScreenGeometry,
+        usesVerticalText: Bool = false,
+        compositionRect: NSRect? = nil,
         compositionLeadingX: CGFloat,
         compositionTrailingX: () -> CGFloat
     ) -> CandidatePlacementResult {
         let bounds = screen.visibleFrame
-        let below = NSPoint(x: anchorRect.minX, y: anchorRect.minY - anchorGap)
-        let above = NSPoint(x: anchorRect.minX, y: anchorRect.maxY + anchorGap + windowSize.height)
-        let verticalOptions: [(CandidatePlacementSide, NSPoint, Bool)] = [
-            (.below, below, below.y - windowSize.height >= bounds.minY),
-            (.above, above, above.y <= bounds.maxY),
-        ]
-        let placement: (CandidatePlacementSide, NSPoint)
-        if let option = verticalOptions.first(where: { $0.2 }) {
-            placement = (option.0, option.1)
-        } else {
-            let sideTop = max(anchorRect.maxY, bounds.minY + windowSize.height)
-            let left = compositionLeadingX - anchorGap - windowSize.width
-            // Resolve the host's trailing edge only when right-side placement is necessary.
-            placement =
-                left >= bounds.minX
-                ? (.left, NSPoint(x: left, y: sideTop))
-                : (.right, NSPoint(x: compositionTrailingX() + anchorGap, y: sideTop))
+        let requiredWidth = max(windowSize.width, requiredWidth ?? windowSize.width)
+        let textRect = usesVerticalText ? compositionRect ?? anchorRect : anchorRect
+        let sides: [CandidatePlacementSide] =
+            usesVerticalText ? [.left, .right, .below, .above] : [.below, .above, .left, .right]
+        let sideTop = max(anchorRect.maxY, bounds.minY + windowSize.height)
+        var placement: (CandidatePlacementSide, NSPoint) = (.below, anchorRect.origin)
+        for side in sides {
+            let point: NSPoint
+            let fits: Bool
+            switch side {
+            case .below:
+                point = NSPoint(x: anchorRect.minX, y: textRect.minY - anchorGap)
+                fits = point.y - windowSize.height >= bounds.minY
+            case .above:
+                point = NSPoint(
+                    x: anchorRect.minX, y: textRect.maxY + anchorGap + windowSize.height)
+                fits = point.y <= bounds.maxY
+            case .left:
+                let leadingX = usesVerticalText ? textRect.minX : compositionLeadingX
+                point = NSPoint(x: leadingX - anchorGap - windowSize.width, y: sideTop)
+                fits = leadingX - anchorGap - requiredWidth >= bounds.minX
+            case .right:
+                // Resolve the host's trailing edge only when right-side placement is necessary.
+                let trailingX = usesVerticalText ? textRect.maxX : compositionTrailingX()
+                point = NSPoint(x: trailingX + anchorGap, y: sideTop)
+                fits = point.x + requiredWidth <= bounds.maxX
+            }
+            placement = (side, point)
+            if fits { break }
         }
         let fitted = fittedTopLeft(placement.1, windowSize: windowSize, bounds: bounds)
         return CandidatePlacementResult(topLeft: fitted, side: placement.0, screen: screen)
@@ -176,7 +195,6 @@ internal enum CandidateWindowFrameInterpolator {
     {
         start + (end - start) * progress
     }
-
 }
 
 @MainActor

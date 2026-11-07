@@ -342,22 +342,15 @@ internal final class CandidateCanvasView: NSView {
     }
     override func accessibilityChildren() -> [Any]? {
         guard candidateController?.visible == true else { return [] }
-        var children: [Any] = candidateController?.accessibilityChildren ?? []
-        if let control = candidateController?.renderedControlView {
-            children += control.accessibilityChildren() ?? []
-        }
-        return children
+        return candidateController?.accessibilityChildren ?? []
     }
     override func accessibilityVisibleChildren() -> [Any]? {
         guard let controller = candidateController, controller.visible else { return [] }
-        var children: [Any] = controller.accessibilityChildren.filter { item in
+        return controller.accessibilityChildren.filter { item in
             controller.currentLayout.item(for: item.index)?.frame.intersects(visibleRect) == true
         }
-        if let control = controller.renderedControlView {
-            children += control.accessibilityChildren() ?? []
-        }
-        return children
     }
+
     override func accessibilitySelectedChildren() -> [Any]? {
         candidateController?.accessibilityChildren.filter { $0.isAccessibilitySelected() } ?? []
     }
@@ -617,84 +610,6 @@ internal final class CandidateItemView: NSView {
         NSAttributedString(string: text, attributes: attributes).draw(
             with: drawingRect,
             options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine]
-        )
-    }
-}
-
-internal final class CandidateControlView: NSView {
-    private var accessibilityButtons: [CandidateAccessibilityButton] = []
-
-    override func isAccessibilityElement() -> Bool { false }
-    override func accessibilityChildren() -> [Any]? { accessibilityButtons }
-    var onExpand: (() -> Void)?
-
-    private let metrics: CandidateMetrics
-    private let imageView = NSImageView()
-
-    init(frame: NSRect, metrics: CandidateMetrics) {
-        self.metrics = metrics
-        super.init(frame: frame)
-        addSubview(imageView)
-        configureImages()
-        accessibilityButtons = [
-            CandidateAccessibilityButton(
-                view: self,
-                title: NSLocalizedString(
-                    "Expand", bundle: .module, comment: "Candidate accessibility action"),
-                rect: bounds, enabled: true
-            ) { [weak self] in self?.onExpand?() }
-        ]
-    }
-
-    required init?(coder: NSCoder) {
-        nil
-    }
-
-    override var isOpaque: Bool { false }
-
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-        configureImages()
-        needsDisplay = true
-    }
-
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
-        true
-    }
-
-    override func mouseDown(with event: NSEvent) {}
-
-    override func draw(_ dirtyRect: NSRect) {
-        NSColor.separatorColor.setFill()
-        NSRect(
-            x: 0, y: 0, width: CandidateStyle.Decoration.separatorThickness,
-            height: bounds.height
-        ).fill()
-        super.draw(dirtyRect)
-    }
-
-    override func mouseUp(with event: NSEvent) {
-        let location = convert(event.locationInWindow, from: nil)
-        guard bounds.contains(location) else {
-            return
-        }
-        onExpand?()
-    }
-
-    private func configureImages() {
-        imageView.image = NSImage(systemSymbolName: "chevron.down", accessibilityDescription: nil)?
-            .withSymbolConfiguration(
-                NSImage.SymbolConfiguration(
-                    pointSize: metrics.scaledAuxiliary(CandidateStyle.Controls.expandSymbol),
-                    weight: .medium))
-        imageView.contentTintColor = .tertiaryLabelColor
-        let side = metrics.scaledAuxiliary(CandidateStyle.Controls.imageBox)
-        imageView.frame = NSRect(
-            x: CandidateStyle.Decoration.separator
-                + metrics.scaledAuxiliary(CandidateStyle.Controls.expandLeading),
-            y: bounds.midY - side / 2,
-            width: side,
-            height: side
         )
     }
 }

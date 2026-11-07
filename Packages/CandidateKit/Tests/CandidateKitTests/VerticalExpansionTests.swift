@@ -17,7 +17,6 @@ final class VerticalExpansionTests: XCTestCase {
         XCTAssertEqual(controller.selectionIndex, 2)
         XCTAssertEqual(controller.currentLayout.item(for: 2)?.frame, firstFrame)
         XCTAssertTrue(selections.isEmpty)
-        XCTAssertNil(controller.currentLayout.control)
 
         XCTAssertTrue(controller.navigate(.right))
         XCTAssertEqual(controller.selectionIndex, 11)
@@ -47,7 +46,6 @@ final class VerticalExpansionTests: XCTestCase {
         XCTAssertFalse(controller.isExpanded)
         XCTAssertEqual(controller.selectionIndex, 1)
         XCTAssertEqual(controller.currentLayout.items.count, 9)
-        XCTAssertNil(controller.currentLayout.control)
     }
 
     func testDownAcrossFirstColumnExpandsAndHomeEndStayInColumn() {

@@ -5,14 +5,13 @@ import XCTest
 
 @MainActor
 final class CandidateBehaviorCompatibilityTests: XCTestCase {
-    func testCrossRowSelectionPreservesOverlapInsteadOfNearestCenter() {
+    func testCrossColumnSelectionPreservesOverlapInsteadOfNearestCenter() {
         let row = CandidateLayoutRow(items: [
-            item(1, x: 0, width: 25), item(2, x: 25, width: 75),
+            item(1, y: 0, height: 25), item(2, y: 25, height: 75),
         ])
-        XCTAssertEqual(row.candidatePreservingInterval(20...100, movingBackward: false), 1)
-        XCTAssertEqual(row.candidatePreservingInterval(20...100, movingBackward: true), 2)
-        XCTAssertEqual(row.candidatePreservingInterval(nil, movingBackward: true), 1)
-        XCTAssertEqual(row.candidatePreservingInterval(110...120, movingBackward: false), 2)
+        XCTAssertEqual(row.candidatePreservingInterval(20...100), 1)
+        XCTAssertEqual(row.candidatePreservingInterval(nil), 1)
+        XCTAssertEqual(row.candidatePreservingInterval(110...120), 2)
     }
 
     func testVerticalPageCallbackSeesUpdatedViewport() throws {
@@ -42,10 +41,10 @@ final class CandidateBehaviorCompatibilityTests: XCTestCase {
     }
 
     private func item(
-        _ index: Int, x: CGFloat, y: CGFloat = 0, width: CGFloat
+        _ index: Int, y: CGFloat, height: CGFloat
     ) -> CandidateLayoutItem {
         CandidateLayoutItem(
-            candidateIndex: index, frame: NSRect(x: x, y: y, width: width, height: 28),
+            candidateIndex: index, frame: NSRect(x: 0, y: y, width: 28, height: height),
             indexText: "", showsIndexText: false, showsDetail: false, alignedCandidateWidth: nil)
     }
 
