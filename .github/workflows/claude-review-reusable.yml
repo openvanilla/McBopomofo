@@ -71,7 +71,7 @@ jobs:
 
       - name: Report Claude Review Failure
         if: steps.claude-review.outcome == 'failure'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           FAILURE_MESSAGE: |
             **Claude Code Review Failed**
