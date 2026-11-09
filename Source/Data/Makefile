@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: sort clean format typecheck analyze
+.PHONY: sort clean format typecheck analyze tui
 
 all: data.txt data-plain-bpmf.txt associated-phrases-v2.txt
 
@@ -44,7 +44,7 @@ PhraseFreq.txt: curation/builders/frequency_builder.py phrase.occ exclusion.txt
 	$(PYTHON) -m curation.builders.frequency_builder
 
 clean:
-	rm -f data.txt data-raw.txt data-plain-bpmf.txt phrase.list
+	rm -f data.txt data-raw.txt data-plain-bpmf.txt phrase.list Tools/mcb_tui
 
 # FOR INTERNAL USE
 _install: tidy sort check all
@@ -133,3 +133,30 @@ analyze: curation/analyzers/find_cover_issues.py data.txt
 		--input data.txt \
 		--limit $(ANALYZE_LIMIT)
 
+# --- TUI Simulator ---
+CXX ?= c++
+CXXFLAGS ?= -std=c++20 -O2 -Wall
+ENGINE_DIR := ../Engine
+
+TUI_ENGINE_SRCS := \
+	$(ENGINE_DIR)/gramambular2/reading_grid.cpp \
+	$(ENGINE_DIR)/Mandarin/Mandarin.cpp \
+	$(ENGINE_DIR)/AssociatedPhrasesV2.cpp \
+	$(ENGINE_DIR)/ByteBlockBackedDictionary.cpp \
+	$(ENGINE_DIR)/McBopomofoLM.cpp \
+	$(ENGINE_DIR)/MemoryMappedFile.cpp \
+	$(ENGINE_DIR)/ParselessPhraseDB.cpp \
+	$(ENGINE_DIR)/ParselessLM.cpp \
+	$(ENGINE_DIR)/PhraseReplacementMap.cpp \
+	$(ENGINE_DIR)/UTF8Helper.cpp \
+	$(ENGINE_DIR)/UserOverrideModel.cpp \
+	$(ENGINE_DIR)/UserPhrasesLM.cpp \
+	$(ENGINE_DIR)/VariantAnnotator.cpp
+
+Tools/mcb_tui: Tools/mcb_tui.cpp $(TUI_ENGINE_SRCS)
+	$(CXX) $(CXXFLAGS) \
+		-I$(ENGINE_DIR) -I$(ENGINE_DIR)/gramambular2 -I$(ENGINE_DIR)/Mandarin \
+		$^ -o $@
+
+tui: Tools/mcb_tui data.txt
+	./Tools/mcb_tui data.txt
