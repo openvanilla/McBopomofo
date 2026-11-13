@@ -56,7 +56,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         print("CandidatePreview controls:")
         print("  Arrows, Page Up/Down, Home/End, Tab/Shift-Tab: navigate")
         print("  Selection keys and Return: confirm; action samples use the displayed Shift hints")
-        print("  Command-1/2: horizontal/vertical; Command-3/4: expandable/paged")
+        print("  Command-1/2: horizontal/vertical; Command-3/4: vertical expandable/paged")
         print(
             "  Command-0: center; Command-5/6/7: above/left/right placement; Command-8: hide guides"
         )
@@ -313,8 +313,8 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         synchronizePreviewTheme()
         reloadSample(
             initialSelectedIndex: arguments.contains("--last") ? sample.entries.count - 1 : 0)
-        if arguments.contains("--expanded") {
-            _ = controller.navigate(configuration.orientation == .vertical ? .right : .down)
+        if arguments.contains("--expanded"), configuration.orientation == .vertical {
+            _ = controller.navigate(.right)
         }
         if arguments.contains("--tooltip") { controller.tooltip = "聯想詞" }
         if arguments.contains("--black-background") { showBackground(2) }
@@ -340,6 +340,9 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         default: return true
         }
         item.state = selected ? .on : .off
+        if item.action == #selector(selectDisplayMode), item.tag == 0 {
+            return controller.configuration.orientation == .vertical
+        }
         return true
     }
 
@@ -370,7 +373,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
             "Orientation", to: layout, action: #selector(selectOrientation),
             choices: ["Horizontal", "Vertical"], keys: ["1", "2"])
         addMenu(
-            "Display Mode", to: layout, action: #selector(selectDisplayMode),
+            "Vertical Display Mode", to: layout, action: #selector(selectDisplayMode),
             choices: ["Expandable", "Paged"], keys: ["3", "4"])
         layout.addItem(.separator())
         addMenu(

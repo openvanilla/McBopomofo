@@ -67,9 +67,7 @@ public struct CandidateConfiguration: Equatable, Sendable {
     public var pageSize: Int
     /// Render key labels after the candidate, replacing its detail and omitting the index column.
     public var showsKeyLabelsAsDetails: Bool
-    public var usesWideExpandedCells: Bool
     public var animationDuration: TimeInterval
-    public var horizontalMaximumVisibleRows: Int
     public var verticalMinimumVisibleRows: Int?
     public var verticalMaximumVisibleColumns: Int
     public var hostHandlesNavigationKeys: Bool
@@ -82,9 +80,7 @@ public struct CandidateConfiguration: Equatable, Sendable {
         indexLabels: String = "1234567890",
         pageSize: Int = 9,
         showsKeyLabelsAsDetails: Bool = false,
-        usesWideExpandedCells: Bool = true,
         animationDuration: TimeInterval = 0.2,
-        horizontalMaximumVisibleRows: Int = 5,
         verticalMinimumVisibleRows: Int? = nil,
         verticalMaximumVisibleColumns: Int = 5,
         hostHandlesNavigationKeys: Bool = true,
@@ -96,9 +92,7 @@ public struct CandidateConfiguration: Equatable, Sendable {
         self.indexLabels = indexLabels
         self.pageSize = pageSize
         self.showsKeyLabelsAsDetails = showsKeyLabelsAsDetails
-        self.usesWideExpandedCells = usesWideExpandedCells
         self.animationDuration = animationDuration
-        self.horizontalMaximumVisibleRows = horizontalMaximumVisibleRows
         self.verticalMinimumVisibleRows = verticalMinimumVisibleRows
         self.verticalMaximumVisibleColumns = verticalMaximumVisibleColumns
         self.hostHandlesNavigationKeys = hostHandlesNavigationKeys
@@ -331,7 +325,6 @@ open class CandidateController: NSWindowController {
 
     internal var currentLayout = CandidatePanelLayout.empty
     internal let renderer = CandidateRenderer()
-    internal var renderedControlView: CandidateControlView? { renderer.control }
     internal var accessibilityItems: [CandidateAccessibilityItem] = []
     internal var presentation = CandidatePresentationState()
     internal var currentPageIndex: Int {
@@ -491,7 +484,6 @@ open class CandidateController: NSWindowController {
         candidatePanel.contentView?.needsDisplay = true
         backdropView.needsDisplay = true
         canvasView.needsDisplay = true
-        renderedControlView?.needsDisplay = true
         scrollView.needsDisplay = true
         scrollView.verticalScroller?.needsDisplay = true
         scrollView.horizontalScroller?.needsDisplay = true
@@ -524,7 +516,7 @@ open class CandidateController: NSWindowController {
         }
 
         switch panelKind {
-        case .horizontalExpandable where isExpanded, .verticalExpandable where isExpanded:
+        case .verticalExpandable where isExpanded:
             let preservedScrollOrigin = scrollView.contentView.bounds.origin
             let newLayout = makeCurrentLayout()
             currentLayout = newLayout
@@ -564,6 +556,8 @@ open class CandidateController: NSWindowController {
             if changesPanel, let placementContext {
                 show(
                     near: placementContext.anchorRect,
+                    usesVerticalText: placementContext.usesVerticalText,
+                    compositionRect: placementContext.compositionRect,
                     compositionLeadingX: placementContext.compositionLeadingX,
                     compositionTrailingXProvider: placementContext.compositionTrailingXProvider
                 )
@@ -589,6 +583,8 @@ open class CandidateController: NSWindowController {
         if wasVisible, let placementContext {
             show(
                 near: placementContext.anchorRect,
+                usesVerticalText: placementContext.usesVerticalText,
+                compositionRect: placementContext.compositionRect,
                 compositionLeadingX: placementContext.compositionLeadingX,
                 compositionTrailingXProvider: placementContext.compositionTrailingXProvider
             )
@@ -672,6 +668,8 @@ open class CandidateController: NSWindowController {
 
     public func show(
         near anchorRect: NSRect,
+        usesVerticalText: Bool = false,
+        compositionRect: NSRect? = nil,
         compositionLeadingX: CGFloat? = nil,
         compositionTrailingXProvider: (() -> CGFloat)? = nil
     ) {
@@ -682,6 +680,8 @@ open class CandidateController: NSWindowController {
 
         let context = CandidatePlacementContext(
             anchorRect: anchorRect,
+            usesVerticalText: usesVerticalText,
+            compositionRect: compositionRect,
             compositionLeadingX: compositionLeadingX,
             compositionTrailingXProvider: compositionTrailingXProvider
         )
@@ -768,30 +768,24 @@ open class CandidateController: NSWindowController {
                 candidates: candidates, configuration: configuration, metrics: metrics)
             : currentLayout.rows
         let context = CandidateNavigationContext(
-            state: presentation, kind: panelKind, orientation: configuration.orientation,
+            state: presentation, kind: panelKind,
             count: candidates.count, pageSize: configuration.pageSize,
             bands: bands,
-            expandedBands: configuration.allowsExpansion && !isExpanded ? expandedRows : bands)
+            expandedBands: panelKind == .verticalExpandable && !isExpanded
+                ? expandedLayout.rows : bands
+        )
         guard
             let decision = CandidateNavigationReducer.resolve(
                 navigation, wrapping: wrapping, context: context)
         else { return false }
-        func applyViewportRequest() {
-            switch decision.viewport {
-            case .verticalAnchor(let anchor): scrollVertical(toAnchor: anchor)
-            case nil: break
-            }
-        }
-        if let page = decision.page { currentPageIndex = page }
         if let expansion = decision.expanded, expansion != isExpanded {
             if expansion {
-                expandExpandable(selecting: decision.selection)
+                expand(selecting: decision.selection)
             } else {
-                collapseExpandable()
+                collapse()
             }
-            applyViewportRequest()
         } else {
-            applyViewportRequest()
+            if let anchor = decision.verticalAnchor { scrollVertical(toAnchor: anchor) }
             setSelection(decision.selection)
         }
         if decision.ensuresSelectionVisible { ensureSelectionVisible() }
@@ -978,7 +972,7 @@ open class CandidateController: NSWindowController {
         guard configuration.orientation == .vertical else { return }
         let viewportCount =
             panelKind == .verticalExpandable && isExpanded
-            ? configuration.pageSize * visibleExpandedRowCount + 1
+            ? configuration.pageSize * max(configuration.verticalMaximumVisibleColumns, 1) + 1
             : max(configuration.pageSize, configuration.verticalMinimumVisibleRows ?? 0) + 1
         let start = min(candidates.count, max(0, verticalNumberingAnchor))
         textMeasurements.prime(
@@ -1012,13 +1006,8 @@ open class CandidateController: NSWindowController {
                 ensuresSelectionVisible: false)
             return
         }
-        let bounds =
-            window.screen?.visibleFrame
-            ?? screenFrame(containing: NSPoint(x: initialFrame.minX, y: initialFrame.maxY))
-        let topLeft = CandidatePlacementEngine.fittedTopLeft(
-            NSPoint(x: initialFrame.minX, y: initialFrame.maxY),
-            windowSize: snapshot.windowSize, bounds: bounds)
-        let finalFrame = windowFrame(topLeft: topLeft, size: snapshot.windowSize)
+        let previousSide = placementSide
+        let finalFrame = reanchoredWindowFrame(for: snapshot.windowSize)
         render(
             layout: snapshot, preservedScrollOrigin: viewportOrigin,
             updatesWindowFrame: false, ensuresSelectionVisible: false)
@@ -1031,7 +1020,7 @@ open class CandidateController: NSWindowController {
             self.backdropView.layoutSubtreeIfNeeded()
             window.displayIfNeeded()
         }
-        if !animated {
+        if !animated || previousSide != placementSide {
             applyFrame(finalFrame)
             scrollView.contentView.scroll(to: clampedScrollOrigin(viewportOrigin))
             scrollView.reflectScrolledClipView(scrollView.contentView)
@@ -1052,45 +1041,14 @@ open class CandidateController: NSWindowController {
         )
     }
 
-    internal func synchronizePresentationStateForSelection() {
-        guard selectionIndex >= 0 else {
-            return
-        }
-
-        switch panelKind {
-        case .verticalExpandable where !isExpanded:
-            isExpanded = selectionIndex >= configuration.pageSize
-        case .horizontalExpandable where !isExpanded:
-            let collapsedRow = HorizontalCandidateLayoutEngine.collapsedRow(
-                candidates: candidates,
-                configuration: configuration,
-                metrics: metrics
-            )
-            if !collapsedRow.candidateIndexes.contains(selectionIndex) {
-                isExpanded = true
-            }
-        case .horizontalPaged:
-            let pages = HorizontalCandidateLayoutEngine.packedPages(
-                candidates: candidates,
-                configuration: configuration,
-                metrics: metrics
-            )
-            if let selectedPage = pages.firstIndex(where: {
-                $0.candidateIndexes.contains(selectionIndex)
-            }) {
-                currentPageIndex = selectedPage
-            }
-        default:
-            break
-        }
-    }
-
     internal func rebuildLayout() {
         guard isWindowLoaded else {
             return
         }
 
-        synchronizePresentationStateForSelection()
+        if panelKind == .verticalExpandable, !isExpanded {
+            isExpanded = selectionIndex >= configuration.pageSize
+        }
         let preservedScrollOrigin = scrollView.contentView.bounds.origin
         let newLayout = makeCurrentLayout()
         currentLayout = newLayout
@@ -1113,28 +1071,22 @@ open class CandidateController: NSWindowController {
                 scrollerStyle: scrollView.scrollerStyle,
                 maximumWidth: layoutAvailableWidth
             )
-        case .horizontalExpandable:
-            newLayout = HorizontalCandidateLayoutEngine.expandableLayout(
-                candidates: candidates,
-                keyLabels: keyLabels,
-                configuration: configuration,
-                metrics: metrics,
-                selectedIndex: selectionIndex,
-                expanded: isExpanded,
-                scrollerStyle: scrollView.scrollerStyle
-            )
         case .horizontalPaged:
             let pages = HorizontalCandidateLayoutEngine.packedPages(
                 candidates: candidates,
                 configuration: configuration,
                 metrics: metrics
             )
+            if let selectedPage = pages.firstIndex(where: {
+                $0.candidateIndexes.contains(selectionIndex)
+            }) {
+                currentPageIndex = selectedPage
+            }
             currentPageIndex = min(max(currentPageIndex, 0), max(pages.count - 1, 0))
             newLayout = HorizontalCandidateLayoutEngine.pagedLayout(
                 pages: pages,
                 pageIndex: currentPageIndex,
                 keyLabels: keyLabels,
-                configuration: configuration,
                 metrics: metrics
             )
         case .vertical:
@@ -1161,10 +1113,6 @@ open class CandidateController: NSWindowController {
             minimumWidth: min(
                 screenWidth,
                 contentView.titleView.intrinsicContentSize.width + contentView.padding * 2))
-        if newLayout.headerHeight > 0, configuration.orientation == .vertical {
-            newLayout.cornerRadius = metrics.scaledAuxiliary(
-                CandidateStyle.Decoration.defaultCornerRadius)
-        }
         return newLayout
     }
 
@@ -1177,8 +1125,7 @@ open class CandidateController: NSWindowController {
         renderer.synchronize(
             layout: layout, candidates: candidates, metrics: metrics,
             selection: selectionIndex, colors: resolvedSelectionColors, canvas: canvasView,
-            makeItem: { makeItemView(for: $0, interactive: true) },
-            makeControl: { makeControlView(for: $0, interactive: true) })
+            makeItem: { makeItemView(for: $0, interactive: true) })
         candidatePanel.dragActivationDistance = metrics.dragActivationDistance
 
         configureScrollers(for: layout)
@@ -1242,22 +1189,6 @@ open class CandidateController: NSWindowController {
             view.onConfirm = { [weak self] index in
                 guard self?.isFrameTransitionActive == false else { return }
                 self?.confirmCandidate(at: index)
-            }
-        }
-        return view
-    }
-
-    internal func makeControlView(
-        for control: CandidateControlLayout,
-        interactive: Bool
-    ) -> CandidateControlView {
-        let view = CandidateControlView(frame: control.frame, metrics: metrics)
-        if interactive {
-            view.onExpand = { [weak self] in
-                guard let self, !isFrameTransitionActive,
-                    panelKind == .horizontalExpandable, !isExpanded
-                else { return }
-                expandExpandable(selecting: max(selectionIndex, 0))
             }
         }
         return view
@@ -1397,10 +1328,23 @@ open class CandidateController: NSWindowController {
         for windowSize: NSSize,
         context: CandidatePlacementContext
     ) -> CandidatePlacementResult {
-        CandidatePlacementEngine.place(
+        var requiredWidth = windowSize.width
+        if context.usesVerticalText, panelKind == .verticalExpandable, !isExpanded,
+            candidates.count > configuration.pageSize
+        {
+            let visibleCount =
+                configuration.pageSize * (max(configuration.verticalMaximumVisibleColumns, 1) + 1)
+            textMeasurements.prime(
+                candidates, indexes: 0..<min(visibleCount, candidates.count), metrics: metrics)
+            requiredWidth = max(requiredWidth, expandedLayout.windowSize.width)
+        }
+        return CandidatePlacementEngine.place(
             windowSize: windowSize,
+            requiredWidth: requiredWidth,
             anchorRect: context.anchorRect,
             screen: placementScreen(for: context.anchorRect),
+            usesVerticalText: context.usesVerticalText,
+            compositionRect: context.compositionRect,
             compositionLeadingX: context.compositionLeadingX ?? context.anchorRect.minX,
             compositionTrailingX: {
                 context.compositionTrailingXProvider?() ?? context.anchorRect.maxX
@@ -1476,7 +1420,7 @@ open class CandidateController: NSWindowController {
         switch panelKind {
         case .horizontalPaged:
             indexes = currentLayout.rows.first?.candidateIndexes ?? []
-        case .horizontalExpandable, .verticalExpandable:
+        case .verticalExpandable:
             if isExpanded {
                 indexes =
                     currentLayout.row(containing: selectionIndex)?.candidateIndexes
@@ -1505,11 +1449,11 @@ open class CandidateController: NSWindowController {
         }
     }
 
-    internal func expandExpandable(selecting index: Int) {
+    internal func expand(selecting index: Int) {
         let previousIndex = selectionIndex
         let targetIndex = min(max(index, 0), candidates.count - 1)
         if visible, frameTransitionDriver == nil {
-            performExpandableTransition(expanding: true, targetSelection: targetIndex)
+            performExpansionTransition(expanding: true, targetSelection: targetIndex)
         } else {
             isExpanded = true
             selectionIndex = targetIndex
@@ -1518,38 +1462,19 @@ open class CandidateController: NSWindowController {
         emitSelectionChange(from: previousIndex)
     }
 
-    internal func collapseExpandable() {
-        let collapsed = collapsedNavigationRow
+    internal func collapse() {
         let previousIndex = selectionIndex
-        let targetIndex: Int
-        if let finalIndex = collapsed.candidateIndexes.last, selectionIndex > finalIndex {
-            targetIndex = finalIndex
-        } else {
-            targetIndex = selectionIndex
-        }
+        let targetIndex = min(selectionIndex, configuration.pageSize - 1)
         scrollView.contentView.scroll(to: .zero)
         scrollView.reflectScrolledClipView(scrollView.contentView)
         if visible, frameTransitionDriver == nil {
-            performExpandableTransition(expanding: false, targetSelection: targetIndex)
+            performExpansionTransition(expanding: false, targetSelection: targetIndex)
         } else {
             isExpanded = false
             selectionIndex = targetIndex
             rebuildLayout()
         }
         emitSelectionChange(from: previousIndex)
-    }
-
-    internal var collapsedNavigationRow: CandidateLayoutRow {
-        if configuration.orientation == .vertical {
-            return VerticalCandidateLayoutEngine.expandableLayout(
-                candidates: candidates, keyLabels: keyLabels, configuration: configuration,
-                metrics: metrics, selectedIndex: selectionIndex, expanded: false,
-                scrollerStyle: scrollView.scrollerStyle
-            ).rows.first ?? CandidateLayoutRow(items: [])
-        }
-        return HorizontalCandidateLayoutEngine.collapsedRow(
-            candidates: candidates, configuration: configuration, metrics: metrics
-        )
     }
 
     internal func emitSelectionChange(from previousIndex: Int) {
@@ -1565,7 +1490,7 @@ open class CandidateController: NSWindowController {
         )
     }
 
-    internal func performExpandableTransition(expanding: Bool, targetSelection: Int) {
+    internal func performExpansionTransition(expanding: Bool, targetSelection: Int) {
         guard let window, !currentLayout.items.isEmpty else {
             isExpanded = expanding
             selectionIndex = targetSelection
@@ -1580,6 +1505,12 @@ open class CandidateController: NSWindowController {
         selectionIndex = targetSelection
         let targetLayout = makeCurrentLayout()
         currentLayout = targetLayout
+        let previousSide = placementSide
+        let targetWindowFrame = reanchoredWindowFrame(for: targetLayout.windowSize)
+        if previousSide != placementSide {
+            render(layout: targetLayout, preservedScrollOrigin: .zero)
+            return
+        }
         render(
             layout: targetLayout,
             preservedScrollOrigin: .zero,
@@ -1587,11 +1518,9 @@ open class CandidateController: NSWindowController {
             ensuresSelectionVisible: false
         )
 
-        let targetWindowFrame = reanchoredWindowFrame(for: targetLayout.windowSize)
         let tracks = CandidateAnimationPlanner.tracks(
             compact: expanding ? oldLayout : targetLayout,
             expanded: expanding ? targetLayout : oldLayout,
-            orientation: configuration.orientation,
             expanding: expanding)
         renderer.bind(
             tracks: tracks, canvas: canvasView,
@@ -1599,7 +1528,7 @@ open class CandidateController: NSWindowController {
                 let view = makeItemView(for: item, interactive: false)
                 view.selected = item.candidateIndex == oldSelection
                 return view
-            }, makeControl: { makeControlView(for: $0, interactive: false) })
+            })
         canvasView.rowWashAlpha = expanding ? 0 : 1
         if !expanding {
             canvasView.rowWashRect = oldLayout.rowWashRect
@@ -1611,8 +1540,6 @@ open class CandidateController: NSWindowController {
         scrollView.hasHorizontalScroller = false
         scrollView.verticalScrollElasticity = .none
         scrollView.horizontalScrollElasticity = .none
-        let startCorner = oldLayout.cornerRadius
-        let targetCorner = targetLayout.cornerRadius
 
         startFrameTransition(
             update: { [weak self] progress in
@@ -1628,7 +1555,6 @@ open class CandidateController: NSWindowController {
                 layoutContent(size: acceptedWindowSize)
                 renderer.applyMotions(progress: progress)
                 canvasView.rowWashAlpha = expanding ? progress : 1 - progress
-                backdropView.cornerRadius = startCorner + (targetCorner - startCorner) * progress
                 backdropView.layoutSubtreeIfNeeded()
                 window.displayIfNeeded()
             },
@@ -1644,7 +1570,6 @@ open class CandidateController: NSWindowController {
                 canvasView.separatorRects = targetLayout.separatorRects
                 layoutContent(size: acceptedWindowSize)
                 configureScrollers(for: targetLayout)
-                backdropView.cornerRadius = targetCorner
                 scrollView.contentView.scroll(to: clampedScrollOrigin(.zero))
                 scrollView.reflectScrolledClipView(scrollView.contentView)
                 if targetLayout.hasVerticalScroller || targetLayout.hasHorizontalScroller,
@@ -1659,37 +1584,13 @@ open class CandidateController: NSWindowController {
         )
     }
 
-    internal var expandedRows: [CandidateLayoutRow] {
-        if configuration.orientation == .vertical {
-            return VerticalCandidateLayoutEngine.expandableLayout(
-                candidates: candidates, keyLabels: keyLabels, configuration: configuration,
-                metrics: metrics, selectedIndex: selectionIndex, expanded: true,
-                scrollerStyle: scrollView.scrollerStyle
-            ).rows
-        }
-        return HorizontalCandidateLayoutEngine.expandedRows(
-            candidates: candidates,
-            configuration: configuration,
-            metrics: metrics
+    internal var expandedLayout: CandidatePanelLayout {
+        VerticalCandidateLayoutEngine.expandableLayout(
+            candidates: candidates, keyLabels: keyLabels, configuration: configuration,
+            metrics: metrics, selectedIndex: selectionIndex, expanded: true,
+            scrollerStyle: scrollView.scrollerStyle,
+            maximumWidth: layoutAvailableWidth
         )
-    }
-
-    internal var visibleExpandedRowCount: Int {
-        max(
-            configuration.orientation == .horizontal
-                ? configuration.horizontalMaximumVisibleRows
-                : configuration.verticalMaximumVisibleColumns, 1)
-    }
-
-    internal func scrollExpanded(toTopRow requestedTopRow: Int) {
-        let maximumTopRow = max(currentLayout.rows.count - visibleExpandedRowCount, 0)
-        let topRow = min(max(requestedTopRow, 0), maximumTopRow)
-        guard let frame = currentLayout.rows[topRow].items.first?.frame else { return }
-        let axis = configuration.orientation
-        scrollView.contentView.scroll(
-            to: clampedScrollOrigin(axis.scrollPoint(axis.scrollInterval(frame).lowerBound))
-        )
-        scrollView.reflectScrolledClipView(scrollView.contentView)
     }
 
     internal func scrollVertical(toAnchor requestedAnchor: Int) {
@@ -1732,10 +1633,9 @@ open class CandidateController: NSWindowController {
             return
         }
         let visible = scrollView.contentView.bounds
-        let axis: CandidateOrientation =
-            currentLayout.hasHorizontalScroller ? .vertical : .horizontal
-        let viewport = axis.scrollInterval(visible)
-        let item = axis.scrollInterval(frame)
+        let horizontal = currentLayout.hasHorizontalScroller
+        let viewport = horizontal ? visible.minX...visible.maxX : visible.minY...visible.maxY
+        let item = horizontal ? frame.minX...frame.maxX : frame.minY...frame.maxY
         var target = viewport.lowerBound
         let trailingPeek =
             selectionIndex + 1 < candidates.count
@@ -1748,7 +1648,8 @@ open class CandidateController: NSWindowController {
         } else {
             return
         }
-        scrollView.contentView.scroll(to: clampedScrollOrigin(axis.scrollPoint(target)))
+        let origin = horizontal ? NSPoint(x: target, y: 0) : NSPoint(x: 0, y: target)
+        scrollView.contentView.scroll(to: clampedScrollOrigin(origin))
         scrollView.reflectScrolledClipView(scrollView.contentView)
     }
 

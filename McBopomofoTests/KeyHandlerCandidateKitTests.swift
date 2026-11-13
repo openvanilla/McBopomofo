@@ -52,17 +52,15 @@ final class KeyHandlerCandidatePreferenceTests: XCTestCase {
         let saved = Preferences.chooseCandidateUsingSpace
         defer { Preferences.chooseCandidateUsingSpace = saved }
 
-        for vertical in [false, true] {
-            let fixture = try CandidateKeyFixture(vertical: vertical, expandable: true)
-            defer { fixture.controller.visible = false }
-            fixture.controller.selectedCandidateIndex = 2
+        let fixture = try CandidateKeyFixture(vertical: true, expandable: true)
+        defer { fixture.controller.visible = false }
+        fixture.controller.selectedCandidateIndex = 2
 
-            Preferences.chooseCandidateUsingSpace = false
-            fixture.send(" ")
-            XCTAssertEqual(fixture.controller.selectedCandidateIndex, 2)
-            fixture.send(" ")
-            XCTAssertGreaterThan(fixture.controller.selectedCandidateIndex, 2)
-        }
+        Preferences.chooseCandidateUsingSpace = false
+        fixture.send(" ")
+        XCTAssertEqual(fixture.controller.selectedCandidateIndex, 2)
+        fixture.send(" ")
+        XCTAssertGreaterThan(fixture.controller.selectedCandidateIndex, 2)
     }
 
     func testNonexpandingNavigationPreservesSelectionAndKeyLabels() throws {
@@ -225,23 +223,21 @@ final class KeyHandlerCandidatePreferenceTests: XCTestCase {
     }
 
     func testExpandedPageKeysMoveOneRowOrColumnAndClampAtTheEnd() throws {
-        for vertical in [false, true] {
-            let fixture = try CandidateKeyFixture(vertical: vertical, expandable: true)
-            defer { fixture.controller.visible = false }
-            fixture.controller.selectedCandidateIndex = 2
-            XCTAssertTrue(fixture.controller.showNextPage())
-            XCTAssertEqual(fixture.controller.selectedCandidateIndex, 2)
+        let fixture = try CandidateKeyFixture(vertical: true, expandable: true)
+        defer { fixture.controller.visible = false }
+        fixture.controller.selectedCandidateIndex = 2
+        XCTAssertTrue(fixture.controller.showNextPage())
+        XCTAssertEqual(fixture.controller.selectedCandidateIndex, 2)
 
-            fixture.send("\u{F72D}", keyCode: KeyCode.pageDown.rawValue)
-            XCTAssertEqual(fixture.controller.selectedCandidateIndex, 6)
-            fixture.send("\u{F72C}", keyCode: KeyCode.pageUp.rawValue)
-            XCTAssertEqual(fixture.controller.selectedCandidateIndex, 2)
+        fixture.send("\u{F72D}", keyCode: KeyCode.pageDown.rawValue)
+        XCTAssertEqual(fixture.controller.selectedCandidateIndex, 6)
+        fixture.send("\u{F72C}", keyCode: KeyCode.pageUp.rawValue)
+        XCTAssertEqual(fixture.controller.selectedCandidateIndex, 2)
 
-            fixture.controller.selectedCandidateIndex = 22
-            XCTAssertFalse(fixture.controller.showNextPage())
-            XCTAssertEqual(fixture.controller.selectedCandidateIndex, 22)
-            XCTAssertTrue(fixture.selections.isEmpty)
-        }
+        fixture.controller.selectedCandidateIndex = 22
+        XCTAssertFalse(fixture.controller.showNextPage())
+        XCTAssertEqual(fixture.controller.selectedCandidateIndex, 22)
+        XCTAssertTrue(fixture.selections.isEmpty)
     }
 
     func testPreviewAndInputMethodNavigationStayInSync() throws {
@@ -309,7 +305,8 @@ final class KeyHandlerCandidatePreferenceTests: XCTestCase {
 
                     fixture.controller.selectedCandidateIndex = 9
                     fixture.send("\u{F729}", keyCode: KeyCode.home.rawValue)
-                    XCTAssertEqual(fixture.controller.selectedCandidateIndex, expandable ? 8 : 0)
+                    XCTAssertEqual(
+                        fixture.controller.selectedCandidateIndex, vertical && expandable ? 8 : 0)
                     fixture.send("\u{F72B}", keyCode: KeyCode.end.rawValue)
                     XCTAssertEqual(fixture.controller.selectedCandidateIndex, 9)
                     fixture.send("\t", keyCode: KeyCode.tab.rawValue)
@@ -353,7 +350,7 @@ private final class CandidateKeyFixture: NSObject, @MainActor KeyHandlerDelegate
         controller =
             vertical
             ? CandidateKit.VerticalCandidateController(expandable: expandable)
-            : CandidateKit.HorizontalCandidateController(expandable: expandable)
+            : CandidateKit.HorizontalCandidateController()
         let candidates = (0..<count).map {
             InputState.Candidate(
                 reading: "ㄧ", value: "字\($0)", displayText: "字\($0)", rawValue: "字\($0)")
@@ -364,6 +361,7 @@ private final class CandidateKeyFixture: NSObject, @MainActor KeyHandlerDelegate
         handler.delegate = self
         handler.inputMode = .bopomofo
         var configuration = controller.configuration
+        configuration.allowsExpansion = expandable
         configuration.indexLabels = "asdf"
         configuration.pageSize = 4
         configuration.animationDuration = 0

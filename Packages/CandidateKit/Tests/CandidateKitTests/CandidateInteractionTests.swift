@@ -73,30 +73,6 @@ final class CandidateInteractionTests: XCTestCase {
         controller.visible = false
     }
 
-    func testExpandedPageKeysMoveOneRowWithoutScrollingVisibleSelection() throws {
-        let controller = CandidateController()
-        controller.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 7)
-        controller.visible = true
-        XCTAssertTrue(controller.navigate(.down))
-        XCTAssertTrue(controller.isExpanded)
-        XCTAssertEqual(
-            controller.currentLayout.rows.firstIndex { $0.candidateIndexes.contains(7) }, 1)
-
-        XCTAssertTrue(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 121, modifiers: [], characters: "\u{F72D}"))))
-
-        XCTAssertEqual(controller.selectionIndex, 13)
-        XCTAssertEqual(controller.scrollView.contentView.bounds.minY, 0)
-
-        XCTAssertTrue(
-            controller.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 116, modifiers: [], characters: "\u{F72C}"))))
-        XCTAssertEqual(controller.selectionIndex, 7)
-        XCTAssertEqual(controller.scrollView.contentView.bounds.minY, 0)
-        controller.visible = false
-    }
-
     func testVerticalPageNavigationPreservesOffsetAndRelativeCommitUsesAnchor() {
         var configuration = CandidateConfiguration.default
         configuration.orientation = .vertical
