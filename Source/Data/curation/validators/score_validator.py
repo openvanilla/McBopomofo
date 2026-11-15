@@ -17,7 +17,7 @@ def segPick(thisbpmf, segcand='', segscore=0):
     myscore = -9999.99
     mycand = ''
     if thisbpmf not in phrases:
-        print thisbpmf
+        print(thisbpmf)
         sys.exit(1)
     for a, b in phrases[thisbpmf]:
         if myscore < b:
@@ -37,8 +37,8 @@ def twoCharWalk(bpmf2walk):
         segscore = 0
         for mybpmf in bpmfinput:
             if mybpmf not in phrases:
-                print mybpmf
-                print bpmf2walk
+                print(mybpmf)
+                print(bpmf2walk)
                 sys.exit(0)
             (segcand, segscore) = segPick(mybpmf, segcand, segscore)
         candidate.append((segcand, segscore))
@@ -52,7 +52,7 @@ def twoCharWalk(bpmf2walk):
     #
     candidate.sort(key=lambda x: x[1], reverse=True)
     if candidate == []:
-        print bpmf2walk
+        print(bpmf2walk)
         sys.exit()
     return candidate[0]
 
@@ -66,8 +66,8 @@ def threeCharWalk(bpmf2walk):
         segscore = 0
         mybpmf = bpmfinput[0]
         if mybpmf not in phrases:
-            print mybpmf
-            print bpmf2walk
+            print(mybpmf)
+            print(bpmf2walk)
             sys.exit(0)
         (segcand, segscore) = segPick(mybpmf, segcand, segscore)
         thisbpmf = '-'.join(bpmfinput[1:3])
@@ -90,8 +90,8 @@ def threeCharWalk(bpmf2walk):
         (segcand, segscore) = segPick(thisbpmf, segcand, segscore)
         mybpmf = bpmfinput[2]
         if mybpmf not in phrases:
-            print mybpmf
-            print bpmf2walk
+            print(mybpmf)
+            print(bpmf2walk)
             sys.exit(0)
         (segcand, segscore) = segPick(mybpmf, segcand, segscore)
         candidate.append((segcand, segscore))
@@ -272,31 +272,31 @@ def sixCharWalk(bpmf2walk):
 
 
 def chkBPMFoutput(phrases, bpmf2chk):
-    if len(bpmf2chk.split('-')) is 2:
+    if len(bpmf2chk.split('-')) == 2:
         (a, b) = twoCharWalk(bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
-            print '%s %f %s %f' % (c, d, a, b)
-    if len(bpmf2chk.split('-')) is 3:
+            print('%s %f %s %f' % (c, d, a, b))
+    if len(bpmf2chk.split('-')) == 3:
         (a, b) = threeCharWalk(bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
-            print '%s %f %s %f' % (c, d, a, b)
-    if len(bpmf2chk.split('-')) is 4:
+            print('%s %f %s %f' % (c, d, a, b))
+    if len(bpmf2chk.split('-')) == 4:
         (a, b) = fourCharWalk(bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
-            print '%s %f %s %f' % (c, d, a, b)
-    if len(bpmf2chk.split('-')) is 5:
+            print('%s %f %s %f' % (c, d, a, b))
+    if len(bpmf2chk.split('-')) == 5:
         (a, b) = fiveCharWalk(bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
-            print '%s %f %s %f' % (c, d, a, b)
-    if len(bpmf2chk.split('-')) is 6:
+            print('%s %f %s %f' % (c, d, a, b))
+    if len(bpmf2chk.split('-')) == 6:
         (a, b) = sixCharWalk(bpmf2chk)
         (c, d) = phrases[bpmf2chk][0]
         if (a, b) != (c, d):
-            print '%s %f %s %f' % (c, d, a, b)
+            print('%s %f %s %f' % (c, d, a, b))
 
 
 if __name__ == '__main__':

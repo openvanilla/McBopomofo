@@ -85,7 +85,7 @@ tidy:
 	@sed -i '' -e 's/1/˙/g;s/2/ˊ/g;s/3/ˇ/g;s/4/ˋ/g' BPMFMappings.txt
 
 _phrase.occ: phrase.list
-	@$(PYTHON) bin_legacy/count.occurrence.py phrase.list > tmp && mv tmp phrase.occ
+	@$(PYTHON) scripts/count_occurrences.py phrase.list > tmp && mv tmp phrase.occ
 
 phrase.list: BPMFBase.txt BPMFMappings.txt
 	awk '{print $$1}' phrase.occ > phrase.list

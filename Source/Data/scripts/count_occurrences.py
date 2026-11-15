@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
+import sys, os
 import codecs
 import configparser
 import multiprocessing
 from pathlib import Path
 
 # Import centralized project paths
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from curation import PROJECT_ROOT, CONFIG_FILE
 
 __author__ = "Mengjuei Hsieh and The McBopomofo Authors"
