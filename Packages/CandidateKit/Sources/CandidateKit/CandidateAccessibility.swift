@@ -125,49 +125,10 @@ internal final class CandidateAccessibilityItem: NSAccessibilityElement {
     }
 }
 
-@MainActor
-internal final class CandidateAccessibilityButton: NSAccessibilityElement {
-    weak var view: NSView?
-    let rect: NSRect
-    let action: () -> Void
-
-    init(view: NSView, title: String, rect: NSRect, enabled: Bool, action: @escaping () -> Void) {
-        self.view = view
-        self.rect = rect
-        self.action = action
-        super.init()
-        setAccessibilityRole(.button)
-        setAccessibilityLabel(title)
-        setAccessibilityEnabled(enabled)
-        setAccessibilityParent(view)
-    }
-
-    override func accessibilityFrame() -> NSRect {
-        accessibilityUI(self) { element in
-            guard let view = element.view, let window = view.window else { return .zero }
-            return window.convertToScreen(view.convert(element.rect, to: nil))
-        }
-    }
-
-    override func accessibilityParent() -> Any? {
-        accessibilityUI(self) { $0.view?.superview }
-    }
-
-    override func accessibilityPerformPress() -> Bool {
-        accessibilityUI(self) { element in
-            guard element.isAccessibilityEnabled(), element.view?.window?.isVisible == true else {
-                return false
-            }
-            element.action()
-            return true
-        }
-    }
-}
-
 extension CandidateController {
     internal var accessibilityNavigationActions: [NSAccessibilityCustomAction] {
         guard visible else { return [] }
-        var actions = [
+        return [
             NSAccessibilityCustomAction(
                 name: NSLocalizedString(
                     "Previous Page", bundle: .module, comment: "Candidate accessibility action")
@@ -181,26 +142,6 @@ extension CandidateController {
                 self?.navigate(.pageDown) == true
             },
         ]
-        if configuration.allowsExpansion, candidates.count > collapsedNavigationRow.items.count {
-            let expanded = isExpanded
-            actions.insert(
-                NSAccessibilityCustomAction(
-                    name: expanded
-                        ? NSLocalizedString(
-                            "Collapse", bundle: .module, comment: "Candidate accessibility action")
-                        : NSLocalizedString(
-                            "Expand", bundle: .module, comment: "Candidate accessibility action")
-                ) { [weak self] in
-                    guard let self, self.visible else { return false }
-                    if expanded {
-                        self.collapseExpandable()
-                    } else {
-                        self.expandExpandable(selecting: max(self.selectionIndex, 0))
-                    }
-                    return true
-                }, at: 0)
-        }
-        return actions
     }
 
     internal func resetAccessibilityItems() {

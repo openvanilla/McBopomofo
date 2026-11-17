@@ -37,12 +37,10 @@ extension Bool {
     }
 }
 
-private let kMinKeyLabelSize: CGFloat = 10
-private let kCandidateWindowAnchorGap: CGFloat = 4
-
 private struct CandidateTextAnchorContext {
     let lineHeightRect: NSRect
     let usesVerticalText: Bool
+    let compositionRect: NSRect?
     let compositionLeadingX: CGFloat
     let compositionTrailingXProvider: () -> CGFloat
 }
@@ -54,10 +52,6 @@ extension CandidateController {
     static let vertical = VerticalCandidateController()
 
     @objc var isHorizontal: Bool { configuration.orientation == .horizontal }
-    @objc var allowsExpansion: Bool { configuration.allowsExpansion }
-    @objc func navigateCandidates(_ navigation: CandidateNavigation, wrapping: Bool) -> Bool {
-        navigate(navigation, wrapping: wrapping)
-    }
 }
 
 @MainActor
@@ -872,7 +866,6 @@ extension McBopomofoInputMethodController {
 
         // set the attributes for the candidate panel (which uses NSAttributedString)
         let textSize = Preferences.candidateListTextSize
-        let keyLabelSize = max(textSize / 2, kMinKeyLabelSize)
 
         func font(name: String?, size: CGFloat) -> NSFont {
             if let name = name {
@@ -882,11 +875,11 @@ extension McBopomofoInputMethodController {
         }
 
         let candidateKeys: String = {
-            let preferredKeys = Preferences.candidateKeys
+            // Validation ignores surrounding whitespace, so use the same trimmed keys.
+            let preferredKeys = Preferences.candidateKeys.trimmingCharacters(
+                in: .whitespacesAndNewlines)
             do {
                 try Preferences.validate(candidateKeys: preferredKeys)
-                _ = try CandidateConfiguration(
-                    indexLabels: preferredKeys, pageSize: preferredKeys.count)
                 return preferredKeys
             } catch {
                 return Preferences.defaultCandidateKeys
@@ -901,9 +894,9 @@ extension McBopomofoInputMethodController {
         var configuration = candidateController.configuration
         configuration.allowsExpansion =
             Preferences.useExpandableCandidateWindow
-            && !(state is InputState.Number || state is InputState.IcuTransform)
-        configuration.candidateFontSize = textSize
-        configuration.indexLabels = isAutoAssociatedPhrase ? "" : candidateKeys
+            && !NSWorkspace.shared.isVoiceOverEnabled
+            && !(state is InputState.Number || state is InputState.IcuTransform
+                || state is InputState.SelectingDictionary)
         configuration.showsKeyLabelsAsDetails = usesShiftedKeys
         configuration.pageSize = keyLabels.count
         do {
@@ -918,7 +911,7 @@ extension McBopomofoInputMethodController {
             clientBundleIdentifier: NSWorkspace.shared.frontmostApplication?.bundleIdentifier
         )
         candidateController.keyLabelFont = font(
-            name: Preferences.candidateKeyLabelFontName, size: keyLabelSize)
+            name: Preferences.candidateKeyLabelFontName, size: textSize)
         candidateController.candidateFont = font(
             name: Preferences.candidateTextFontName, size: textSize)
 
@@ -939,21 +932,13 @@ extension McBopomofoInputMethodController {
         }
         let anchorContext = candidateTextAnchorContext(for: state, client: textClient)
 
-        if anchorContext.usesVerticalText {
-            candidateController.set(
-                windowTopLeftPoint: NSMakePoint(
-                    anchorContext.lineHeightRect.maxX + kCandidateWindowAnchorGap,
-                    anchorContext.lineHeightRect.origin.y - kCandidateWindowAnchorGap),
-                bottomOutOfScreenAdjustmentHeight:
-                    anchorContext.lineHeightRect.size.height + kCandidateWindowAnchorGap)
-            candidateController.visible = true
-        } else {
-            candidateController.show(
-                near: anchorContext.lineHeightRect,
-                compositionLeadingX: anchorContext.compositionLeadingX,
-                compositionTrailingXProvider: anchorContext.compositionTrailingXProvider
-            )
-        }
+        candidateController.show(
+            near: anchorContext.lineHeightRect,
+            usesVerticalText: anchorContext.usesVerticalText,
+            compositionRect: anchorContext.compositionRect,
+            compositionLeadingX: anchorContext.compositionLeadingX,
+            compositionTrailingXProvider: anchorContext.compositionTrailingXProvider
+        )
     }
 
     private func candidateTextAnchorContext(
@@ -988,6 +973,7 @@ extension McBopomofoInputMethodController {
             lineHeightRect = NSMakeRect(0.0, 0.0, 16.0, 16.0)
         }
 
+        var compositionRect: NSRect? = usesVerticalText ? lineHeightRect : nil
         var compositionLeadingX = lineHeightRect.minX
         var compositionTrailingX = lineHeightRect.maxX
         var compositionTrailingIndex: Int?
@@ -996,10 +982,12 @@ extension McBopomofoInputMethodController {
             if bufferLength > 0 {
                 if let leadingFrame = candidateTextFrame(at: 0, client: client) {
                     compositionLeadingX = leadingFrame.minX
+                    compositionRect = compositionRect?.union(leadingFrame)
                 }
                 compositionTrailingIndex = bufferLength - 1
                 if let trailingFrame = candidateTextFrame(at: bufferLength - 1, client: client) {
                     compositionTrailingX = trailingFrame.maxX
+                    compositionRect = compositionRect?.union(trailingFrame)
                 }
             }
         }
@@ -1018,6 +1006,7 @@ extension McBopomofoInputMethodController {
         return CandidateTextAnchorContext(
             lineHeightRect: lineHeightRect,
             usesVerticalText: usesVerticalText,
+            compositionRect: compositionRect,
             compositionLeadingX: compositionLeadingX,
             compositionTrailingXProvider: trailingXProvider
         )

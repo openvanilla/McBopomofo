@@ -8,7 +8,7 @@ final class CandidateAcceptanceTests: XCTestCase {
     func testEmptyAndSingleCandidateLifecycle() {
         let controller = CandidateController()
         var notifications: [Int] = []
-        controller.onSelectionChange = { _, index, _ in notifications.append(index) }
+        controller.onSelectionChange = { index, _ in notifications.append(index) }
 
         controller.replaceCandidates([], initialSelectedIndex: 0)
         controller.visible = true
@@ -24,10 +24,11 @@ final class CandidateAcceptanceTests: XCTestCase {
             [Candidate(displayString: "永")],
             initialSelectedIndex: 0
         )
+        controller.visible = true
+        defer { controller.visible = false }
 
         XCTAssertEqual(controller.selectionIndex, 0)
         XCTAssertEqual(notifications, [0])
-        XCTAssertNil(controller.currentLayout.control)
         XCTAssertFalse(controller.currentLayout.hasVerticalScroller)
         XCTAssertEqual(controller.currentLayout.cornerRadius, 8)
         XCTAssertEqual(
@@ -40,15 +41,13 @@ final class CandidateAcceptanceTests: XCTestCase {
         XCTAssertEqual(notifications, [0, 2])
     }
 
-    func testSmallPageSizesKeepEmBudgetAndReserveBlankLabels() throws {
+    func testSmallPageSizesReserveBlankLabels() throws {
         for pageSize in 1...3 {
-            let configuration = try CandidateConfiguration(
-                indexLabels: "1",
-                pageSize: pageSize
-            )
+            let configuration = CandidateConfiguration(pageSize: pageSize)
             let candidates = uniformCandidates(6)
             let pages = HorizontalCandidateLayoutEngine.packedPages(
                 candidates: candidates,
+                keyLabels: [CandidateKeyLabel(key: "1", displayedText: "1")],
                 configuration: configuration,
                 metrics: defaultMetrics
             )
@@ -56,18 +55,10 @@ final class CandidateAcceptanceTests: XCTestCase {
                 pages: pages,
                 pageIndex: 0,
                 keyLabels: [CandidateKeyLabel(key: "1", displayedText: "1")],
-                configuration: configuration,
                 metrics: defaultMetrics
             )
 
             XCTAssertEqual(pages[0].items.count, pageSize)
-            XCTAssertEqual(
-                HorizontalCandidateLayoutEngine.horizontalBudget(
-                    configuration: configuration,
-                    metrics: defaultMetrics
-                ),
-                384
-            )
             XCTAssertEqual(layout.items[0].indexText, "1")
             XCTAssertTrue(layout.items.allSatisfy(\.showsIndexText))
             XCTAssertTrue(layout.items.dropFirst().allSatisfy { $0.indexText.isEmpty })
@@ -75,12 +66,15 @@ final class CandidateAcceptanceTests: XCTestCase {
     }
 
     func testDuplicateAndSpaceLabelsCommitOnlyTheFirstMatch() throws {
-        let configuration = try CandidateConfiguration(indexLabels: "1 1", pageSize: 4)
+        let configuration = CandidateConfiguration(pageSize: 4)
         let controller = CandidateController(configuration: configuration)
+        controller.keyLabels = "1 1".map {
+            CandidateKeyLabel(key: String($0), displayedText: String($0))
+        }
         controller.replaceCandidates(uniformCandidates(4), initialSelectedIndex: 3)
         controller.visible = true
         var confirmedIndexes: [Int] = []
-        controller.onConfirmation = { _, index, _ in confirmedIndexes.append(index) }
+        controller.onConfirmation = { index, _ in confirmedIndexes.append(index) }
 
         XCTAssertTrue(controller.commitCandidate(matchingIndexLabel: "1"))
         XCTAssertFalse(controller.commitCandidate(matchingIndexLabel: " "))
@@ -89,8 +83,8 @@ final class CandidateAcceptanceTests: XCTestCase {
         controller.visible = false
     }
 
-    func testVerticalDetailFitDecisionCanChangeAfterFullMeasurement() throws {
-        let configuration = try CandidateConfiguration(
+    func testVerticalDetailsHideWhenWidestCandidateLeavesNoRoom() throws {
+        let configuration = CandidateConfiguration(
             orientation: .vertical,
             pageSize: 1
         )
@@ -98,23 +92,23 @@ final class CandidateAcceptanceTests: XCTestCase {
             Candidate(displayString: String(repeating: "i", count: 30), detail: "d"),
             Candidate(displayString: String(repeating: "Ｗ", count: 13)),
         ]
-        let initial = VerticalCandidateLayoutEngine.layout(
-            candidates: candidates,
+        let detailFits = VerticalCandidateLayoutEngine.layout(
+            candidates: [candidates[0]],
             keyLabels: defaultKeyLabels,
             configuration: configuration,
             metrics: defaultMetrics,
             numberingAnchor: 0,
             scrollerStyle: .overlay,
-            measuredIndexes: [0]
+            maximumWidth: 256
         )
-        let fullyMeasured = VerticalCandidateLayoutEngine.layout(
+        let widestLeavesNoRoom = VerticalCandidateLayoutEngine.layout(
             candidates: candidates,
             keyLabels: defaultKeyLabels,
             configuration: configuration,
             metrics: defaultMetrics,
             numberingAnchor: 0,
             scrollerStyle: .overlay,
-            measuredIndexes: nil
+            maximumWidth: 256
         )
         let noFit = VerticalCandidateLayoutEngine.layout(
             candidates: [
@@ -125,40 +119,17 @@ final class CandidateAcceptanceTests: XCTestCase {
             metrics: defaultMetrics,
             numberingAnchor: 0,
             scrollerStyle: .overlay,
-            measuredIndexes: nil
+            maximumWidth: 256
         )
 
-        XCTAssertTrue(initial.items[0].showsDetail)
-        XCTAssertFalse(fullyMeasured.items[0].showsDetail)
-        XCTAssertGreaterThan(fullyMeasured.windowSize.width, initial.windowSize.width)
+        XCTAssertTrue(detailFits.items[0].showsDetail)
+        XCTAssertFalse(widestLeavesNoRoom.items[0].showsDetail)
+        XCTAssertGreaterThan(widestLeavesNoRoom.windowSize.width, detailFits.windowSize.width)
         XCTAssertFalse(noFit.items[0].showsDetail)
     }
 
-    func testExpansionAndPageUpCollapseBoundary() throws {
-        var stationaryConfiguration = CandidateConfiguration.default
-        stationaryConfiguration.animationDuration = 0
-        let stationary = CandidateController(configuration: stationaryConfiguration)
-        stationary.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 0)
-        stationary.visible = true
-        XCTAssertTrue(stationary.navigate(.down))
-        XCTAssertEqual(stationary.selectionIndex, 0)
-        stationary.visible = false
-
-        let collapsing = CandidateController(configuration: stationaryConfiguration)
-        collapsing.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 0)
-        collapsing.visible = true
-        XCTAssertTrue(collapsing.navigate(.down))
-        collapsing.finishFrameTransition()
-        collapsing.scrollExpanded(toTopRow: 1)
-
-        XCTAssertTrue(collapsing.navigate(.pageUp))
-        XCTAssertFalse(collapsing.isExpanded)
-        collapsing.visible = false
-    }
-
     func testNavigationBoundariesAndWrappingAcrossPanelKinds() throws {
-        var pagedConfiguration = try CandidateConfiguration(pageSize: 3)
-        pagedConfiguration.allowsExpansion = false
+        let pagedConfiguration = CandidateConfiguration(pageSize: 3)
         let paged = CandidateController(configuration: pagedConfiguration)
         paged.replaceCandidates(uniformCandidates(8), initialSelectedIndex: 2)
         paged.visible = true
@@ -175,9 +146,9 @@ final class CandidateAcceptanceTests: XCTestCase {
         paged.selectedCandidateIndex = 7
         XCTAssertFalse(paged.navigate(.right))
         XCTAssertEqual(paged.selectionIndex, 7)
-        XCTAssertTrue(paged.navigate(.right, wrapping: true))
+        XCTAssertTrue(paged.navigate(.itemForward))
         XCTAssertEqual(paged.selectionIndex, 0)
-        XCTAssertTrue(paged.navigate(.left, wrapping: true))
+        XCTAssertTrue(paged.navigate(.itemBackward))
         XCTAssertEqual(paged.selectionIndex, 7)
         paged.visible = false
 
@@ -190,99 +161,12 @@ final class CandidateAcceptanceTests: XCTestCase {
 
         XCTAssertFalse(vertical.navigate(.up))
         XCTAssertEqual(vertical.selectionIndex, 0)
-        XCTAssertTrue(vertical.navigate(.up, wrapping: true))
+        XCTAssertTrue(vertical.navigate(.itemBackward))
         XCTAssertEqual(vertical.selectionIndex, 7)
         XCTAssertFalse(vertical.navigate(.down))
-        XCTAssertTrue(vertical.navigate(.down, wrapping: true))
+        XCTAssertTrue(vertical.navigate(.itemForward))
         XCTAssertEqual(vertical.selectionIndex, 0)
         vertical.visible = false
-
-        var expandableConfiguration = CandidateConfiguration.default
-        expandableConfiguration.animationDuration = 0
-        let expandable = CandidateController(configuration: expandableConfiguration)
-        expandable.replaceCandidates(uniformCandidates(20), initialSelectedIndex: 0)
-        expandable.visible = true
-        XCTAssertTrue(expandable.navigate(.down))
-        XCTAssertTrue(expandable.isExpanded)
-        XCTAssertTrue(expandable.navigate(.left, wrapping: true))
-        XCTAssertEqual(expandable.selectionIndex, 19)
-        XCTAssertTrue(expandable.isExpanded)
-        expandable.visible = false
-    }
-
-    func testSuspendedPageHomeAndEndResultsMatchEachPanel() {
-        var pagedConfiguration = CandidateConfiguration.default
-        pagedConfiguration.allowsExpansion = false
-        for (navigation, expectedIndex) in [
-            (CandidateNavigation.pageDown, 9),
-            (.pageForward, 9),
-            (.pageUp, 0),
-            (.pageBackward, 0),
-            (.home, 0),
-            (.end, 19),
-        ] {
-            let result = suspendedResult(
-                configuration: pagedConfiguration,
-                navigation: navigation
-            )
-            XCTAssertEqual(result.selectionIndex, expectedIndex)
-        }
-
-        var expandableConfiguration = CandidateConfiguration.default
-        expandableConfiguration.animationDuration = 0
-        for navigation in [CandidateNavigation.pageDown, .pageForward] {
-            let result = suspendedResult(
-                configuration: expandableConfiguration,
-                navigation: navigation
-            )
-            XCTAssertEqual(result.selectionIndex, 0)
-            XCTAssertTrue(result.isExpanded)
-        }
-        for (navigation, expectedIndex) in [
-            (CandidateNavigation.pageUp, 0),
-            (.pageBackward, 0),
-            (.home, 0),
-            (.end, 8),
-        ] {
-            let result = suspendedResult(
-                configuration: expandableConfiguration,
-                navigation: navigation
-            )
-            XCTAssertEqual(result.selectionIndex, expectedIndex)
-        }
-
-        var verticalConfiguration = CandidateConfiguration.default
-        verticalConfiguration.orientation = .vertical
-        verticalConfiguration.allowsExpansion = false
-        for navigation in [
-            CandidateNavigation.right, .pageDown, .pageForward,
-        ] {
-            XCTAssertEqual(
-                suspendedResult(
-                    configuration: verticalConfiguration,
-                    navigation: navigation
-                ).selectionIndex,
-                9
-            )
-        }
-        for navigation in [
-            CandidateNavigation.left, .pageUp, .pageBackward, .home,
-        ] {
-            XCTAssertEqual(
-                suspendedResult(
-                    configuration: verticalConfiguration,
-                    navigation: navigation
-                ).selectionIndex,
-                0
-            )
-        }
-        XCTAssertEqual(
-            suspendedResult(
-                configuration: verticalConfiguration,
-                navigation: .end
-            ).selectionIndex,
-            19
-        )
     }
 
     func testKeyboardPolicyFiltersModifiersAndCanBeDisabled() throws {
@@ -290,7 +174,7 @@ final class CandidateAcceptanceTests: XCTestCase {
         controller.replaceCandidates(uniformCandidates(3), initialSelectedIndex: 0)
         controller.visible = true
         var confirmations: [Int] = []
-        controller.onConfirmation = { _, index, _ in confirmations.append(index) }
+        controller.onConfirmation = { index, _ in confirmations.append(index) }
 
         XCTAssertFalse(
             controller.handleKeyEvent(
@@ -328,11 +212,31 @@ final class CandidateAcceptanceTests: XCTestCase {
             )
         )
         XCTAssertEqual(confirmations, [0, 0])
+
+        controller.selectedCandidateIndex = 2
+        XCTAssertTrue(
+            controller.handleKeyEvent(
+                try XCTUnwrap(keyEvent(keyCode: 48, characters: "\t", modifiers: []))
+            )
+        )
+        XCTAssertEqual(controller.selectionIndex, 0)
+        XCTAssertTrue(
+            controller.handleKeyEvent(
+                try XCTUnwrap(keyEvent(keyCode: 48, characters: "\t", modifiers: .shift))
+            )
+        )
+        XCTAssertEqual(controller.selectionIndex, 2)
+        XCTAssertFalse(
+            controller.handleKeyEvent(
+                try XCTUnwrap(keyEvent(keyCode: 48, characters: "\t", modifiers: .option))
+            )
+        )
+        XCTAssertEqual(controller.selectionIndex, 2)
         controller.visible = false
 
         var disabledConfiguration = CandidateConfiguration.default
-        disabledConfiguration.hostHandlesNavigationKeys = false
-        disabledConfiguration.hostHandlesIndexLabelKeys = false
+        disabledConfiguration.handlesNavigationKeys = false
+        disabledConfiguration.handlesIndexLabelKeys = false
         let disabled = CandidateController(configuration: disabledConfiguration)
         disabled.replaceCandidates(uniformCandidates(3), initialSelectedIndex: 0)
         disabled.visible = true
@@ -349,7 +253,7 @@ final class CandidateAcceptanceTests: XCTestCase {
         disabled.visible = false
     }
 
-    func testDelegateReloadPreservesDetailsContextsAndAbsoluteIndexes() {
+    func testDelegateReloadPreservesDetailsAndAbsoluteIndexes() {
         let delegate = AcceptanceDelegate()
         let controller = CandidateController()
         controller.delegate = delegate
@@ -359,15 +263,11 @@ final class CandidateAcceptanceTests: XCTestCase {
         XCTAssertEqual(controller.candidates.map(\.displayString), delegate.entries)
         XCTAssertNil(controller.candidates[0].detail)
         XCTAssertEqual(controller.candidates[1].detail, "reading")
-        let context = controller.candidates[1].context as AnyObject?
-        XCTAssertTrue(context === delegate.contexts[1])
-        XCTAssertEqual(delegate.highlightedIndexes, [0])
 
         controller.visible = true
         XCTAssertTrue(controller.navigate(.right))
         controller.confirmSelectedCandidate()
 
-        XCTAssertEqual(delegate.highlightedIndexes, [0, 1])
         XCTAssertEqual(delegate.selectedIndexes, [1])
         controller.visible = false
     }
@@ -387,19 +287,6 @@ final class CandidateAcceptanceTests: XCTestCase {
 
     private func uniformCandidates(_ count: Int) -> [Candidate] {
         (0..<count).map { _ in Candidate(displayString: "永") }
-    }
-
-    private func suspendedResult(
-        configuration: CandidateConfiguration,
-        navigation: CandidateNavigation
-    ) -> (selectionIndex: Int, isExpanded: Bool) {
-        let controller = CandidateController(configuration: configuration)
-        controller.replaceCandidates(uniformCandidates(20), initialSelectedIndex: -1)
-        controller.visible = true
-        _ = controller.navigate(navigation)
-        let result = (controller.selectionIndex, controller.isExpanded)
-        controller.visible = false
-        return result
     }
 
     private func keyEvent(
@@ -426,8 +313,6 @@ final class CandidateAcceptanceTests: XCTestCase {
 private final class AcceptanceDelegate: NSObject, CandidateControllerDelegate {
     let entries = ["甲", "乙", "丙"]
     let readings = ["", "reading", ""]
-    let contexts = [NSObject(), NSObject(), NSObject()]
-    var highlightedIndexes: [UInt] = []
     var selectedIndexes: [UInt] = []
 
     func candidateCountForController(_ controller: CandidateController) -> UInt {
@@ -443,7 +328,7 @@ private final class AcceptanceDelegate: NSObject, CandidateControllerDelegate {
 
     func candidateController(
         _ controller: CandidateController,
-        readingAtIndex index: UInt
+        detailAtIndex index: UInt
     ) -> String? {
         readings[Int(index)]
     }
@@ -461,19 +346,5 @@ private final class AcceptanceDelegate: NSObject, CandidateControllerDelegate {
         didSelectCandidateAtIndex index: UInt
     ) {
         selectedIndexes.append(index)
-    }
-
-    func candidateController(
-        _ controller: CandidateController,
-        didHighlightCandidateAtIndex index: UInt
-    ) {
-        highlightedIndexes.append(index)
-    }
-
-    func candidateController(
-        _ controller: CandidateController,
-        contextAtIndex index: UInt
-    ) -> Any? {
-        contexts[Int(index)]
     }
 }
