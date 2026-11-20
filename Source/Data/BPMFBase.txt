@@ -19877,6 +19877,7 @@
 瘂 ㄧㄚˇ ya3 u83 utf8
 鐚 ㄧㄚˇ ya3 u83 utf8
 鵶 ㄧㄚˇ ya3 u83 utf8
+氬 ㄧㄚˇ ya3 u83 utf8
 亞 ㄧㄚˋ ya4 u84 big5
 訝 ㄧㄚˋ ya4 u84 big5
 迓 ㄧㄚˋ ya4 u84 big5
