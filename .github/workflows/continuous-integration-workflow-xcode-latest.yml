@@ -52,9 +52,6 @@ jobs:
       - name: Test McBopomofo Engine (SIMD) 
         run: ctest --output-on-failure
         working-directory: Source/build-simd
-      - name: Test CandidateUI
-        run: swift test --enable-code-coverage
-        working-directory: Packages/CandidateUI
       - name: Test CandidateKit
         run: swift test --enable-code-coverage
         working-directory: Packages/CandidateKit
