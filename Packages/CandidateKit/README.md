@@ -42,7 +42,7 @@ final class ExampleCandidates: NSObject, CandidateControllerDelegate {
     }
 
     func candidateController(
-        _ controller: CandidateController, readingAtIndex index: UInt
+        _ controller: CandidateController, detailAtIndex index: UInt
     ) -> String? {
         nil
     }
@@ -80,7 +80,7 @@ final class ExampleHost {
 
 Keep the delegate alive for as long as the window is used. Its reference in the
 controller is weak. Call `reloadData()` again whenever the candidate data
-changes. `readingAtIndex` and `requestExplanationFor` can return `nil` when no
+changes. `detailAtIndex` and `requestExplanationFor` can return `nil` when no
 detail or explanation is available.
 
 Configure fonts, selection labels, orientation, and expansion through the
@@ -100,8 +100,9 @@ swift run --package-path Packages/CandidateKit CandidateKitPreview
 ```
 
 The default preview uses the `candidates` sample, horizontal orientation,
-expansion enabled, 16 pt text, numeric selection keys (`123456789`), and the
-system appearance. The first candidate is selected.
+16 pt text, numeric selection keys (`123456789`), and the system appearance.
+The first candidate is selected. Expansion is enabled, but it only applies to
+vertical windows; horizontal windows are always paged.
 
 Options can be combined, for example:
 
@@ -117,8 +118,8 @@ swift run --package-path Packages/CandidateKit CandidateKitPreview --paged --dar
 | --- | --- |
 | `--sample=NAME` | Select one of the eight samples listed below. Defaults to `candidates`; an unrecognized name also uses `candidates`. |
 | `--vertical` | Use a vertical candidate window instead of the default horizontal window. |
-| `--paged` | Disable expansion and use paged navigation. |
-| `--expanded` | Send an initial expansion-direction navigation action: Right for vertical windows or Down for horizontal windows. Use with expansion enabled and enough candidates to expand. |
+| `--paged` | Disable expansion in vertical windows and use paged navigation. Horizontal windows are always paged. |
+| `--expanded` | Send an initial Right navigation action to a vertical window, which expands it. Use with `--vertical`, expansion enabled, and enough candidates to expand. Horizontal windows ignore it. |
 | `--last` | Initially select the last candidate in the sample. |
 | `--letter-keys` | Use `asdfzxcvb` instead of `123456789` for selection keys. |
 | `--font-size=SIZE` | Set the candidate font size to `12`, `16`, `24`, or `32` pt. Other values leave the default 16 pt size unchanged. |
@@ -132,8 +133,8 @@ swift run --package-path Packages/CandidateKit CandidateKitPreview --paged --dar
 
 Use the `--sample=NAME` and `--font-size=SIZE` forms with an equals sign.
 `--sample` takes precedence over both sample shortcut flags. `--expanded` does
-not override `--paged`; it sends a navigation action under the selected display
-mode.
+not override `--paged`; it sends the Right navigation action under the selected
+display mode.
 
 ### Samples
 
@@ -148,7 +149,7 @@ mode.
 | `short-list` | Five candidates for checking a short list. |
 | `long-list` | 201 candidates for checking expansion, scrolling, and navigation near the end of a list. |
 
-Shifted selection-key hints follow the current page, row, or column. Unselected
+Shifted selection-key hints follow the current page or column. Unselected
 hints use the detail color; selected hints use the selection text color.
 Switch to `candidates` to compare trailing hints with ordinary leading labels.
 These samples supply demonstration data, not input-method conversion logic.
@@ -162,7 +163,7 @@ hints.
 
 | Menu | Controls |
 | --- | --- |
-| Layout | Horizontal (Command-1), Vertical (Command-2), Expandable (Command-3), Paged (Command-4); font sizes 12, 16, 24, and 32 pt; numeric or letter selection keys. |
+| Layout | Horizontal (Command-1), Vertical (Command-2); Expandable (Command-3) or Paged (Command-4) for vertical windows; font sizes 12, 16, 24, and 32 pt; numeric or letter selection keys. |
 | Samples | All eight samples listed above. |
 | Appearance | System (Command-S), Light (Command-L), or Dark (Command-D) theme; Desktop (Command-T), White (Command-W), or Black (Command-B) backdrop; Accent Color Comparison (Command-A). Theme and backdrop are independent. |
 | Placement | Center (Command-0), Above Anchor (Command-5), Left of Composition (Command-6), Right of Composition (Command-7), and Hide Guides (Command-8). |
@@ -172,10 +173,12 @@ samples support selection keys and Return to confirm; action samples use the
 Shift combinations displayed beside their candidates. The terminal prints
 highlight and confirmation events. Quit the preview with Command-Q.
 
-In expanded layouts, Page Down advances one row horizontally or one column
-vertically, and Page Up moves back one row or column. These keys match the host
-page actions and accessibility page actions rather than jumping a full viewport.
-Home and End select the first and last candidates in the current row or column.
+In an expanded vertical window, Page Down advances one column and Page Up moves
+back one column. These keys match the host page actions and accessibility page
+actions rather than jumping a full viewport. Home and End select the first and
+last candidates in the current column. In horizontal and paged vertical windows,
+Page Down and Page Up move by one page, and Home and End select the first and
+last candidates of the whole list.
 Tab and Shift-Tab move through candidates and wrap at either end of the list.
 The input method uses the same navigation rules for modern candidate windows.
 

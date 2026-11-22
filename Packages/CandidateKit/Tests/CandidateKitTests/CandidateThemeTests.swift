@@ -51,6 +51,9 @@ final class CandidateThemeTests: XCTestCase {
     func testThemeSynchronizationUpdatesAppearanceWashAndExistingItems() throws {
         let controller = CandidateController()
         controller.replaceCandidates([Candidate(displayString: "測試")], initialSelectedIndex: 0)
+        controller.centerOnMainScreen()
+        controller.visible = true
+        defer { controller.visible = false }
         let darkAppearance = try XCTUnwrap(NSAppearance(named: .darkAqua))
 
         controller.synchronizeTheme(
@@ -108,6 +111,9 @@ final class CandidateThemeTests: XCTestCase {
             let controller = CandidateController(configuration: configuration)
             controller.replaceCandidates(
                 (0..<60).map { Candidate(displayString: "字\($0)") }, initialSelectedIndex: 12)
+            controller.centerOnMainScreen()
+            controller.visible = true
+            defer { controller.visible = false }
             controller.synchronizeTheme(
                 clientAppearance: NSAppearance(named: .aqua), clientBundleIdentifier: nil)
             let glass = try XCTUnwrap(controller.backdropView.subviews.first as? NSGlassEffectView)

@@ -5,11 +5,40 @@ import XCTest
 
 @MainActor
 final class VerticalExpansionTests: XCTestCase {
+    func testWideLaterColumnIsFullyVisibleAndScrollingIsStable() throws {
+        for style: NSScroller.Style in [.overlay, .legacy] {
+            for length in [40, 300] {
+                let controller = makeController(count: 54, selected: 0)
+                defer { controller.visible = false }
+                controller.handlePreferredScrollerStyleChange(to: style)
+                controller.replaceCandidates(
+                    (0..<54).map {
+                        Candidate(
+                            displayString: String(repeating: "字", count: $0 < 45 ? 2 : length))
+                    }, initialSelectedIndex: 0)
+                XCTAssertTrue(controller.navigate(.right))
+                let initialWidth = controller.currentLayout.windowSize.width
+                controller.selectedCandidateIndex = 45
+
+                let item = try XCTUnwrap(controller.currentLayout.item(for: 45))
+                let viewport = controller.scrollView.documentVisibleRect
+                XCTAssertGreaterThan(controller.currentLayout.windowSize.width, initialWidth)
+                XCTAssertLessThanOrEqual(
+                    controller.currentLayout.windowSize.width, controller.layoutAvailableWidth)
+                XCTAssertTrue(viewport.contains(item.frame))
+                XCTAssertEqual(controller.renderer[45]?.frame, item.frame)
+                XCTAssertEqual(controller.candidateIndexAtKeyLabelIndex(0), 45)
+                controller.ensureSelectionVisible()
+                XCTAssertEqual(controller.scrollView.documentVisibleRect, viewport)
+            }
+        }
+    }
+
     func testRightExpandsBeforeMoving() throws {
         let controller = makeController(count: 30, selected: 2)
         defer { controller.visible = false }
         var selections: [Int] = []
-        controller.onSelectionChange = { _, index, _ in selections.append(index) }
+        controller.onSelectionChange = { index, _ in selections.append(index) }
         let firstFrame = controller.currentLayout.item(for: 2)?.frame
 
         XCTAssertTrue(controller.navigate(.right))
@@ -17,12 +46,11 @@ final class VerticalExpansionTests: XCTestCase {
         XCTAssertEqual(controller.selectionIndex, 2)
         XCTAssertEqual(controller.currentLayout.item(for: 2)?.frame, firstFrame)
         XCTAssertTrue(selections.isEmpty)
-        XCTAssertNil(controller.currentLayout.control)
 
         XCTAssertTrue(controller.navigate(.right))
         XCTAssertEqual(controller.selectionIndex, 11)
         XCTAssertEqual(selections, [11])
-        XCTAssertEqual(controller.currentLayout.rows.map { $0.items.count }, [9, 9, 9, 3])
+        XCTAssertEqual(Set(controller.currentLayout.items.map(\.frame.minX)).count, 4)
         XCTAssertEqual(controller.relativeCandidateIndex(at: 0), 9)
         XCTAssertEqual(controller.relativeCandidateIndex(at: 8), 17)
         XCTAssertEqual(
@@ -47,7 +75,6 @@ final class VerticalExpansionTests: XCTestCase {
         XCTAssertFalse(controller.isExpanded)
         XCTAssertEqual(controller.selectionIndex, 1)
         XCTAssertEqual(controller.currentLayout.items.count, 9)
-        XCTAssertNil(controller.currentLayout.control)
     }
 
     func testDownAcrossFirstColumnExpandsAndHomeEndStayInColumn() {

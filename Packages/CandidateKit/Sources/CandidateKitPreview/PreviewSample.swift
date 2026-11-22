@@ -101,7 +101,7 @@ enum PreviewSample: String, CaseIterable {
                 Candidate(displayString: "沒有說明"),
                 Candidate(
                     displayString: "長篇說明",
-                    detail: "這是一段超過候選視窗寬度的說明，用來查看截斷結果"),
+                    detail: "這是一段超長的說明文字，用來檢視是否會造成排版錯位"),
             ]
         case .shortList:
             return Array(PreviewSample.candidates.entries.prefix(5))

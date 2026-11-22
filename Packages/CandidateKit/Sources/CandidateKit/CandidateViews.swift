@@ -28,19 +28,13 @@ internal struct CandidatePanelDragTracker {
     private(set) var didDrag = false
     private var startingPointerLocation: NSPoint?
     private var pointerOffset = NSPoint.zero
-    private var activationDistance: CGFloat = 0
 
-    mutating func begin(
-        pointerLocation: NSPoint,
-        windowOrigin: NSPoint,
-        activationDistance: CGFloat
-    ) {
+    mutating func begin(pointerLocation: NSPoint, windowOrigin: NSPoint) {
         startingPointerLocation = pointerLocation
         pointerOffset = NSPoint(
             x: pointerLocation.x - windowOrigin.x,
             y: pointerLocation.y - windowOrigin.y
         )
-        self.activationDistance = max(0, activationDistance)
         didDrag = false
     }
 
@@ -50,7 +44,10 @@ internal struct CandidatePanelDragTracker {
         }
         let deltaX = pointerLocation.x - startingPointerLocation.x
         let deltaY = pointerLocation.y - startingPointerLocation.y
-        guard didDrag || hypot(deltaX, deltaY) > activationDistance else {
+        guard
+            didDrag
+                || hypot(deltaX, deltaY) > CandidateStyle.Interaction.dragActivationDistance
+        else {
             return nil
         }
         didDrag = true
@@ -72,7 +69,6 @@ internal struct CandidatePanelDragTracker {
 internal final class CandidatePanel: NSPanel {
     private var dragTracker = CandidatePanelDragTracker()
     var onManualMove: ((NSPoint) -> Void)?
-    var dragActivationDistance: CGFloat = 0
 
     init() {
         super.init(
@@ -98,17 +94,12 @@ internal final class CandidatePanel: NSPanel {
         case .leftMouseDown:
             dragTracker.begin(
                 pointerLocation: convertPoint(toScreen: event.locationInWindow),
-                windowOrigin: frame.origin,
-                activationDistance: dragActivationDistance
+                windowOrigin: frame.origin
             )
         case .leftMouseDragged:
             let pointerLocation = convertPoint(toScreen: event.locationInWindow)
             if let origin = dragTracker.updatedWindowOrigin(pointerLocation: pointerLocation) {
-                if let onManualMove {
-                    onManualMove(origin)
-                } else {
-                    setFrameOrigin(origin)
-                }
+                onManualMove?(origin)
                 return
             }
         case .leftMouseUp:
@@ -187,17 +178,6 @@ internal final class CandidateBackdropView: NSView {
 
     var effectAppearanceName: NSAppearance.Name {
         effectView.effectiveAppearance.name
-    }
-
-    var usesLiquidGlass: Bool {
-        if #available(macOS 26.0, *) {
-            return effectView is NSGlassEffectView
-        }
-        return false
-    }
-
-    var usesHUDVibrancy: Bool {
-        effectView is NSVisualEffectView
     }
 
     var isAppearanceCorrectionActive: Bool {
@@ -300,6 +280,13 @@ internal final class CandidateContentView: NSView {
     var headerHeight: CGFloat = 0
     var padding: CGFloat = 0
 
+    var minimumHeaderWidth: CGFloat {
+        guard !titleView.stringValue.isEmpty else { return 0 }
+        // The cell includes text drawing insets that intrinsicContentSize can omit.
+        return ceil(titleView.cell?.cellSize.width ?? titleView.intrinsicContentSize.width)
+            + padding * 2
+    }
+
     init(scrollView: NSScrollView) {
         self.scrollView = scrollView
         super.init(frame: .zero)
@@ -341,23 +328,18 @@ internal final class CandidateCanvasView: NSView {
         return title.isEmpty ? nil : title
     }
     override func accessibilityChildren() -> [Any]? {
-        guard candidateController?.visible == true else { return [] }
-        var children: [Any] = candidateController?.accessibilityChildren ?? []
-        if let control = candidateController?.renderedControlView {
-            children += control.accessibilityChildren() ?? []
-        }
-        return children
+        candidateController?.accessibilityChildren ?? []
     }
     override func accessibilityVisibleChildren() -> [Any]? {
         guard let controller = candidateController, controller.visible else { return [] }
-        var children: [Any] = controller.accessibilityChildren.filter { item in
-            controller.currentLayout.item(for: item.index)?.frame.intersects(visibleRect) == true
-        }
-        if let control = controller.renderedControlView {
-            children += control.accessibilityChildren() ?? []
-        }
-        return children
+        let elements = controller.accessibilityItems
+        return controller.currentLayout.items
+            .filter {
+                $0.frame.intersects(visibleRect) && elements.indices.contains($0.candidateIndex)
+            }
+            .map { elements[$0.candidateIndex] }
     }
+
     override func accessibilitySelectedChildren() -> [Any]? {
         candidateController?.accessibilityChildren.filter { $0.isAccessibilitySelected() } ?? []
     }
@@ -538,13 +520,13 @@ internal final class CandidateItemView: NSView {
             detailText.map { ceil(metrics.width(of: $0, font: metrics.detailFont)) } ?? 0
 
         if let detail = detailText {
+            // The layout only reserves a short detail's own width, so reserve no more here.
+            let reservedDetailWidth = min(
+                detailTextWidth,
+                CandidateStyle.Layout.minimumDetailEm * metrics.candidateFont.pointSize)
             let candidateWidth = min(
                 desiredCandidateWidth,
-                max(
-                    0,
-                    availableWidth - metrics.candidateDetailGap
-                        - CandidateStyle.Layout.minimumDetailEm * metrics.candidateFont.pointSize
-                )
+                max(0, availableWidth - metrics.candidateDetailGap - reservedDetailWidth)
             )
             drawText(
                 candidate.displayString,
@@ -617,84 +599,6 @@ internal final class CandidateItemView: NSView {
         NSAttributedString(string: text, attributes: attributes).draw(
             with: drawingRect,
             options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine]
-        )
-    }
-}
-
-internal final class CandidateControlView: NSView {
-    private var accessibilityButtons: [CandidateAccessibilityButton] = []
-
-    override func isAccessibilityElement() -> Bool { false }
-    override func accessibilityChildren() -> [Any]? { accessibilityButtons }
-    var onExpand: (() -> Void)?
-
-    private let metrics: CandidateMetrics
-    private let imageView = NSImageView()
-
-    init(frame: NSRect, metrics: CandidateMetrics) {
-        self.metrics = metrics
-        super.init(frame: frame)
-        addSubview(imageView)
-        configureImages()
-        accessibilityButtons = [
-            CandidateAccessibilityButton(
-                view: self,
-                title: NSLocalizedString(
-                    "Expand", bundle: .module, comment: "Candidate accessibility action"),
-                rect: bounds, enabled: true
-            ) { [weak self] in self?.onExpand?() }
-        ]
-    }
-
-    required init?(coder: NSCoder) {
-        nil
-    }
-
-    override var isOpaque: Bool { false }
-
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-        configureImages()
-        needsDisplay = true
-    }
-
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
-        true
-    }
-
-    override func mouseDown(with event: NSEvent) {}
-
-    override func draw(_ dirtyRect: NSRect) {
-        NSColor.separatorColor.setFill()
-        NSRect(
-            x: 0, y: 0, width: CandidateStyle.Decoration.separatorThickness,
-            height: bounds.height
-        ).fill()
-        super.draw(dirtyRect)
-    }
-
-    override func mouseUp(with event: NSEvent) {
-        let location = convert(event.locationInWindow, from: nil)
-        guard bounds.contains(location) else {
-            return
-        }
-        onExpand?()
-    }
-
-    private func configureImages() {
-        imageView.image = NSImage(systemSymbolName: "chevron.down", accessibilityDescription: nil)?
-            .withSymbolConfiguration(
-                NSImage.SymbolConfiguration(
-                    pointSize: metrics.scaledAuxiliary(CandidateStyle.Controls.expandSymbol),
-                    weight: .medium))
-        imageView.contentTintColor = .tertiaryLabelColor
-        let side = metrics.scaledAuxiliary(CandidateStyle.Controls.imageBox)
-        imageView.frame = NSRect(
-            x: CandidateStyle.Decoration.separator
-                + metrics.scaledAuxiliary(CandidateStyle.Controls.expandLeading),
-            y: bounds.midY - side / 2,
-            width: side,
-            height: side
         )
     }
 }

@@ -22,7 +22,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 import AppKit
-import CoreVideo
 import QuartzCore
 
 @objc(CKCandidatePlacementSide)
@@ -41,21 +40,14 @@ internal struct CandidateScreenGeometry: Equatable {
 internal struct CandidatePlacementResult: Equatable {
     var topLeft: NSPoint
     var side: CandidatePlacementSide
-    var screen: CandidateScreenGeometry
 }
 
 internal struct CandidatePlacementContext {
     var anchorRect: NSRect
+    var usesVerticalText: Bool
+    var compositionRect: NSRect?
     var compositionLeadingX: CGFloat?
     var compositionTrailingXProvider: (() -> CGFloat)?
-
-    func clearingCompositionEdges() -> CandidatePlacementContext {
-        CandidatePlacementContext(
-            anchorRect: anchorRect,
-            compositionLeadingX: nil,
-            compositionTrailingXProvider: nil
-        )
-    }
 }
 
 internal enum CandidatePlacementEngine {
@@ -82,32 +74,49 @@ internal enum CandidatePlacementEngine {
 
     static func place(
         windowSize: NSSize,
+        requiredSize: NSSize? = nil,
         anchorRect: NSRect,
         screen: CandidateScreenGeometry,
+        usesVerticalText: Bool = false,
+        compositionRect: NSRect? = nil,
         compositionLeadingX: CGFloat,
         compositionTrailingX: () -> CGFloat
     ) -> CandidatePlacementResult {
         let bounds = screen.visibleFrame
-        let below = NSPoint(x: anchorRect.minX, y: anchorRect.minY - anchorGap)
-        let above = NSPoint(x: anchorRect.minX, y: anchorRect.maxY + anchorGap + windowSize.height)
-        let verticalOptions: [(CandidatePlacementSide, NSPoint, Bool)] = [
-            (.below, below, below.y - windowSize.height >= bounds.minY),
-            (.above, above, above.y <= bounds.maxY),
-        ]
-        let placement: (CandidatePlacementSide, NSPoint)
-        if let option = verticalOptions.first(where: { $0.2 }) {
-            placement = (option.0, option.1)
-        } else {
-            let sideTop = max(anchorRect.maxY, bounds.minY + windowSize.height)
-            let left = compositionLeadingX - anchorGap - windowSize.width
-            // Resolve the host's trailing edge only when right-side placement is necessary.
-            placement =
-                left >= bounds.minX
-                ? (.left, NSPoint(x: left, y: sideTop))
-                : (.right, NSPoint(x: compositionTrailingX() + anchorGap, y: sideTop))
+        let requiredSize = NSSize(
+            width: max(windowSize.width, requiredSize?.width ?? windowSize.width),
+            height: max(windowSize.height, requiredSize?.height ?? windowSize.height))
+        let textRect = usesVerticalText ? compositionRect ?? anchorRect : anchorRect
+        let sides: [CandidatePlacementSide] =
+            usesVerticalText ? [.left, .right, .below, .above] : [.below, .above, .left, .right]
+        let sideTop = anchorRect.maxY
+        var placement: (CandidatePlacementSide, NSPoint) = (.below, anchorRect.origin)
+        for side in sides {
+            let point: NSPoint
+            let fits: Bool
+            switch side {
+            case .below:
+                point = NSPoint(x: anchorRect.minX, y: textRect.minY - anchorGap)
+                fits = point.y - requiredSize.height >= bounds.minY
+            case .above:
+                point = NSPoint(
+                    x: anchorRect.minX, y: textRect.maxY + anchorGap + windowSize.height)
+                fits = textRect.maxY + anchorGap + requiredSize.height <= bounds.maxY
+            case .left:
+                let leadingX = usesVerticalText ? textRect.minX : compositionLeadingX
+                point = NSPoint(x: leadingX - anchorGap - windowSize.width, y: sideTop)
+                fits = leadingX - anchorGap - requiredSize.width >= bounds.minX
+            case .right:
+                // Resolve the host's trailing edge only when right-side placement is necessary.
+                let trailingX = usesVerticalText ? textRect.maxX : compositionTrailingX()
+                point = NSPoint(x: trailingX + anchorGap, y: sideTop)
+                fits = point.x + requiredSize.width <= bounds.maxX
+            }
+            placement = (side, point)
+            if fits { break }
         }
         let fitted = fittedTopLeft(placement.1, windowSize: windowSize, bounds: bounds)
-        return CandidatePlacementResult(topLeft: fitted, side: placement.0, screen: screen)
+        return CandidatePlacementResult(topLeft: fitted, side: placement.0)
     }
 
     static func fittedTopLeft(_ point: NSPoint, windowSize: NSSize, bounds: NSRect) -> NSPoint {
@@ -117,29 +126,12 @@ internal enum CandidatePlacementEngine {
         )
     }
 
-    static func shouldAnimateMovement(
-        from start: NSPoint, to end: NSPoint, rowHeight: CGFloat
-    ) -> Bool {
-        let deltaX = end.x - start.x
-        let deltaY = end.y - start.y
-        // Measure travel in candidate-row units so the threshold follows the visible type scale.
-        guard rowHeight.isFinite, rowHeight > 0 else { return false }
-        return hypot(deltaX, deltaY) / rowHeight > 1
-    }
-
     private static func intersectionArea(_ lhs: NSRect, _ rhs: NSRect) -> CGFloat {
         let intersection = lhs.intersection(rhs)
         guard !intersection.isNull else {
             return 0
         }
         return max(intersection.width, 0) * max(intersection.height, 0)
-    }
-}
-
-internal enum CandidateMotionCurve {
-    static func value(at progress: CGFloat) -> CGFloat {
-        let phase = min(max(progress, 0), 1)
-        return (1 - cos(.pi * phase)) / 2
     }
 }
 
@@ -154,88 +146,24 @@ extension NSRect {
     }
 }
 
-internal enum CandidateWindowFrameInterpolator {
-    static func interpolated(
-        from start: NSRect,
-        to end: NSRect,
-        progress: CGFloat
-    ) -> NSRect {
-        let left = interpolate(start.minX, end.minX, progress: progress)
-        let top = interpolate(start.maxY, end.maxY, progress: progress)
-        let width = interpolate(start.width, end.width, progress: progress)
-        let height = interpolate(start.height, end.height, progress: progress)
-        return NSRect(
-            x: left,
-            y: top - height,
-            width: width,
-            height: height
-        )
-    }
-
-    private static func interpolate(_ start: CGFloat, _ end: CGFloat, progress: CGFloat) -> CGFloat
-    {
-        start + (end - start) * progress
-    }
-
-}
-
-@MainActor
-internal protocol CandidateTransitionClock: AnyObject {
-    var now: CFTimeInterval { get }
-    func start(onFrame: @escaping @MainActor () -> Void)
-    func stop()
-}
-
 @MainActor
 internal final class CandidateTransitionDriver {
-    private final class DisplayLinkCallbackProxy: @unchecked Sendable {
-        private let lock = NSLock()
-        private let onFrame: @MainActor () -> Void
-        private var isMainThreadUpdatePending = false
-
-        init(onFrame: @escaping @MainActor () -> Void) {
-            self.onFrame = onFrame
-        }
-
-        func requestFrame() {
-            lock.lock()
-            guard !isMainThreadUpdatePending else {
-                lock.unlock()
-                return
-            }
-            isMainThreadUpdatePending = true
-            lock.unlock()
-
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.lock.lock()
-                self.isMainThreadUpdatePending = false
-                self.lock.unlock()
-                self.onFrame()
-            }
-        }
-    }
-
     private let duration: TimeInterval
-    private let clock: (any CandidateTransitionClock)?
     private weak var window: NSWindow?
     private let update: (CGFloat) -> Void
     private let completion: () -> Void
     private var windowDisplayLink: AnyObject?
-    private var legacyDisplayLink: CVDisplayLink?
-    private var displayLinkCallbackProxy: DisplayLinkCallbackProxy?
+    private var fallbackTimer: Timer?
     private var startingTime: CFTimeInterval = 0
     private var hasCompleted = false
 
     init(
         duration: TimeInterval,
         window: NSWindow?,
-        clock: (any CandidateTransitionClock)? = nil,
         update: @escaping (CGFloat) -> Void,
         completion: @escaping () -> Void
     ) {
         self.duration = duration
-        self.clock = clock
         self.window = window
         self.update = update
         self.completion = completion
@@ -243,15 +171,11 @@ internal final class CandidateTransitionDriver {
 
     func start() {
         guard duration > 0 else {
-            complete()
+            finish()
             return
         }
-        startingTime = clock?.now ?? CACurrentMediaTime()
+        startingTime = CACurrentMediaTime()
         update(0)
-        if let clock {
-            clock.start { [weak self] in self?.tick() }
-            return
-        }
         if #available(macOS 14.0, *), let window {
             let displayLink = window.displayLink(
                 target: self,
@@ -262,77 +186,17 @@ internal final class CandidateTransitionDriver {
             return
         }
 
-        startLegacyDisplayLink()
-    }
-
-    private func startLegacyDisplayLink() {
-        let callbackProxy = DisplayLinkCallbackProxy { [weak self] in
-            self?.tick()
+        // macOS 13 has no window display link, so a timer drives the frames there.
+        let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.tick()
+            }
         }
-        var newDisplayLink: CVDisplayLink?
-        let displayID =
-            (window?.screen?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]
-            as? NSNumber)?.uint32Value
-            ?? CGMainDisplayID()
-        guard CVDisplayLinkCreateWithCGDisplay(displayID, &newDisplayLink) == kCVReturnSuccess,
-            let newDisplayLink
-        else {
-            complete()
-            return
-        }
-        displayLinkCallbackProxy = callbackProxy
-        legacyDisplayLink = newDisplayLink
-        let callbackResult = CVDisplayLinkSetOutputCallback(
-            newDisplayLink,
-            { _, _, _, _, _, userInfo in
-                guard let userInfo else { return kCVReturnSuccess }
-                let callbackProxy = Unmanaged<DisplayLinkCallbackProxy>
-                    .fromOpaque(userInfo)
-                    .takeUnretainedValue()
-                callbackProxy.requestFrame()
-                return kCVReturnSuccess
-            },
-            Unmanaged.passUnretained(callbackProxy).toOpaque()
-        )
-        guard callbackResult == kCVReturnSuccess,
-            CVDisplayLinkStart(newDisplayLink) == kCVReturnSuccess
-        else {
-            stopDisplayLink()
-            complete()
-            return
-        }
+        RunLoop.main.add(timer, forMode: .common)
+        fallbackTimer = timer
     }
 
     func finish() {
-        guard !hasCompleted else {
-            return
-        }
-        stopDisplayLink()
-        complete()
-    }
-
-    func cancel() {
-        guard !hasCompleted else {
-            return
-        }
-        hasCompleted = true
-        stopDisplayLink()
-    }
-
-    private func tick() {
-        guard !hasCompleted else {
-            return
-        }
-        let elapsed = (clock?.now ?? CACurrentMediaTime()) - startingTime
-        let linearProgress = min(max(elapsed / duration, 0), 1)
-        if linearProgress >= 1 {
-            complete()
-        } else {
-            update(CandidateMotionCurve.value(at: linearProgress))
-        }
-    }
-
-    private func complete() {
         guard !hasCompleted else {
             return
         }
@@ -342,20 +206,27 @@ internal final class CandidateTransitionDriver {
         completion()
     }
 
+    private func tick() {
+        guard !hasCompleted else {
+            return
+        }
+        let elapsed = CACurrentMediaTime() - startingTime
+        let linearProgress = min(max(elapsed / duration, 0), 1)
+        if linearProgress >= 1 {
+            finish()
+        } else {
+            // Ease in and out along a half cosine wave.
+            update((1 - cos(.pi * linearProgress)) / 2)
+        }
+    }
+
     private func stopDisplayLink() {
-        clock?.stop()
         if #available(macOS 14.0, *) {
             (windowDisplayLink as? CADisplayLink)?.invalidate()
         }
         windowDisplayLink = nil
-        guard let legacyDisplayLink else {
-            displayLinkCallbackProxy = nil
-            return
-        }
-        CVDisplayLinkStop(legacyDisplayLink)
-        CVDisplayLinkSetOutputCallback(legacyDisplayLink, nil, nil)
-        self.legacyDisplayLink = nil
-        displayLinkCallbackProxy = nil
+        fallbackTimer?.invalidate()
+        fallbackTimer = nil
     }
 
     @objc private func windowDisplayLinkDidFire() {
