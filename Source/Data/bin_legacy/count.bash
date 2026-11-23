@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
    exit 0
 fi
 myPATH=$(dirname $0)
-$myPATH/../scripts/count_occurrence.py -j 1 - << EOF
+$myPATH/../scripts/count_occurrences.py -j 1 - << EOF | sed -e 's/\t/ /'
 $1
 EOF
 exit 0
