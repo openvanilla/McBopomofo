@@ -127,7 +127,7 @@ final class VerticalExpansionTests: XCTestCase {
         let controller = VerticalCandidateController()
         var configuration = controller.configuration
         configuration.animationDuration = 0
-        try! controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
         controller.replaceCandidates(
             (0..<count).map { Candidate(displayString: "字\($0)") }, initialSelectedIndex: selected)
         controller.centerOnMainScreen()

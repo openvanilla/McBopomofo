@@ -180,7 +180,6 @@ last candidates in the current column. In horizontal and paged vertical windows,
 Page Down and Page Up move by one page, and Home and End select the first and
 last candidates of the whole list.
 Tab and Shift-Tab move through candidates and wrap at either end of the list.
-The input method uses the same navigation rules for modern candidate windows.
 
 ### Run tests
 

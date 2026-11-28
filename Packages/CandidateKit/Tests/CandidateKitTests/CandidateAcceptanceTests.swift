@@ -45,13 +45,13 @@ final class CandidateAcceptanceTests: XCTestCase {
         for pageSize in 1...3 {
             let configuration = CandidateConfiguration(pageSize: pageSize)
             let candidates = uniformCandidates(6)
-            let pages = HorizontalCandidateLayoutEngine.packedPages(
+            let pages = HorizontalCandidateLayoutEngine.pages(
                 candidates: candidates,
                 keyLabels: [CandidateKeyLabel(key: "1", displayedText: "1")],
                 configuration: configuration,
                 metrics: defaultMetrics
             )
-            let layout = HorizontalCandidateLayoutEngine.pagedLayout(
+            let layout = HorizontalCandidateLayoutEngine.layout(
                 pages: pages,
                 pageIndex: 0,
                 keyLabels: [CandidateKeyLabel(key: "1", displayedText: "1")],
@@ -65,10 +65,10 @@ final class CandidateAcceptanceTests: XCTestCase {
         }
     }
 
-    func testDuplicateAndSpaceLabelsCommitOnlyTheFirstMatch() throws {
+    func testDuplicateLabelsCommitOnlyTheFirstMatch() throws {
         let configuration = CandidateConfiguration(pageSize: 4)
         let controller = CandidateController(configuration: configuration)
-        controller.keyLabels = "1 1".map {
+        controller.keyLabels = "121".map {
             CandidateKeyLabel(key: String($0), displayedText: String($0))
         }
         controller.replaceCandidates(uniformCandidates(4), initialSelectedIndex: 3)
@@ -77,7 +77,6 @@ final class CandidateAcceptanceTests: XCTestCase {
         controller.onConfirmation = { index, _ in confirmedIndexes.append(index) }
 
         XCTAssertTrue(controller.commitCandidate(matchingIndexLabel: "1"))
-        XCTAssertFalse(controller.commitCandidate(matchingIndexLabel: " "))
 
         XCTAssertEqual(confirmedIndexes, [0])
         controller.visible = false
@@ -235,16 +234,10 @@ final class CandidateAcceptanceTests: XCTestCase {
         controller.visible = false
 
         var disabledConfiguration = CandidateConfiguration.default
-        disabledConfiguration.handlesNavigationKeys = false
         disabledConfiguration.handlesIndexLabelKeys = false
         let disabled = CandidateController(configuration: disabledConfiguration)
         disabled.replaceCandidates(uniformCandidates(3), initialSelectedIndex: 0)
         disabled.visible = true
-        XCTAssertFalse(
-            disabled.handleKeyEvent(
-                try XCTUnwrap(keyEvent(keyCode: 124, characters: "\u{F703}", modifiers: []))
-            )
-        )
         XCTAssertFalse(
             disabled.handleKeyEvent(
                 try XCTUnwrap(keyEvent(keyCode: 18, characters: "1", modifiers: []))

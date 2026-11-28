@@ -104,7 +104,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
     }
 
     private func apply(_ configuration: CandidateConfiguration) {
-        try! controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
         centerCandidateWindow()
         controller.visible = true
         reportCandidateWindow()
@@ -116,7 +116,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         configuration.showsKeyLabelsAsDetails = sample.usesShiftedKeys
         configuration.handlesIndexLabelKeys = !sample.usesShiftedKeys
         controller.tooltip = sample.header
-        try! controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
         controller.replaceCandidates(sample.entries, initialSelectedIndex: initialSelectedIndex)
         controller.keyLabels =
             sample == .associated
@@ -307,7 +307,7 @@ final class PreviewAppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValid
         {
             controller.candidateFont = .systemFont(ofSize: CGFloat(size))
         }
-        try! controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
         synchronizePreviewTheme()
         reloadSample(
             initialSelectedIndex: arguments.contains("--last") ? sample.entries.count - 1 : 0)

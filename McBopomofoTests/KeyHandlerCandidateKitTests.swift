@@ -35,12 +35,19 @@ final class KeyHandlerCandidatePreferenceTests: XCTestCase {
             let fixture = try CandidateKeyFixture(vertical: vertical, expandable: false)
             let controller = fixture.controller
             defer { controller.visible = false }
-            XCTAssertEqual(controller.isHorizontal, !vertical)
             XCTAssertEqual(controller.keyLabels.map(\.key), Array("asdf").map(String.init))
             fixture.send(
                 vertical ? "\u{F701}" : "\u{F703}",
                 keyCode: vertical ? KeyCode.down.rawValue : KeyCode.right.rawValue)
             XCTAssertEqual(controller.selectedCandidateIndex, 1)
+            fixture.send(
+                vertical ? "\u{F703}" : "\u{F701}",
+                keyCode: vertical ? KeyCode.right.rawValue : KeyCode.down.rawValue)
+            XCTAssertEqual(controller.selectedCandidateIndex, vertical ? 5 : 4)
+            fixture.send(
+                vertical ? "\u{F702}" : "\u{F700}",
+                keyCode: vertical ? KeyCode.left.rawValue : KeyCode.up.rawValue)
+            XCTAssertEqual(controller.selectedCandidateIndex, vertical ? 1 : 0)
             fixture.send("\u{F72B}", keyCode: KeyCode.end.rawValue)
             XCTAssertEqual(controller.selectedCandidateIndex, 23)
             fixture.send("\u{F729}", keyCode: KeyCode.home.rawValue)
@@ -210,7 +217,7 @@ final class KeyHandlerCandidatePreferenceTests: XCTestCase {
             candidates: choosing.candidates, useVerticalMode: false)
         var configuration = fixture.controller.configuration
         configuration.showsKeyLabelsAsDetails = true
-        try fixture.controller.apply(configuration: configuration)
+        fixture.controller.apply(configuration: configuration)
         fixture.controller.keyLabels = Array("asdf").map {
             CandidateKit.CandidateKeyLabel(key: String($0), displayedText: "⇧ " + String($0))
         }
@@ -362,7 +369,7 @@ private final class CandidateKeyFixture: NSObject, @MainActor KeyHandlerDelegate
         configuration.allowsExpansion = expandable
         configuration.pageSize = 4
         configuration.animationDuration = 0
-        try controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
         controller.keyLabels = "asdf".map {
             CandidateKit.CandidateKeyLabel(key: String($0), displayedText: String($0))
         }

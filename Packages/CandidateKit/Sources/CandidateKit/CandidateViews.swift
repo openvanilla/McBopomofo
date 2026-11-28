@@ -301,8 +301,9 @@ internal final class CandidateContentView: NSView {
     func configure(title: String, metrics: CandidateMetrics) {
         titleView.stringValue = title
         titleView.toolTip = title.isEmpty ? nil : title
-        titleView.font = .systemFont(ofSize: metrics.scaledAuxiliary(11))
-        padding = metrics.scaledAuxiliary(8)
+        titleView.font = .systemFont(
+            ofSize: metrics.scaledAuxiliary(CandidateStyle.Typography.titleSize))
+        padding = metrics.scaledAuxiliary(CandidateStyle.Spacing.titlePadding)
         headerHeight = title.isEmpty ? 0 : ceil(titleView.intrinsicContentSize.height) + padding
         titleView.isHidden = title.isEmpty
         needsLayout = true
@@ -356,20 +357,20 @@ internal final class CandidateCanvasView: NSView {
     var separatorRects: [NSRect] = [] {
         didSet { needsDisplay = true }
     }
-    var rowWashRect: NSRect? {
+    var spotlightRect: NSRect? {
         didSet { needsDisplay = true }
     }
-    var rowWashAlpha: CGFloat = 1 {
+    var spotlightAlpha: CGFloat = 1 {
         didSet { needsDisplay = true }
     }
 
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { false }
 
-    var rowWashOpacity: CGFloat {
+    var spotlightOpacity: CGFloat {
         effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            ? CandidateStyle.Decoration.darkRowWashOpacity
-            : CandidateStyle.Decoration.lightRowWashOpacity
+            ? CandidateStyle.Decoration.darkSpotlightOpacity
+            : CandidateStyle.Decoration.lightSpotlightOpacity
     }
 
     override func viewDidChangeEffectiveAppearance() {
@@ -381,9 +382,9 @@ internal final class CandidateCanvasView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        if let rowWashRect, rowWashRect.intersects(dirtyRect) {
-            NSColor.white.withAlphaComponent(rowWashOpacity * rowWashAlpha).setFill()
-            rowWashRect.fill()
+        if let spotlightRect, spotlightRect.intersects(dirtyRect) {
+            NSColor.white.withAlphaComponent(spotlightOpacity * spotlightAlpha).setFill()
+            spotlightRect.fill()
         }
 
         NSColor.separatorColor.setFill()
@@ -512,27 +513,20 @@ internal final class CandidateItemView: NSView {
         }
 
         let availableWidth = max(0, bounds.width - x - metrics.trailingPadding)
-        let intrinsicCandidateWidth = ceil(
-            metrics.width(of: candidate.displayString, font: metrics.candidateFont)
-        )
-        let desiredCandidateWidth = alignedCandidateWidth ?? intrinsicCandidateWidth
-        let detailTextWidth =
-            detailText.map { ceil(metrics.width(of: $0, font: metrics.detailFont)) } ?? 0
-
+        var candidateWidth = availableWidth
         if let detail = detailText {
+            let intrinsicCandidateWidth = ceil(
+                metrics.width(of: candidate.displayString, font: metrics.candidateFont)
+            )
+            let desiredCandidateWidth = alignedCandidateWidth ?? intrinsicCandidateWidth
+            let detailTextWidth = ceil(metrics.width(of: detail, font: metrics.detailFont))
             // The layout only reserves a short detail's own width, so reserve no more here.
             let reservedDetailWidth = min(
                 detailTextWidth,
                 CandidateStyle.Layout.minimumDetailEm * metrics.candidateFont.pointSize)
-            let candidateWidth = min(
+            candidateWidth = min(
                 desiredCandidateWidth,
                 max(0, availableWidth - metrics.candidateDetailGap - reservedDetailWidth)
-            )
-            drawText(
-                candidate.displayString,
-                font: metrics.candidateFont,
-                color: selected ? selectionColors.foreground : .labelColor,
-                rect: NSRect(x: x, y: 0, width: candidateWidth, height: bounds.height)
             )
             let detailX = x + candidateWidth + metrics.candidateDetailGap
             drawText(
@@ -549,14 +543,13 @@ internal final class CandidateItemView: NSView {
                     height: bounds.height
                 )
             )
-        } else {
-            drawText(
-                candidate.displayString,
-                font: metrics.candidateFont,
-                color: selected ? selectionColors.foreground : .labelColor,
-                rect: NSRect(x: x, y: 0, width: availableWidth, height: bounds.height)
-            )
         }
+        drawText(
+            candidate.displayString,
+            font: metrics.candidateFont,
+            color: selected ? selectionColors.foreground : .labelColor,
+            rect: NSRect(x: x, y: 0, width: candidateWidth, height: bounds.height)
+        )
         super.draw(dirtyRect)
     }
 

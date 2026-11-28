@@ -1790,16 +1790,14 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (isPageDown) {
-        BOOL updated = [gCurrentCandidateController showNextPage];
-        if (!updated) {
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationPageDown]) {
             errorCallback();
         }
         return YES;
     }
 
     if (isPageUp) {
-        BOOL updated = [gCurrentCandidateController showPreviousPage];
-        if (!updated) {
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationPageUp]) {
             errorCallback();
         }
         return YES;
@@ -1812,16 +1810,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
 
 
     if (input.isLeft) {
-        if (gCurrentCandidateController.isHorizontal) {
-            BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
-            if (!updated) {
-                errorCallback();
-            }
-        } else {
-            BOOL updated = [gCurrentCandidateController showPreviousPage];
-            if (!updated) {
-                errorCallback();
-            }
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationLeft]) {
+            errorCallback();
         }
         return YES;
     }
@@ -1835,16 +1825,8 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isRight) {
-        if (gCurrentCandidateController.isHorizontal) {
-            BOOL updated = [gCurrentCandidateController highlightNextCandidate];
-            if (!updated) {
-                errorCallback();
-            }
-        } else {
-            BOOL updated = [gCurrentCandidateController showNextPage];
-            if (!updated) {
-                errorCallback();
-            }
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationRight]) {
+            errorCallback();
         }
         return YES;
     }
@@ -1858,31 +1840,15 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
     }
 
     if (input.isUp) {
-        if (gCurrentCandidateController.isHorizontal) {
-            BOOL updated = [gCurrentCandidateController showPreviousPage];
-            if (!updated) {
-                errorCallback();
-            }
-        } else {
-            BOOL updated = [gCurrentCandidateController highlightPreviousCandidate];
-            if (!updated) {
-                errorCallback();
-            }
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationUp]) {
+            errorCallback();
         }
         return YES;
     }
 
     if (input.isDown) {
-        if (gCurrentCandidateController.isHorizontal) {
-            BOOL updated = [gCurrentCandidateController showNextPage];
-            if (!updated) {
-                errorCallback();
-            }
-        } else {
-            BOOL updated = [gCurrentCandidateController highlightNextCandidate];
-            if (!updated) {
-                errorCallback();
-            }
+        if (![gCurrentCandidateController navigate:CKCandidateNavigationDown]) {
+            errorCallback();
         }
         return YES;
     }
@@ -1899,7 +1865,7 @@ InputMode InputModePlainBopomofo = @"org.openvanilla.inputmethod.McBopomofo.Plai
         return NO;
     }
 
-    if ((input.isEnd || input.emacsKey == McBopomofoEmacsKeyEnd) && candidateCount > 0) {
+    if (input.isEnd || input.emacsKey == McBopomofoEmacsKeyEnd) {
         if (![gCurrentCandidateController navigate:CKCandidateNavigationEnd]) {
             errorCallback();
         }

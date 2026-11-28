@@ -82,8 +82,8 @@ internal final class CandidateRenderer {
             view.selectionColors = colors
             view.outerCornerRadius = layout.cornerRadius
         }
-        canvas.rowWashRect = layout.rowWashRect
-        canvas.rowWashAlpha = 1
+        canvas.spotlightRect = layout.spotlightRect
+        canvas.spotlightAlpha = 1
         canvas.separatorRects = layout.separatorRects
     }
 }

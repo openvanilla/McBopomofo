@@ -25,14 +25,14 @@ import AppKit
 import CoreText
 
 internal enum CandidatePanelKind {
-    case horizontalPaged
-    case verticalExpandable
+    case horizontal
     case vertical
+    case verticalExpandable
 
     static func resolve(configuration: CandidateConfiguration) -> CandidatePanelKind {
         switch configuration.orientation {
         case .horizontal:
-            .horizontalPaged
+            .horizontal
         case .vertical:
             configuration.allowsExpansion ? .verticalExpandable : .vertical
         }
@@ -48,7 +48,7 @@ internal struct CandidateLayoutItem: Equatable {
     var alignedCandidateWidth: CGFloat?
 }
 
-internal struct CandidateLayoutRow {
+internal struct CandidateLayoutGroup {
     var items: [CandidateLayoutItem]
 
     var candidateIndexes: [Int] {
@@ -61,7 +61,7 @@ internal struct CandidatePanelLayout {
     var documentSize: NSSize
     var items: [CandidateLayoutItem]
     var separatorRects: [NSRect]
-    var rowWashRect: NSRect?
+    var spotlightRect: NSRect?
     var hasVerticalScroller: Bool
     var cornerRadius: CGFloat
     var hasHorizontalScroller = false
@@ -88,7 +88,7 @@ internal struct CandidatePanelLayout {
         separatorRects = separatorRects.map {
             NSRect(x: $0.minX, y: $0.minY, width: $0.width + extraWidth, height: $0.height)
         }
-        if rowWashRect?.maxX == documentSize.width { rowWashRect?.size.width += extraWidth }
+        if spotlightRect?.maxX == documentSize.width { spotlightRect?.size.width += extraWidth }
         documentSize.width += extraWidth
         windowSize.width += extraWidth
     }
@@ -109,7 +109,7 @@ internal struct CandidatePanelLayout {
         documentSize: .zero,
         items: [],
         separatorRects: [],
-        rowWashRect: nil,
+        spotlightRect: nil,
         hasVerticalScroller: false,
         cornerRadius: CandidateStyle.Decoration.defaultCornerRadius
     )
@@ -215,21 +215,18 @@ internal struct CandidateMetrics {
 
 @MainActor
 internal enum HorizontalCandidateLayoutEngine {
-    static func packedPages(
+    static func pages(
         candidates: [Candidate],
         keyLabels: [CandidateKeyLabel],
         configuration: CandidateConfiguration,
         metrics: CandidateMetrics,
         maximumWidth: CGFloat = .greatestFiniteMagnitude
-    ) -> [CandidateLayoutRow] {
-        guard !candidates.isEmpty else {
-            return []
-        }
+    ) -> [CandidateLayoutGroup] {
         let pageWidth = max(1, floor(maximumWidth))
         let labelsEnabled = !keyLabels.isEmpty
         let showsIndex = configuration.showsIndexColumn(for: keyLabels)
-        var rows: [CandidateLayoutRow] = []
-        var rowItems: [CandidateLayoutItem] = []
+        var pages: [CandidateLayoutGroup] = []
+        var pageItems: [CandidateLayoutItem] = []
         var x: CGFloat = 0
 
         for (index, candidate) in candidates.enumerated() {
@@ -237,14 +234,14 @@ internal enum HorizontalCandidateLayoutEngine {
                 metrics.intrinsicWidth(for: candidate, showsIndexColumn: showsIndex),
                 pageWidth
             )
-            let exceedsCount = rowItems.count >= configuration.pageSize
-            let exceedsWidth = !rowItems.isEmpty && x + width > pageWidth
+            let exceedsCount = pageItems.count >= configuration.pageSize
+            let exceedsWidth = !pageItems.isEmpty && x + width > pageWidth
             if exceedsCount || exceedsWidth {
-                rows.append(CandidateLayoutRow(items: rowItems))
-                rowItems = []
+                pages.append(CandidateLayoutGroup(items: pageItems))
+                pageItems = []
                 x = 0
             }
-            rowItems.append(
+            pageItems.append(
                 CandidateLayoutItem(
                     candidateIndex: index,
                     frame: NSRect(x: x, y: 0, width: width, height: metrics.itemHeight),
@@ -256,14 +253,14 @@ internal enum HorizontalCandidateLayoutEngine {
             )
             x += width
         }
-        if !rowItems.isEmpty {
-            rows.append(CandidateLayoutRow(items: rowItems))
+        if !pageItems.isEmpty {
+            pages.append(CandidateLayoutGroup(items: pageItems))
         }
-        return rows
+        return pages
     }
 
-    static func pagedLayout(
-        pages: [CandidateLayoutRow],
+    static func layout(
+        pages: [CandidateLayoutGroup],
         pageIndex: Int,
         keyLabels: [CandidateKeyLabel],
         metrics: CandidateMetrics
@@ -271,21 +268,21 @@ internal enum HorizontalCandidateLayoutEngine {
         guard pages.indices.contains(pageIndex) else {
             return .empty
         }
-        var row = pages[pageIndex]
-        for index in row.items.indices {
-            row.items[index].indexText =
+        var page = pages[pageIndex]
+        for index in page.items.indices {
+            page.items[index].indexText =
                 keyLabels.indices.contains(index) ? keyLabels[index].displayedText : ""
         }
         let windowSize = NSSize(
-            width: row.items.last?.frame.maxX ?? 0,
+            width: page.items.last?.frame.maxX ?? 0,
             height: metrics.itemHeight
         )
         return CandidatePanelLayout(
             windowSize: windowSize,
             documentSize: windowSize,
-            items: row.items,
+            items: page.items,
             separatorRects: [],
-            rowWashRect: nil,
+            spotlightRect: nil,
             hasVerticalScroller: false,
             cornerRadius: metrics.cornerRadius
         )
@@ -355,7 +352,7 @@ internal enum VerticalCandidateLayoutEngine {
     ) -> CandidatePanelLayout {
         guard !candidates.isEmpty else { return .empty }
         let count = expanded ? candidates.count : min(candidates.count, configuration.pageSize)
-        var columns: [CandidateLayoutRow] = []
+        var columns: [CandidateLayoutGroup] = []
         var x: CGFloat = 0
         var height: CGFloat = 0
         for start in stride(from: 0, to: count, by: configuration.pageSize) {
@@ -379,7 +376,7 @@ internal enum VerticalCandidateLayoutEngine {
                 item.showsIndexText = item.showsIndexText && (!expanded || isSelectedColumn)
                 return item
             }
-            columns.append(CandidateLayoutRow(items: items))
+            columns.append(CandidateLayoutGroup(items: items))
             x += column.windowSize.width + CandidateStyle.Decoration.separator
         }
         let documentWidth = x - CandidateStyle.Decoration.separator
@@ -402,7 +399,7 @@ internal enum VerticalCandidateLayoutEngine {
         let scrollerHeight =
             hasScroller && scrollerStyle == .legacy
             ? NSScroller.scrollerWidth(for: .regular, scrollerStyle: scrollerStyle) : 0
-        let wash =
+        let spotlight =
             expanded
             ? selectedColumn?.items.first.map {
                 NSRect(x: $0.frame.minX, y: 0, width: $0.frame.width, height: height)
@@ -412,7 +409,7 @@ internal enum VerticalCandidateLayoutEngine {
             documentSize: NSSize(width: documentWidth, height: height),
             items: columns.flatMap(\.items),
             separatorRects: separators,
-            rowWashRect: wash,
+            spotlightRect: spotlight,
             hasVerticalScroller: false,
             cornerRadius: metrics.cornerRadius,
             hasHorizontalScroller: hasScroller,
@@ -505,15 +502,14 @@ internal enum VerticalCandidateLayoutEngine {
         let documentHeight =
             CGFloat(candidates.count) * metrics.rowPitch - CandidateStyle.Decoration.separator
 
-        var items: [CandidateLayoutItem] = []
-        for index in candidates.indices {
+        let items = candidates.indices.map { index in
             let relativeIndex = index - numberingAnchor
             let isNumbered = relativeIndex >= 0 && relativeIndex < configuration.pageSize
             let indexText =
                 isNumbered && keyLabels.indices.contains(relativeIndex)
                 ? keyLabels[relativeIndex].displayedText
                 : ""
-            let item = CandidateLayoutItem(
+            return CandidateLayoutItem(
                 candidateIndex: index,
                 frame: NSRect(
                     x: 0,
@@ -527,7 +523,6 @@ internal enum VerticalCandidateLayoutEngine {
                     && (configuration.showsKeyLabelsAsDetails || candidates[index].detail != nil),
                 alignedCandidateWidth: showsDetails ? maximumCandidateWidth : nil
             )
-            items.append(item)
         }
         let separators = CandidatePanelLayout.horizontalSeparators(
             rowCount: candidates.count, itemHeight: metrics.itemHeight, width: itemWidth
@@ -537,7 +532,7 @@ internal enum VerticalCandidateLayoutEngine {
             documentSize: NSSize(width: itemWidth, height: documentHeight),
             items: items,
             separatorRects: separators,
-            rowWashRect: nil,
+            spotlightRect: nil,
             hasVerticalScroller: overflowing,
             cornerRadius: metrics.cornerRadius,
             pageSize: configuration.pageSize
