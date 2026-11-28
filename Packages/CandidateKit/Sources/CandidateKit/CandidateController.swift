@@ -45,20 +45,6 @@ public enum CandidateNavigation: Int, Sendable {
     case itemForward
 }
 
-public enum CandidateConfigurationError: Error, Equatable, LocalizedError {
-    case invalidPageSize(Int)
-    case invalidVerticalMaximumVisibleColumns(Int)
-
-    public var errorDescription: String? {
-        switch self {
-        case .invalidPageSize(let value):
-            "Candidate page size must be between 1 and 15. Received \(value)."
-        case .invalidVerticalMaximumVisibleColumns(let value):
-            "Vertical maximum visible columns must be at least 1. Received \(value)."
-        }
-    }
-}
-
 public struct CandidateConfiguration: Equatable, Sendable {
     public var orientation: CandidateOrientation
     public var allowsExpansion: Bool
@@ -67,8 +53,6 @@ public struct CandidateConfiguration: Equatable, Sendable {
     public var showsKeyLabelsAsDetails: Bool
     public var animationDuration: TimeInterval
     public var verticalMaximumVisibleColumns: Int
-    /// Whether `handleKeyEvent(_:)` handles Space, Tab, arrow, page, Home, End, and Return keys.
-    public var handlesNavigationKeys: Bool
     /// Whether `handleKeyEvent(_:)` commits the candidate whose index label matches the key.
     public var handlesIndexLabelKeys: Bool
 
@@ -79,7 +63,6 @@ public struct CandidateConfiguration: Equatable, Sendable {
         showsKeyLabelsAsDetails: Bool = false,
         animationDuration: TimeInterval = 0.2,
         verticalMaximumVisibleColumns: Int = 5,
-        handlesNavigationKeys: Bool = true,
         handlesIndexLabelKeys: Bool = true
     ) {
         self.orientation = orientation
@@ -88,7 +71,6 @@ public struct CandidateConfiguration: Equatable, Sendable {
         self.showsKeyLabelsAsDetails = showsKeyLabelsAsDetails
         self.animationDuration = animationDuration
         self.verticalMaximumVisibleColumns = verticalMaximumVisibleColumns
-        self.handlesNavigationKeys = handlesNavigationKeys
         self.handlesIndexLabelKeys = handlesIndexLabelKeys
     }
 
@@ -99,25 +81,6 @@ public struct CandidateConfiguration: Equatable, Sendable {
 
     public static var `default`: CandidateConfiguration {
         CandidateConfiguration()
-    }
-
-    /// The fields are freely mutable, so the controller validates a configuration when it
-    /// receives one.
-    public func validate() throws {
-        guard (1...15).contains(pageSize) else {
-            throw CandidateConfigurationError.invalidPageSize(pageSize)
-        }
-        guard verticalMaximumVisibleColumns >= 1 else {
-            throw CandidateConfigurationError.invalidVerticalMaximumVisibleColumns(
-                verticalMaximumVisibleColumns)
-        }
-    }
-}
-
-extension Character {
-    fileprivate var isPrintableASCII: Bool {
-        unicodeScalars.count == 1
-            && unicodeScalars.first.map { (0x20...0x7E).contains($0.value) } == true
     }
 }
 
@@ -322,13 +285,6 @@ public class CandidateController: NSWindowController {
     }
 
     public init(configuration: CandidateConfiguration) {
-        // Passing an invalid configuration here is a programming error. Values that are only
-        // known at run time go through apply(configuration:), which reports them instead.
-        do {
-            try configuration.validate()
-        } catch {
-            preconditionFailure(error.localizedDescription)
-        }
         self.configuration = configuration
         self.candidateFont = .systemFont(ofSize: CandidateStyle.Typography.referenceSize)
         self.keyLabelFont = .systemFont(ofSize: NSFont.systemFontSize)
@@ -423,8 +379,7 @@ public class CandidateController: NSWindowController {
 
     // The input method always hides the panel before reconfiguring it, and the preview
     // repositions it afterward, so applying a configuration only needs to rebuild the layout.
-    public func apply(configuration newConfiguration: CandidateConfiguration) throws {
-        try newConfiguration.validate()
+    public func apply(configuration newConfiguration: CandidateConfiguration) {
         guard newConfiguration != configuration else {
             return
         }
@@ -450,15 +405,13 @@ public class CandidateController: NSWindowController {
             return
         }
 
-        let count = Int(delegate.candidateCountForController(self))
-        let newCandidates = (0..<count).map { index in
-            let unsignedIndex = UInt(index)
+        let newCandidates = (0..<delegate.candidateCountForController(self)).map { index in
             let candidate = Candidate(
-                displayString: delegate.candidateController(self, candidateAtIndex: unsignedIndex),
-                detail: delegate.candidateController(self, detailAtIndex: unsignedIndex)
+                displayString: delegate.candidateController(self, candidateAtIndex: index),
+                detail: delegate.candidateController(self, detailAtIndex: index)
             )
             candidate.accessibilityReading = delegate.candidateController?(
-                self, accessibilityReadingAtIndex: unsignedIndex)
+                self, accessibilityReadingAtIndex: index)
             return candidate
         }
         replaceCandidates(newCandidates, initialSelectedIndex: 0)
@@ -516,9 +469,9 @@ public class CandidateController: NSWindowController {
         let visibleFrame = screen.visibleFrame
         let point = NSPoint(
             x: visibleFrame.midX - window.frame.width / 2,
-            y: visibleFrame.midY + window.frame.height / 2
+            y: visibleFrame.midY - window.frame.height / 2
         )
-        movePanelManually(to: NSPoint(x: point.x, y: point.y - window.frame.height))
+        movePanelManually(to: point)
     }
 
     internal func movePanelManually(to origin: NSPoint) {
@@ -543,17 +496,12 @@ public class CandidateController: NSWindowController {
 
         var context = CandidateNavigationContext(
             kind: panelKind, selection: selectionIndex,
-            count: candidates.count, pageSize: effectivePageSize)
-        switch panelKind {
-        case .horizontalPaged:
-            context.pages = HorizontalCandidateLayoutEngine.packedPages(
+            count: candidates.count, pageSize: effectivePageSize, expanded: isExpanded)
+        if panelKind == .horizontal {
+            context.pages = HorizontalCandidateLayoutEngine.pages(
                 candidates: candidates, keyLabels: keyLabels, configuration: configuration,
                 metrics: metrics, maximumWidth: layoutAvailableWidth
             ).map(\.candidateIndexes)
-        case .verticalExpandable:
-            context.expanded = isExpanded
-        case .vertical:
-            break
         }
         guard let decision = CandidateNavigationReducer.resolve(navigation, context: context)
         else {
@@ -580,50 +528,35 @@ public class CandidateController: NSWindowController {
             return false
         }
 
-        if configuration.handlesNavigationKeys {
-            if event.charactersIgnoringModifiers == " " && !flags.contains(.option) {
-                showNextPage()
-                return true
-            }
+        if event.charactersIgnoringModifiers == " " && !flags.contains(.option) {
+            showNextPage()
+            return true
+        }
 
-            if event.keyCode == 48 {
-                guard !flags.contains(.option) else {
-                    return false
-                }
-                return navigate(flags.contains(.shift) ? .itemBackward : .itemForward)
+        if event.keyCode == 48 {
+            guard !flags.contains(.option) else {
+                return false
             }
+            return navigate(flags.contains(.shift) ? .itemBackward : .itemForward)
+        }
 
-            if !flags.contains(.shift) && !flags.contains(.option) {
-                let navigation: CandidateNavigation?
+        if !flags.contains(.shift) && !flags.contains(.option) {
+            let navigation: CandidateNavigation? =
                 switch event.specialKey {
-                case .leftArrow:
-                    navigation = .left
-                case .rightArrow:
-                    navigation = .right
-                case .upArrow:
-                    navigation = .up
-                case .downArrow:
-                    navigation = .down
-                case .pageUp:
-                    navigation = .pageUp
-                case .pageDown:
-                    navigation = .pageDown
-                case .home:
-                    navigation = .home
-                case .end:
-                    navigation = .end
-                default:
-                    navigation = nil
+                case .leftArrow: .left
+                case .rightArrow: .right
+                case .upArrow: .up
+                case .downArrow: .down
+                case .pageUp: .pageUp
+                case .pageDown: .pageDown
+                case .home: .home
+                case .end: .end
+                default: nil
                 }
-                if let navigation {
-                    return navigate(navigation)
-                }
+            if let navigation {
+                return navigate(navigation)
             }
-
-            if (event.keyCode == 36 || event.keyCode == 76)
-                && !flags.contains(.shift)
-                && !flags.contains(.option)
-            {
+            if event.keyCode == 36 || event.keyCode == 76 {
                 confirmSelectedCandidate()
                 return true
             }
@@ -633,8 +566,7 @@ public class CandidateController: NSWindowController {
             !flags.contains(.option),
             !flags.contains(.shift),
             let characters = event.charactersIgnoringModifiers,
-            characters.count == 1,
-            !characters.allSatisfy(\.isWhitespace)
+            characters.count == 1
         else {
             return false
         }
@@ -662,7 +594,7 @@ public class CandidateController: NSWindowController {
     }
 
     @objc public func candidateIndexAtKeyLabelIndex(_ index: UInt) -> UInt {
-        guard visible, let resolved = relativeCandidateIndex(at: Int(index)) else {
+        guard let resolved = relativeCandidateIndex(at: Int(index)) else {
             return UInt.max
         }
         return UInt(resolved)
@@ -782,15 +714,15 @@ public class CandidateController: NSWindowController {
                 isExpanded = true
                 newLayout = expandedLayout
             }
-        case .horizontalPaged:
-            let pages = HorizontalCandidateLayoutEngine.packedPages(
+        case .horizontal:
+            let pages = HorizontalCandidateLayoutEngine.pages(
                 candidates: candidates,
                 keyLabels: keyLabels,
                 configuration: configuration,
                 metrics: metrics,
                 maximumWidth: layoutAvailableWidth
             )
-            newLayout = HorizontalCandidateLayoutEngine.pagedLayout(
+            newLayout = HorizontalCandidateLayoutEngine.layout(
                 pages: pages,
                 pageIndex: pages.firstIndex { $0.candidateIndexes.contains(selectionIndex) } ?? 0,
                 keyLabels: keyLabels,
@@ -880,7 +812,6 @@ public class CandidateController: NSWindowController {
             showsDetail: item.showsDetail,
             alignedCandidateWidth: item.alignedCandidateWidth
         )
-        view.outerCornerRadius = currentLayout.cornerRadius
         view.onSelect = { [weak self] index in
             guard self?.isFrameTransitionActive == false else { return }
             // A clicked candidate is already on screen, so the viewport stays where it is.
@@ -991,8 +922,8 @@ public class CandidateController: NSWindowController {
 
         let previousIndex = selectionIndex
         selectionIndex = newIndex
-        if alignsViewportToPage, panelKind == .vertical, abs(newIndex - previousIndex) > 1,
-            candidates.count > effectivePageSize
+        if alignsViewportToPage, currentLayout.hasVerticalScroller,
+            abs(newIndex - previousIndex) > 1
         {
             let pageSize = effectivePageSize
             let pageStart = newIndex / pageSize * pageSize
@@ -1027,7 +958,7 @@ public class CandidateController: NSWindowController {
 
         let indexes: [Int]
         switch panelKind {
-        case .horizontalPaged:
+        case .horizontal:
             indexes = currentLayout.items.map(\.candidateIndex)
         case .verticalExpandable:
             // Shortcuts number the column that holds the selection, or the compact column.
@@ -1046,10 +977,7 @@ public class CandidateController: NSWindowController {
     }
 
     internal func indexLabelPosition(matching label: Character) -> Int? {
-        guard label.isPrintableASCII, !label.isWhitespace else {
-            return nil
-        }
-        return keyLabels.prefix(effectivePageSize).firstIndex { keyLabel in
+        keyLabels.prefix(effectivePageSize).firstIndex { keyLabel in
             keyLabel.key.count == 1 && keyLabel.key.first == label
         }
     }
@@ -1107,7 +1035,7 @@ public class CandidateController: NSWindowController {
                 let acceptedWindowSize = window.frame.size
                 backdropView.frame = NSRect(origin: .zero, size: acceptedWindowSize)
                 layoutContent(size: acceptedWindowSize)
-                canvasView.rowWashAlpha = expanding ? progress : 1 - progress
+                canvasView.spotlightAlpha = expanding ? progress : 1 - progress
                 backdropView.layoutSubtreeIfNeeded()
                 window.displayIfNeeded()
             },

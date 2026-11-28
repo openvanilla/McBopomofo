@@ -50,8 +50,6 @@ private struct CandidateTextAnchorContext {
 extension CandidateController {
     static let horizontal = HorizontalCandidateController()
     static let vertical = VerticalCandidateController()
-
-    @objc var isHorizontal: Bool { configuration.orientation == .horizontal }
 }
 
 @MainActor
@@ -899,12 +897,7 @@ extension McBopomofoInputMethodController {
                 || state is InputState.SelectingDictionary)
         configuration.showsKeyLabelsAsDetails = usesShiftedKeys
         configuration.pageSize = keyLabels.count
-        do {
-            try candidateController.apply(configuration: configuration)
-        } catch {
-            assertionFailure("Validated candidate configuration was rejected: \(error)")
-            return
-        }
+        candidateController.apply(configuration: configuration)
 
         candidateController.synchronizeTheme(
             clientAppearance: NSApp.effectiveAppearance,

@@ -67,8 +67,8 @@ internal enum CandidateNavigationReducer {
         guard c.count > 0 else { return nil }
         let decision: CandidateNavigationDecision?
         switch c.kind {
+        case .horizontal: decision = horizontal(input, c)
         case .vertical: decision = vertical(input, c)
-        case .horizontalPaged: decision = paged(input, c)
         case .verticalExpandable: decision = expandable(input, c)
         }
         // A decision that changes neither the selection nor the expansion is unhandled.
@@ -78,7 +78,7 @@ internal enum CandidateNavigationReducer {
         return decision
     }
 
-    private static func paged(
+    private static func horizontal(
         _ input: CandidateNavigation,
         _ c: CandidateNavigationContext
     ) -> CandidateNavigationDecision? {

@@ -30,6 +30,7 @@ internal enum CandidateStyle {
         static let referenceSize: CGFloat = 16
         static let shortcutEm: CGFloat = 0.5625
         static let detailUnits: CGFloat = 3
+        static let titleSize: CGFloat = 11
     }
     enum Spacing {
         static let leadingUnits: CGFloat = 1
@@ -40,14 +41,15 @@ internal enum CandidateStyle {
         static let shortcutAllowance: CGFloat = 2
         static let opticalTrailingEm: CGFloat = 0.125
         static let overlayClearance: CGFloat = 2
+        static let titlePadding: CGFloat = 8
     }
     enum Decoration {
         static let separator: CGFloat = 1
         static let separatorThickness: CGFloat = 0.5
         static let defaultCornerRadius: CGFloat = 8
         static let selectionInset: CGFloat = 2
-        static let lightRowWashOpacity: CGFloat = 1 / 2
-        static let darkRowWashOpacity: CGFloat = 1 / 8
+        static let lightSpotlightOpacity: CGFloat = 0.5
+        static let darkSpotlightOpacity: CGFloat = 0.125
     }
     enum Layout {
         static let minimumDetailEm: CGFloat = 1

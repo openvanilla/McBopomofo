@@ -128,10 +128,7 @@ internal enum CandidatePlacementEngine {
 
     private static func intersectionArea(_ lhs: NSRect, _ rhs: NSRect) -> CGFloat {
         let intersection = lhs.intersection(rhs)
-        guard !intersection.isNull else {
-            return 0
-        }
-        return max(intersection.width, 0) * max(intersection.height, 0)
+        return intersection.width * intersection.height
     }
 }
 

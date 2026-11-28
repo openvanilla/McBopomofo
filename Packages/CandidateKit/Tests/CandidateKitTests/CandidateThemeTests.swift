@@ -48,7 +48,7 @@ final class CandidateThemeTests: XCTestCase {
         }
     }
 
-    func testThemeSynchronizationUpdatesAppearanceWashAndExistingItems() throws {
+    func testThemeSynchronizationUpdatesAppearanceSpotlightAndExistingItems() throws {
         let controller = CandidateController()
         controller.replaceCandidates([Candidate(displayString: "測試")], initialSelectedIndex: 0)
         controller.centerOnMainScreen()
@@ -66,7 +66,7 @@ final class CandidateThemeTests: XCTestCase {
         XCTAssertEqual(controller.scrollView.effectiveAppearance.name, .darkAqua)
         XCTAssertEqual(controller.canvasView.effectiveAppearance.name, .darkAqua)
         XCTAssertEqual(controller.clientBundleIdentifier, "invalid.bundle.identifier")
-        XCTAssertEqual(controller.canvasView.rowWashOpacity, 1 / 8)
+        XCTAssertEqual(controller.canvasView.spotlightOpacity, 0.125)
         let itemView = try XCTUnwrap(controller.renderer[0])
         XCTAssertEqual(itemView.effectiveAppearance.name, .darkAqua)
         assertSameSelection(itemView.selectionColors, controller.resolvedSelectionColors)
@@ -88,7 +88,7 @@ final class CandidateThemeTests: XCTestCase {
         XCTAssertEqual(controller.backdropView.effectAppearanceName, .aqua)
         XCTAssertEqual(controller.scrollView.effectiveAppearance.name, .aqua)
         XCTAssertEqual(controller.canvasView.effectiveAppearance.name, .aqua)
-        XCTAssertEqual(controller.canvasView.rowWashOpacity, 1 / 2)
+        XCTAssertEqual(controller.canvasView.spotlightOpacity, 0.5)
         XCTAssertEqual(itemView.effectiveAppearance.name, .aqua)
         assertSameSelection(itemView.selectionColors, controller.resolvedSelectionColors)
 
@@ -131,7 +131,7 @@ final class CandidateThemeTests: XCTestCase {
                 XCTAssertNil(content.appearance)
                 XCTAssertEqual(controller.canvasView.effectiveAppearance.name, name)
                 XCTAssertEqual(
-                    controller.canvasView.rowWashOpacity, name == .darkAqua ? 1 / 8 : 1 / 2)
+                    controller.canvasView.spotlightOpacity, name == .darkAqua ? 0.125 : 0.5)
                 XCTAssertNil(controller.scrollView.appearance)
                 XCTAssertNil(controller.scrollView.contentView.appearance)
                 XCTAssertNil(controller.canvasView.appearance)

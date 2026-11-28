@@ -62,7 +62,7 @@ final class CandidateReconfigurationTests: XCTestCase {
 
             for keys in ["asdf", "123456789", "asdfzxcvb"] {
                 configuration.pageSize = keys.count
-                try controller.apply(configuration: configuration)
+                controller.apply(configuration: configuration)
                 controller.keyLabels = keys.map {
                     CandidateKeyLabel(key: String($0), displayedText: String($0))
                 }
@@ -112,7 +112,7 @@ final class CandidateReconfigurationTests: XCTestCase {
         configuration.orientation = .vertical
         configuration.allowsExpansion = false
 
-        try controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
 
         XCTAssertEqual(controller.panelKind, .vertical)
         XCTAssertEqual(controller.selectionIndex, 12)
@@ -137,7 +137,7 @@ final class CandidateReconfigurationTests: XCTestCase {
         XCTAssertEqual(controller.window?.frame.size, controller.currentLayout.windowSize)
     }
 
-    func testLayoutConfigurationAndPublicFontPropertiesRecomputeGeometry() throws {
+    func testLayoutConfigurationAndPublicFontPropertiesRecomputeGeometry() {
         let controller = CandidateController()
         controller.replaceCandidates(uniformCandidates(80), initialSelectedIndex: 0)
         controller.centerOnMainScreen()
@@ -154,9 +154,8 @@ final class CandidateReconfigurationTests: XCTestCase {
 
         var configuration = controller.configuration
         configuration.pageSize = 3
-        configuration.handlesNavigationKeys = false
         configuration.handlesIndexLabelKeys = false
-        try controller.apply(configuration: configuration)
+        controller.apply(configuration: configuration)
 
         XCTAssertEqual(controller.configuration, configuration)
         XCTAssertEqual(controller.metrics.itemHeight, 35)
